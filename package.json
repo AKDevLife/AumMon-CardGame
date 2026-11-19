@@ -20,7 +20,8 @@
     "test:e2e": "playwright test",
     "check:secrets": "node scripts/check-secrets.mjs",
     "check": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm test && pnpm build && pnpm check:secrets",
-    "progress": "node scripts/progress.mjs"
+    "progress": "node scripts/progress.mjs",
+    "db:test": "bash scripts/db-test.sh"
   },
   "dependencies": {
     "@aummon/game-engine": "workspace:*",

@@ -38,6 +38,27 @@ jobs:
       - name: Secret check (repo + client bundle)
         run: pnpm check:secrets
 
+  database:
+    name: Database (migrations + pgTAP)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: supabase/postgres:17.6.1.054
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -h localhost"
+          --health-interval 5s --health-timeout 5s --health-retries 30
+    steps:
+      - uses: actions/checkout@v5
+      - name: Migrate and test
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/postgres
+        run: bash scripts/db-test.sh
+
   e2e:
     name: E2E (Playwright)
     runs-on: ubuntu-latest

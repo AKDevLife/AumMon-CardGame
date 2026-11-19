@@ -2,6 +2,14 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-19 — 2.1 Core schema migration (local only)
+
+- **Files:** `supabase/migrations/20261119000000_core_schema.sql`, `supabase/tests/database/001_core_schema.test.sql`, `scripts/db-test.sh`, `tests/architecture/supabase-config.test.ts`, CI `database` job
+- **Tests:** migration on local `supabase/postgres:17`; 35 pgTAP tests (tables, RLS on, private schema denied to anon/authenticated, constraints, composite FKs, client cannot read/write game state)
+- **Decisions / deviations from blueprint §3.4:** `deck_templates` PK `(id, version)` + one active version per id; unique character per room/match (Q10); human/bot/local check on `match_players`; explicit `service_role` grants on `private`; dropped duplicate `match_events` index (covered by unique constraint).
+- **Deferred:** `matches.phase = 'turn_start'` (Q7) not added — blueprint enum kept; will add in a new migration with task 4.12. RLS policies → 2.4, triggers → 2.2, seed → 2.5.
+- **Remaining:** no cloud project linked (1.10).
+
 ## 2026-11-19 — Provisional rule decisions (Q6, Q8–Q12)
 
 - **Files:** `docs/rule-clarifications.md`
