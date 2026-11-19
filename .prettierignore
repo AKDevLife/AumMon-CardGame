@@ -1,0 +1,11 @@
+# Locked project documents — never reformat automatically.
+aummon_game_spec.md
+aummon_project_blueprint.md
+
+pnpm-lock.yaml
+dist/
+coverage/
+playwright-report/
+test-results/
+supabase/.temp/
+supabase/config.toml
