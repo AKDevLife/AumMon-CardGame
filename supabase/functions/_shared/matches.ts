@@ -15,7 +15,7 @@ import {
   type RngState,
 } from "@aummon/game-engine";
 import { db } from "./db.ts";
-import { advance, type Runtime } from "./flow.ts";
+import { advance, currentSeat, type Runtime } from "./flow.ts";
 import { HttpError } from "./http.ts";
 import {
   encodeRng,
@@ -101,6 +101,46 @@ export async function createSoloRoom(
     }
     return room.id;
   });
+}
+
+export interface LocalSeatInput {
+  characterId: string;
+  displayName: string;
+}
+
+/** Pass & Play room: local seats on one device, controlled by the owner (blueprint §6.2). */
+export async function createPassPlayRoom(userId: string, seats: LocalSeatInput[]): Promise<string> {
+  if (seats.length < 2 || seats.length > 4)
+    throw new HttpError(400, "invalid_seats", "Pass & Play needs 2–4 seats");
+  if (new Set(seats.map((s) => s.characterId)).size !== seats.length) {
+    throw new HttpError(
+      400,
+      "duplicate_character",
+      "Characters must be unique (clarification Q10)",
+    );
+  }
+  return db().begin(async (tx) => {
+    const chars = await tx<{ id: string }[]>`select id from public.characters where is_enabled`;
+    const enabled = new Set(chars.map((c) => c.id));
+    if (seats.some((s) => !enabled.has(s.characterId)))
+      throw new HttpError(400, "invalid_character", "Unknown character");
+    const [room] = await tx<{ id: string }[]>`
+      insert into public.game_rooms (owner_id, mode, status, max_players)
+      values (${userId}, 'pass_play', 'lobby', ${seats.length}) returning id`;
+    if (!room) throw new Error("room insert failed");
+    for (const [i, s] of seats.entries()) {
+      await tx`
+        insert into public.room_players (room_id, seat, player_type, character_id, display_name_snapshot, status)
+        values (${room.id}, ${i + 1}, 'local', ${s.characterId}, ${s.displayName}, 'ready')`;
+    }
+    return room.id;
+  });
+}
+
+/** Engine player id the caller acts for: own seat, or the current local seat for the Pass & Play owner. */
+export function actorFor(locked: LockedMatch, state: GameState): string | null {
+  if (state.mode === "pass_play" && locked.ownerId === locked.userId) return currentSeat(state);
+  return locked.viewerPlayerId;
 }
 
 /** Start a match from a lobby room (owner only). Builds the engine state server-side. */
@@ -198,30 +238,50 @@ export async function respond(
   tx: Tx,
   locked: LockedMatch,
   runtime: Runtime,
+  options: { reveal?: boolean } = {},
 ): Promise<MatchResponse> {
   const events = await recentEvents(tx, locked.matchId, runtime.state.round);
+  const { state } = runtime;
+  const seat = state.mode === "pass_play" ? currentSeat(state) : null;
+  // Pass & Play: a hand is shown only after the privacy handoff (reveal), and only the current seat's.
+  const viewer =
+    state.mode === "pass_play" ? (options.reveal ? seat : null) : locked.viewerPlayerId;
   return {
-    view: buildPlayerView(runtime.state, locked.viewerPlayerId, events),
-    viewerPlayerId: locked.viewerPlayerId,
+    mode: state.mode,
+    currentSeat: seat
+      ? { playerId: seat, displayName: state.players.find((p) => p.id === seat)?.displayName ?? "" }
+      : null,
+    view: buildPlayerView(state, viewer, events),
+    viewerPlayerId: viewer,
     deadline: runtime.deadline === null ? null : new Date(runtime.deadline).toISOString(),
   };
 }
 
 /**
- * Standard pipeline: lock → (optional command) → advance (bots/timeouts/resolve) → save → filtered view.
+ * Standard pipeline: lock → advance (due bots/timeouts) → optional command → advance → save → filtered view.
  */
 export async function withMatch(
   userId: string,
   matchId: string,
-  act?: (locked: LockedMatch) => { state: GameState; events: GameEvent[] },
+  act?: (
+    locked: LockedMatch,
+    actorId: string | null,
+  ) => { state: GameState; events: GameEvent[]; rng?: RngState },
+  options: { reveal?: boolean } = {},
 ): Promise<MatchResponse> {
   return db().begin(async (tx) => {
     const locked = await lockMatch(tx, matchId, userId);
-    const acted = act ? act(locked) : { state: locked.state, events: [] };
-    const next = advance({ ...locked, state: acted.state }, Date.now());
-    const events = [...acted.events, ...next.events];
-    if (acted.state !== locked.state || events.length > 0)
+    const current = advance(locked, Date.now());
+    const acted = act
+      ? act({ ...locked, state: current.state, rng: current.rng }, actorFor(locked, current.state))
+      : { state: current.state, events: [] };
+    const next = advance(
+      { ...current, state: acted.state, rng: acted.rng ?? current.rng },
+      Date.now(),
+    );
+    const events = [...current.events, ...acted.events, ...next.events];
+    if (next.state !== locked.state || events.length > 0)
       await saveMatch(tx, matchId, next, events);
-    return respond(tx, locked, next);
+    return respond(tx, locked, next, options);
   });
 }

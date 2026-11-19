@@ -5,7 +5,7 @@ import { db } from "../_shared/db.ts";
 import { advance } from "../_shared/flow.ts";
 import { handler, HttpError, readJson } from "../_shared/http.ts";
 import { int, optionalOneOf, optionalUuid, rejectServerFields, uuid } from "../_shared/input.ts";
-import { respond } from "../_shared/matches.ts";
+import { actorFor, respond } from "../_shared/matches.ts";
 import { findReceipt, hashRequest, storeReceipt } from "../_shared/receipts.ts";
 import { lockMatch, saveMatch } from "../_shared/store.ts";
 
@@ -40,15 +40,13 @@ Deno.serve(
         requestHash,
       );
       if (previous !== undefined) return previous;
-      if (!locked.viewerPlayerId)
-        throw new HttpError(403, "not_a_player", "You have no seat in this match");
-
       // Apply due timeouts/bots first so the command is checked against current state.
       const current = advance(locked, Date.now());
-      const out = submitAction(current.state, locked.viewerPlayerId, full);
+      const actorId = actorFor(locked, current.state); // Pass & Play: server-chosen current seat
+      if (!actorId) throw new HttpError(403, "not_your_turn", "You cannot act now");
+      const out = submitAction(current.state, actorId, full);
       if (!out.transition) {
-        if (current.events.length > 0)
-          await saveMatch(tx, command.matchId, current, current.events);
+        // Throwing rolls back the transaction; due timeouts are re-applied on the next request.
         throw new HttpError(
           409,
           out.result.ok ? "rejected" : out.result.code,
