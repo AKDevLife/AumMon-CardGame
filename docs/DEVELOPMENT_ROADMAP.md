@@ -41,7 +41,7 @@ Percentages: `pnpm progress` (top-level tasks only). Phase 0 (Rulebook v1 decisi
 - [x] **2.4** RLS policies for all `public` tables + `is_match_member` helper — deps: 2.3 — PR #12 (2026-11-19)
 - [x] **2.5** Seed: 4 characters, card definitions, deck template v1 (16/10/8/6) — deps: 2.1 — PR #13 (2026-11-19)
   - [x] Chaos split 2/2/2 + card IDs per clarification Q1 (provisional)
-- [ ] **2.6** SQL/RLS tests: User A, User B, anonymous, non-member — deps: 2.4
+- [x] **2.6** SQL/RLS tests: User A, User B, anonymous, non-member — deps: 2.4 — PR #14 (2026-11-19)
 - [ ] **2.7** Browser Supabase client + env validation — deps: 2.1
 - [ ] **2.8** Sign up / Login / Logout / session handling UI — deps: 2.7
 - [ ] **2.9** Profile create/update UI (display name validation) — deps: 2.8
