@@ -17,17 +17,10 @@ for (const line of text.split("\n")) {
     phases.push(current);
     continue;
   }
-  const task = /^- \[( |x)\] \*\*(\d+\.\d+)\*\*\s*(.*)$/.exec(line);
+  const task = /^- \[( |x|~|!)\] \*\*(\d+\.\d+)\*\*\s*(.*)$/.exec(line);
   if (task && current) {
     const rest = task[3];
-    const status =
-      task[1] === "x"
-        ? "done"
-        : rest.includes("🔒")
-          ? "blocked"
-          : rest.includes("⏳")
-            ? "in-progress"
-            : "todo";
+    const status = { x: "done", "!": "blocked", "~": "in-progress" }[task[1]] ?? "todo";
     current.tasks.push({ id: task[2], title: rest.split(" — ")[0], status });
   }
 }
