@@ -27,7 +27,7 @@ Percentages: `pnpm progress` (top-level tasks only). Phase 0 (Rulebook v1 decisi
   - [x] `deck_templates` PK `(id, version)`; composite FKs from `deck_template_cards`, `matches`
   - [x] RLS enabled on all `public` tables (deny-all until 2.4); `private` revoked from anon/authenticated, granted to service_role
   - [x] pgTAP tests + `pnpm db:test` + CI `database` job
-- [ ] **2.2** `profiles` auto-create trigger + `updated_at` triggers — deps: 2.1
+- [x] **2.2** `profiles` auto-create trigger + `updated_at` triggers — deps: 2.1
 - [ ] **2.3** Grants review for `public` tables (least privilege for anon/authenticated); `private` grants done in 2.1 — deps: 2.1
 - [ ] **2.4** RLS policies for all `public` tables + `is_match_member` helper — deps: 2.3
 - [ ] **2.5** Seed: 4 characters, card definitions, deck template v1 (16/10/8/6) — deps: 2.1
