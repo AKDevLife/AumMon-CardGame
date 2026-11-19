@@ -2,6 +2,12 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-19 — 4.1 Engine in Edge Functions
+
+- **Files:** `scripts/sync-engine.mjs`, `supabase/functions/{deno.json,engine-health/index.ts,_shared/deno-env.d.ts}`, `tsconfig.functions.json`, CI `e2e-auth` job boots functions
+- **Tests:** local `supabase functions serve` → `engine-health` returns `{"engineVersion":"0.1.0","rulesetVersion":"1"}`; same check in CI
+- **Decisions:** Supabase only mounts/bundles `supabase/`, so engine sources are copied (git-ignored, generated) to `supabase/functions/_shared/game-engine` by `pnpm sync:engine` before serve/deploy; import map `@aummon/game-engine`; Edge Functions type-checked by repo TS with minimal Deno ambient types.
+
 ## 2026-11-19 — 3.1–3.13 Pure game engine (Rulebook v1)
 
 - **Files:** `packages/game-engine/src/{domain,rng,rules/v1,characters,bots,views}/*`, tests in `packages/game-engine/tests/*`
