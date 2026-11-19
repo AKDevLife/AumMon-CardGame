@@ -103,3 +103,16 @@ export function advance(input: Runtime, now: number): AdvanceResult {
   }
   return { state, rng: rng.getState(), deadline, events };
 }
+
+/**
+ * Pass & Play: the seat whose turn it is on the shared device (task 5.2).
+ * The server decides — clients never choose the seat.
+ */
+export function currentSeat(state: GameState): string | null {
+  if (state.phase === "turn_start") return aquaEligible(state);
+  if (state.phase !== "select") return null;
+  const pending = new Set(pendingPlayers(state));
+  return (
+    [...state.players].sort((a, b) => a.seat - b.seat).find((p) => pending.has(p.id))?.id ?? null
+  );
+}

@@ -12,6 +12,7 @@ export type Tx = TransactionSql;
 
 export interface LockedMatch extends Runtime {
   matchId: string;
+  userId: string;
   ownerId: string;
   /** Engine player id of the caller's seat (online/solo); null for owner-only access. */
   viewerPlayerId: string | null;
@@ -59,6 +60,7 @@ export async function lockMatch(tx: Tx, matchId: string, userId: string): Promis
     throw new HttpError(404, "not_found", "Match not found");
   return {
     matchId,
+    userId,
     ownerId: row.owner_id,
     viewerPlayerId,
     state: row.internal_state,
@@ -120,6 +122,8 @@ export async function recentEvents(tx: Tx, matchId: string, round: number): Prom
 }
 
 export interface MatchResponse {
+  mode: GameState["mode"];
+  currentSeat: { playerId: string; displayName: string } | null;
   view: PlayerGameView;
   viewerPlayerId: string | null;
   deadline: string | null;

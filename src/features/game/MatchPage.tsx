@@ -4,6 +4,7 @@ import { Link, useParams } from "react-router";
 import { StickerButton } from "../../components/StickerButton.tsx";
 import { ApiError, callFunction } from "../../lib/api.ts";
 import { useAuth } from "../auth/auth-context.ts";
+import { HandoffScreen } from "../passplay/HandoffScreen.tsx";
 import { CARD_INFO, CHARACTER_NAME, describeEvent, PHASE_LABEL } from "./labels.ts";
 import type { MatchResponse } from "./types.ts";
 
@@ -76,19 +77,29 @@ export function MatchPage() {
   const seconds = useCountdown(data?.deadline ?? null);
   const client = auth.mode === "live" ? auth.client : null;
 
-  const refresh = useCallback(async () => {
-    if (!client) return;
-    try {
-      setData(await callFunction<MatchResponse>(client, "matches-view", { matchId }));
-      setError(null);
-    } catch (e) {
-      setError(e instanceof ApiError ? e.message : "โหลดเกมไม่สำเร็จ");
-    }
-  }, [client, matchId]);
+  const passPlayRef = useRef(false);
+
+  const refresh = useCallback(
+    async (reveal = false) => {
+      if (!client) return;
+      try {
+        const next = await callFunction<MatchResponse>(client, "matches-view", { matchId, reveal });
+        passPlayRef.current = next.mode === "pass_play";
+        setData(next);
+        setError(null);
+      } catch (e) {
+        setError(e instanceof ApiError ? e.message : "โหลดเกมไม่สำเร็จ");
+      }
+    },
+    [client, matchId],
+  );
 
   useEffect(() => {
     const first = setTimeout(() => void refresh(), 0);
-    const id = setInterval(() => void refresh(), POLL_MS);
+    // Pass & Play has no remote players or timers; polling would also hide a revealed hand.
+    const id = setInterval(() => {
+      if (!passPlayRef.current) void refresh();
+    }, POLL_MS);
     return () => {
       clearTimeout(first);
       clearInterval(id);
@@ -99,6 +110,11 @@ export function MatchPage() {
   if (!data) return <p className="text-center text-am-muted">{error ?? "กำลังโหลด…"}</p>;
 
   const { view, viewerPlayerId: me } = data;
+  const handoff =
+    data.mode === "pass_play" &&
+    view.result.status === "ongoing" &&
+    data.currentSeat !== null &&
+    data.viewerPlayerId !== data.currentSeat.playerId;
   const mine = view.players.find((p) => p.id === me);
   const name = (id: unknown) => view.players.find((p) => p.id === id)?.displayName ?? "?";
   const opponents = view.players.filter((p) => p.id !== me && p.status === "alive");
@@ -178,7 +194,20 @@ export function MatchPage() {
 
       <PlayerBoard view={view} me={me} />
 
-      {myAquaWindow && (
+      {handoff && data.currentSeat && (
+        <HandoffScreen
+          name={data.currentSeat.displayName}
+          pending={pending}
+          onReveal={() => {
+            setPending(true);
+            void refresh(true).finally(() => {
+              setPending(false);
+            });
+          }}
+        />
+      )}
+
+      {!handoff && myAquaWindow && (
         <div className="am-sticker flex flex-col gap-2 bg-am-deco-green p-4">
           <h2 className="font-display font-bold">สกิล Aqua: สลับการ์ดสุ่ม 1 ใบ (ครั้งเดียวต่อเกม)</h2>
           <div className="flex flex-wrap gap-2">
@@ -201,33 +230,35 @@ export function MatchPage() {
         </div>
       )}
 
-      <div>
-        <h2 className="mb-2 font-display text-lg font-semibold">
-          การ์ดในมือ ({view.myHand.length}/5)
-        </h2>
-        <div role="group" aria-label="Hand" className="grid grid-cols-3 gap-2">
-          {view.myHand.map((c) => {
-            const meta = CARD_INFO[c.definitionId];
-            const selected = selection?.cardId === c.instanceId;
-            return (
-              <button
-                key={c.instanceId}
-                type="button"
-                disabled={!canAct || pending}
-                aria-pressed={selected}
-                onClick={() => {
-                  setSelection({ cardId: c.instanceId });
-                  idempotencyKey.current = null;
-                }}
-                className={`am-sticker am-pressable flex min-h-24 flex-col p-2 text-left disabled:opacity-60 ${selected ? "bg-am-hover" : "bg-am-card"}`}
-              >
-                <span className="font-display font-bold">{meta?.label ?? c.name}</span>
-                <span className="text-[11px] leading-tight text-am-muted">{meta?.text}</span>
-              </button>
-            );
-          })}
+      {!handoff && (
+        <div>
+          <h2 className="mb-2 font-display text-lg font-semibold">
+            การ์ดในมือ ({view.myHand.length}/5)
+          </h2>
+          <div role="group" aria-label="Hand" className="grid grid-cols-3 gap-2">
+            {view.myHand.map((c) => {
+              const meta = CARD_INFO[c.definitionId];
+              const selected = selection?.cardId === c.instanceId;
+              return (
+                <button
+                  key={c.instanceId}
+                  type="button"
+                  disabled={!canAct || pending}
+                  aria-pressed={selected}
+                  onClick={() => {
+                    setSelection({ cardId: c.instanceId });
+                    idempotencyKey.current = null;
+                  }}
+                  className={`am-sticker am-pressable flex min-h-24 flex-col p-2 text-left disabled:opacity-60 ${selected ? "bg-am-hover" : "bg-am-card"}`}
+                >
+                  <span className="font-display font-bold">{meta?.label ?? c.name}</span>
+                  <span className="text-[11px] leading-tight text-am-muted">{meta?.text}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
       {canAct && info?.target && (
         <div role="group" className="flex flex-wrap gap-2" aria-label="Target">
@@ -271,7 +302,7 @@ export function MatchPage() {
           {pending ? "กำลังส่ง…" : "ยืนยันการ์ด (คว่ำหน้า)"}
         </StickerButton>
       )}
-      {!canAct && view.result.status === "ongoing" && !myAquaWindow && (
+      {!canAct && !handoff && view.result.status === "ongoing" && !myAquaWindow && (
         <p className="text-center text-am-muted">รอผู้เล่นคนอื่น…</p>
       )}
 

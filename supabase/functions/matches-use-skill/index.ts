@@ -1,7 +1,7 @@
 // POST { matchId, targetPlayerId? } → Aqua swap (target) or skip (no target)  (Rule 11; Q7; task 4.12)
-import { useTurnStartSkill, createSeededRandom } from "@aummon/game-engine";
+import { createSeededRandom, useTurnStartSkill } from "@aummon/game-engine";
 import { requireUser } from "../_shared/auth.ts";
-import { HttpError, handler, readJson } from "../_shared/http.ts";
+import { handler, HttpError, readJson } from "../_shared/http.ts";
 import { optionalUuid, uuid } from "../_shared/input.ts";
 import { withMatch } from "../_shared/matches.ts";
 
@@ -10,19 +10,17 @@ Deno.serve(
     const userId = await requireUser(request);
     const body = await readJson(request);
     const target = optionalUuid(body, "targetPlayerId");
-    return withMatch(userId, uuid(body, "matchId"), (locked) => {
-      if (!locked.viewerPlayerId)
-        throw new HttpError(403, "not_a_player", "You have no seat in this match");
+    return withMatch(userId, uuid(body, "matchId"), (locked, actorId) => {
+      if (!actorId) throw new HttpError(403, "not_your_turn", "No skill available for you now");
       const rng = createSeededRandom(locked.rng);
       try {
         const t = useTurnStartSkill(
           locked.state,
-          locked.viewerPlayerId,
+          actorId,
           target ? { kind: "swap", targetPlayerId: target } : { kind: "skip" },
           rng,
         );
-        locked.rng = rng.getState();
-        return t;
+        return { ...t, rng: rng.getState() };
       } catch (error) {
         throw new HttpError(
           409,
