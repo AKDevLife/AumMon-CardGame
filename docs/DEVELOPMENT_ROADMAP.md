@@ -69,7 +69,7 @@ Percentages: `pnpm progress` (top-level tasks only). Phase 0 (Rulebook v1 decisi
 
 ## Phase 4 — Solo Vertical Slice
 
-- [ ] **4.1** Engine import into Edge Functions (Deno) — verify approach — deps: 3.1
+- [x] **4.1** Engine import into Edge Functions (Deno) — verify approach — deps: 3.1 — PR #20 (2026-11-19)
 - [ ] **4.2** `_shared`: JWT auth, input validation, CORS, errors, engine↔DB adapter — deps: 4.1, 2.4
 - [ ] **4.3** DB functions: `claim_resolution`, `commit_round`, command receipts (idempotency) — deps: 2.1
 - [ ] **4.4** Timer mechanism for 30s timeout + resolver lease recovery — deps: 4.3
