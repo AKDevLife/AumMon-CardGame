@@ -44,7 +44,7 @@ Percentages: `pnpm progress` (top-level tasks only). Phase 0 (Rulebook v1 decisi
 - [x] **2.6** SQL/RLS tests: User A, User B, anonymous, non-member — deps: 2.4 — PR #14 (2026-11-19)
 - [x] **2.7** Browser Supabase client + env validation — deps: 2.1 — PR #15 (2026-11-19)
 - [x] **2.8** Sign up / Login / Logout / session handling UI — deps: 2.7 — PR #16 (2026-11-19)
-- [ ] **2.9** Profile create/update UI (display name validation) — deps: 2.8
+- [x] **2.9** Profile create/update UI (display name validation) — deps: 2.8 — PR #17 (2026-11-19)
 - [ ] **2.10** E2E: sign up → login → profile — deps: 2.9
 
 **Acceptance:** A cannot read/edit B's private profile · non-member cannot read a match · browser cannot read `private` schema · migrations + seed reproducible
