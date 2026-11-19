@@ -5,6 +5,7 @@ import { countCards } from "../src/rules/v1/deck.ts";
 import { decideResult, resolveRound } from "../src/rules/v1/resolve.ts";
 import {
   aquaEligible,
+  forfeit,
   pendingPlayers,
   startRound,
   submitAction,
@@ -280,5 +281,28 @@ describe("round lifecycle", () => {
       ["p2", "defense"],
     ]);
     expect(JSON.stringify(s)).toBe(snapshot);
+  });
+});
+
+describe("forfeit (matches-forfeit)", () => {
+  it("surrenders, discards the hand and can end the match", () => {
+    const s = selectState(["pyro_pup", "aqua_otter"], [["attack"], ["defense"]]);
+    const t = forfeit(s, "p2");
+    expect(getPlayer(t.state, "p2").status).toBe("surrendered");
+    expect(t.state.hands["p2"]).toEqual([]);
+    expect(t.state.result).toEqual({ status: "win", winnerId: "p1" });
+    expect(t.state.phase).toBe("end");
+    expect(countCards(t.state)).toBe(40);
+    expect(() => forfeit(t.state, "p1")).toThrow();
+  });
+
+  it("with 3 players the match continues and the leaver no longer blocks resolve", () => {
+    const s = selectState(
+      ["pyro_pup", "aqua_otter", "breeze_kit"],
+      [["attack"], ["defense"], ["defense"]],
+    );
+    const t = forfeit(s, "p3");
+    expect(t.state.result.status).toBe("ongoing");
+    expect(pendingPlayers(t.state)).toEqual(["p1", "p2"]);
   });
 });

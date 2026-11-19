@@ -4,9 +4,9 @@
 
 ## Current
 
-- **Phase:** 6 — Online Multiplayer (Phases 2–5 complete locally; cloud link pending 1.10)
+- **Phase:** 7 — Public Launch & Scale Evaluation (Phases 2–6 complete locally; cloud link pending 1.10)
 - **Current task:** none in progress
-- **Next task:** 6.1 Online lobby + join code
+- **Next task:** 7.1 Security review + abuse checks
 
 ## Completion
 
@@ -17,9 +17,9 @@
 | 3 Pure Game Engine      |     13 |     13 |    100% |
 | 4 Solo Vertical Slice   |     12 |     12 |    100% |
 | 5 Pass & Play           |      5 |      5 |    100% |
-| 6 Online Multiplayer    |      0 |      8 |      0% |
+| 6 Online Multiplayer    |      7 |      8 |     88% |
 | 7 Public Launch & Scale |      0 |      8 |      0% |
-| **Overall**             | **54** | **72** | **75%** |
+| **Overall**             | **61** | **72** | **85%** |
 
 ## Completed
 
@@ -27,6 +27,7 @@
 - 1.11 Vercel Preview per PR (verified)
 - 1.13–1.16 UI Preview (layout, Home/Login/Register UI-only, `vercel.json`, iPhone E2E)
 - 2.1 core schema migration (15 tables, constraints, indexes, schema separation, RLS deny-by-default)
+- 6.1–6.7 Online: lobby with hashed/expiring 8-char join code, rate limits, ready/start/leave, Realtime (RLS postgres_changes + private match channel with Presence), resume, forfeit, lazy 30s timeout, two-browser E2E
 - 5.1–5.5 Pass & Play: local seats, server-chosen current seat, privacy handoff (hand only after reveal), shared-device notice, E2E
 - 4.10 security attack tests (1–8, 10)
 - 4.9 / 4.11 / 4.12 solo UI (character & bot select, board, hand, target/choice, Aqua skill, event log, result) + E2E plays a full match
@@ -58,7 +59,7 @@ None
 
 ## Latest verification
 
-- Local: `pnpm check` ✅ (126 tests incl. 71 engine, build, secret scan) · backend integration ✅ 12 (local Supabase + Edge Functions) · `pnpm test:e2e` ✅ 9 (incl. full solo + pass & play matches) (incl. iPhone 13 + auth flow on local Supabase) · `pnpm db:test` ✅ (4 migrations + seed + 117 pgTAP tests)
+- Local: `pnpm check` ✅ (128 tests incl. engine, build, secret scan) · backend integration ✅ 20 (local Supabase + Edge Functions) · `pnpm test:e2e` ✅ 10 (incl. full solo, pass & play and two-browser online matches) (incl. iPhone 13 + auth flow on local Supabase) · `pnpm db:test` ✅ (7 migrations + seed + 121 pgTAP tests)
 - CI: see latest PR
 
 ## Rule questions

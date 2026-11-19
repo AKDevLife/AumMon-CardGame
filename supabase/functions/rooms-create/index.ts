@@ -2,6 +2,7 @@
 import { requireUser } from "../_shared/auth.ts";
 import { handler, HttpError, readJson } from "../_shared/http.ts";
 import { int, oneOf } from "../_shared/input.ts";
+import { createOnlineRoom } from "../_shared/lobby.ts";
 import { createPassPlayRoom, createSoloRoom } from "../_shared/matches.ts";
 
 const NAME_RE = /^[\p{L}\p{M}\p{N} _.-]{1,24}$/u;
@@ -25,9 +26,9 @@ Deno.serve(
     const mode = oneOf(body, "mode", ["solo", "pass_play", "online"] as const);
     if (mode === "pass_play")
       return { roomId: await createPassPlayRoom(userId, localSeats(body["seats"])) };
-    if (mode !== "solo")
-      throw new HttpError(400, "unsupported_mode", "Online rooms use the lobby (Phase 6)");
     const characterId = typeof body["characterId"] === "string" ? body["characterId"] : "";
+    if (mode === "online")
+      return createOnlineRoom(userId, characterId, int(body, "maxPlayers", 2, 4));
     const botCount = int(body, "botCount", 1, 3);
     return { roomId: await createSoloRoom(userId, characterId, botCount) };
   }),

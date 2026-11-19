@@ -99,7 +99,7 @@ jobs:
       - name: Start local Supabase (no cloud)
         run: >-
           pnpm exec supabase start -x
-          studio,imgproxy,inbucket,mailpit,logflare,vector,supavisor,postgres-meta,storage-api,realtime
+          studio,imgproxy,inbucket,mailpit,logflare,vector,supavisor,postgres-meta,storage-api
       - name: Serve Edge Functions and check the engine boots under Deno
         run: |
           pnpm sync:engine

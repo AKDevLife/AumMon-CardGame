@@ -134,3 +134,33 @@ export function pendingPlayers(state: GameState): PlayerId[] {
     .filter((p) => !state.submissions[p.id])
     .map((p) => p.id);
 }
+
+/**
+ * A player leaves the match (`matches-forfeit`): status `surrendered`, hand to
+ * discard, pending submission dropped. The match result is re-evaluated.
+ */
+export function forfeit(input: GameState, playerId: PlayerId): Transition {
+  const state = cloneState(input);
+  const player = getPlayer(state, playerId);
+  if (!isAlive(player) || state.result.status !== "ongoing")
+    throw new PhaseError("Player cannot forfeit now");
+  player.status = "surrendered";
+  state.discard.push(...handOf(state, playerId).splice(0));
+  state.submissions = Object.fromEntries(
+    Object.entries(state.submissions).filter(([id]) => id !== playerId),
+  );
+  const alive = state.players.filter(isAlive);
+  if (alive.length === 1) state.result = { status: "win", winnerId: must(alive[0], "winner").id };
+  else if (alive.length === 0) state.result = { status: "draw" };
+  if (state.result.status !== "ongoing") state.phase = "end";
+  state.version += 1;
+  return {
+    state,
+    events: [
+      { type: "player.forfeited", round: state.round, publicPayload: { playerId } },
+      ...(state.result.status !== "ongoing"
+        ? [{ type: "round.ended", round: state.round, publicPayload: { result: state.result } }]
+        : []),
+    ],
+  };
+}

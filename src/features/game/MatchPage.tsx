@@ -1,4 +1,5 @@
 import type { PlayerGameView } from "@aummon/game-engine";
+import { REALTIME_SUBSCRIBE_STATES } from "@supabase/supabase-js";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router";
 import { StickerButton } from "../../components/StickerButton.tsx";
@@ -38,7 +39,15 @@ function Hearts({ hp, max }: { hp: number; max: number }) {
   );
 }
 
-function PlayerBoard({ view, me }: { view: PlayerGameView; me: string | null }) {
+function PlayerBoard({
+  view,
+  me,
+  online,
+}: {
+  view: PlayerGameView;
+  me: string | null;
+  online: Set<string> | null;
+}) {
   return (
     <ul className="grid grid-cols-2 gap-3" aria-label="Players">
       {view.players.map((p) => (
@@ -51,7 +60,15 @@ function PlayerBoard({ view, me }: { view: PlayerGameView; me: string | null }) 
               {p.displayName}
               {p.id === me ? " (คุณ)" : ""}
             </span>
-            {p.hasSubmitted && <span title="เลือกแล้ว">✅</span>}
+            <span className="flex items-center gap-1">
+              {online && (
+                <span
+                  aria-label={online.has(p.id) ? "ออนไลน์" : "ออฟไลน์"}
+                  className={`inline-block h-2.5 w-2.5 rounded-full ${online.has(p.id) ? "bg-am-confirm" : "bg-am-muted"}`}
+                />
+              )}
+              {p.hasSubmitted && <span title="เลือกแล้ว">✅</span>}
+            </span>
           </div>
           <div className="text-xs text-am-muted">
             {CHARACTER_NAME[p.characterId] ?? p.characterId}
@@ -106,10 +123,47 @@ export function MatchPage() {
     };
   }, [refresh]);
 
+  // Online: private Realtime channel (members only, RLS) for match updates + Presence.
+  const [online, setOnline] = useState<Set<string>>(new Set());
+  const mode = data?.mode;
+  const me = data?.viewerPlayerId ?? null;
+  useEffect(() => {
+    if (!client || mode !== "online" || !me) return;
+    const channel = client.channel(`match:${matchId}`, {
+      config: { private: true, presence: { key: me } },
+    });
+    channel
+      .on("presence", { event: "sync" }, () => {
+        setOnline(new Set(Object.keys(channel.presenceState())));
+      })
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "matches", filter: `id=eq.${matchId}` },
+        () => {
+          void refresh();
+        },
+      )
+      .subscribe((status) => {
+        if (status === REALTIME_SUBSCRIBE_STATES.SUBSCRIBED) void channel.track({ online: true });
+      });
+    return () => {
+      void client.removeChannel(channel);
+    };
+  }, [client, mode, me, matchId, refresh]);
+
+  // When the server deadline passes, ask the server to apply the timeout (Rule 14).
+  useEffect(() => {
+    if (seconds !== 0) return;
+    const id = setTimeout(() => void refresh(), 300);
+    return () => {
+      clearTimeout(id);
+    };
+  }, [seconds, refresh]);
+
   if (!client) return <p className="text-center text-am-muted">ต้องเชื่อมระบบก่อนเล่น (Preview)</p>;
   if (!data) return <p className="text-center text-am-muted">{error ?? "กำลังโหลด…"}</p>;
 
-  const { view, viewerPlayerId: me } = data;
+  const { view } = data;
   const handoff =
     data.mode === "pass_play" &&
     view.result.status === "ongoing" &&
@@ -192,7 +246,7 @@ export function MatchPage() {
         </div>
       )}
 
-      <PlayerBoard view={view} me={me} />
+      <PlayerBoard view={view} me={me} online={data.mode === "online" ? online : null} />
 
       {handoff && data.currentSeat && (
         <HandoffScreen
@@ -311,6 +365,20 @@ export function MatchPage() {
           {error}
         </p>
       )}
+
+      {data.mode !== "pass_play" &&
+        mine?.status === "alive" &&
+        view.result.status === "ongoing" && (
+          <StickerButton
+            variant="danger"
+            disabled={pending}
+            onClick={() => {
+              if (window.confirm("ยอมแพ้และออกจากเกมนี้?")) void send("matches-forfeit", { matchId });
+            }}
+          >
+            ยอมแพ้
+          </StickerButton>
+        )}
 
       <div className="am-sticker bg-am-card p-3">
         <h2 className="mb-1 font-display font-semibold">เหตุการณ์ล่าสุด</h2>

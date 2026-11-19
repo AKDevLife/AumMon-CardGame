@@ -26,6 +26,7 @@ export {
 } from "./rules/v1/actions.ts";
 export {
   aquaEligible,
+  forfeit,
   pendingPlayers,
   PhaseError,
   startRound,

@@ -7,6 +7,7 @@ import { handler, HttpError, readJson } from "../_shared/http.ts";
 import { int, optionalOneOf, optionalUuid, rejectServerFields, uuid } from "../_shared/input.ts";
 import { actorFor, respond } from "../_shared/matches.ts";
 import { findReceipt, hashRequest, storeReceipt } from "../_shared/receipts.ts";
+import { rateLimit } from "../_shared/ratelimit.ts";
 import { lockMatch, saveMatch } from "../_shared/store.ts";
 
 Deno.serve(
@@ -30,6 +31,7 @@ Deno.serve(
     };
     const requestHash = await hashRequest(full);
 
+    await rateLimit(userId, "match.submit", 60, 60);
     return db().begin(async (tx) => {
       const locked = await lockMatch(tx, command.matchId, userId);
       const previous = await findReceipt(
