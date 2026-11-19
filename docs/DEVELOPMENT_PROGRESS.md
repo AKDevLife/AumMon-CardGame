@@ -6,20 +6,20 @@
 
 - **Phase:** 2 — Auth & Database Foundation (local database only)
 - **Current task:** none in progress
-- **Next task:** 2.7 Browser Supabase client + env validation
+- **Next task:** 2.8 Sign up / Login / Logout / session UI
 
 ## Completion
 
 | Phase                   |   Done |  Total |       % |
 | ----------------------- | -----: | -----: | ------: |
 | 1 Project Foundation    |     14 |     16 |     88% |
-| 2 Auth & Database       |      6 |     10 |     60% |
+| 2 Auth & Database       |      7 |     10 |     70% |
 | 3 Pure Game Engine      |      0 |     13 |      0% |
 | 4 Solo Vertical Slice   |      0 |     12 |      0% |
 | 5 Pass & Play           |      0 |      5 |      0% |
 | 6 Online Multiplayer    |      0 |      8 |      0% |
 | 7 Public Launch & Scale |      0 |      8 |      0% |
-| **Overall**             | **20** | **72** | **28%** |
+| **Overall**             | **21** | **72** | **29%** |
 
 ## Completed
 
@@ -27,6 +27,7 @@
 - 1.11 Vercel Preview per PR (verified)
 - 1.13–1.16 UI Preview (layout, Home/Login/Register UI-only, `vercel.json`, iPhone E2E)
 - 2.1 core schema migration (15 tables, constraints, indexes, schema separation, RLS deny-by-default)
+- 2.7 browser Supabase client (publishable key only; rejects secret/service-role keys; null in UI preview mode)
 - 2.6 access-matrix tests (A/B/non-member/anon/service_role, pass & play, lobby)
 - 2.5 seed: 4 characters, 6 card definitions, standard deck v1 (40 cards)
 - 2.4 RLS policies + `is_match_member` / `is_room_member`
@@ -48,7 +49,7 @@ None
 
 ## Latest verification
 
-- Local: `pnpm check` ✅ (18 tests, build, secret scan) · `pnpm test:e2e` ✅ 6 (incl. iPhone 13) · `pnpm db:test` ✅ (4 migrations + seed + 117 pgTAP tests)
+- Local: `pnpm check` ✅ (30 tests, build, secret scan) · `pnpm test:e2e` ✅ 6 (incl. iPhone 13) · `pnpm db:test` ✅ (4 migrations + seed + 117 pgTAP tests)
 - CI: see latest PR
 
 ## Rule questions
