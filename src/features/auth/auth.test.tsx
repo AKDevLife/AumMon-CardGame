@@ -123,7 +123,7 @@ describe("auth (live mode)", () => {
   it("shows the signed-in user and logs out", async () => {
     const { client, auth } = mockClient({ session: { user: { email: "a@test.local" } } });
     renderAt("/", client);
-    expect(await screen.findByText("a@test.local")).toBeInTheDocument();
+    expect(await screen.findByRole("link", { name: "โปรไฟล์" })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "ออกจากระบบ" }));
     await waitFor(() => {
       expect(auth.signOut).toHaveBeenCalled();

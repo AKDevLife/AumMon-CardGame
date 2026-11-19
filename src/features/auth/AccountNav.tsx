@@ -16,7 +16,9 @@ export function AccountNav() {
     };
     return (
       <nav aria-label="Account" className="flex items-center gap-2">
-        <span className="max-w-32 truncate text-sm text-am-muted">{auth.session.user.email}</span>
+        <NavLink to="/profile" className={navClass}>
+          โปรไฟล์
+        </NavLink>
         <button
           type="button"
           onClick={() => void signOut()}
