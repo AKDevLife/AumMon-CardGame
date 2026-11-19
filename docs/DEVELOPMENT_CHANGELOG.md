@@ -2,6 +2,10 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-19 — 1.11 Vercel Preview verified
+
+- Vercel builds a Preview deployment per PR (PR #9 status: success). No env vars; Production auto-deploy from `main` disabled.
+
 ## 2026-11-19 — 1.13–1.16 UI Preview
 
 - **Files:** `src/app/{AppLayout,HomePage,NotFoundPage,routes}.tsx`, `src/features/auth/*`, `src/components/{PreviewBanner,TextField}.tsx`, `vercel.json`, `tests/e2e/smoke.spec.ts`

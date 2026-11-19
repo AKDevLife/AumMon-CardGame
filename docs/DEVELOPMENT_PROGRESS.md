@@ -12,18 +12,19 @@
 
 | Phase                   |   Done |  Total |       % |
 | ----------------------- | -----: | -----: | ------: |
-| 1 Project Foundation    |     13 |     16 |     81% |
+| 1 Project Foundation    |     14 |     16 |     88% |
 | 2 Auth & Database       |      2 |     10 |     20% |
 | 3 Pure Game Engine      |      0 |     13 |      0% |
 | 4 Solo Vertical Slice   |      0 |     12 |      0% |
 | 5 Pass & Play           |      0 |      5 |      0% |
 | 6 Online Multiplayer    |      0 |      8 |      0% |
 | 7 Public Launch & Scale |      0 |      8 |      0% |
-| **Overall**             | **15** | **72** | **21%** |
+| **Overall**             | **16** | **72** | **22%** |
 
 ## Completed
 
 - 1.1–1.9 foundation, CI, operating rules, tracking
+- 1.11 Vercel Preview per PR (verified)
 - 1.13–1.16 UI Preview (layout, Home/Login/Register UI-only, `vercel.json`, iPhone E2E)
 - 2.1 core schema migration (15 tables, constraints, indexes, schema separation, RLS deny-by-default)
 - 2.2 profile auto-create + `updated_at` triggers
@@ -37,7 +38,6 @@ None
 | Task | Reason                                       | Owner action                                                        |
 | ---- | -------------------------------------------- | ------------------------------------------------------------------- |
 | 1.10 | No project ref / token / network to Supabase | Send project ref; approve network hosts; enter token in secret form |
-| 1.11 | Vercel env vars not verifiable from session  | Set `VITE_SUPABASE_*` for Preview; confirm or send Preview URL      |
 | 1.12 | Repo settings                                | Enable branch protection on `main` requiring CI                     |
 | 6.8  | Staging project may exceed free tier         | Approve cost / create project                                       |
 | 7.8  | Production deploy                            | Approval at launch                                                  |
