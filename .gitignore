@@ -35,3 +35,4 @@ Thumbs.db
 .vscode/*
 !.vscode/extensions.json
 supabase/functions/_shared/game-engine/
+supabase/functions/.local-ca.crt

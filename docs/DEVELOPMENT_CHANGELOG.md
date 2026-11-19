@@ -2,6 +2,18 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-19 — 4.2–4.8 Solo backend (local Supabase)
+
+- **Files:** `supabase/functions/{rooms-create,matches-start,matches-view,matches-submit-action,matches-use-skill}`, `supabase/functions/_shared/{http,input,auth,db,store,receipts,flow,matches}.ts`, migration `20261119000400_match_flow.sql`, `tests/integration/flow.test.ts`, `tests/backend/solo.test.ts`
+- **Tests:** 7 flow tests (bots, 30s/15s timeouts, pass & play no timeout); 7 HTTP tests against real Edge Functions: unauthenticated 401, non-member 404, forged `hp` 400, foreign card 409, idempotency replay/conflict, concurrent submits → exactly one accepted, full match without leaking deck/rng/skill state.
+- **Decisions (architecture detail, within blueprint):**
+  - Each command = one DB transaction that first locks the `matches` row (`SELECT … FOR UPDATE`), then loads state → single resolver, no duplicate resolve, crash = rollback (replaces explicit lease tokens).
+  - Canonical engine state + RNG in `private.match_runtime` (`internal_state`, `rng_state`); public mirrors in `matches`, `match_players`, `match_events`. `private.match_cards` / `round_submissions` are not used yet (state is in `internal_state`).
+  - Timeouts are evaluated lazily on every view/submit (`phase_deadline`); no scheduler needed for solo.
+  - Card instance ids are random UUIDs (no type info in ids).
+- **Bug found & fixed by tests:** a joined `FOR UPDATE` returned a stale runtime row under READ COMMITTED → concurrent submits double-resolved; lock is now a separate statement.
+- **Local env note:** edge-runtime needs `SSL_CERT_FILE` for the sandbox proxy CA (local only, git-ignored).
+
 ## 2026-11-19 — 4.1 Engine in Edge Functions
 
 - **Files:** `scripts/sync-engine.mjs`, `supabase/functions/{deno.json,engine-health/index.ts,_shared/deno-env.d.ts}`, `tsconfig.functions.json`, CI `e2e-auth` job boots functions

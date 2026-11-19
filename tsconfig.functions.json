@@ -6,7 +6,8 @@
     "types": [],
     "paths": {
       "@aummon/game-engine": ["./packages/game-engine/src/index.ts"],
-      "npm:@supabase/supabase-js@2": ["./node_modules/@supabase/supabase-js"]
+      "npm:@supabase/supabase-js@2": ["./node_modules/@supabase/supabase-js"],
+      "npm:postgres@3.4.9": ["./node_modules/postgres"]
     }
   },
   "include": ["supabase/functions/**/*.ts"],
