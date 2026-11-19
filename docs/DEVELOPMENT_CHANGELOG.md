@@ -2,6 +2,13 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-19 — 1.13–1.16 UI Preview
+
+- **Files:** `src/app/{AppLayout,HomePage,NotFoundPage,routes}.tsx`, `src/features/auth/*`, `src/components/{PreviewBanner,TextField}.tsx`, `vercel.json`, `tests/e2e/smoke.spec.ts`
+- **Tests:** 18 unit, 6 E2E (desktop + iPhone 13 viewport, no horizontal scroll)
+- **Decisions:** added `react-router` (blueprint `src/app/` router); forms are disabled and every page shows a "not connected" banner — no mock auth; Vercel auto-deploy from `main` disabled per owner (Preview per PR only); `noindex` header.
+- **Remaining:** owner must import repo into Vercel (1.11).
+
 ## 2026-11-19 — 2.2 Database triggers (local only)
 
 - **Files:** `supabase/migrations/20261119000100_triggers.sql`, `supabase/tests/database/002_triggers.test.sql`
