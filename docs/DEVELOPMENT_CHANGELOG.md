@@ -2,6 +2,13 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-19 — 4.9 / 4.11 / 4.12 Solo UI
+
+- **Files:** `src/features/solo/SoloSetupPage.tsx`, `src/features/game/{MatchPage,labels,types}.ts(x)`, `src/lib/api.ts`, routes `/play/solo`, `/match/:matchId`, `tests/e2e/solo.spec.ts`
+- **Tests:** 3 unit (event text); E2E: sign up → Solo vs 1 bot → play every round via UI until win/draw ✅ (local Supabase + Edge Functions); iPhone 13 screenshots reviewed.
+- **Decisions:** client polls `matches-view` every 2 s (Realtime arrives in Phase 6); UI only sends card instance / target / choice / idempotency key, retries reuse the key; countdown shows server deadline; `viewerPlayerId` added to API responses.
+- **Phase 4 acceptance:** 1 player + bots play to the end ✅ · bots server-side, legal only ✅ · client cannot fake HP/damage/target ✅
+
 ## 2026-11-19 — 4.2–4.8 Solo backend (local Supabase)
 
 - **Files:** `supabase/functions/{rooms-create,matches-start,matches-view,matches-submit-action,matches-use-skill}`, `supabase/functions/_shared/{http,input,auth,db,store,receipts,flow,matches}.ts`, migration `20261119000400_match_flow.sql`, `tests/integration/flow.test.ts`, `tests/backend/solo.test.ts`

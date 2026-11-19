@@ -202,6 +202,7 @@ export async function respond(
   const events = await recentEvents(tx, locked.matchId, runtime.state.round);
   return {
     view: buildPlayerView(runtime.state, locked.viewerPlayerId, events),
+    viewerPlayerId: locked.viewerPlayerId,
     deadline: runtime.deadline === null ? null : new Date(runtime.deadline).toISOString(),
   };
 }

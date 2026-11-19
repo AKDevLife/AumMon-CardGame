@@ -121,5 +121,6 @@ export async function recentEvents(tx: Tx, matchId: string, round: number): Prom
 
 export interface MatchResponse {
   view: PlayerGameView;
+  viewerPlayerId: string | null;
   deadline: string | null;
 }

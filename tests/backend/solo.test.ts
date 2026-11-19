@@ -163,6 +163,7 @@ describe.runIf(run)("solo match via Edge Functions", () => {
         "already_submitted",
         "version_conflict",
         "wrong_round",
+        "wrong_phase", // the accepted submit may have ended the match
         "card_not_in_hand",
       ]).toContain(r.body["error"]);
     }
@@ -181,7 +182,7 @@ describe.runIf(run)("solo match via Edge Functions", () => {
         break;
       }
       const res = await a.call("matches-submit-action", pickCommand(view, me));
-      expect(res.status).toBe(200);
+      expect(res.status, JSON.stringify(res.body)).toBe(200);
       view = res.body["view"] as View;
       const raw = JSON.stringify(res.body);
       expect(raw).not.toContain("rng");
