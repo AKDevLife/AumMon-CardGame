@@ -2,6 +2,13 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-19 — 2.10 Auth E2E · Phase 2 complete (local)
+
+- **Files:** `tests/e2e/auth.spec.ts`, CI job `e2e-auth` (starts local Supabase in the runner — no cloud)
+- **Tests:** sign up → profile edit persists → logout → wrong password rejected → login
+- **Phase 2 acceptance:** A cannot read/edit B profile ✅ · non-member cannot read match ✅ · browser cannot read `private` ✅ · migrations + seed reproducible ✅
+- **Remaining:** apply migrations to Supabase Dev project after 1.10.
+
 ## 2026-11-19 — 2.9 Profile UI
 
 - **Files:** `src/features/profile/ProfilePage.tsx` (+ tests), `/profile` route, header "โปรไฟล์" link (email moved from header to profile page for small screens)
