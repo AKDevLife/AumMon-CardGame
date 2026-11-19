@@ -2,6 +2,12 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-19 — 2.3 Public grants (local only)
+
+- **Files:** `supabase/migrations/20261119000200_public_grants.sql`, `supabase/tests/database/003_public_grants.test.sql`
+- **Tests:** 13 new pgTAP tests (63 total); 001 tests updated (client writes now denied by grant, not only RLS)
+- **Decisions:** revoked Supabase default ALL from anon/authenticated (tables, sequences, functions) incl. default privileges for future objects; `authenticated` gets SELECT on 10 public tables + UPDATE(display_name, avatar_url) on profiles; anon gets nothing (account required); all game writes via service_role.
+
 ## 2026-11-19 — 1.11 Vercel Preview verified
 
 - Vercel builds a Preview deployment per PR (PR #9 status: success). No env vars; Production auto-deploy from `main` disabled.
