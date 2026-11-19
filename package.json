@@ -21,7 +21,9 @@
     "check:secrets": "node scripts/check-secrets.mjs",
     "check": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm test && pnpm build && pnpm check:secrets",
     "progress": "node scripts/progress.mjs",
-    "db:test": "bash scripts/db-test.sh"
+    "db:test": "bash scripts/db-test.sh",
+    "sync:engine": "node scripts/sync-engine.mjs",
+    "functions:serve": "pnpm sync:engine && supabase functions serve"
   },
   "dependencies": {
     "@aummon/game-engine": "workspace:*",

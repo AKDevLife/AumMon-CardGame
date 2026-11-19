@@ -34,6 +34,7 @@ export default tseslint.config(
       "playwright-report/",
       "test-results/",
       "supabase/.temp/",
+      "supabase/functions/_shared/game-engine/",
       "node_modules/",
     ],
   },
@@ -69,6 +70,12 @@ export default tseslint.config(
       ...reactHooks.configs.recommended.rules,
       "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
     },
+  },
+
+  // Edge Functions (Deno runtime)
+  {
+    files: ["supabase/functions/**/*.ts"],
+    languageOptions: { globals: { Deno: "readonly" } },
   },
 
   // Node-side config and test files

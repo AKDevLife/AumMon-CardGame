@@ -1,0 +1,5 @@
+{
+  "imports": {
+    "@aummon/game-engine": "./_shared/game-engine/index.ts"
+  }
+}

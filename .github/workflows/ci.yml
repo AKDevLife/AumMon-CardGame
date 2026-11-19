@@ -99,7 +99,16 @@ jobs:
       - name: Start local Supabase (no cloud)
         run: >-
           pnpm exec supabase start -x
-          studio,imgproxy,inbucket,mailpit,edge-runtime,logflare,vector,supavisor,postgres-meta,storage-api,realtime
+          studio,imgproxy,inbucket,mailpit,logflare,vector,supavisor,postgres-meta,storage-api,realtime
+      - name: Serve Edge Functions and check the engine boots under Deno
+        run: |
+          pnpm sync:engine
+          nohup pnpm exec supabase functions serve --no-verify-jwt > /tmp/functions.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -sf http://127.0.0.1:54321/functions/v1/engine-health | grep -q '"rulesetVersion":"1"'; then exit 0; fi
+            sleep 3
+          done
+          cat /tmp/functions.log; exit 1
       - name: Export local public env
         run: |
           pnpm exec supabase status -o env | grep -E '^(API_URL|PUBLISHABLE_KEY)=' > /tmp/sb.env
