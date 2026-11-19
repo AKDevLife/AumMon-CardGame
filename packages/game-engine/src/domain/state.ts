@@ -40,3 +40,9 @@ export function handOf(state: GameState, playerId: PlayerId): CardInstanceId[] {
   if (!hand) throw new Error(`No hand for player ${playerId}`);
   return hand;
 }
+
+/** Narrow a value that the engine's invariants guarantee; throws if violated. */
+export function must<T>(value: T | undefined | null, what: string): T {
+  if (value === undefined || value === null) throw new Error(`Invariant violated: missing ${what}`);
+  return value;
+}

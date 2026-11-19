@@ -8,6 +8,7 @@ import type {
   RandomSource,
   Transition,
 } from "../../domain/types.ts";
+import { assertCharacterSupported } from "../../characters/registry.ts";
 import { ENGINE_VERSION, RULESET_VERSION } from "../../version.ts";
 import { RULESET_V1 } from "./constants.ts";
 import { drawCard, shuffle } from "./deck.ts";
@@ -48,6 +49,7 @@ function validate(input: InitializeMatchInput): void {
   if (new Set(seats.map((s) => s.character.id)).size !== seats.length) {
     throw new SetupError("Characters must be unique per match (clarification Q10)");
   }
+  for (const s of seats) assertCharacterSupported(s.character);
   if (cards.length !== deckSize) throw new SetupError(`Deck must have ${deckSize} cards`);
   if (new Set(cards.map((c) => c.id)).size !== cards.length) {
     throw new SetupError("Card instance ids must be unique");
