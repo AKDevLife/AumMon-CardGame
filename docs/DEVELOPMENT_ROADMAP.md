@@ -16,7 +16,7 @@ Percentages: `pnpm progress` (top-level tasks only). Phase 0 (Rulebook v1 decisi
 - [x] **1.8** Secret guard script, README, `.env.example` — deps: 1.7
 - [x] **1.9** Claude operating rules + progress tracking system
 - [ ] **1.10** Supabase Dev project + `supabase link` — 🔒 Blocked: needs project ref, access token and network access to Supabase
-- [ ] **1.11** Vercel Preview + Production environments (separate env vars) — 🔒 Blocked: owner must import the repo into Vercel (no env vars needed for UI Preview); verify PR Preview URL
+- [ ] **1.11** Vercel Preview + Production environments (separate env vars) — ⏳ In progress: repo imported into Vercel; verifying PR Preview URL
 - [ ] **1.12** Branch protection on `main` requiring CI — 🔒 Blocked: owner repo settings
 
 ### UI Preview track (parallel; no backend, engine or DB work)
