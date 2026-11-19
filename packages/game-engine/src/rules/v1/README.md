@@ -1,6 +1,5 @@
 # rules/v1
 
-Rulebook v1 (`ruleset_version = "1"`) implementation — **Phase 3**.
-
-The 15 locked rules live in `aummon_game_spec.md` section 7. Do not change v1
-behaviour; a rule change that affects results needs a new ruleset folder.
+Rulebook v1 (`ruleset_version = "1"`). Locked rules: `aummon_game_spec.md` §7;
+provisional details: `docs/rule-clarifications.md`. Never change v1 behaviour —
+a result-affecting change needs a new ruleset folder.

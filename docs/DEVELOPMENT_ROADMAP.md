@@ -51,19 +51,19 @@ Percentages: `pnpm progress` (top-level tasks only). Phase 0 (Rulebook v1 decisi
 
 ## Phase 3 — Pure Game Engine
 
-- [ ] **3.1** Full domain model: card instances, zones, submissions, skill state — deps: 1.5
-- [ ] **3.2** Seeded deterministic `RandomSource` implementation — deps: 3.1
-- [ ] **3.3** Deck/hand/discard: initial 3, max 5, skip draw at 5, reshuffle, empty-deck safe (Rules 7–8) — deps: 3.2
-- [ ] **3.4** Character registry + hook/effectKey validation (config error on mismatch) — deps: 3.1
-- [ ] **3.5** Action validator + legal actions (target, choice, ownership) — deps: 3.3
-- [ ] **3.6** Card effects: attack, defense shield, support heal/draw (Rules 3, 4, 6) — deps: 3.5
-- [ ] **3.7** Chaos effects: Redirect, AoE, Disrupt (Rule 5; clarifications Q1–Q3, Q5) — deps: 3.6
-- [ ] **3.8** Character skills: Pyro, Aqua, Breeze, Terra (Rules 9–12; clarifications Q4, Q5, Q7) — deps: 3.4, 3.6
-- [ ] **3.9** Round resolver: speed/seat order, elimination, `onRoundEnd`, win/draw (Rules 1, 12, 13, 15) — deps: 3.6
-- [ ] **3.10** Player view builder (allow-list, no private data) — deps: 3.1
-- [ ] **3.11** Rule-based bot strategy (legal actions only, seat-limited view) — deps: 3.5, 3.10
-- [ ] **3.12** Timeout auto-bot action selection (Rule 14) — deps: 3.11
-- [ ] **3.13** Scenario tests 2–4 players + property tests (card conservation, HP bounds) — deps: 3.9
+- [x] **3.1** Full domain model: card instances, zones, submissions, skill state — deps: 1.5 — PR #19 (2026-11-19)
+- [x] **3.2** Seeded deterministic `RandomSource` implementation — deps: 3.1 — PR #19 (2026-11-19)
+- [x] **3.3** Deck/hand/discard: initial 3, max 5, skip draw at 5, reshuffle, empty-deck safe (Rules 7–8) — deps: 3.2 — PR #19 (2026-11-19)
+- [x] **3.4** Character registry + hook/effectKey validation (config error on mismatch) — deps: 3.1 — PR #19 (2026-11-19)
+- [x] **3.5** Action validator + legal actions (target, choice, ownership) — deps: 3.3 — PR #19 (2026-11-19)
+- [x] **3.6** Card effects: attack, defense shield, support heal/draw (Rules 3, 4, 6) — deps: 3.5 — PR #19 (2026-11-19)
+- [x] **3.7** Chaos effects: Redirect, AoE, Disrupt (Rule 5; clarifications Q1–Q3, Q5) — deps: 3.6 — PR #19 (2026-11-19)
+- [x] **3.8** Character skills: Pyro, Aqua, Breeze, Terra (Rules 9–12; clarifications Q4, Q5, Q7) — deps: 3.4, 3.6 — PR #19 (2026-11-19)
+- [x] **3.9** Round resolver: speed/seat order, elimination, `onRoundEnd`, win/draw (Rules 1, 12, 13, 15) — deps: 3.6 — PR #19 (2026-11-19)
+- [x] **3.10** Player view builder (allow-list, no private data) — deps: 3.1 — PR #19 (2026-11-19)
+- [x] **3.11** Rule-based bot strategy (legal actions only, seat-limited view) — deps: 3.5, 3.10 — PR #19 (2026-11-19)
+- [x] **3.12** Timeout auto-bot action selection (Rule 14) — deps: 3.11 — PR #19 (2026-11-19)
+- [x] **3.13** Scenario tests 2–4 players + property tests (card conservation, HP bounds) — deps: 3.9 — PR #19 (2026-11-19)
 
 **Acceptance:** scenarios run without browser/DB · engine has no Supabase/UI deps · tests cover spec §9 DoD list
 

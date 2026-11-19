@@ -2,6 +2,13 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-19 — 3.1–3.13 Pure game engine (Rulebook v1)
+
+- **Files:** `packages/game-engine/src/{domain,rng,rules/v1,characters,bots,views}/*`, tests in `packages/game-engine/tests/*`
+- **Tests:** 71 engine tests: every Rulebook v1 rule (1, 3–15) with scenarios; validator/legal actions; player-view leak checks; bot legality over 59 seeds; 75 full bot-vs-bot games (2–4 players) checking card conservation (40), HP bounds, no actions after elimination, termination, determinism.
+- **Decisions:** xoshiro128** RNG with serializable state (replay/recovery); `submitAction` does not bump `version` (simultaneous Select), phase transitions do; played cards leave the hand at reveal (cannot be dodge-discarded) and go to discard after resolving (Q8); Defense/Redirect applied at reveal as round-long effects (Rule 4, Q2); `turn_start` phase in engine only (DB in 4.12); `normal` bot scores legal actions, ties broken by RNG (Q12).
+- **Phase 3 acceptance:** scenarios run without browser/DB ✅ · no Supabase/UI deps (ESLint + architecture test) ✅ · spec §9 DoD test list covered ✅
+
 ## 2026-11-19 — 2.10 Auth E2E · Phase 2 complete (local)
 
 - **Files:** `tests/e2e/auth.spec.ts`, CI job `e2e-auth` (starts local Supabase in the runner — no cloud)
