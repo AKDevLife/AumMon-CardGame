@@ -1,7 +1,7 @@
 -- Task 2.1 — schema, constraints, schema separation and RLS deny-by-default.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(35);
+select plan(36);
 
 -- Tables (blueprint §3.2; optional match_private_events not created)
 select has_table('public', t, 'public.' || t) from unnest(array[
@@ -70,7 +70,7 @@ select throws_ok($$insert into private.match_cards (match_id, card_definition_id
 set local role authenticated;
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000000a","role":"authenticated"}', true);
 select is((select count(*)::int from public.matches), 0, 'authenticated sees no matches without policies');
-update public.match_players set hp = 99;  -- RLS: affects 0 rows
+select throws_ok($$update public.match_players set hp = 99$$, '42501', null, 'authenticated cannot update HP (grant)');
 select throws_ok($$select * from private.match_cards$$, '42501', null, 'authenticated cannot read private.match_cards');
 select throws_ok($$insert into private.round_submissions (match_id, round_number, match_player_id, card_instance_id, idempotency_key)
   values (gen_random_uuid(), 1, gen_random_uuid(), gen_random_uuid(), gen_random_uuid())$$, '42501', null,
@@ -78,7 +78,7 @@ select throws_ok($$insert into private.round_submissions (match_id, round_number
 reset role;
 
 set local role anon;
-select is((select count(*)::int from public.characters), 0, 'anon sees no rows without policies');
+select throws_ok($$select * from public.characters$$, '42501', null, 'anon has no access to public tables');
 select throws_ok($$select * from private.match_runtime$$, '42501', null, 'anon cannot read private.match_runtime');
 reset role;
 

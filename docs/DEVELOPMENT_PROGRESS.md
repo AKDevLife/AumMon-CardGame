@@ -6,20 +6,20 @@
 
 - **Phase:** 2 — Auth & Database Foundation (local database only)
 - **Current task:** none in progress
-- **Next task:** 2.3 grants review for `public` tables
+- **Next task:** 2.4 RLS policies
 
 ## Completion
 
 | Phase                   |   Done |  Total |       % |
 | ----------------------- | -----: | -----: | ------: |
 | 1 Project Foundation    |     14 |     16 |     88% |
-| 2 Auth & Database       |      2 |     10 |     20% |
+| 2 Auth & Database       |      3 |     10 |     30% |
 | 3 Pure Game Engine      |      0 |     13 |      0% |
 | 4 Solo Vertical Slice   |      0 |     12 |      0% |
 | 5 Pass & Play           |      0 |      5 |      0% |
 | 6 Online Multiplayer    |      0 |      8 |      0% |
 | 7 Public Launch & Scale |      0 |      8 |      0% |
-| **Overall**             | **16** | **72** | **22%** |
+| **Overall**             | **17** | **72** | **24%** |
 
 ## Completed
 
@@ -27,6 +27,7 @@
 - 1.11 Vercel Preview per PR (verified)
 - 1.13–1.16 UI Preview (layout, Home/Login/Register UI-only, `vercel.json`, iPhone E2E)
 - 2.1 core schema migration (15 tables, constraints, indexes, schema separation, RLS deny-by-default)
+- 2.3 least-privilege grants on `public`
 - 2.2 profile auto-create + `updated_at` triggers
 
 ## In progress
@@ -44,7 +45,7 @@ None
 
 ## Latest verification
 
-- Local: `pnpm check` ✅ (18 tests, build, secret scan) · `pnpm test:e2e` ✅ 6 (incl. iPhone 13) · `pnpm db:test` ✅ (2 migrations + 49 pgTAP tests)
+- Local: `pnpm check` ✅ (18 tests, build, secret scan) · `pnpm test:e2e` ✅ 6 (incl. iPhone 13) · `pnpm db:test` ✅ (3 migrations + 63 pgTAP tests)
 - CI: see latest PR
 
 ## Rule questions
