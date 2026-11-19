@@ -6,11 +6,13 @@ const PAGES = [
   { path: "/register", heading: "สมัครสมาชิก" },
 ];
 
+const backend = Boolean(process.env["VITE_SUPABASE_URL"]);
+
 for (const { path, heading } of PAGES) {
-  test(`${path} renders with preview banner`, async ({ page }) => {
+  test(`${path} renders${backend ? "" : " with preview banner"}`, async ({ page }) => {
     await page.goto(path);
     await expect(page.getByRole("heading", { level: 1, name: heading })).toBeVisible();
-    await expect(page.getByRole("status")).toContainText("ยังไม่เชื่อมระบบจริง");
+    if (!backend) await expect(page.getByRole("status")).toContainText("ยังไม่เชื่อมระบบจริง");
   });
 }
 
