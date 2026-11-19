@@ -1,0 +1,80 @@
+@import "tailwindcss";
+
+/*
+ * AumMon UI tokens — aummon_game_spec.md section 5 / blueprint Appendix A.
+ * Change the theme here only.
+ */
+:root {
+  --am-bg: #f6f0ff;
+  --am-deco-purple: #e6d8ff;
+  --am-deco-green: #d3f5e8;
+  --am-deco-yellow: #ffe6a8;
+  --am-ink: #2a1650;
+  --am-muted: #6d5a9a;
+  --am-accent: #5b2fb8;
+  --am-round: #ff2d9b;
+  --am-title: #ffc21a;
+  --am-card: #fffbe6;
+  --am-hover: #ffe36e;
+  --am-confirm: #4cc35e;
+  --am-danger: #e8244f;
+  --am-border: 3px solid var(--am-ink);
+  --am-shadow: 0 5px 0 var(--am-ink);
+  --am-shadow-pressed: 0 2px 0 var(--am-ink);
+}
+
+@theme inline {
+  --color-am-bg: var(--am-bg);
+  --color-am-deco-purple: var(--am-deco-purple);
+  --color-am-deco-green: var(--am-deco-green);
+  --color-am-deco-yellow: var(--am-deco-yellow);
+  --color-am-ink: var(--am-ink);
+  --color-am-muted: var(--am-muted);
+  --color-am-accent: var(--am-accent);
+  --color-am-round: var(--am-round);
+  --color-am-title: var(--am-title);
+  --color-am-card: var(--am-card);
+  --color-am-hover: var(--am-hover);
+  --color-am-confirm: var(--am-confirm);
+  --color-am-danger: var(--am-danger);
+
+  --shadow-sticker: var(--am-shadow);
+  --shadow-sticker-pressed: var(--am-shadow-pressed);
+
+  --font-display: "Fredoka", "Kanit", ui-rounded, system-ui, sans-serif;
+  --font-body: "Kanit", "Fredoka", system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    background-color: var(--am-bg);
+    color: var(--am-ink);
+    font-family: var(--font-body);
+  }
+
+  body {
+    margin: 0;
+    min-height: 100dvh;
+    background-color: var(--am-bg);
+  }
+}
+
+@layer components {
+  .am-sticker {
+    border: var(--am-border);
+    box-shadow: var(--am-shadow);
+    border-radius: 1.25rem;
+  }
+
+  .am-pressable {
+    transition:
+      transform 80ms ease-out,
+      box-shadow 80ms ease-out,
+      background-color 120ms ease-out;
+  }
+
+  .am-pressable:not(:disabled):active {
+    transform: translateY(3px);
+    box-shadow: var(--am-shadow-pressed);
+  }
+}
