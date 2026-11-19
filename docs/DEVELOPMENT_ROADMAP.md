@@ -96,13 +96,13 @@ Percentages: `pnpm progress` (top-level tasks only). Phase 0 (Rulebook v1 decisi
 
 ## Phase 6 — Online Multiplayer
 
-- [ ] **6.1** Create/join lobby; join code random, hashed, expiring, rate-limited — deps: 4.2
-- [ ] **6.2** Ready / start / leave (`rooms-ready`, `rooms-leave`) — deps: 6.1
-- [ ] **6.3** Private Realtime channels + authorization; Presence online/offline — deps: 6.1
-- [ ] **6.4** Reconnect / resume (`matches-resume`) + forfeit (`matches-forfeit`) — deps: 6.3
-- [ ] **6.5** Disconnect/timeout 30s → server bot, regain control next round (Rule 14) — deps: 4.4, 6.4
-- [ ] **6.6** Concurrency tests: duplicate/simultaneous submits, single resolver — deps: 6.5
-- [ ] **6.7** E2E: two-browser online match — deps: 6.5
+- [x] **6.1** Create/join lobby; join code random, hashed, expiring, rate-limited — deps: 4.2 — PR #24 (2026-11-19)
+- [x] **6.2** Ready / start / leave (`rooms-ready`, `rooms-leave`) — deps: 6.1 — PR #24 (2026-11-19)
+- [x] **6.3** Private Realtime channels + authorization; Presence online/offline — deps: 6.1 — PR #24 (2026-11-19)
+- [x] **6.4** Reconnect / resume (`matches-resume`) + forfeit (`matches-forfeit`) — deps: 6.3 — PR #24 (2026-11-19)
+- [x] **6.5** Disconnect/timeout 30s → server bot, regain control next round (Rule 14) — deps: 4.4, 6.4 — PR #24 (2026-11-19)
+- [x] **6.6** Concurrency tests: duplicate/simultaneous submits, single resolver — deps: 6.5 — PR #24 (2026-11-19)
+- [x] **6.7** E2E: two-browser online match — deps: 6.5 — PR #24 (2026-11-19)
 - [!] **6.8** Staging Supabase project separate from production — Blocked: owner account, may exceed free tier
 
 **Acceptance:** 2–4 accounts on different devices · cannot read opponent hand/submission · duplicate/concurrent commands never double-resolve

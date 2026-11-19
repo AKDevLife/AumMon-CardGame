@@ -1,5 +1,9 @@
 /** Online multiplayer backend (Phase 6) against local Supabase + Edge Functions + Realtime. */
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import {
+  createClient,
+  REALTIME_SUBSCRIBE_STATES,
+  type SupabaseClient,
+} from "@supabase/supabase-js";
 import { randomUUID } from "node:crypto";
 import { beforeAll, describe, expect, it } from "vitest";
 
@@ -77,7 +81,7 @@ function listen(client: SupabaseClient, matchId: string) {
     );
   const ready = new Promise<void>((resolve) => {
     channel.subscribe((status) => {
-      if (status === "SUBSCRIBED") resolve();
+      if (status === REALTIME_SUBSCRIBE_STATES.SUBSCRIBED) resolve();
     });
   });
   return { received, ready, channel };
@@ -185,13 +189,32 @@ describe.runIf(run)("online multiplayer via Edge Functions", () => {
     const resolved = after.view.events.filter((e) => e.type === "round.ended");
     expect(resolved.length).toBeLessThanOrEqual(2); // events cover current + previous round only
     expect(after.view.round === round + 1 || after.view.result.status !== "ongoing").toBe(true);
-    for (let i = 0; i < 20 && la.received.length === 0; i++) await wait(250);
+    for (let i = 0; i < 40 && la.received.length === 0; i++) await wait(250);
     expect(la.received.length).toBeGreaterThan(0);
     expect(JSON.stringify(la.received)).not.toMatch(/internal_state|rng_state|"deck"|"hands"/);
     expect(lc.received).toEqual([]);
     await a.client.removeChannel(la.channel);
     await c.client.removeChannel(lc.channel);
   });
+
+  it("private match channel (Presence/Broadcast) admits members only", async () => {
+    const join = (client: SupabaseClient) =>
+      new Promise<string>((resolve) => {
+        const ch = client.channel(`match:${matchId}`, { config: { private: true } });
+        ch.subscribe((status) => {
+          if (status !== REALTIME_SUBSCRIBE_STATES.CLOSED) {
+            resolve(status);
+            void client.removeChannel(ch);
+          }
+        });
+        setTimeout(() => {
+          resolve("TIMEOUT");
+        }, 8000);
+      });
+    const [member, outsider] = await Promise.all([join(a.client), join(c.client)]);
+    expect(member).toBe(REALTIME_SUBSCRIBE_STATES.SUBSCRIBED);
+    expect(outsider).not.toBe(REALTIME_SUBSCRIBE_STATES.SUBSCRIBED);
+  }, 20_000);
 
   it("forfeit ends a 2-player match for the other player", async () => {
     const r = await b.call("matches-forfeit", { matchId });

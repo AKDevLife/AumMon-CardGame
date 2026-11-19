@@ -2,6 +2,15 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-19 — Phase 6 Online Multiplayer (local Supabase)
+
+- **Files:** migrations `20261119000500_online.sql`, `20261119000600_realtime_private_channels.sql`; functions `rooms-join`, `rooms-ready`, `rooms-leave`, `matches-resume`, `matches-forfeit`, online mode in `rooms-create`/`matches-start`; `_shared/{lobby,ratelimit}.ts`; engine `forfeit`; UI `src/features/online/{OnlinePage,LobbyPage}.tsx`, Realtime + Presence + forfeit in `MatchPage`; tests `tests/backend/online.test.ts`, `tests/e2e/online.spec.ts`, `supabase/tests/database/007_online.test.sql`
+- **Tests:** 8 backend (hashed code, bad code/character/full room, rate limit 429, ready/owner-only start, own-hand-only, RLS-filtered Realtime to members only, simultaneous submits, private channel members-only, forfeit); 4 pgTAP; 2 engine forfeit; E2E two browser contexts play a full online match.
+- **Decisions:** join code = 8 chars from a 32-symbol alphabet (~1.1e12), SHA-256 only in DB, 30 min expiry, 10 joins/min per user; notifications via Postgres Changes on public mirror tables (RLS decides receivers) — no private data published; Presence on private `match:<id>` channel (realtime.messages policy using `is_match_member`); timeouts stay lazy (client refreshes at deadline); rate limits run outside the command transaction.
+- **Bugs found by tests:** rate-limit increments were rolled back with failed requests; rate limiting inside the transaction could exhaust the 2-connection pool.
+- **Phase 6 acceptance:** 2–4 accounts on different browsers ✅ · cannot read opponent hand/submission ✅ · duplicate/concurrent commands never double-resolve ✅
+- **Remaining:** 6.8 staging project (owner, cost).
+
 ## 2026-11-19 — 4.10 + Phase 5 Pass & Play
 
 - **Files:** `supabase/functions/_shared/{flow,matches}.ts` (`currentSeat`, `actorFor`, reveal option), `rooms-create` (pass_play seats), `matches-view` (`reveal`), `src/features/passplay/*`, `tests/backend/pass-play.test.ts`, `tests/e2e/pass-play.spec.ts`, recovery test in `tests/integration/flow.test.ts`

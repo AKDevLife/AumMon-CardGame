@@ -20,10 +20,16 @@ export function HomePage() {
 
       <nav aria-label="Game modes" className="flex flex-col gap-4">
         {MODES.map((mode) =>
-          (mode.id === "solo" || mode.id === "pass_play") && signedIn ? (
+          signedIn ? (
             <Link
               key={mode.id}
-              to={mode.id === "solo" ? "/play/solo" : "/play/pass"}
+              to={
+                mode.id === "solo"
+                  ? "/play/solo"
+                  : mode.id === "pass_play"
+                    ? "/play/pass"
+                    : "/play/online"
+              }
               className="am-sticker am-pressable flex min-h-14 items-center justify-center bg-am-card px-6 py-3 font-display text-lg font-semibold hover:bg-am-hover"
             >
               {mode.label}
@@ -40,7 +46,7 @@ export function HomePage() {
           ),
         )}
         <p id="modes-note" className="text-center text-sm text-am-muted">
-          {signedIn ? "Online กำลังพัฒนา" : "ต้องเข้าสู่ระบบก่อนเริ่มเล่น"}
+          {signedIn ? "เลือกโหมดที่ต้องการเล่น" : "ต้องเข้าสู่ระบบก่อนเริ่มเล่น"}
         </p>
       </nav>
 
