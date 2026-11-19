@@ -2,6 +2,13 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-19 — 2.4 RLS policies (local only)
+
+- **Files:** `supabase/migrations/20261119000300_rls_policies.sql`, `supabase/tests/database/004_rls_policies.test.sql`
+- **Tests:** 22 new pgTAP tests (85 total) — User A, User B, non-member, anonymous
+- **Decisions:** helpers `is_match_member` (blueprint §4.3) and `is_room_member` (same pattern, avoids recursion) are SECURITY DEFINER, empty search_path, EXECUTE for authenticated only; profiles readable/updatable by owner only (other players' names come from `display_name_snapshot`); disabled characters/cards hidden; all policies SELECT-only except own-profile UPDATE.
+- **Note:** local `supabase/postgres` image's `auth.uid()` reads legacy `request.jwt.claim.sub`; tests set both claim settings.
+
 ## 2026-11-19 — 2.3 Public grants (local only)
 
 - **Files:** `supabase/migrations/20261119000200_public_grants.sql`, `supabase/tests/database/003_public_grants.test.sql`
