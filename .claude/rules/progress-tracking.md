@@ -8,8 +8,9 @@ Files (keep them matching the real repository state):
 
 ## Rules
 
-- Task line format: `- [ ] **P.N** title — deps: …` ; status labels: `⏳ In progress`, `🔒 Blocked: reason`.
-- Mark `[x]` only after verification (local checks + CI) succeeded.
+- Task line: `- [ ] **P.N** title — deps: … — PR #n (YYYY-MM-DD)`. Status: `[ ]` not started, `[~]` in progress, `[x]` completed, `[!]` blocked (reason inline).
+- Acceptance criteria per phase; blockers listed in the progress file with owner steps.
+- Mark `[x]` only after acceptance criteria and verification (local checks + CI) succeeded.
 - Percentages come from `pnpm progress` (counts checkboxes); never estimate or fabricate them.
 - After each logical task: update roadmap checkbox, progress file and changelog, then commit them with the implementation in the same PR.
 - Changelog: significant changes only, no trivial details.
