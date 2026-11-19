@@ -2,6 +2,12 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-19 — Provisional rule decisions (Q6, Q8–Q12)
+
+- **Files:** `docs/rule-clarifications.md`
+- **Decisions (owner-delegated):** heal at full HP legal/no effect; played, cancelled and eliminated-hand cards go to discard; no self-targeting; unique characters per match; no timeout in Pass & Play; single `normal` bot in v1.
+- **Remaining:** none — all 12 questions have provisional answers.
+
 ## 2026-11-19 — Provisional rule decisions (Q1–Q5, Q7)
 
 - **Files:** `docs/rule-clarifications.md`, `docs/DEVELOPMENT_ROADMAP.md`

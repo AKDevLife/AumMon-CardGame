@@ -13,13 +13,13 @@
 | 3   | Chaos speed swap     | ✅ Provisional | Engine       |
 | 4   | Pyro bonus timing    | ✅ Provisional | Engine       |
 | 5   | AoE as a Hit         | ✅ Provisional | Engine       |
-| 6   | Support edge cases   | ❓ Open        | Validator    |
+| 6   | Support edge cases   | ✅ Provisional | Validator    |
 | 7   | Aqua activation      | ✅ Provisional | Engine, API  |
-| 8   | Card zones           | ❓ Open        | Engine       |
-| 9   | Targeting            | ❓ Open        | Validator    |
-| 10  | Duplicate characters | ❓ Open        | Lobby        |
-| 11  | Timeout scope        | ❓ Open        | Server       |
-| 12  | Bot difficulty       | ❓ Open        | Bot          |
+| 8   | Card zones           | ✅ Provisional | Engine       |
+| 9   | Targeting            | ✅ Provisional | Validator    |
+| 10  | Duplicate characters | ✅ Provisional | Lobby        |
+| 11  | Timeout scope        | ✅ Provisional | Server       |
+| 12  | Bot difficulty       | ✅ Provisional | Bot          |
 
 ## Provisional decisions
 
@@ -67,13 +67,33 @@
 - Bot: ใช้ทันทีในรอบแรกที่ใช้ได้ โดยเลือกคู่แข่งที่ HP สูงสุด (เท่ากันใช้ seat น้อย)
 - Implementation: เพิ่ม phase `turn_start` และ Command ใช้สกิลแยก (`matches-use-skill`) — 15 วินาทีปรับได้หลัง Playtest
 
-## Open questions
+### Q6 — Support (Rule 6)
 
-| #   | หัวข้อ                 | คำถาม                                                                                     | อ้างอิง          |
-| --- | -------------------- | ----------------------------------------------------------------------------------------- | -------------- |
-| 6   | Support edge cases   | Rule 6 ประโยคไม่จบ — ยืนยันว่า `draw` ตอนมือ 5 ใบได้; `heal` ตอน HP เต็มเป็น Action ที่ legal หรือไม่ | Rule 6         |
-| 8   | Card zones           | การ์ดที่เล่นแล้ว, Action ที่ถูกยกเลิก และมือของผู้ถูกคัดออก ไปที่ Discard หรือไม่                           | Rule 8, 13     |
-| 9   | Targeting            | โจมตีตัวเองได้หรือไม่; Defense ต้องมี target หรือไม่                                               | Rule 3, 5      |
-| 10  | Duplicate characters | ผู้เล่นในห้องเดียวกันเลือกตัวละครซ้ำได้หรือไม่                                                        | Spec §2        |
-| 11  | Timeout scope        | Timeout 30s ใช้กับ Solo และ Pass & Play ด้วยหรือไม่                                            | Rule 14        |
-| 12  | Bot difficulty       | v1 ต้องมี easy/normal/hard ครบ หรือเริ่มที่ระดับเดียว                                              | Blueprint §5.6 |
+- `draw` เลือกได้แม้มือมี 5 ใบตอน Select (เล่น Support แล้วเหลือ 4 จึงจั่วได้ 1)
+- `heal` ตอน HP เต็มเป็น Action ที่ legal แต่ไม่มีผล (UI แสดงคำเตือน; Bot ไม่เลือก)
+- `draw` เมื่อ Deck และ Discard ว่าง = ไม่มีผล (Rule 8)
+
+### Q8 — Card zones (Rule 8, 13)
+
+- การ์ดที่เล่นแล้วไป Discard หลัง Action นั้น Resolve
+- Action ที่ถูกยกเลิก (Rule 13): การ์ดไป Discard
+- ผู้ถูกคัดออก: ไพ่ในมือทั้งหมดไป Discard ทันที
+- ผล: การ์ดครบ 40 ใบเสมอ (Card conservation test)
+
+### Q9 — Targeting (Rule 3, 5)
+
+- `attack`, `chaos_disrupt`, `chaos_redirect`: ต้องเลือกผู้เล่นอื่นที่ยังมีชีวิต 1 คน — เลือกตัวเองไม่ได้
+- `defense`, `support`, `chaos_aoe`: ไม่มี target (Server ปฏิเสธถ้าส่งมา)
+
+### Q10 — Duplicate characters
+
+- ตัวละครห้ามซ้ำใน Match เดียวกัน (มี 4 ตัว รองรับ 4 ผู้เล่นพอดี; อ่านกระดานง่าย)
+
+### Q11 — Timeout scope (Rule 14)
+
+- Solo และ Online: Timeout 30 วินาที → Server Bot เลือกแทน
+- Pass & Play: ไม่มี Timeout (มีช่วงส่งเครื่อง/Privacy Handoff)
+
+### Q12 — Bot difficulty
+
+- v1 มีระดับเดียว `normal` (heuristic ตาม Blueprint §5.6); โครงสร้างรองรับ `easy`/`hard` ภายหลังผ่าน weights

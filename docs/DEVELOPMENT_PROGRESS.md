@@ -45,6 +45,6 @@ None
 - Local: `pnpm check` ✅ (typecheck, lint, format, 11 tests, build, secret scan) · `pnpm test:e2e` ✅
 - CI on `main`: ✅ run #6 (2026-11-19)
 
-## Open rule questions (not blocking yet)
+## Rule questions
 
-- `docs/rule-clarifications.md` Q6, Q8–Q12 — needed before tasks 3.5/3.6 (Q6, Q8, Q9), lobby (Q10), timeout (Q11), bots (Q12)
+- All 12 in `docs/rule-clarifications.md` have provisional answers (revisit after playtest)
