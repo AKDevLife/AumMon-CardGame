@@ -2,6 +2,14 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-19 — 4.10 + Phase 5 Pass & Play
+
+- **Files:** `supabase/functions/_shared/{flow,matches}.ts` (`currentSeat`, `actorFor`, reveal option), `rooms-create` (pass_play seats), `matches-view` (`reveal`), `src/features/passplay/*`, `tests/backend/pass-play.test.ts`, `tests/e2e/pass-play.spec.ts`, recovery test in `tests/integration/flow.test.ts`
+- **Tests:** 5 backend (seat validation, no hand before reveal, reveal shows only current seat, other accounts 404, full game); E2E 2 local seats with handoff to the end; recovery determinism (attack 10).
+- **Decisions:** server picks the acting seat (lowest-seat pending player; Aqua window → Aqua) — client never sends a seat id; hands are returned only with `reveal: true` and only for the current seat; no polling in Pass & Play; no timeout (Q11).
+- **Bugs found by tests:** Thai names with combining marks (e.g. "ผู้") were rejected → name regex now allows `\p{M}`; flaky backend test when a submit ended the match.
+- **Phase 5 acceptance:** 2–4 players finish on one device ✅ · previous seat's hand not shown ✅ · shared-device limitation explained ✅
+
 ## 2026-11-19 — 4.9 / 4.11 / 4.12 Solo UI
 
 - **Files:** `src/features/solo/SoloSetupPage.tsx`, `src/features/game/{MatchPage,labels,types}.ts(x)`, `src/lib/api.ts`, routes `/play/solo`, `/match/:matchId`, `tests/e2e/solo.spec.ts`

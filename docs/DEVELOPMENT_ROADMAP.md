@@ -78,7 +78,7 @@ Percentages: `pnpm progress` (top-level tasks only). Phase 0 (Rulebook v1 decisi
 - [x] **4.7** `matches-view` (filtered `PlayerGameView`) — deps: 4.5 — PR #21 (2026-11-19)
 - [x] **4.8** Server-side bot execution in match flow — deps: 3.11, 4.6 — PR #21 (2026-11-19)
 - [x] **4.9** Game UI: board, hand, target/choice select, reveal/resolve animation, result — deps: 4.7 — PR #22 (2026-11-19)
-- [~] **4.10** Security tests: must-pass attacks 1–8, 10 (blueprint §10) — deps: 4.8 — attacks 2–7 tested via HTTP (PR #21); 1 & 9 need 2 humans (Phase 6); 10 relies on single-transaction commit (test pending)
+- [x] **4.10** Security tests: must-pass attacks 1–8, 10 (blueprint §10) — deps: 4.8 — attacks 1–8, 10 covered (HTTP, engine, recovery determinism); 9 in Phase 6 — PR #23 (2026-11-19)
 - [x] **4.11** E2E: sign up → solo match → match complete — deps: 4.9 — PR #22 (2026-11-19)
 - [x] **4.12** `turn_start` phase + `matches-use-skill` command for Aqua (clarification Q7) — deps: 3.8, 4.6 — PR #21, #22 (2026-11-19)
 
@@ -86,11 +86,11 @@ Percentages: `pnpm progress` (top-level tasks only). Phase 0 (Rulebook v1 decisi
 
 ## Phase 5 — Pass & Play
 
-- [ ] **5.1** Local seats (no `user_id`) owned by room owner — deps: 4.5
-- [ ] **5.2** Server-side current-seat control — deps: 5.1
-- [ ] **5.3** Privacy Handoff UI + state obscure/reset between seats — deps: 5.2
-- [ ] **5.4** Shared-device limitation notice — deps: 5.3
-- [ ] **5.5** E2E: 2–4 local seats play to the end — deps: 5.3
+- [x] **5.1** Local seats (no `user_id`) owned by room owner — deps: 4.5 — PR #23 (2026-11-19)
+- [x] **5.2** Server-side current-seat control — deps: 5.1 — PR #23 (2026-11-19)
+- [x] **5.3** Privacy Handoff UI + state obscure/reset between seats — deps: 5.2 — PR #23 (2026-11-19)
+- [x] **5.4** Shared-device limitation notice — deps: 5.3 — PR #23 (2026-11-19)
+- [x] **5.5** E2E: 2–4 local seats play to the end — deps: 5.3 — PR #23 (2026-11-19)
 
 **Acceptance:** 2–4 players finish on one device · previous seat's hand not shown normally · limitation explained
 
