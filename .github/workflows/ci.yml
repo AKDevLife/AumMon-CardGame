@@ -82,3 +82,37 @@ jobs:
           name: playwright-report
           path: playwright-report/
           retention-days: 7
+
+  e2e-auth:
+    name: E2E auth (local Supabase)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: checks
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Start local Supabase (no cloud)
+        run: >-
+          pnpm exec supabase start -x
+          studio,imgproxy,inbucket,mailpit,edge-runtime,logflare,vector,supavisor,postgres-meta,storage-api,realtime
+      - name: Export local public env
+        run: |
+          pnpm exec supabase status -o env | grep -E '^(API_URL|PUBLISHABLE_KEY)=' > /tmp/sb.env
+          . /tmp/sb.env
+          echo "VITE_SUPABASE_URL=$API_URL" >> "$GITHUB_ENV"
+          echo "VITE_SUPABASE_PUBLISHABLE_KEY=$PUBLISHABLE_KEY" >> "$GITHUB_ENV"
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Run Playwright against local backend
+        run: pnpm test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report-auth
+          path: playwright-report/
+          retention-days: 7
