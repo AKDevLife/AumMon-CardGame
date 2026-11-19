@@ -19,7 +19,7 @@
 | 5 Pass & Play           |     0 |      5 |      0% |
 | 6 Online Multiplayer    |     0 |      8 |      0% |
 | 7 Public Launch & Scale |     0 |      8 |      0% |
-| **Overall**             | **9** | **67** | **13%** |
+| **Overall**             | **9** | **68** | **13%** |
 
 ## Completed
 
@@ -43,4 +43,8 @@ None
 ## Latest verification
 
 - Local: `pnpm check` ✅ (typecheck, lint, format, 11 tests, build, secret scan) · `pnpm test:e2e` ✅
-- CI on `main`: ✅ run #4 (2026-11-19)
+- CI on `main`: ✅ run #6 (2026-11-19)
+
+## Open rule questions (not blocking yet)
+
+- `docs/rule-clarifications.md` Q6, Q8–Q12 — needed before tasks 3.5/3.6 (Q6, Q8, Q9), lobby (Q10), timeout (Q11), bots (Q12)

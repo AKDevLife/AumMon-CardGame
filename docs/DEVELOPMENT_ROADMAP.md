@@ -29,7 +29,7 @@ Percentages: `pnpm progress` (top-level tasks only). Phase 0 (Rulebook v1 decisi
 - [ ] **2.3** Grants: revoke `private` from anon/authenticated; explicit server-role grants — deps: 2.1
 - [ ] **2.4** RLS policies for all `public` tables + `is_match_member` helper — deps: 2.3
 - [ ] **2.5** Seed: 4 characters, card definitions, deck template v1 (16/10/8/6) — deps: 2.1
-  - [ ] Chaos card split/IDs — needs answer to clarification Q1
+  - [ ] Chaos split 2/2/2 + card IDs per clarification Q1 (provisional)
 - [ ] **2.6** SQL/RLS tests: User A, User B, anonymous, non-member — deps: 2.4
 - [ ] **2.7** Browser Supabase client + env validation — deps: 2.1
 - [ ] **2.8** Sign up / Login / Logout / session handling UI — deps: 2.7
@@ -46,8 +46,8 @@ Percentages: `pnpm progress` (top-level tasks only). Phase 0 (Rulebook v1 decisi
 - [ ] **3.4** Character registry + hook/effectKey validation (config error on mismatch) — deps: 3.1
 - [ ] **3.5** Action validator + legal actions (target, choice, ownership) — deps: 3.3
 - [ ] **3.6** Card effects: attack, defense shield, support heal/draw (Rules 3, 4, 6) — deps: 3.5
-- [ ] **3.7** Chaos effects: Redirect, AoE, Disrupt (Rule 5) — deps: 3.6 — 🔒 Blocked: clarification Q1–Q3, Q5
-- [ ] **3.8** Character skills: Pyro, Aqua, Breeze, Terra (Rules 9–12) — deps: 3.4, 3.6 — 🔒 Blocked: clarification Q4, Q5, Q7
+- [ ] **3.7** Chaos effects: Redirect, AoE, Disrupt (Rule 5; clarifications Q1–Q3, Q5) — deps: 3.6
+- [ ] **3.8** Character skills: Pyro, Aqua, Breeze, Terra (Rules 9–12; clarifications Q4, Q5, Q7) — deps: 3.4, 3.6
 - [ ] **3.9** Round resolver: speed/seat order, elimination, `onRoundEnd`, win/draw (Rules 1, 12, 13, 15) — deps: 3.6
 - [ ] **3.10** Player view builder (allow-list, no private data) — deps: 3.1
 - [ ] **3.11** Rule-based bot strategy (legal actions only, seat-limited view) — deps: 3.5, 3.10
@@ -69,6 +69,7 @@ Percentages: `pnpm progress` (top-level tasks only). Phase 0 (Rulebook v1 decisi
 - [ ] **4.9** Game UI: board, hand, target/choice select, reveal/resolve animation, result — deps: 4.7
 - [ ] **4.10** Security tests: must-pass attacks 1–8, 10 (blueprint §10) — deps: 4.8
 - [ ] **4.11** E2E: sign up → solo match → match complete — deps: 4.9
+- [ ] **4.12** `turn_start` phase + `matches-use-skill` command for Aqua (clarification Q7) — deps: 3.8, 4.6
 
 **Acceptance:** 1 player + bots play to the end · bots run server-side with legal actions only · client cannot fake HP/damage/target
 

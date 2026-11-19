@@ -2,6 +2,13 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-19 — Provisional rule decisions (Q1–Q5, Q7)
+
+- **Files:** `docs/rule-clarifications.md`, `docs/DEVELOPMENT_ROADMAP.md`
+- **Decisions (owner-delegated, revisit after playtest):** chaos 2/2/2; Redirect = round-long, single-target actions only; no speed-swap chaos in v1; Pyro bonus added after reductions, `attack` only; AoE = one Hit per target; Aqua = opt-in `turn_start` window (15s, auto-skip).
+- **Effect:** tasks 3.7, 3.8 unblocked; new task 4.12 (Aqua skill command). Rulebook v1 text unchanged.
+- **Remaining:** Q6, Q8–Q12 open.
+
 ## 2026-11-19 — 1.9 Autonomy rules + progress tracking
 
 - **Files:** `CLAUDE.md`, `.claude/rules/*` (new `progress-tracking.md`), `docs/DEVELOPMENT_*.md`, `scripts/progress.mjs`
