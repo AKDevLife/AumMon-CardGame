@@ -2,6 +2,12 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-19 — 2.9 Profile UI
+
+- **Files:** `src/features/profile/ProfilePage.tsx` (+ tests), `/profile` route, header "โปรไฟล์" link (email moved from header to profile page for small screens)
+- **Tests:** 6 new unit tests (44 total); real flow covered by 2.10 E2E
+- **Decisions:** only `display_name` is editable (column grant from 2.3); avatar upload not in scope (no storage in blueprint Phase 2).
+
 ## 2026-11-19 — 2.8 Auth UI
 
 - **Files:** `src/features/auth/{AuthProvider,AccountNav,AuthCard,LoginPage,RegisterPage,validation,auth-context}.*`, `src/app/AppLayout.tsx`, `src/main.tsx`
