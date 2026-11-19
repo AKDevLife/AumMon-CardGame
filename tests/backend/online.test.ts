@@ -70,6 +70,13 @@ function command(r: Resp) {
 
 function listen(client: SupabaseClient, matchId: string) {
   const received: unknown[] = [];
+  let markReady: () => void = () => undefined;
+  // SUBSCRIBED fires before the Postgres Changes replication is ready; wait for the
+  // realtime "system" confirmation (or a short fallback) before generating changes.
+  const ready = new Promise<void>((resolve) => {
+    markReady = resolve;
+    setTimeout(resolve, 8000);
+  });
   const channel = client
     .channel(`match-${matchId}-${randomUUID()}`)
     .on(
@@ -78,12 +85,11 @@ function listen(client: SupabaseClient, matchId: string) {
       (p) => {
         received.push(p.new);
       },
-    );
-  const ready = new Promise<void>((resolve) => {
-    channel.subscribe((status) => {
-      if (status === REALTIME_SUBSCRIBE_STATES.SUBSCRIBED) resolve();
+    )
+    .on("system", {}, (payload: { extension?: string; status?: string }) => {
+      if (payload.extension === "postgres_changes" && payload.status === "ok") markReady();
     });
-  });
+  channel.subscribe();
   return { received, ready, channel };
 }
 
