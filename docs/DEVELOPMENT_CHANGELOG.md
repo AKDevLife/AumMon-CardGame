@@ -2,6 +2,12 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-19 — 2.2 Database triggers (local only)
+
+- **Files:** `supabase/migrations/20261119000100_triggers.sql`, `supabase/tests/database/002_triggers.test.sql`
+- **Tests:** 14 new pgTAP tests (49 total): profile auto-create, display-name fallback, duplicate rejection, `updated_at` override, function security
+- **Decisions:** `private.handle_new_user()` is SECURITY DEFINER with `search_path = ''`, in non-exposed `private` schema, EXECUTE revoked from client roles; `on conflict do nothing`. Display name from `raw_user_meta_data.display_name` (trimmed, 2–24 chars) else `Player-<6 hex of id>`. `updated_at` trigger only on `profiles` (only table with that column).
+
 ## 2026-11-19 — 2.1 Core schema migration (local only)
 
 - **Files:** `supabase/migrations/20261119000000_core_schema.sql`, `supabase/tests/database/001_core_schema.test.sql`, `scripts/db-test.sh`, `tests/architecture/supabase-config.test.ts`, CI `database` job
