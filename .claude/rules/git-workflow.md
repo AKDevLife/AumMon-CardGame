@@ -1,9 +1,19 @@
 # Git Workflow
 
-- Never commit directly to `main`.
-- One feature branch per task or logical change group (e.g. `feat/…`, `fix/…`, `chore/…`).
-- Review changed files (`git status` / `git diff`) before committing; never commit unrelated files.
-- Concise, conventional commit messages (`feat:`, `fix:`, `chore:`, `docs:`, `test:`, `ci:`).
-- Run required checks before opening a PR; PRs target `main`.
-- Never merge a PR without the owner's approval.
-- Never force-push or rewrite shared history without authorization.
+- Never commit directly to `main`; one feature branch per logical task (`feat/…`, `fix/…`, `chore/…`, `docs/…`).
+- Review `git status` / `git diff` before committing; never commit unrelated files.
+- Concise conventional commits (`feat:`, `fix:`, `chore:`, `docs:`, `test:`, `ci:`).
+- PRs target `main`. Never force-push or rewrite shared history without authorization.
+
+## Self-merge (authorized)
+
+Merge your own PR only when ALL hold:
+
+1. `pnpm check` passes locally and every CI check on the PR is green.
+2. Changed files reviewed; no unrelated changes.
+3. No secrets exposed (`pnpm check:secrets` + diff review).
+4. No locked Rulebook v1 rule changed.
+5. No existing functionality broken (existing tests still pass).
+
+If any condition fails, fix it first. Never merge broken or unverified code.
+After merging, sync local `main` and start the next task on a new branch.

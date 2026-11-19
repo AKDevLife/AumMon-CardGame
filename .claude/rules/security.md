@@ -5,6 +5,5 @@
 - Never bypass authentication or authorization; validate and authorize every server command.
 - Never weaken RLS, grants or Realtime authorization to make tests pass.
 - Never expose private game data (hands, deck order, face-down actions, RNG state, private skill state) to clients, logs or broadcasts.
-- No destructive database operations without approval.
-- No production data changes or production deploys without explicit authorization.
+- Development/test databases may be migrated and reset autonomously; production data and credentials are approval-only (CLAUDE.md).
 - Report any discovered vulnerability immediately, before continuing other work.

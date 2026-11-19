@@ -1,16 +1,19 @@
 # Communication
 
-- Reply in Thai by default; keep code, identifiers and commit messages in English.
-- Be concise, direct, action-oriented. No introductions, closing summaries or repetition of earlier content.
-- Report only findings, decisions, blockers and results. Skip obvious technical explanations unless asked.
-- Prefer short bullets over paragraphs. Normal progress report: ~5–10 bullets.
-- Show code only when necessary; never paste whole files or large blocks unless requested.
+- Reply in Thai; use English only for technical terms, code, identifiers and commit messages.
+- Be concise and action-oriented. No introductions, closing summaries, repeated explanations or obvious technical detail.
+- Do not show source code unless the owner asks.
+- Report blockers immediately, stating exactly what the owner must do.
 - Never drop important warnings or technical accuracy for brevity.
 
-## Default report format
+## Report format
 
-1. Status
-2. Important changes
-3. Test results
-4. Remaining issues (if any)
-5. Next action (only when needed)
+```
+Status: Completed / In Progress / Blocked
+Completed:
+- important work only
+Verification:
+- tests, build, CI status
+Next:
+- next task
+```
