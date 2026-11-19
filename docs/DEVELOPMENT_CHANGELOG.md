@@ -2,6 +2,13 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-19 — 2.8 Auth UI
+
+- **Files:** `src/features/auth/{AuthProvider,AccountNav,AuthCard,LoginPage,RegisterPage,validation,auth-context}.*`, `src/app/AppLayout.tsx`, `src/main.tsx`
+- **Tests:** 8 new unit tests (38 total, mocked client); manual Playwright run against local Supabase stack: register → profile created by trigger → logout → wrong password rejected → login → session persists after reload ✅
+- **Decisions:** live mode only when `VITE_SUPABASE_*` is valid; otherwise preview banner + disabled forms (Vercel Preview has no env yet); generic login/signup errors (no account enumeration); display name sent as `display_name` metadata for the 2.2 trigger; password min 6 = `config.toml`.
+- **Remaining:** automated auth E2E in CI → 2.10.
+
 ## 2026-11-19 — 2.7 Browser Supabase client
 
 - **Files:** `src/lib/env.ts`, `src/lib/supabase/client.ts` (+ tests); dependency `@supabase/supabase-js`

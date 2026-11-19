@@ -43,7 +43,7 @@ Percentages: `pnpm progress` (top-level tasks only). Phase 0 (Rulebook v1 decisi
   - [x] Chaos split 2/2/2 + card IDs per clarification Q1 (provisional)
 - [x] **2.6** SQL/RLS tests: User A, User B, anonymous, non-member — deps: 2.4 — PR #14 (2026-11-19)
 - [x] **2.7** Browser Supabase client + env validation — deps: 2.1 — PR #15 (2026-11-19)
-- [ ] **2.8** Sign up / Login / Logout / session handling UI — deps: 2.7
+- [x] **2.8** Sign up / Login / Logout / session handling UI — deps: 2.7 — PR #16 (2026-11-19)
 - [ ] **2.9** Profile create/update UI (display name validation) — deps: 2.8
 - [ ] **2.10** E2E: sign up → login → profile — deps: 2.9
 
