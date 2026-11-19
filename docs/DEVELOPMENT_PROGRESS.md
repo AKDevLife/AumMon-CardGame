@@ -4,9 +4,9 @@
 
 ## Current
 
-- **Phase:** 3 — Pure Game Engine (Phase 2 complete on local; cloud link pending 1.10)
+- **Phase:** 4 — Solo Vertical Slice (Phases 2–3 complete locally; cloud link pending 1.10)
 - **Current task:** none in progress
-- **Next task:** 3.1 Full domain model
+- **Next task:** 4.1 Engine import into Edge Functions (Deno)
 
 ## Completion
 
@@ -14,12 +14,12 @@
 | ----------------------- | -----: | -----: | ------: |
 | 1 Project Foundation    |     14 |     16 |     88% |
 | 2 Auth & Database       |     10 |     10 |    100% |
-| 3 Pure Game Engine      |      0 |     13 |      0% |
+| 3 Pure Game Engine      |     13 |     13 |    100% |
 | 4 Solo Vertical Slice   |      0 |     12 |      0% |
 | 5 Pass & Play           |      0 |      5 |      0% |
 | 6 Online Multiplayer    |      0 |      8 |      0% |
 | 7 Public Launch & Scale |      0 |      8 |      0% |
-| **Overall**             | **24** | **72** | **33%** |
+| **Overall**             | **37** | **72** | **51%** |
 
 ## Completed
 
@@ -27,6 +27,7 @@
 - 1.11 Vercel Preview per PR (verified)
 - 1.13–1.16 UI Preview (layout, Home/Login/Register UI-only, `vercel.json`, iPhone E2E)
 - 2.1 core schema migration (15 tables, constraints, indexes, schema separation, RLS deny-by-default)
+- 3.1–3.13 pure engine: domain, seeded RNG, deck/hand, registry, validator, all card effects, character skills, resolver, player view, normal bot, timeout auto-submit, simulations
 - 2.10 auth E2E against local Supabase (CI job `e2e-auth`)
 - 2.9 profile page (own display name, RLS-scoped)
 - 2.8 sign up / login / logout / session (verified against local Supabase Auth)
@@ -52,7 +53,7 @@ None
 
 ## Latest verification
 
-- Local: `pnpm check` ✅ (44 tests, build, secret scan) · `pnpm test:e2e` ✅ 7 (incl. iPhone 13 + auth flow on local Supabase) · `pnpm db:test` ✅ (4 migrations + seed + 117 pgTAP tests)
+- Local: `pnpm check` ✅ (115 tests incl. 71 engine, build, secret scan) · `pnpm test:e2e` ✅ 7 (incl. iPhone 13 + auth flow on local Supabase) · `pnpm db:test` ✅ (4 migrations + seed + 117 pgTAP tests)
 - CI: see latest PR
 
 ## Rule questions
