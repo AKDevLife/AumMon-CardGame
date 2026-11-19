@@ -2,6 +2,13 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-19 — 2.7 Browser Supabase client
+
+- **Files:** `src/lib/env.ts`, `src/lib/supabase/client.ts` (+ tests); dependency `@supabase/supabase-js`
+- **Tests:** 12 new unit tests (30 total)
+- **Decisions:** env result is `configured` / `missing` (UI preview mode, client = null) / `invalid`; non-local URLs must be https; `sb_secret_*` keys and `service_role` JWTs are rejected in the browser.
+- **Env:** full local Supabase stack runs via `SUPABASE_INTERNAL_IMAGE_REGISTRY=docker.io supabase start` (public.ecr.aws quota exceeded in this environment).
+
 ## 2026-11-19 — 2.6 Access-matrix tests
 
 - **Files:** `supabase/tests/database/006_access_matrix.test.sql`
