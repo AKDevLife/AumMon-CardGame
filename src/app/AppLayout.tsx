@@ -1,26 +1,19 @@
 import { ENGINE_VERSION, RULESET_VERSION } from "@aummon/game-engine";
-import { Link, NavLink, Outlet } from "react-router";
+import { Link, Outlet } from "react-router";
 import { PreviewBanner } from "../components/PreviewBanner.tsx";
-
-const navClass = ({ isActive }: { isActive: boolean }) =>
-  `am-sticker am-pressable px-3 py-1.5 text-sm font-semibold ${isActive ? "bg-am-hover" : "bg-am-card"}`;
+import { AccountNav } from "../features/auth/AccountNav.tsx";
+import { useAuth } from "../features/auth/auth-context.ts";
 
 export function AppLayout() {
+  const auth = useAuth();
   return (
     <div className="flex min-h-dvh flex-col pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
-      <PreviewBanner />
+      {auth.mode === "preview" && <PreviewBanner />}
       <header className="flex items-center justify-between gap-3 py-3 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))]">
         <Link to="/" className="font-display text-2xl font-bold">
           AumMon
         </Link>
-        <nav aria-label="Account" className="flex gap-2">
-          <NavLink to="/login" className={navClass}>
-            เข้าสู่ระบบ
-          </NavLink>
-          <NavLink to="/register" className={navClass}>
-            สมัคร
-          </NavLink>
-        </nav>
+        <AccountNav />
       </header>
       <main className="mx-auto flex w-full max-w-xl flex-1 flex-col px-4 py-6">
         <Outlet />

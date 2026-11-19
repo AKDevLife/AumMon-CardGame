@@ -2,6 +2,8 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router";
 import { routes } from "./app/routes.tsx";
+import { AuthProvider } from "./features/auth/AuthProvider.tsx";
+import { getSupabaseClient } from "./lib/supabase/client.ts";
 import "./styles/index.css";
 
 const rootElement = document.getElementById("root");
@@ -9,6 +11,8 @@ if (!rootElement) throw new Error("Root element #root not found");
 
 createRoot(rootElement).render(
   <StrictMode>
-    <RouterProvider router={createBrowserRouter(routes)} />
+    <AuthProvider client={getSupabaseClient()}>
+      <RouterProvider router={createBrowserRouter(routes)} />
+    </AuthProvider>
   </StrictMode>,
 );
