@@ -195,7 +195,7 @@ describe.runIf(run)("online multiplayer via Edge Functions", () => {
     expect(lc.received).toEqual([]);
     await a.client.removeChannel(la.channel);
     await c.client.removeChannel(lc.channel);
-  });
+  }, 30_000);
 
   it("private match channel (Presence/Broadcast) admits members only", async () => {
     const join = (client: SupabaseClient) =>
