@@ -50,8 +50,8 @@ select is((select count(*)::int from public.match_events), 1, 'A sees only own m
 select is((select count(*)::int from public.game_rooms), 1, 'A sees only own room');
 select ok(public.is_match_member('20000000-0000-0000-0000-0000000000a1'), 'A is member of match A');
 select ok(not public.is_match_member('20000000-0000-0000-0000-0000000000b1'), 'A is not member of match B');
-select is((select count(*)::int from public.characters), 1, 'disabled characters hidden');
-select is((select count(*)::int from public.deck_templates), 1, 'deck templates readable');
+select is((select count(*)::int from public.characters where id in ('c1','cx')), 1, 'disabled characters hidden');
+select is((select count(*)::int from public.deck_templates where id = 'std'), 1, 'deck templates readable');
 reset role;
 
 select is((select display_name from public.profiles where id = '00000000-0000-0000-0000-0000000000bb'),

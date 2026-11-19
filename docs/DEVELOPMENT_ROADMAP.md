@@ -39,8 +39,8 @@ Percentages: `pnpm progress` (top-level tasks only). Phase 0 (Rulebook v1 decisi
 - [x] **2.2** `profiles` auto-create trigger + `updated_at` triggers — deps: 2.1 — PR #7 (2026-11-19)
 - [x] **2.3** Grants review for `public` tables (least privilege for anon/authenticated); `private` grants done in 2.1 — deps: 2.1 — PR #10 (2026-11-19)
 - [x] **2.4** RLS policies for all `public` tables + `is_match_member` helper — deps: 2.3 — PR #12 (2026-11-19)
-- [ ] **2.5** Seed: 4 characters, card definitions, deck template v1 (16/10/8/6) — deps: 2.1
-  - [ ] Chaos split 2/2/2 + card IDs per clarification Q1 (provisional)
+- [x] **2.5** Seed: 4 characters, card definitions, deck template v1 (16/10/8/6) — deps: 2.1 — PR #13 (2026-11-19)
+  - [x] Chaos split 2/2/2 + card IDs per clarification Q1 (provisional)
 - [ ] **2.6** SQL/RLS tests: User A, User B, anonymous, non-member — deps: 2.4
 - [ ] **2.7** Browser Supabase client + env validation — deps: 2.1
 - [ ] **2.8** Sign up / Login / Logout / session handling UI — deps: 2.7
