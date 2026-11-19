@@ -15,7 +15,11 @@ export default defineConfig({
         test: {
           name: "architecture",
           environment: "node",
-          include: ["tests/architecture/**/*.test.ts"],
+          include: [
+            "tests/architecture/**/*.test.ts",
+            "tests/integration/**/*.test.ts",
+            "tests/backend/**/*.test.ts",
+          ],
         },
       },
       {
