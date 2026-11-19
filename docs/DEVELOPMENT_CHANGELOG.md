@@ -2,6 +2,12 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-19 — 2.6 Access-matrix tests
+
+- **Files:** `supabase/tests/database/006_access_matrix.test.sql`
+- **Tests:** 23 new (117 total): pass & play owner sees local seats; lobby member sees own lobby only; all 5 private tables denied to clients (incl. own hand); clients cannot forge events or change phase; anon has no SELECT on any public table; service_role bypasses RLS.
+- **Phase 2 acceptance (DB part):** A cannot read/edit B profile ✅ · non-member cannot read match ✅ · browser roles cannot read `private` ✅ · migrations + seed reproducible ✅
+
 ## 2026-11-19 — 2.5 Seed data (local only)
 
 - **Files:** `supabase/seed.sql`, `supabase/tests/database/005_seed.test.sql`, `scripts/db-test.sh` (applies seed twice to prove idempotency)
