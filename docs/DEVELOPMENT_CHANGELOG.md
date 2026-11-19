@@ -2,6 +2,12 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-19 — 2.5 Seed data (local only)
+
+- **Files:** `supabase/seed.sql`, `supabase/tests/database/005_seed.test.sql`, `scripts/db-test.sh` (applies seed twice to prove idempotency)
+- **Tests:** 9 new pgTAP tests (94 total): 4 characters match spec §3, 40 cards = 16/10/8/6, chaos 2/2/2
+- **Decisions:** card IDs `attack`, `defense`, `support`, `chaos_redirect`, `chaos_aoe`, `chaos_disrupt`; `effect_spec` is descriptive metadata only — rule logic stays in the engine; deck `standard` v1 active.
+
 ## 2026-11-19 — 2.4 RLS policies (local only)
 
 - **Files:** `supabase/migrations/20261119000300_rls_policies.sql`, `supabase/tests/database/004_rls_policies.test.sql`
