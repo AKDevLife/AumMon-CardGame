@@ -12,18 +12,19 @@
 
 | Phase                   |   Done |  Total |       % |
 | ----------------------- | -----: | -----: | ------: |
-| 1 Project Foundation    |      9 |     12 |     75% |
+| 1 Project Foundation    |     13 |     16 |     81% |
 | 2 Auth & Database       |      2 |     10 |     20% |
 | 3 Pure Game Engine      |      0 |     13 |      0% |
 | 4 Solo Vertical Slice   |      0 |     12 |      0% |
 | 5 Pass & Play           |      0 |      5 |      0% |
 | 6 Online Multiplayer    |      0 |      8 |      0% |
 | 7 Public Launch & Scale |      0 |      8 |      0% |
-| **Overall**             | **11** | **68** | **16%** |
+| **Overall**             | **15** | **72** | **21%** |
 
 ## Completed
 
 - 1.1–1.9 foundation, CI, operating rules, tracking
+- 1.13–1.16 UI Preview (layout, Home/Login/Register UI-only, `vercel.json`, iPhone E2E)
 - 2.1 core schema migration (15 tables, constraints, indexes, schema separation, RLS deny-by-default)
 - 2.2 profile auto-create + `updated_at` triggers
 
@@ -43,7 +44,7 @@ None
 
 ## Latest verification
 
-- Local: `pnpm check` ✅ (12 tests, build, secret scan) · `pnpm db:test` ✅ (2 migrations + 49 pgTAP tests)
+- Local: `pnpm check` ✅ (18 tests, build, secret scan) · `pnpm test:e2e` ✅ 6 (incl. iPhone 13) · `pnpm db:test` ✅ (2 migrations + 49 pgTAP tests)
 - CI: see latest PR
 
 ## Rule questions

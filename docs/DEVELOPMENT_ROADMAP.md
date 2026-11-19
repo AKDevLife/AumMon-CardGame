@@ -16,8 +16,17 @@ Percentages: `pnpm progress` (top-level tasks only). Phase 0 (Rulebook v1 decisi
 - [x] **1.8** Secret guard script, README, `.env.example` — deps: 1.7
 - [x] **1.9** Claude operating rules + progress tracking system
 - [ ] **1.10** Supabase Dev project + `supabase link` — 🔒 Blocked: needs project ref, access token and network access to Supabase
-- [ ] **1.11** Vercel Preview + Production environments (separate env vars) — 🔒 Blocked: owner to confirm Vercel env vars / Preview URL
+- [ ] **1.11** Vercel Preview + Production environments (separate env vars) — 🔒 Blocked: owner must import the repo into Vercel (no env vars needed for UI Preview); verify PR Preview URL
 - [ ] **1.12** Branch protection on `main` requiring CI — 🔒 Blocked: owner repo settings
+
+### UI Preview track (parallel; no backend, engine or DB work)
+
+- [x] **1.13** Main layout + router (iPhone safe areas, `100dvh`, touch targets) — deps: 1.2
+- [x] **1.14** Home, Login, Register UI only — forms disabled, "UI Preview — ยังไม่เชื่อมระบบจริง" banner on every page (real auth: 2.8–2.9) — deps: 1.13
+- [x] **1.15** `vercel.json`: SPA rewrites, security headers, `noindex`, auto-deploy from `main` disabled (no Production) — deps: 1.14
+- [x] **1.16** Responsive E2E: iPhone 13 viewport, no horizontal scroll, screenshots — deps: 1.14
+
+**UI Preview acceptance:** PR Preview URL opens on iPhone; no Production deployment; no secrets in bundle.
 
 **Acceptance (blueprint §9 Phase 1):** PRs pass CI ✅ · Deploy Preview works (1.11) · no secrets in client bundle or Git ✅
 
