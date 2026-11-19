@@ -137,4 +137,17 @@ describe("server flow (advance)", () => {
     for (let t = 1; t < 500 && r.state.phase !== "end"; t++) r = advance(r, t * 31_000);
     expect(r.state.phase).toBe("end");
   });
+
+  it("recovery after a crash re-runs from the committed state with identical results (attack test 10)", () => {
+    // A crash before commit rolls back the transaction; the next request re-runs
+    // advance() from the same committed runtime. It must be deterministic and must
+    // not mutate its input, so the round resolves exactly once with the same outcome.
+    const committed = advance(solo(), 0);
+    const snapshot = JSON.stringify(committed);
+    const firstAttempt = advance(committed, 30_000); // "crashed" — never persisted
+    const retry = advance(committed, 30_000);
+    expect(JSON.stringify(committed)).toBe(snapshot);
+    expect(JSON.stringify(retry)).toBe(JSON.stringify(firstAttempt));
+    expect(retry.events.filter((e) => e.type === "actions.revealed")).toHaveLength(1);
+  });
 });
