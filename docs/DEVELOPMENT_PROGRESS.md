@@ -5,8 +5,8 @@
 ## Current
 
 - **Phase:** 4 — Solo Vertical Slice (Phases 2–3 complete locally; cloud link pending 1.10)
-- **Current task:** none in progress
-- **Next task:** 4.2 `_shared` Edge Function utilities
+- **Current task:** 4.9 Game UI (4.10, 4.12 in progress)
+- **Next task:** 4.9 Game UI
 
 ## Completion
 
@@ -15,11 +15,11 @@
 | 1 Project Foundation    |     14 |     16 |     88% |
 | 2 Auth & Database       |     10 |     10 |    100% |
 | 3 Pure Game Engine      |     13 |     13 |    100% |
-| 4 Solo Vertical Slice   |      1 |     12 |      8% |
+| 4 Solo Vertical Slice   |      8 |     12 |     67% |
 | 5 Pass & Play           |      0 |      5 |      0% |
 | 6 Online Multiplayer    |      0 |      8 |      0% |
 | 7 Public Launch & Scale |      0 |      8 |      0% |
-| **Overall**             | **38** | **72** | **53%** |
+| **Overall**             | **45** | **72** | **63%** |
 
 ## Completed
 
@@ -27,6 +27,7 @@
 - 1.11 Vercel Preview per PR (verified)
 - 1.13–1.16 UI Preview (layout, Home/Login/Register UI-only, `vercel.json`, iPhone E2E)
 - 2.1 core schema migration (15 tables, constraints, indexes, schema separation, RLS deny-by-default)
+- 4.2–4.8 solo backend: `rooms-create`, `matches-start`, `matches-view`, `matches-submit-action`, `matches-use-skill`; row-locked transactions, idempotency receipts, lazy 30s/15s timeouts, server bots
 - 4.1 engine runs in Edge Functions (Deno) via generated `_shared/game-engine` copy; CI boots `engine-health`
 - 3.1–3.13 pure engine: domain, seeded RNG, deck/hand, registry, validator, all card effects, character skills, resolver, player view, normal bot, timeout auto-submit, simulations
 - 2.10 auth E2E against local Supabase (CI job `e2e-auth`)
@@ -41,7 +42,8 @@
 
 ## In progress
 
-None
+- 4.10 security tests (attack 10 test pending; 1 & 9 in Phase 6)
+- 4.12 Aqua skill UI
 
 ## Blocked
 
@@ -54,7 +56,7 @@ None
 
 ## Latest verification
 
-- Local: `pnpm check` ✅ (115 tests incl. 71 engine, build, secret scan) · `pnpm test:e2e` ✅ 7 (incl. iPhone 13 + auth flow on local Supabase) · `pnpm db:test` ✅ (4 migrations + seed + 117 pgTAP tests)
+- Local: `pnpm check` ✅ (115 tests incl. 71 engine, build, secret scan) · backend integration ✅ 7 (local Supabase + Edge Functions) · `pnpm test:e2e` ✅ 7 (incl. iPhone 13 + auth flow on local Supabase) · `pnpm db:test` ✅ (4 migrations + seed + 117 pgTAP tests)
 - CI: see latest PR
 
 ## Rule questions

@@ -70,17 +70,17 @@ Percentages: `pnpm progress` (top-level tasks only). Phase 0 (Rulebook v1 decisi
 ## Phase 4 — Solo Vertical Slice
 
 - [x] **4.1** Engine import into Edge Functions (Deno) — verify approach — deps: 3.1 — PR #20 (2026-11-19)
-- [ ] **4.2** `_shared`: JWT auth, input validation, CORS, errors, engine↔DB adapter — deps: 4.1, 2.4
-- [ ] **4.3** DB functions: `claim_resolution`, `commit_round`, command receipts (idempotency) — deps: 2.1
-- [ ] **4.4** Timer mechanism for 30s timeout + resolver lease recovery — deps: 4.3
-- [ ] **4.5** `rooms-create` (solo) + `matches-start` with server bot seats — deps: 4.2
-- [ ] **4.6** `matches-submit-action` (validation list blueprint §4.5) — deps: 4.3, 4.5
-- [ ] **4.7** `matches-view` (filtered `PlayerGameView`) — deps: 4.5
-- [ ] **4.8** Server-side bot execution in match flow — deps: 3.11, 4.6
+- [x] **4.2** `_shared`: JWT auth, input validation, CORS, errors, engine↔DB adapter — deps: 4.1, 2.4 — PR #21 (2026-11-19)
+- [x] **4.3** DB functions: `claim_resolution`, `commit_round`, command receipts (idempotency) — deps: 2.1 — PR #21 (2026-11-19)
+- [x] **4.4** Timer mechanism for 30s timeout + resolver lease recovery — deps: 4.3 — PR #21 (2026-11-19)
+- [x] **4.5** `rooms-create` (solo) + `matches-start` with server bot seats — deps: 4.2 — PR #21 (2026-11-19)
+- [x] **4.6** `matches-submit-action` (validation list blueprint §4.5) — deps: 4.3, 4.5 — PR #21 (2026-11-19)
+- [x] **4.7** `matches-view` (filtered `PlayerGameView`) — deps: 4.5 — PR #21 (2026-11-19)
+- [x] **4.8** Server-side bot execution in match flow — deps: 3.11, 4.6 — PR #21 (2026-11-19)
 - [ ] **4.9** Game UI: board, hand, target/choice select, reveal/resolve animation, result — deps: 4.7
-- [ ] **4.10** Security tests: must-pass attacks 1–8, 10 (blueprint §10) — deps: 4.8
+- [~] **4.10** Security tests: must-pass attacks 1–8, 10 (blueprint §10) — deps: 4.8 — attacks 2–7 tested via HTTP (PR #21); 1 & 9 need 2 humans (Phase 6); 10 relies on single-transaction commit (test pending)
 - [ ] **4.11** E2E: sign up → solo match → match complete — deps: 4.9
-- [ ] **4.12** `turn_start` phase + `matches-use-skill` command for Aqua (clarification Q7) — deps: 3.8, 4.6
+- [~] **4.12** `turn_start` phase + `matches-use-skill` command for Aqua (clarification Q7) — deps: 3.8, 4.6 — backend + migration done (PR #21); UI pending (4.9)
 
 **Acceptance:** 1 player + bots play to the end · bots run server-side with legal actions only · client cannot fake HP/damage/target
 
