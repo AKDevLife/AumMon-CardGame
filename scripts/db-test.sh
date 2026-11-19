@@ -34,6 +34,12 @@ for f in supabase/migrations/*.sql; do
   psql "$DATABASE_URL" -X -q -v ON_ERROR_STOP=1 -f "$f" >/dev/null
 done
 
+if [[ -f supabase/seed.sql ]]; then
+  echo "Applying supabase/seed.sql (twice, to check idempotency)"
+  psql "$DATABASE_URL" -X -q -v ON_ERROR_STOP=1 -f supabase/seed.sql >/dev/null
+  psql "$DATABASE_URL" -X -q -v ON_ERROR_STOP=1 -f supabase/seed.sql >/dev/null
+fi
+
 status=0
 for t in supabase/tests/database/*.test.sql; do
   out="$(psql "$DATABASE_URL" -X -q -t -A -v ON_ERROR_STOP=1 -f "$t" 2>&1)" || status=1
