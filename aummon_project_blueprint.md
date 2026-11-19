@@ -1,7 +1,7 @@
 # AumMon — Project Blueprint & Implementation Guide
 
 > เอกสารออกแบบระบบและคู่มือเริ่มพัฒนาจริงสำหรับ AumMon  
-> ใช้คู่กับ `aummon_token_efficient_spec_2.md` ซึ่งเป็นแหล่งอ้างอิงหลักของกติกาเกม  
+> ใช้คู่กับ `aummon_game_spec.md` ซึ่งเป็นแหล่งอ้างอิงหลักของกติกาเกม  
 > เวอร์ชัน: 1.1 | วันที่จัดทำ: 2026-11-19 | สถานะ: Implementation Blueprint
 
 ---
@@ -861,7 +861,7 @@ Bot ต้องไม่รับ Full GameState หรือ Hand คู่แ
 
 ### 5.7 Resolution pipeline
 
-ลำดับเชิงระบบที่สอดคล้องกับ **Rulebook v1** (ดูรายละเอียดครบใน `aummon_token_efficient_spec_2.md` หัวข้อ 7):
+ลำดับเชิงระบบที่สอดคล้องกับ **Rulebook v1** (ดูรายละเอียดครบใน `aummon_game_spec.md` หัวข้อ 7):
 
 1. Validate Submitted Actions ทั้งหมด
 2. Reveal Actions พร้อมกันในผลลัพธ์ Round
@@ -968,7 +968,7 @@ Response ของ API ต้องไม่คืน Secret, Private Submission
 
 ### 8.2 UI Design tokens
 
-ยึด Palette และ Cartoon Style จาก `aummon_token_efficient_spec_2.md` ใช้ Fredoka/Kanit และระบบขอบหนา/Sticker Shadow อย่างสม่ำเสมอ แยก `tokens.css` หรือ Tailwind Theme Config เพื่อแก้ธีมจากจุดเดียว
+ยึด Palette และ Cartoon Style จาก `aummon_game_spec.md` ใช้ Fredoka/Kanit และระบบขอบหนา/Sticker Shadow อย่างสม่ำเสมอ แยก `tokens.css` หรือ Tailwind Theme Config เพื่อแก้ธีมจากจุดเดียว
 
 ### 8.3 UX states ที่ต้องออกแบบ
 

@@ -1,0 +1,12 @@
+{
+  "name": "@aummon/game-engine",
+  "version": "0.1.0",
+  "private": true,
+  "description": "AumMon pure TypeScript game engine (Rulebook v1). No React, Supabase, UI, network, database or runtime-specific dependencies.",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {}
+}
