@@ -152,6 +152,14 @@ export async function startMatch(
     const [room] = await tx<{ owner_id: string; mode: MatchMode; status: string }[]>`
       select owner_id, mode, status from public.game_rooms where id = ${roomId} for update`;
     if (room?.owner_id !== userId) throw new HttpError(404, "not_found", "Room not found");
+    if (room.mode === "online") {
+      const lobby = await tx<{ player_type: string; status: string }[]>`
+        select player_type, status from public.room_players where room_id = ${roomId} and status <> 'left'`;
+      if (lobby.length < 2)
+        throw new HttpError(409, "not_enough_players", "Online needs at least 2 players");
+      if (lobby.some((p) => p.status !== "ready"))
+        throw new HttpError(409, "not_ready", "All players must be ready");
+    }
     if (room.status !== "lobby")
       throw new HttpError(409, "room_not_in_lobby", "Room already started");
 
