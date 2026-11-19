@@ -15,18 +15,20 @@ Percentages: `pnpm progress` (top-level tasks only). Phase 0 (Rulebook v1 decisi
 - [x] **1.7** GitHub Actions CI: typecheck, lint, format, test, build, secret scan, E2E — deps: 1.4
 - [x] **1.8** Secret guard script, README, `.env.example` — deps: 1.7
 - [x] **1.9** Claude operating rules + progress tracking system
-- [ ] **1.10** Supabase Dev project + `supabase link` — 🔒 Blocked: owner must create Supabase account/project
-- [ ] **1.11** Vercel Preview + Production environments (separate env vars) — 🔒 Blocked: owner must connect Vercel to GitHub
+- [ ] **1.10** Supabase Dev project + `supabase link` — 🔒 Blocked: needs project ref, access token and network access to Supabase
+- [ ] **1.11** Vercel Preview + Production environments (separate env vars) — 🔒 Blocked: owner to confirm Vercel env vars / Preview URL
 - [ ] **1.12** Branch protection on `main` requiring CI — 🔒 Blocked: owner repo settings
 
 **Acceptance (blueprint §9 Phase 1):** PRs pass CI ✅ · Deploy Preview works (1.11) · no secrets in client bundle or Git ✅
 
 ## Phase 2 — Auth & Database Foundation
 
-- [ ] **2.1** Migration: `public`/`private` schemas, core tables, composite FKs, indexes (blueprint §3.4) — deps: 1.6
-  - [ ] Resolve `deck_templates` versioning conflict (PK `id` vs `unique(id, version)`)
+- [x] **2.1** Migration: `public`/`private` schemas, core tables, composite FKs, indexes (blueprint §3.4) — deps: 1.6
+  - [x] `deck_templates` PK `(id, version)`; composite FKs from `deck_template_cards`, `matches`
+  - [x] RLS enabled on all `public` tables (deny-all until 2.4); `private` revoked from anon/authenticated, granted to service_role
+  - [x] pgTAP tests + `pnpm db:test` + CI `database` job
 - [ ] **2.2** `profiles` auto-create trigger + `updated_at` triggers — deps: 2.1
-- [ ] **2.3** Grants: revoke `private` from anon/authenticated; explicit server-role grants — deps: 2.1
+- [ ] **2.3** Grants review for `public` tables (least privilege for anon/authenticated); `private` grants done in 2.1 — deps: 2.1
 - [ ] **2.4** RLS policies for all `public` tables + `is_match_member` helper — deps: 2.3
 - [ ] **2.5** Seed: 4 characters, card definitions, deck template v1 (16/10/8/6) — deps: 2.1
   - [ ] Chaos split 2/2/2 + card IDs per clarification Q1 (provisional)
