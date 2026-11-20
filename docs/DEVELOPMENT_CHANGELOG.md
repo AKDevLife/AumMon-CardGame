@@ -2,6 +2,11 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-20 — 7.7 Smoke tests + runbook
+
+- **Files:** `scripts/smoke.mjs` (`pnpm smoke <site> <supabase>`; read-only), `docs/OPERATIONS.md` (deploy, rollback, incident checklist)
+- **Tests:** smoke on playtest + AumMon-Dev: 8/8 PASS (site 200, security headers, bundle config/no secret, deep link, engine-health, 401, CORS, private schema hidden).
+
 ## 2026-11-20 — 7.6 Load test + region fix
 
 - **Files:** `tests/load/solo-load.mjs`, `src/lib/api.ts` (`x-region` header), `_shared/http.ts` (CORS allows `x-region`), `docs/OPERATIONS.md` (baseline)

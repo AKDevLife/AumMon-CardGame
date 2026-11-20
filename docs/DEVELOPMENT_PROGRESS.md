@@ -4,9 +4,9 @@
 
 ## Current
 
-- **Phase:** 7 — Public Launch & Scale Evaluation (Dev cloud project live)
+- **Phase:** 7 — remaining tasks need owner decisions (6.8, 7.3, 7.8, 1.12)
 - **Current task:** none in progress
-- **Next task:** 7.7 Smoke tests + incident/rollback runbook
+- **Next task:** none unblocked — waiting for owner (see Blocked)
 
 ## Completion
 
@@ -19,7 +19,7 @@
 | 5 Pass & Play           |      5 |      5 |    100% |
 | 6 Online Multiplayer    |      7 |      8 |     88% |
 | 7 Public Launch & Scale |      0 |      8 |      0% |
-| **Overall**             | **67** | **72** | **93%** |
+| **Overall**             | **68** | **72** | **94%** |
 
 ## Completed
 
