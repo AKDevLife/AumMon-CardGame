@@ -61,5 +61,6 @@ test("sign up → solo 1v1 vs bot → play until the match ends", async ({ page 
     }
   }
   await expect(result).toBeVisible();
+  console.log("SOLO-END", await page.locator("main").innerText());
   await expect(page.getByRole("alert")).toHaveCount(0);
 });

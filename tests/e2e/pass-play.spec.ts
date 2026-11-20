@@ -33,7 +33,7 @@ test("pass & play 1v1: privacy handoff between turns, then forfeit ends the matc
       continue;
     }
     const keep = page.getByRole("button", { name: "เก็บมือนี้" });
-    if (await keep.isVisible().catch(() => false)) {
+    if ((await keep.isVisible()) && (await keep.isEnabled())) {
       await keep.click();
       await expect(idle).toHaveCount(0);
       continue;
