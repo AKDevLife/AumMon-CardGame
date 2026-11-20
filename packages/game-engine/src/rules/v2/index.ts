@@ -1,0 +1,6 @@
+/** Ruleset 2 (1v1 TCG, aummon_game_spec.md v3.0) — card data. */
+export type * from "./types.ts";
+export { CARD_DEFINITIONS_V2, getCardDefinition } from "./cards.ts";
+export { EVOLUTION_RECIPES_V2, FUSION_RECIPES_V2 } from "./recipes.ts";
+export { POWER_BUDGET_V2, RULESET_V2, STARTER_DECK_V2 } from "./constants.ts";
+export { validateCardData, type DataReport } from "./validate.ts";
