@@ -2,6 +2,13 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-20 — 8.9 Ruleset 2 database catalog
+
+- **Files:** `supabase/migrations/20261120000200_ruleset2_catalog.sql`, `supabase/seed.sql`, `supabase/tests/database/010_ruleset2_catalog.test.sql`, `tests/architecture/seed-v2.test.ts`.
+- **Schema (additive):** `card_definitions` gains ruleset 2 columns (rarity, stage, cost, ATK/HP, traits, keywords, slots, deckable) with per-ruleset checks; `evolution_recipes`, `fusion_recipes` (RLS read-only for authenticated); `deck_templates.ruleset_version`; match phases `mulligan/main/battle`; character columns nullable on `match_players`. Match state + card instances stay in `private.match_runtime.internal_state`.
+- **Seed:** 25 cards, 11 recipes, `starter_v2` deck; drift test keeps seed equal to engine data.
+- **Tests:** pgTAP 12 new (10 suites pass); 27 drift checks.
+
 ## 2026-11-20 — 8.8 Ruleset 2 bot
 
 - **Files:** `rules/v2/bot.ts` (`chooseBotCommand`), `tests/v2-bot.test.ts`.

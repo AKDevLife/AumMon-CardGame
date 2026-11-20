@@ -44,8 +44,10 @@ export type CommandErrorCode =
   | "no_recipe";
 
 export class CommandError extends Error {
-  constructor(readonly code: CommandErrorCode) {
+  readonly code: CommandErrorCode;
+  constructor(code: CommandErrorCode) {
     super(code);
+    this.code = code;
     this.name = "CommandError";
   }
 }
