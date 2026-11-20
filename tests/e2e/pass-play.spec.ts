@@ -25,7 +25,7 @@ test("pass & play 1v1: privacy handoff between turns, then forfeit ends the matc
   for (let step = 0; step < 120 && handoffs < 5; step++) {
     if (await result.isVisible()) break;
     const reveal = page.getByRole("button", { name: /แสดงการ์ด/ });
-    if (await reveal.isEnabled().catch(() => false)) {
+    if ((await reveal.isVisible()) && (await reveal.isEnabled())) {
       await expect(page.getByRole("group", { name: "Hand" })).toHaveCount(0); // nothing private before handoff
       await reveal.click();
       await expect(page.getByRole("group", { name: "Hand" })).toBeVisible();
