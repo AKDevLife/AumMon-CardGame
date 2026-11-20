@@ -30,7 +30,8 @@ function corsHeaders(request: Request): Record<string, string> {
   return origin
     ? {
         "Access-Control-Allow-Origin": origin,
-        "Access-Control-Allow-Headers": "authorization, content-type, apikey, x-client-info",
+        "Access-Control-Allow-Headers":
+          "authorization, content-type, apikey, x-client-info, x-region",
         "Access-Control-Allow-Methods": "POST, OPTIONS",
         Vary: "Origin",
       }

@@ -1,5 +1,8 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+/** Region of the Supabase project database (AumMon-Dev: Tokyo). */
+const DEFAULT_FUNCTIONS_REGION = "ap-northeast-1";
+
 export class ApiError extends Error {
   constructor(
     readonly status: number,
@@ -29,6 +32,9 @@ export async function callFunction<T>(
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
         apikey: key,
+        // Run Edge Functions next to the database (task 7.6: cross-region calls made
+        // each command ~40x slower). Override with VITE_SUPABASE_FUNCTIONS_REGION.
+        "x-region": import.meta.env.VITE_SUPABASE_FUNCTIONS_REGION ?? DEFAULT_FUNCTIONS_REGION,
       },
       body: JSON.stringify(body),
     });
