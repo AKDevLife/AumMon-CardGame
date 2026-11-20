@@ -2,6 +2,10 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-20 — 9.7 Thai card names (owner request)
+
+- All 25 cards named in Thai (e.g. เป็ดยางจิ๋ว, ผู้พิทักษ์กระป๋อง, เป็ดยางเทอร์โบ); keywords โจมตีทันที/โล่กำบัง/บินได้/เจาะทะลุ/เร่งพลัง; card text, traits, events and buttons in Thai (game + admin). Engine `cards.ts`, `seed.sql`, migration `20261120000500_thai_card_names.sql`, spec §1.5/§1.6/§6.5.4 (English kept in brackets), clarification R2-9. Display only: IDs, stats and `ruleset_version` unchanged.
+
 ## 2026-11-20 — 9.6 Admin room cleanup (owner request)
 
 - Rooms page: every open room can be closed (lobby or playing; an unfinished game is abandoned with no winner, history kept — rows are closed, not deleted). Server marks stale rooms with a reason: no players, expired code, game already finished, or no activity for 2 hours; "ปิดห้องที่ค้างทั้งหมด" closes them in one audited action.

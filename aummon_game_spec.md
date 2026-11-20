@@ -63,21 +63,27 @@
 
 | Card ID | Name | Copies |
 |---|---|---:|
-| U001 | Rubber Duckling | 2 |
-| U002 | Tin Can Guardian | 2 |
-| U003 | Paper Glider | 2 |
-| U004 | Pocket Flashlight | 2 |
-| U005 | Mini Skateboard | 2 |
-| U006 | Thermos Golem | 2 |
-| U007 | Battery Buddy | 2 |
-| U008 | Wind-up Robot | 2 |
-| A001 | Quick Doodle | 3 |
-| A002 | Lost & Found | 2 |
-| A003 | Scrap Return | 2 |
-| E001 | Clip-on Propeller | 2 |
-| E002 | Reinforced Lid | 2 |
-| E003 | Power Charger | 3 |
+| U001 | เป็ดยางจิ๋ว (Rubber Duckling) | 2 |
+| U002 | ผู้พิทักษ์กระป๋อง (Tin Can Guardian) | 2 |
+| U003 | เครื่องร่อนกระดาษ (Paper Glider) | 2 |
+| U004 | ไฟฉายพกพา (Pocket Flashlight) | 2 |
+| U005 | สเก็ตบอร์ดจิ๋ว (Mini Skateboard) | 2 |
+| U006 | โกเลมกระติกน้ำ (Thermos Golem) | 2 |
+| U007 | เพื่อนถ่านไฟฉาย (Battery Buddy) | 2 |
+| U008 | หุ่นยนต์ไขลาน (Wind-up Robot) | 2 |
+| A001 | ขีดเขียนด่วน (Quick Doodle) | 3 |
+| A002 | ของหายได้คืน (Lost & Found) | 2 |
+| A003 | เก็บเศษมาใช้ใหม่ (Scrap Return) | 2 |
+| E001 | ใบพัดหนีบ (Clip-on Propeller) | 2 |
+| E002 | ฝาเสริมเกราะ (Reinforced Lid) | 2 |
+| E003 | ที่ชาร์จพลัง (Power Charger) | 3 |
 | **รวม** | Unit 16 · Action 7 · Equipment 7 | **30** |
+
+---
+
+## 1.6 ชื่อการ์ดภาษาไทย (เจ้าของยืนยัน 2026-11-20)
+
+ชื่อที่แสดงในเกมเป็นภาษาไทยทั้งหมด (ชื่ออังกฤษเดิมอยู่ในวงเล็บในตาราง §1.5 และ §6.5.4) และ Keyword แสดงเป็น: โจมตีทันที (Haste), โล่กำบัง (Guard), บินได้ (Flying), เจาะทะลุ (Piercing), เร่งพลัง (Boost). เป็นการเปลี่ยนข้อความแสดงผลเท่านั้น ไม่กระทบผลเกม (Card ID, ค่าพลัง และ `ruleset_version` คงเดิม)
 
 ---
 
@@ -554,36 +560,36 @@ Fusion:
 
 | Card ID | Name | Stage | Cost | ATK / HP | Keyword & Trait |
 |---|---|---:|---:|---:|---|
-| U001 | Rubber Duckling | 0 | 1 | 2 / 3 | `Haste` • TOY |
-| U002 | Tin Can Guardian | 0 | 1 | 1 / 4 | `Guard` • METAL |
-| U003 | Paper Glider | 0 | 1 | 2 / 2 | `Flying` • PAPER |
-| U004 | Pocket Flashlight | 0 | 2 | 2 / 4 | Ability: ลดค่า Evo ตัวเอง 1 • LIGHT_SOURCE |
-| U005 | Mini Skateboard | 0 | 2 | 3 / 3 | `Boost` • RIDEABLE |
-| U006 | Thermos Golem | 0 | 2 | 2 / 5 | `Guard` • CONTAINER, METAL |
-| U007 | Battery Buddy | 0 | 2 | 2 / 4 | Ability: ติด Equipment ได้ทุกสาย • POWER |
-| U008 | Wind-up Robot | 0 | 2 | 3 / 3 | `Haste` • CLOCKWORK |
-| U101 | Turbo Bath Duck | 1 | Evo 2 | 4 / 5 | `Haste`, `Piercing` • TOY |
-| U102 | Steel Can Bastion | 1 | Evo 2 | 2 / 7 | `Guard` • METAL |
-| U103 | Paper Jet | 1 | Evo 2 | 4 / 4 | `Flying`, `Piercing` • PAPER |
-| U104 | Solar Searchlight | 1 | Evo 2 | 3 / 6 | `Guard` • LIGHT_SOURCE |
-| U105 | Rocket Skateboard | 1 | Evo 3 | 5 / 5 | `Boost`, `Haste` • RIDEABLE |
-| U106 | Pressure Tank Golem | 1 | Evo 3 | 3 / 8 | `Guard` • CONTAINER, METAL |
-| U107 | Portable Power Hub | 1 | Evo 2 | 3 / 6 | Ability: ติด Equipment ได้ทุกสาย • POWER |
-| U108 | Overwound Clockwork | 1 | Evo 2 | 4 / 5 | `Haste`, `Piercing` • CLOCKWORK |
-| U201 | Amphibious Glider | 2 | Fus 3 | 6 / 7 | `Flying` • FUSION |
-| U202 | Fortress Kettle | 2 | Fus 4 | 4 / 9 | `Guard` (Conditional) • FUSION |
-| U203 | Electric Ride | 2 | Fus 4 | 6 / 8 | `Boost` (Conditional) • FUSION |
+| U001 | เป็ดยางจิ๋ว (Rubber Duckling) | 0 | 1 | 2 / 3 | `Haste` • TOY |
+| U002 | ผู้พิทักษ์กระป๋อง (Tin Can Guardian) | 0 | 1 | 1 / 4 | `Guard` • METAL |
+| U003 | เครื่องร่อนกระดาษ (Paper Glider) | 0 | 1 | 2 / 2 | `Flying` • PAPER |
+| U004 | ไฟฉายพกพา (Pocket Flashlight) | 0 | 2 | 2 / 4 | Ability: ลดค่า Evo ตัวเอง 1 • LIGHT_SOURCE |
+| U005 | สเก็ตบอร์ดจิ๋ว (Mini Skateboard) | 0 | 2 | 3 / 3 | `Boost` • RIDEABLE |
+| U006 | โกเลมกระติกน้ำ (Thermos Golem) | 0 | 2 | 2 / 5 | `Guard` • CONTAINER, METAL |
+| U007 | เพื่อนถ่านไฟฉาย (Battery Buddy) | 0 | 2 | 2 / 4 | Ability: ติด Equipment ได้ทุกสาย • POWER |
+| U008 | หุ่นยนต์ไขลาน (Wind-up Robot) | 0 | 2 | 3 / 3 | `Haste` • CLOCKWORK |
+| U101 | เป็ดยางเทอร์โบ (Turbo Bath Duck) | 1 | Evo 2 | 4 / 5 | `Haste`, `Piercing` • TOY |
+| U102 | ป้อมกระป๋องเหล็ก (Steel Can Bastion) | 1 | Evo 2 | 2 / 7 | `Guard` • METAL |
+| U103 | เจ็ตกระดาษ (Paper Jet) | 1 | Evo 2 | 4 / 4 | `Flying`, `Piercing` • PAPER |
+| U104 | ไฟฉายสุริยะ (Solar Searchlight) | 1 | Evo 2 | 3 / 6 | `Guard` • LIGHT_SOURCE |
+| U105 | สเก็ตบอร์ดจรวด (Rocket Skateboard) | 1 | Evo 3 | 5 / 5 | `Boost`, `Haste` • RIDEABLE |
+| U106 | โกเลมถังแรงดัน (Pressure Tank Golem) | 1 | Evo 3 | 3 / 8 | `Guard` • CONTAINER, METAL |
+| U107 | พาวเวอร์แบงก์ยักษ์ (Portable Power Hub) | 1 | Evo 2 | 3 / 6 | Ability: ติด Equipment ได้ทุกสาย • POWER |
+| U108 | หุ่นไขลานคลั่ง (Overwound Clockwork) | 1 | Evo 2 | 4 / 5 | `Haste`, `Piercing` • CLOCKWORK |
+| U201 | เป็ดร่อนสะเทินน้ำ (Amphibious Glider) | 2 | Fus 3 | 6 / 7 | `Flying` • FUSION |
+| U202 | กาต้มน้ำป้อมปราการ (Fortress Kettle) | 2 | Fus 4 | 4 / 9 | `Guard` (Conditional) • FUSION |
+| U203 | สเก็ตสายฟ้า (Electric Ride) | 2 | Fus 4 | 6 / 8 | `Boost` (Conditional) • FUSION |
 
 **Action & Equipment Definitions (6 ใบ)**
 
 | Card ID | Name | Type | Cost | Effect |
 |---|---|---|---:|---|
-| A001 | Quick Doodle | Action | 1 | `Draw 2` (จั่วการ์ด 2 ใบ) |
-| A002 | Lost & Found | Action | 1 | `Search` ค้นหา Equipment 1 ใบจาก Deck ขึ้นมือ |
-| A003 | Scrap Return | Action | 1 | นำ Equipment 1 ใบจาก Discard กลับขึ้นมือ |
-| E001 | Clip-on Propeller | Equipment | 1 | ติดกับ `TOY` หรือ `PAPER` (1 Slot): มอบ `Flying` |
-| E002 | Reinforced Lid | Equipment | 1 | ติดกับ `CONTAINER` หรือ `METAL` (1 Slot): เพิ่ม **+2 HP** |
-| E003 | Power Charger | Equipment | 1 | ติดกับทุก Unit (1 Slot): เพิ่ม **+1 ATK** |
+| A001 | ขีดเขียนด่วน (Quick Doodle) | Action | 1 | `Draw 2` (จั่วการ์ด 2 ใบ) |
+| A002 | ของหายได้คืน (Lost & Found) | Action | 1 | `Search` ค้นหา Equipment 1 ใบจาก Deck ขึ้นมือ |
+| A003 | เก็บเศษมาใช้ใหม่ (Scrap Return) | Action | 1 | นำ Equipment 1 ใบจาก Discard กลับขึ้นมือ |
+| E001 | ใบพัดหนีบ (Clip-on Propeller) | Equipment | 1 | ติดกับ `TOY` หรือ `PAPER` (1 Slot): มอบ `Flying` |
+| E002 | ฝาเสริมเกราะ (Reinforced Lid) | Equipment | 1 | ติดกับ `CONTAINER` หรือ `METAL` (1 Slot): เพิ่ม **+2 HP** |
+| E003 | ที่ชาร์จพลัง (Power Charger) | Equipment | 1 | ติดกับทุก Unit (1 Slot): เพิ่ม **+1 ATK** |
 
 ## 6.6 Core Scenario Tests — V1.1 Expected Results
 

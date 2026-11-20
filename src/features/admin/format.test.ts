@@ -13,8 +13,8 @@ describe("admin readable formatting", () => {
   });
 
   it("formats game data", () => {
-    expect(card("U001_RUBBER_DUCKLING")).toBe("Rubber Duckling");
-    expect(keywords(["haste", "guard"])).toBe("Haste, Guard");
+    expect(card("U001_RUBBER_DUCKLING")).toBe("เป็ดยางจิ๋ว");
+    expect(keywords(["haste", "guard"])).toBe("โจมตีทันที, โล่กำบัง");
     expect(eventText({ type: "turn_ended", seat: 0 })).toBe("จบเทิร์น / จั่วการ์ด");
     expect(eventText({ type: "forfeit", seat: 1 })).toBe("ผู้เล่น 2 ยอมแพ้");
     expect(

@@ -347,13 +347,9 @@ export function AdminPage() {
                   {
                     label: "ร่าง",
                     value: (r) =>
-                      r["stage"] === 0
-                        ? "ร่างพื้นฐาน"
-                        : r["stage"] === 1
-                          ? "ร่างพัฒนา (Evolution)"
-                          : "ร่างรวม (Fusion)",
+                      r["stage"] === 0 ? "ร่างพื้นฐาน" : r["stage"] === 1 ? "ร่างพัฒนา" : "ร่างรวม",
                   },
-                  { label: "ค่าพลังงาน", value: (r) => `${text(r["cost"])} SPARK` },
+                  { label: "ค่าพลังงาน", value: (r) => `${text(r["cost"])} พลังงาน` },
                   {
                     label: "พลัง",
                     value: (r) =>
@@ -367,21 +363,21 @@ export function AdminPage() {
                 ]}
               />
             </Section>
-            <Section title="สูตรพัฒนาร่าง (Evolution)" help="Unit ร่างพื้นฐานจ่าย SPARK เพื่อเปลี่ยนเป็นร่างใหม่">
+            <Section title="สูตรพัฒนาร่าง" help="ตัวละครร่างพื้นฐานจ่ายพลังงานเพื่อเปลี่ยนเป็นร่างใหม่">
               <RowList
                 rows={asRows(field(data, "evolutions"))}
                 title={(r) => `${card(r["source_card_id"])} → ${card(r["target_card_id"])}`}
-                columns={[{ label: "ค่าพลังงาน", value: (r) => `${text(r["cost"])} SPARK` }]}
+                columns={[{ label: "ค่าพลังงาน", value: (r) => `${text(r["cost"])} พลังงาน` }]}
               />
             </Section>
-            <Section title="สูตรรวมร่าง (Fusion)" help="รวม Unit 2 ตัวบนสนามเป็นตัวใหม่">
+            <Section title="สูตรรวมร่าง" help="รวมตัวละคร 2 ตัวบนสนามเป็นตัวใหม่">
               <RowList
                 rows={asRows(field(data, "fusions"))}
                 title={(r) =>
                   `${card(r["parent_a_card_id"])} + ${card(r["parent_b_card_id"])} → ${card(r["result_card_id"])}`
                 }
                 columns={[
-                  { label: "ค่าพลังงาน", value: (r) => `${text(r["cost"])} SPARK` },
+                  { label: "ค่าพลังงาน", value: (r) => `${text(r["cost"])} พลังงาน` },
                   { label: "รับความสามารถ", value: (r) => keywords(r["inherited_keywords"]) },
                 ]}
               />
@@ -392,7 +388,7 @@ export function AdminPage() {
         const rows = asRows(data);
         const total = rows.reduce((n, r) => n + Number(r["quantity"] ?? 0), 0);
         return (
-          <Section title={`Starter Deck (${total.toLocaleString("th-TH")} ใบ)`}>
+          <Section title={`ชุดการ์ดเริ่มต้น (${total.toLocaleString("th-TH")} ใบ)`}>
             <RowList
               rows={rows}
               title={(r) => card(r["card_definition_id"])}
