@@ -12,7 +12,7 @@ Merge your own PR only when ALL hold:
 1. `pnpm check` passes locally and every CI check on the PR is green.
 2. Changed files reviewed; no unrelated changes.
 3. No secrets exposed (`pnpm check:secrets` + diff review).
-4. No locked Rulebook v1 rule changed.
+4. No locked game rule (`aummon_game_spec.md`) changed without owner approval.
 5. No existing functionality broken (existing tests still pass).
 
 If any condition fails, fix it first. Never merge broken or unverified code.

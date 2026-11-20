@@ -1,7 +1,6 @@
 # Locked project documents — never reformat automatically.
 aummon_game_spec.md
 aummon_project_blueprint.md
-AumMon_Master_Project_Handoff.md
 
 pnpm-lock.yaml
 dist/

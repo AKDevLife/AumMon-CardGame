@@ -2,7 +2,8 @@
 
 > เอกสารออกแบบระบบและคู่มือเริ่มพัฒนาจริงสำหรับ AumMon  
 > ใช้คู่กับ `aummon_game_spec.md` ซึ่งเป็นแหล่งอ้างอิงหลักของกติกาเกม  
-> เวอร์ชัน: 1.1 | วันที่จัดทำ: 2026-11-19 | สถานะ: Implementation Blueprint
+> เวอร์ชัน: 1.2 | อัปเดต: 2026-11-20 | สถานะ: Implementation Blueprint  
+> **2026-11-20:** เกมเปลี่ยนเป็น TCG 1v1 (Spec v3.0, `ruleset_version = "2"`). Platform, Auth, Security, Stack และ Operations ยังใช้ได้ตามเดิม. หัวข้อที่อธิบายกติกาเก่า 2–4 คน (§3.4 ตาราง Game, §5.2, §5.5–5.7) เป็นของ `ruleset_version = "1"` และจะถูกแทนที่ระหว่าง Roadmap Phase 8 — กติกาที่ถูกต้องอยู่ใน `aummon_game_spec.md`
 
 ---
 
@@ -15,7 +16,7 @@
 | Membership | ต้องมี Account |
 | AI Bot | ประมวลผลและตัดสินใจบน Server เท่านั้น |
 | Business model | เล่นฟรีก่อน และเตรียมทางขยายเป็นระบบหารายได้ภายหลัง |
-| Game modes | Solo vs Bots, Pass & Play, Online Multiplayer 2–4 คน |
+| Game modes | Solo vs Bot, Pass & Play, Online — 1v1 (2 ผู้เล่น) |
 | Game authority | Server-authoritative; Client ส่งคำสั่ง ไม่ส่งผลลัพธ์เกม |
 
 ### เป้าหมายทางเทคนิค
@@ -23,7 +24,7 @@
 1. ใช้ Game Engine ชุดเดียวกันในทุกโหมด
 2. ซ่อน Hand, Deck order และ Face-down Actions จาก Client ที่ไม่มีสิทธิ์
 3. ป้องกันการโกงจากการแก้ Browser, การส่งคำสั่งซ้ำ และ Request พร้อมกัน
-4. เพิ่มตัวละคร/การ์ดได้โดยไม่ต้องรื้อ Core Round Rules
+4. เพิ่มการ์ด/Recipe ได้ด้วยข้อมูล (Card Definitions, Recipes) โดยไม่ต้องรื้อ Core Rules
 5. เริ่มต้นด้วย Supabase + Vercel แต่แยก Game Engine ให้พร้อมย้ายไป Dedicated Game Server ได้ในอนาคต
 6. แยก Monetization ออกจากกติกาเกม
 
@@ -652,6 +653,8 @@ Policies ข้างต้นเป็นตัวอย่างขั้น�
 
 ### 5.2 TypeScript domain contracts
 
+> ⚠ Contracts ด้านล่างเป็นของ ruleset 1 (เลิกใช้). Ruleset 2 ต้องแยก Card Definitions / Evolution Recipes / Fusion Recipes / Card Instances / Match State / Match Events ตาม Spec §3.3 และ Data Contract §6.2 — ออกแบบในงาน 8.2–8.3
+
 ```ts
 export type PlayerId = string;
 export type CardInstanceId = string;
@@ -787,6 +790,8 @@ export interface GameEngine {
 
 ### 5.5 Character hook registry
 
+> ⚠ Ruleset 1 เท่านั้น. Ruleset 2 ใช้ Keyword/Effect registry ตาม Spec §5
+
 ```ts
 export interface HookContext {
   state: GameState;
@@ -852,7 +857,7 @@ export interface BotStrategy {
 
 Bot ต้องไม่รับ Full GameState หรือ Hand คู่แข่ง ใช้ Difficulty Presets เช่น `easy`, `normal`, `hard` ผ่าน Weight/Heuristic ที่ปรับได้ ไม่ต้องใช้ LLM ในการตัดสินใจทุก Turn
 
-ตัวอย่าง Heuristic เริ่มต้น:
+ตัวอย่าง Heuristic เริ่มต้น (ruleset 1; Bot ruleset 2 ใช้ Heuristic การลง Unit/โจมตี/Evolution ในงาน 8.8):
 - HP ต่ำ: เพิ่มน้ำหนัก Defense/Heal
 - HP เต็ม: ลดน้ำหนัก Heal
 - เลือก Attack Target จาก HP, Threat และโอกาสชนะ
@@ -861,7 +866,9 @@ Bot ต้องไม่รับ Full GameState หรือ Hand คู่แ
 
 ### 5.7 Resolution pipeline
 
-ลำดับเชิงระบบที่สอดคล้องกับ **Rulebook v1** (ดูรายละเอียดครบใน `aummon_game_spec.md` หัวข้อ 7):
+> ⚠ Ruleset 1 เท่านั้น. Ruleset 2 เป็นเทิร์นสลับกัน (Start → Main → Battle & End) ตาม Spec §4.5 และ Effect Pipeline §5.6–5.7, §5.14
+
+ลำดับเชิงระบบของ **Rulebook v1** (ruleset 1 — เลิกใช้; ดู Git history ของ Spec v2.1):
 
 1. Validate Submitted Actions ทั้งหมด
 2. Reveal Actions พร้อมกันในผลลัพธ์ Round
@@ -877,30 +884,26 @@ Bot ต้องไม่รับ Full GameState หรือ Hand คู่แ
 
 ## 6. Game Modes
 
-### 6.1 Solo vs Server Bots
+### 6.1 Solo vs Server Bot
 
-- Account สร้าง Room/Match
-- Server เติม Bot Seats ตามจำนวนผู้เล่นรวมที่เลือก (2–4)
-- Engine สร้าง Hands และ Deck
-- Bot เลือก Action ใน Server จากข้อมูลที่ Bot Seat มีสิทธิ์เห็น
-- Bot Submission เข้าระบบเดียวกับ Human Submission
+- Account สร้าง Room/Match 1v1; Server เติม Bot 1 Seat
+- Engine สร้าง Deck (Starter Deck ตาม Spec §1.5) และ Hand
+- Bot เล่นทั้งเทิร์นบน Server จากข้อมูลที่ Bot Seat มีสิทธิ์เห็น ผ่านช่องทางเดียวกับ Human
+- Turn timer 90 วินาที: หมดเวลา Server จบเทิร์นอัตโนมัติ
 
 ### 6.2 Pass & Play
 
-- เจ้าของ Account สร้าง Pass & Play Room
-- มี Local Seats หลายที่นั่งโดยไม่มี Account แยก
-- ให้เจ้าของเครื่องเป็นผู้ควบคุม Room
-- ผู้เล่นเลือก Action ทีละ Seat ผ่าน Privacy Handoff
-- Server ตรวจ Seat ปัจจุบันและไม่รับ Seat ID ที่ Client เลือกเองโดยไม่มีการตรวจ
-- ข้อจำกัด: เป็น Shared Device จึงไม่สามารถรับประกันการปกปิดข้อมูลจากคนที่เข้าถึงเครื่อง/DevTools ได้
+- เจ้าของ Account สร้าง Room; Local Seats 2 ที่นั่งไม่มี Account แยก
+- เล่นสลับเทิร์น; ทุกครั้งที่เปลี่ยนเทิร์นผ่าน Privacy Handoff
+- Server ตรวจ Seat ปัจจุบัน ไม่รับ Seat ID ที่ Client เลือกเองโดยไม่มีการตรวจ; ไม่มีจับเวลา
+- ข้อจำกัด: Shared Device ไม่สามารถรับประกันการปกปิดข้อมูลจากผู้ที่เข้าถึงเครื่อง/DevTools ได้
 
 ### 6.3 Online Multiplayer
 
-- ผู้เล่นใช้ Account แยกกัน เข้าห้องด้วย Join Code
-- Join Code ต้องสุ่มเดายาก, เก็บเฉพาะ Hash, มี Expiration และ Rate Limit
-- ทุก Action ตรวจ Membership/Seat/Version/Card Ownership/Target
-- Reconnect ดึงสถานะจาก Server ไม่ใช้ Local State เป็นแหล่งความจริง
-- Disconnect policy/Timeout ใช้ตาม Rulebook v1 (ครบกำหนด 30 วินาทีให้ Server Bot เข้าเล่นแทนอัตโนมัติ)
+- 2 Account เข้าห้องด้วย Join Code (สุ่มเดายาก, เก็บ Hash, หมดอายุ, Rate Limit)
+- ทุก Command ตรวจ Membership/Seat/Turn/Version/Card Instance/Target
+- Reconnect ดึงสถานะจาก Server; Forfeit คงเดิม
+- Turn timer 90 วินาที: หมดเวลา Server จบเทิร์นอัตโนมัติ
 
 ---
 
@@ -1089,6 +1092,10 @@ Response ของ API ต้องไม่คืน Secret, Private Submission
 - 2–4 Accounts เล่นจากคนละ Browser/Device ได้
 - ผู้เล่นไม่สามารถอ่าน Hand/Submission ของคู่แข่ง
 - Command ซ้ำและ Submit พร้อมกันไม่ทำให้ Resolve ซ้ำ
+
+### Phase 8 — 1v1 TCG Ruleset (`ruleset_version = "2"`)
+
+แทนที่เกม 2–4 คนด้วย TCG 1v1 ตาม `aummon_game_spec.md` v3.0 โดยคง Platform เดิม. รายการงานละเอียดอยู่ใน `docs/DEVELOPMENT_ROADMAP.md` Phase 8 (8.1–8.14).
 
 ### Phase 7 — Public Launch & Scale Evaluation
 
