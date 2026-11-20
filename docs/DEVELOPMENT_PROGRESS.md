@@ -50,7 +50,7 @@ None
 
 ## Latest verification (2026-11-20)
 
-- Local: `pnpm check` ✅ 208 unit/integration tests · pgTAP ✅ (9 suites) · backend ✅ 21 · E2E ✅ 16 (incl. axe a11y, solo, pass & play, two-browser online)
+- Local: `pnpm check` ✅ 209 unit/integration tests · pgTAP ✅ (9 suites) · backend ✅ 21 · E2E ✅ 16 (incl. axe a11y, solo, pass & play, two-browser online)
 - Cloud (AumMon-Dev + playtest): smoke ✅ 8/8 · load test ✅ 20/20 matches, submit p50 261 ms
 - CI on `main`: ✅
 
