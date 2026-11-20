@@ -109,7 +109,7 @@ Percentages: `pnpm progress` (top-level tasks only). Phase 0 (Rulebook v1 decisi
 
 ## Phase 7 — Public Launch & Scale Evaluation
 
-- [ ] **7.1** Security review + abuse checks (rate limits, CORS, CSP, headers; re-enable email confirmation for production) — deps: 6.7
+- [x] **7.1** Security review + abuse checks (rate limits, CORS, CSP, headers; re-enable email confirmation for production) — deps: 6.7 — PR #29 (2026-11-20)
 - [ ] **7.2** Error tracking / monitoring + scaling metrics (blueprint §11.4) — deps: 6.7
 - [ ] **7.3** Backup + restore test — deps: 6.8
 - [ ] **7.4** Privacy Policy, Terms, account deletion flow — deps: 2.9

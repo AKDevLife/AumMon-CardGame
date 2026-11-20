@@ -6,7 +6,7 @@
 
 - **Phase:** 7 — Public Launch & Scale Evaluation (Dev cloud project live)
 - **Current task:** none in progress
-- **Next task:** 7.1 Security review + abuse checks
+- **Next task:** 7.2 Monitoring (needs owner decision on provider)
 
 ## Completion
 
@@ -19,7 +19,7 @@
 | 5 Pass & Play           |      5 |      5 |    100% |
 | 6 Online Multiplayer    |      7 |      8 |     88% |
 | 7 Public Launch & Scale |      0 |      8 |      0% |
-| **Overall**             | **62** | **72** | **86%** |
+| **Overall**             | **63** | **72** | **88%** |
 
 ## Completed
 
