@@ -98,7 +98,7 @@ describe.runIf(run)("ruleset 2 matches via Edge Functions", () => {
     expect(first.status).toBe(200);
     const replay = await send(a, v, { type: "mulligan", instanceIds: [] }, idem);
     expect(replay.body["version"]).toBe(first.body["version"]);
-    expect((await send(a, v, { type: "end_turn" })).body["code"]).toBe("stale_version");
+    expect((await send(a, v, { type: "end_turn" })).body["error"]).toBe("stale_version");
     v = first.body as unknown as Tcg;
 
     for (let i = 0; i < 400 && v.view.status !== "finished"; i++) {
