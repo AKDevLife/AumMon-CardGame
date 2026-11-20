@@ -474,3 +474,7 @@ import_map = "./functions/deno.json"
 [functions.rooms-ready]
 verify_jwt = false
 import_map = "./functions/deno.json"
+
+[functions.account-delete]
+verify_jwt = false
+import_map = "./functions/deno.json"

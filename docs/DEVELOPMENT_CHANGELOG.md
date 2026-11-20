@@ -2,6 +2,12 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-20 — 7.4 Privacy/Terms drafts + account deletion
+
+- **Files:** migration `20261120000100_account_deletion.sql` (FKs → set null/cascade, anonymize trigger), function `account-delete`, `src/features/legal/LegalPages.tsx` (`/privacy`, `/terms`, marked DRAFT), `src/features/profile/DeleteAccount.tsx`, pgTAP 009, `tests/backend/account.test.ts`
+- **Tests:** pgTAP 6 new (history kept + anonymized, profile removed); backend: confirmation required, active match forfeited, login blocked afterwards; applied to AumMon-Dev.
+- **Decisions:** a human seat with `user_id = null` now means "deleted account" (constraint relaxed for humans only; bots/local still cannot have a user id); Pass & Play matches hosted by the deleted user are abandoned. Legal texts are drafts pending professional review (owner choice).
+
 ## 2026-11-20 — 7.2 Monitoring (no-cost)
 
 - **Files:** migration `20261120000000_metrics.sql` (`private.function_metrics`, `metrics_functions_24h`, `metrics_matches_daily`), `_shared/metrics.ts`, `_shared/http.ts` (records status/latency per request), `docs/OPERATIONS.md`, pgTAP 008

@@ -41,4 +41,9 @@ describe("app routes", () => {
     renderAt("/missing");
     expect(screen.getByRole("heading", { name: "ไม่พบหน้านี้" })).toBeInTheDocument();
   });
+
+  it.each(["/privacy", "/terms"])("%s is marked as a draft", (path) => {
+    renderAt(path);
+    expect(screen.getByRole("note")).toHaveTextContent("ร่าง");
+  });
 });

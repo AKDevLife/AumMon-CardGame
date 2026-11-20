@@ -2,6 +2,7 @@ import type { RouteObject } from "react-router";
 import { LoginPage } from "../features/auth/LoginPage.tsx";
 import { RegisterPage } from "../features/auth/RegisterPage.tsx";
 import { MatchPage } from "../features/game/MatchPage.tsx";
+import { PrivacyPage, TermsPage } from "../features/legal/LegalPages.tsx";
 import { ProfilePage } from "../features/profile/ProfilePage.tsx";
 import { LobbyPage } from "../features/online/LobbyPage.tsx";
 import { OnlinePage } from "../features/online/OnlinePage.tsx";
@@ -19,6 +20,8 @@ export const routes: RouteObject[] = [
       { path: "login", element: <LoginPage /> },
       { path: "register", element: <RegisterPage /> },
       { path: "profile", element: <ProfilePage /> },
+      { path: "privacy", element: <PrivacyPage /> },
+      { path: "terms", element: <TermsPage /> },
       { path: "play/solo", element: <SoloSetupPage /> },
       { path: "play/pass", element: <PassPlaySetupPage /> },
       { path: "play/online", element: <OnlinePage /> },
