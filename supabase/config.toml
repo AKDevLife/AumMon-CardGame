@@ -478,3 +478,19 @@ import_map = "./functions/deno.json"
 [functions.account-delete]
 verify_jwt = false
 import_map = "./functions/deno.json"
+
+[functions.tcg-create]
+verify_jwt = false
+import_map = "./functions/deno.json"
+
+[functions.tcg-start]
+verify_jwt = false
+import_map = "./functions/deno.json"
+
+[functions.tcg-command]
+verify_jwt = false
+import_map = "./functions/deno.json"
+
+[functions.tcg-view]
+verify_jwt = false
+import_map = "./functions/deno.json"

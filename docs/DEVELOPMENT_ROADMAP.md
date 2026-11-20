@@ -133,7 +133,7 @@ Owner decision 2026-11-20: replace the 2–4 player game with the 1v1 TCG in `au
 - [x] **8.7** Scenario tests T-001–T-007 + spec §5.17 acceptance + determinism/simulation — deps: 8.6 — PR #48 (2026-11-20) — §5.17 #11, #12, #15 (triggers, target loss, loop limit) N/A: no triggered effects in the V1.1 card set
 - [x] **8.8** Server bot v2 (legal actions only, seat-visible data) — deps: 8.7 — PR #49 (2026-11-20)
 - [x] **8.9** DB migration + seed for ruleset 2 (definitions, recipes, match state/events, RLS) — deps: 8.2 — PR #50 (2026-11-20)
-- [ ] **8.10** Backend: turn-based commands, 90 s turn timer → auto end turn, idempotency — deps: 8.8, 8.9
+- [x] **8.10** Backend: turn-based commands, 90 s turn timer → auto end turn, idempotency — deps: 8.8, 8.9 — PR #51 (2026-11-20)
 - [ ] **8.11** UI: 1v1 board + Solo mode — deps: 8.10
 - [ ] **8.12** Pass & Play 1v1 (privacy handoff per turn, no timer) — deps: 8.11
 - [ ] **8.13** Online 1v1 (lobby 2 seats, realtime, resume, forfeit, timer) — deps: 8.11
