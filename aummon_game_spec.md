@@ -424,8 +424,7 @@ Trigger ที่เกิดระหว่าง Resolution เข้าคิ
 - Stat Bonus จากแหล่งต่างกัน Stack ได้
 - Effect จากแหล่งเดียวกันไม่ Stack โดยค่าเริ่มต้น
 - Keyword เดียวกันไม่ซ้ำ เว้นแต่ระบุ
-- Reinforce ไม่ Stack จำนวนครั้งป้องกัน
-- Overclock ใช้ได้ 1 ครั้งต่อ Unit ต่อ Turn
+- Boost ใช้ได้ 1 ครั้งต่อ Unit ต่อ Turn
 - Damage Reduction รวมตามแหล่ง แต่ Damage ต่ำสุด 0
 - Cost Reduction รวมได้ แต่มี Cost Floor
 - Duration แยกติดตามตาม Effect Source
@@ -450,16 +449,14 @@ Fusion:
 2. ตรวจ Haste / Exhausted / Flying / Guard
 3. Attack Triggers
 4. Response Window หากเปิดได้
-5. Combat Calculation
-6. Damage Modification (เช่น Reinforce)
-7. Apply Damage พร้อมกัน
-8. Piercing คำนวณจาก Damage ที่เกิดขึ้นจริงหลังป้องกัน เทียบกับ HP ที่เหลือก่อน Apply
-9. Post Combat Triggers เช่น Unstable
-10. State-Based Check / Destroy / Win Check
+5. Combat Calculation: `Damage = ATK` ของแต่ละฝ่าย (ไม่มี DEF — §4.7)
+6. Apply Damage พร้อมกัน
+7. Piercing: `Excess = max(0, Attacker ATK − Defender Current HP ก่อน Apply)` ส่งเข้า Player HP (§5.18)
+8. State-Based Check / Destroy / Win Check
 
-**ตัวอย่าง Piercing:** Attacker ATK 7, Target DEF 2, Target HP เหลือ 3 → Base Damage 5; หากไม่มีการป้องกัน Damage ส่วนเกิน 2 ส่งไป Player. หาก Reinforce ป้องกัน 2, Actual Damage 3 จึงไม่มี Damage ส่วนเกิน
+**ตัวอย่าง Piercing (T-004):** U101 ATK 4 ตี Unit ที่ HP เหลือ 2 → Unit ถูกทำลาย และ Damage ส่วนเกิน 2 เข้า Player HP
 
-**Open issue สำคัญ:** ต้องเขียนกฎการคำนวณ Combat แบบเป็นสมการเดียวให้ชัด โดยเฉพาะลำดับ HP ก่อน/หลัง Apply, Simultaneous Damage, Reinforce, Piercing, Damage Prevention และกรณี Unit ถูกทำลายระหว่างการคำนวณ
+**Open issue:** ลำดับละเอียดเมื่อ Unit ถูกทำลายระหว่างการคำนวณ / Damage Prevention จาก Effect ในอนาคต
 
 ## 5.15 Safety Limits
 ค่าเริ่มต้นที่เสนอ:
@@ -486,26 +483,21 @@ Fusion:
 
 ## 5.17 Acceptance Tests
 1. Haste โจมตีได้ในเทิร์นที่ Summon
-2. Haste ไม่ลบ Exhausted
-3. Overclock จ่าย 1 SPARK แล้วได้ +2 ATK
-4. Overclock ใช้ซ้ำใน Turn เดียวกันไม่ได้
-5. Reinforce ลด Damage ครั้งแรก 2
-6. Piercing ส่ง Damage ส่วนเกินไป Player
-7. Guard บังคับการเลือกเป้าหมายเมื่อ Ready
-8. Flying ป้องกันการถูกโจมตีจาก Non-Flying
-9. Draw จั่วตามจำนวน
-10. Search ค้นหาและสับ Deck
-11. Recycle นำการ์ดจาก Discard กลับมือ
-12. Modular เพิ่ม Slot
-13. Ancient ลด Evolution Cost แต่ไม่ต่ำกว่า 1
-14. Unstable ทำ Damage 1 หลัง Combat
-15. Trigger Order ถูกต้อง
-16. Target ที่หายไปทำให้ Effect ล้มเหลวตาม Policy
-17. Evolution ไม่สืบทอด Keyword เดิมอัตโนมัติ
-18. Fusion สืบทอดตาม Recipe เท่านั้น
-19. Loop Protection ทำงาน
-20. Match Reset ล้าง Temporary State
-
+2. Haste ไม่ลบ Exhausted หลังโจมตี
+3. Boost จ่าย 1 SPARK แล้วได้ +2 ATK จนจบเทิร์น
+4. Boost ใช้ซ้ำใน Turn เดียวกันไม่ได้
+5. Piercing ส่ง Damage ส่วนเกินไป Player
+6. Guard บังคับการเลือกเป้าหมายเมื่อ Ready
+7. Flying ป้องกันการถูกโจมตีจาก Non-Flying
+8. Draw จั่วตามจำนวน
+9. Search ค้นหาและสับ Deck
+10. Scrap Return (A003) นำ Equipment จาก Discard กลับมือ
+11. Trigger Order ถูกต้อง
+12. Target ที่หายไปทำให้ Effect ล้มเหลวตาม Policy
+13. Evolution ไม่สืบทอด Keyword เดิมอัตโนมัติ
+14. Fusion สืบทอดตาม Recipe เท่านั้น
+15. Loop Protection ทำงาน
+16. Match Reset ล้าง Temporary State
 
 ## 5.18 Locked Keyword Interpretations — V1.1 Accessible Baseline
 
@@ -744,7 +736,7 @@ Fusion:
 3. Field Card: จำกัด 1 ใบ, การแทนที่, Duration และ Effect
 4. Equipment Slot และ Compatibility Matrix ที่ละเอียด
 5. HP / Max HP / Damage / Heal interaction
-6. Combat timing ที่แน่นอนสำหรับ Simultaneous Damage, Reinforce, Piercing และ Unstable
+6. Combat timing ที่แน่นอนสำหรับ Simultaneous Damage และ Piercing
 7. Trigger ordering เมื่อมี Trigger หลายฝ่ายและ Trigger ใหม่เกิดระหว่าง Resolution
 8. การยกเลิก Effect / Target หาย / Source ถูกทำลาย
 9. Cost Floor และ Cost Reduction stacking
@@ -783,4 +775,5 @@ Fusion:
 
 - รวม Handoff v1.1 เข้าเป็น `aummon_game_spec.md` ไฟล์เดียว; ยกเลิกกติกา 2–4 คน (Rulebook v1) ตามการอนุมัติของเจ้าของ
 - เพิ่ม §1 Product & Platform Decisions: 3 โหมดเป็น 1v1, Starter Deck 30 ใบ, Turn timer 90 วินาที (จบเทิร์นอัตโนมัติ)
+- ลบข้อความ V1.0 ที่ค้าง (DEF, Overclock, Reinforce, Unstable, Modular, Ancient, Recycle) ใน §5.12, §5.14, §5.17, §11 ตามที่เจ้าของยืนยัน (R2-1)
 - ตัดส่วนที่ไม่ใช่กติกาเกม (คำสั่ง AI, สถานะงาน, Architecture — อยู่ใน Blueprint) และ §8.2.1 ที่ล้าสมัย (อ้าง 12 Keywords / KW-001–035 ของ V1.0)

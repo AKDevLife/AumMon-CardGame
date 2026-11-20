@@ -2,6 +2,11 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-20 — Old ruleset text removed (R2-1)
+
+- **Files:** `aummon_game_spec.md` §5.12/5.14/5.17/§11, `docs/rule-clarifications.md`
+- **Decision (owner):** V1.1 rules only; removed V1.0 keyword/DEF leftovers and retired Q1–Q12 clarifications.
+
 ## 2026-11-20 — 8.1 Spec v3.0: 1v1 TCG consolidation
 
 - **Files:** `aummon_game_spec.md` (v3.0, single spec), `aummon_project_blueprint.md` (v1.2), roadmap Phase 8, `docs/rule-clarifications.md` (C1 resolved, R2-1), `.claude/rules/*`, `CLAUDE.md`, `README.md`; removed `AumMon_Master_Project_Handoff.md` (merged).
