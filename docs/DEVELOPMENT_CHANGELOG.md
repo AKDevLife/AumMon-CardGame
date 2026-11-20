@@ -2,6 +2,13 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-20 — 9.1–9.2 Developer Admin
+
+- **Files:** migration `20261120000400_admin.sql`, `supabase/functions/admin-api`, `_shared/admin.ts`, `_shared/env.ts`, `src/features/admin/` (`AdminPage`, `MfaPanel`, `guard`), `docs/ADMIN.md`, `supabase/functions/ci-dev.env`, config (local TOTP on).
+- **Security:** roles only in `private` (no client access, self-grant impossible); every action checks session + role + MFA aal2 on the server; mutations audited in an append-only log; catalog read-only and public match data only (owner decisions); no service key in the client; tier from `AUMMON_ENV` (unset = production, dev tools off).
+- **Tests:** pgTAP 011 (10), backend admin RBAC (7, incl. TOTP + logout), env tier, gate unit test, E2E non-admin blocked. Deployed to Dev with `AUMMON_ENV=development`.
+- **Remaining:** 9.3 owner creates the Dev admin user.
+
 ## 2026-11-20 — 8.14 Ruleset 1 retired
 
 - **Removed:** engine ruleset 1 (domain, characters, views, bots, rules/v1 + tests), Edge Functions `matches-*` (also deleted from Dev), `flow.ts`, `matches.ts`, old match page/route. Engine 0.2.0, `RULESET_VERSION = "2"`.
