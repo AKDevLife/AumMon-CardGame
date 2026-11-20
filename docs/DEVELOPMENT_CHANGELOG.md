@@ -2,6 +2,10 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-20 — 9.8 Game screen UI (owner request)
+
+- Tap a card or unit → popup with only its legal commands (chosen over drag-and-drop: easier and safer on phones). Top-right 📜 history popup (moved from the bottom) and ⚙️ settings popup with กติกา (rules summary) and ยอมแพ้. HP as heart icons, energy as bolt icons with numbers, opponent hand as card backs, deck pile showing cards left. Files: `src/features/tcg/` (`TcgMatchPage`, `GameIcons`, `Popup`, `RulesText`), E2E specs.
+
 ## 2026-11-20 — 9.7 Thai card names (owner request)
 
 - All 25 cards named in Thai (e.g. เป็ดยางจิ๋ว, ผู้พิทักษ์กระป๋อง, เป็ดยางเทอร์โบ); keywords โจมตีทันที/โล่กำบัง/บินได้/เจาะทะลุ/เร่งพลัง; card text, traits, events and buttons in Thai (game + admin). Engine `cards.ts`, `seed.sql`, migration `20261120000500_thai_card_names.sql`, spec §1.5/§1.6/§6.5.4 (English kept in brackets), clarification R2-9. Display only: IDs, stats and `ruleset_version` unchanged.
