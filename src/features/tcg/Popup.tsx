@@ -13,17 +13,26 @@ export function Popup({
   children: ReactNode;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
+  // Closing because the parent changed `open` must not call onClose: that would wipe out
+  // the popup the parent just switched to (bug: settings → rules showed nothing).
+  const closingFromProps = useRef(false);
   useEffect(() => {
     const d = ref.current;
     if (!d) return;
     if (open && !d.open) d.showModal();
-    if (!open && d.open) d.close();
+    if (!open && d.open) {
+      closingFromProps.current = true;
+      d.close();
+    }
   }, [open]);
   return (
     <dialog
       ref={ref}
       aria-label={title}
-      onClose={onClose}
+      onClose={() => {
+        if (closingFromProps.current) closingFromProps.current = false;
+        else onClose();
+      }}
       onClick={(e) => {
         if (e.target === ref.current) onClose();
       }}
