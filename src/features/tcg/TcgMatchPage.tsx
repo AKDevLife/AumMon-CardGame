@@ -1,4 +1,5 @@
 import { v2 } from "@aummon/game-engine";
+import { REALTIME_SUBSCRIBE_STATES } from "@supabase/supabase-js";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router";
 import { StickerButton } from "../../components/StickerButton.tsx";
@@ -157,6 +158,34 @@ export function TcgMatchPage() {
     };
   }, [refresh]);
 
+  // Online: private Realtime channel (members only, RLS) for instant updates + Presence.
+  const [online, setOnline] = useState<Set<string>>(new Set());
+  const mode = data?.mode;
+  const presenceKey = data?.seat === null || data?.seat === undefined ? null : String(data.seat);
+  useEffect(() => {
+    if (!client || mode !== "online" || presenceKey === null) return;
+    const channel = client.channel(`match:${matchId}`, {
+      config: { private: true, presence: { key: presenceKey } },
+    });
+    channel
+      .on("presence", { event: "sync" }, () => {
+        setOnline(new Set(Object.keys(channel.presenceState())));
+      })
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "matches", filter: `id=eq.${matchId}` },
+        () => {
+          void refresh();
+        },
+      )
+      .subscribe((status) => {
+        if (status === REALTIME_SUBSCRIBE_STATES.SUBSCRIBED) void channel.track({ online: true });
+      });
+    return () => {
+      void client.removeChannel(channel);
+    };
+  }, [client, mode, presenceKey, matchId, refresh]);
+
   // Server applies the turn timeout when asked after the deadline.
   useEffect(() => {
     if (seconds !== 0) return;
@@ -249,7 +278,15 @@ export function TcgMatchPage() {
         aria-label="Opponent"
         className="am-sticker flex flex-wrap items-center justify-between gap-2 bg-am-deco-purple p-3"
       >
-        <span className="font-display font-bold">{data.names[foeSeat]}</span>
+        <span className="font-display font-bold">
+          {data.names[foeSeat]}
+          {data.mode === "online" && (
+            <span
+              aria-label={online.has(String(foeSeat)) ? "ออนไลน์" : "ออฟไลน์"}
+              className={`ml-2 inline-block h-2.5 w-2.5 rounded-full ${online.has(String(foeSeat)) ? "bg-am-confirm" : "bg-am-muted"}`}
+            />
+          )}
+        </span>
         <span className="font-display font-bold">❤️ {Math.max(0, foe.hp)}</span>
         <span className="text-sm">
           ✋ {foe.handCount} · 🂠 {foe.deckCount} · ⚡ {foe.spark}/{foe.maxSpark}

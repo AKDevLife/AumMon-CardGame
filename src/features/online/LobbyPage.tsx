@@ -3,13 +3,11 @@ import { useNavigate, useParams } from "react-router";
 import { StickerButton } from "../../components/StickerButton.tsx";
 import { ApiError, callFunction } from "../../lib/api.ts";
 import { useAuth } from "../auth/auth-context.ts";
-import { CHARACTER_NAME } from "../game/labels.ts";
 import { recallJoinCode } from "./join-code-store.ts";
 
 interface Seat {
   seat: number;
   user_id: string | null;
-  character_id: string;
   display_name_snapshot: string;
   status: string;
 }
@@ -44,7 +42,7 @@ export function LobbyPage() {
         .maybeSingle<Room>(),
       client
         .from("room_players")
-        .select("seat, user_id, character_id, display_name_snapshot, status")
+        .select("seat, user_id, display_name_snapshot, status")
         .eq("room_id", roomId)
         .order("seat")
         .overrideTypes<Seat[], { merge: false }>(),
@@ -61,7 +59,7 @@ export function LobbyPage() {
     }
     const matchId = m.data?.[0]?.id;
     if (matchId) {
-      void navigate(`/match/${matchId}`);
+      void navigate(`/game/${matchId}`);
       return;
     }
     setRoom(r.data);
@@ -133,9 +131,7 @@ export function LobbyPage() {
       <ul className="flex flex-col gap-2" aria-label="Lobby players">
         {seats.map((s) => (
           <li key={s.seat} className="am-sticker flex items-center justify-between bg-am-card p-3">
-            <span className="font-semibold">
-              {s.display_name_snapshot} · {CHARACTER_NAME[s.character_id] ?? s.character_id}
-            </span>
+            <span className="font-semibold">{s.display_name_snapshot}</span>
             <span className={s.status === "ready" ? "text-am-confirm" : "text-am-muted"}>
               {s.status === "ready" ? "พร้อม ✅" : "รอ…"}
             </span>
@@ -160,7 +156,7 @@ export function LobbyPage() {
         <StickerButton
           variant="confirm"
           disabled={!canStart || pending}
-          onClick={() => void act("matches-start", { roomId })}
+          onClick={() => void act("tcg-start", { roomId })}
         >
           เริ่มเกม
         </StickerButton>

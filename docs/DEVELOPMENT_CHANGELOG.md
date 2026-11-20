@@ -2,6 +2,11 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-20 — 8.13 Ruleset 2 Online
+
+- **Files:** `_shared/lobby.ts`, `rooms-create`, `rooms-join` (online rooms are ruleset 2: 2 seats, no characters), `OnlinePage.tsx`, `LobbyPage.tsx` (start via `tcg-start`, → `/game/:id`), `TcgMatchPage.tsx` (private Realtime channel + Presence dot), tests `tests/backend/online.test.ts`, E2E `online.spec.ts`.
+- **Behaviour:** hashed expiring join codes + rate limits unchanged; each browser sees only its own hand; concurrent commands serialized by the match row lock; forfeit; 90 s timer.
+
 ## 2026-11-20 — 8.12 Ruleset 2 Pass & Play
 
 - **Files:** `PassPlaySetupPage.tsx` (2 names → `tcg-create`), `_shared/tcg.ts` (hand stays visible while the same seat keeps acting; hidden on seat change), E2E `pass-play.spec.ts`, backend test.

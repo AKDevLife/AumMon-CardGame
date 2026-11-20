@@ -23,32 +23,25 @@ async function displayName(tx: Tx, userId: string) {
   return p?.display_name ?? "Player";
 }
 
-async function assertCharacter(tx: Tx, id: string) {
-  const [c] = await tx<
-    { id: string }[]
-  >`select id from public.characters where id = ${id} and is_enabled`;
-  if (!c) throw new HttpError(400, "invalid_character", "Unknown character");
-}
-
-export async function createOnlineRoom(userId: string, characterId: string, maxPlayers: number) {
+/** Online 1v1 room (ruleset 2, spec §1.2): no characters, exactly 2 seats. */
+export async function createOnlineRoom(userId: string) {
   await rateLimit(userId, "room.create", 10, 60); // outside the transaction (own connection)
   return db().begin(async (tx) => {
-    await assertCharacter(tx, characterId);
     const code = newCode();
     const [room] = await tx<{ id: string }[]>`
-      insert into public.game_rooms (owner_id, join_code_hash, mode, status, max_players, expires_at)
-      values (${userId}, ${await hashRequest(code)}, 'online', 'lobby', ${maxPlayers}, now() + ${`${LOBBY_TTL_MINUTES} minutes`}::interval)
+      insert into public.game_rooms (owner_id, join_code_hash, mode, status, max_players, ruleset_version, expires_at)
+      values (${userId}, ${await hashRequest(code)}, 'online', 'lobby', 2, '2', now() + ${`${LOBBY_TTL_MINUTES} minutes`}::interval)
       returning id`;
     if (!room) throw new Error("room insert failed");
     await tx`
-      insert into public.room_players (room_id, user_id, seat, player_type, character_id, display_name_snapshot, status)
-      values (${room.id}, ${userId}, 1, 'human', ${characterId}, ${await displayName(tx, userId)}, 'ready')`;
+      insert into public.room_players (room_id, user_id, seat, player_type, display_name_snapshot, status)
+      values (${room.id}, ${userId}, 1, 'human', ${await displayName(tx, userId)}, 'ready')`;
     // The plaintext code is returned once to the owner and never stored.
     return { roomId: room.id, joinCode: code };
   });
 }
 
-export async function joinRoom(userId: string, rawCode: string, characterId: string) {
+export async function joinRoom(userId: string, rawCode: string) {
   await rateLimit(userId, "room.join", 10, 60);
   return db().begin(async (tx) => {
     const code = normalizeCode(rawCode);
@@ -56,23 +49,20 @@ export async function joinRoom(userId: string, rawCode: string, characterId: str
       throw new HttpError(404, "room_not_found", "Room not found or expired");
     const [room] = await tx<{ id: string; max_players: number }[]>`
       select id, max_players from public.game_rooms
-      where join_code_hash = ${await hashRequest(code)} and mode = 'online' and status = 'lobby' and expires_at > now()
+      where join_code_hash = ${await hashRequest(code)} and mode = 'online' and ruleset_version = '2'
+        and status = 'lobby' and expires_at > now()
       for update`;
     if (!room) throw new HttpError(404, "room_not_found", "Room not found or expired");
-    await assertCharacter(tx, characterId);
-    const seats = await tx<{ seat: number; user_id: string | null; character_id: string }[]>`
-      select seat, user_id, character_id from public.room_players where room_id = ${room.id} and status <> 'left'`;
+    const seats = await tx<{ seat: number; user_id: string | null }[]>`
+      select seat, user_id from public.room_players where room_id = ${room.id} and status <> 'left'`;
     if (seats.some((s) => s.user_id === userId)) return { roomId: room.id };
     if (seats.length >= room.max_players) throw new HttpError(409, "room_full", "Room is full");
-    if (seats.some((s) => s.character_id === characterId)) {
-      throw new HttpError(409, "character_taken", "Character already taken (clarification Q10)");
-    }
     const used = new Set(seats.map((s) => s.seat));
-    const seat = [1, 2, 3, 4].find((n) => !used.has(n)) ?? 0;
+    const seat = [1, 2].find((n) => !used.has(n)) ?? 0;
     await tx`delete from public.room_players where room_id = ${room.id} and seat = ${seat} and status = 'left'`;
     await tx`
-      insert into public.room_players (room_id, user_id, seat, player_type, character_id, display_name_snapshot, status)
-      values (${room.id}, ${userId}, ${seat}, 'human', ${characterId}, ${await displayName(tx, userId)}, 'waiting')`;
+      insert into public.room_players (room_id, user_id, seat, player_type, display_name_snapshot, status)
+      values (${room.id}, ${userId}, ${seat}, 'human', ${await displayName(tx, userId)}, 'waiting')`;
     return { roomId: room.id };
   });
 }
