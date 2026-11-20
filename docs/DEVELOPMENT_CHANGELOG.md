@@ -2,6 +2,12 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-20 — 8.4 Ruleset 2 combat + keywords
+
+- **Files:** `rules/v2/stats.ts` (effective ATK/HP/keywords incl. equipment), `match.ts` (`boost`, `attack`, Main → Battle phase), `tests/v2-combat.test.ts`.
+- **Behaviour:** simultaneous unit damage, direct attack unless a Ready Guard blocks, Flying targeting, flying-Guard exception, Piercing excess, Boost +2 once/turn, destroyed units + equipment to Discard.
+- **Tests:** 12 new incl. spec scenarios T-001–T-005. **Decision (owner):** R2-6 phase order.
+
 ## 2026-11-20 — 8.3 Ruleset 2 engine core
 
 - **Files:** `packages/game-engine/src/rules/v2/` (`state.ts`, `match.ts`, `view.ts`), `tests/v2-match.test.ts`.

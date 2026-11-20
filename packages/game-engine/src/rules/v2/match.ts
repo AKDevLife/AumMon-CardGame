@@ -1,6 +1,7 @@
 import type { RandomSource } from "../../domain/types.ts";
 import { getCardDefinition } from "./cards.ts";
 import { RULESET_V2 } from "./constants.ts";
+import { unitAtk, unitHp, unitKeywords } from "./stats.ts";
 import {
   cloneState,
   other,
@@ -9,6 +10,7 @@ import {
   type MatchState,
   type PlayerState,
   type Seat,
+  type UnitInstance,
 } from "./state.ts";
 
 /**
@@ -25,7 +27,13 @@ export type CommandErrorCode =
   | "not_enough_spark"
   | "unit_zone_full"
   | "mulligan_done"
-  | "duplicate_card";
+  | "duplicate_card"
+  | "unknown_unit"
+  | "unit_exhausted"
+  | "no_boost"
+  | "boost_used"
+  | "flying_target"
+  | "guard_blocks";
 
 export class CommandError extends Error {
   constructor(readonly code: CommandErrorCode) {
@@ -41,6 +49,14 @@ export type Command =
       readonly instanceIds: readonly string[];
     }
   | { readonly type: "summon"; readonly playerId: string; readonly instanceId: string }
+  | { readonly type: "boost"; readonly playerId: string; readonly instanceId: string }
+  /** target: opponent unit instance id, or "player" for a direct attack. */
+  | {
+      readonly type: "attack";
+      readonly playerId: string;
+      readonly attackerId: string;
+      readonly target: string;
+    }
   | { readonly type: "end_turn"; readonly playerId: string }
   | { readonly type: "forfeit"; readonly playerId: string };
 
@@ -100,6 +116,7 @@ export function initializeMatch(input: MatchInput, rng: RandomSource): MatchStat
     status: "mulligan",
     firstSeat,
     activeSeat: firstSeat,
+    phase: "main",
     turn: 0,
     players,
     result: null,
@@ -141,6 +158,7 @@ function draw(state: MatchState, seat: Seat, events: GameEvent[]): void {
 /** Start Phase: ready units, +1 max SPARK (cap 8), refill, draw (first turn of first player skips). */
 function startTurn(state: MatchState, seat: Seat, events: GameEvent[]): void {
   state.activeSeat = seat;
+  state.phase = "main";
   state.turn += 1;
   const p = state.players[seat];
   for (const u of p.units) u.exhausted = false;
@@ -184,8 +202,7 @@ export function applyCommand(state: MatchState, command: Command, rng: RandomSou
       break;
     }
     case "summon": {
-      if (next.status !== "active") throw new CommandError("wrong_phase");
-      if (seat !== next.activeSeat) throw new CommandError("not_your_turn");
+      requireMain(next, seat);
       const card = me.hand.find((c) => c.instanceId === command.instanceId);
       if (!card) throw new CommandError("card_not_in_hand");
       const def = getCardDefinition(card.cardId);
@@ -195,7 +212,16 @@ export function applyCommand(state: MatchState, command: Command, rng: RandomSou
       me.spark -= def.cost;
       me.hand = me.hand.filter((c) => c !== card);
       const exhausted = !def.keywords.includes("haste");
-      me.units.push({ ...card, damage: 0, exhausted, equipment: [], history: [] });
+      me.units.push({
+        ...card,
+        damage: 0,
+        exhausted,
+        equipment: [],
+        history: [],
+        bonusKeywords: [],
+        tempAtk: 0,
+        boostUsed: false,
+      });
       events.push({
         type: "unit_summoned",
         seat,
@@ -205,9 +231,31 @@ export function applyCommand(state: MatchState, command: Command, rng: RandomSou
       });
       break;
     }
+    case "boost": {
+      requireMain(next, seat);
+      const unit = findUnit(me.units, command.instanceId);
+      if (unit.exhausted) throw new CommandError("unit_exhausted");
+      if (!unitKeywords(unit).has("boost")) throw new CommandError("no_boost");
+      if (unit.boostUsed) throw new CommandError("boost_used");
+      if (me.spark < 1) throw new CommandError("not_enough_spark");
+      me.spark -= 1;
+      unit.tempAtk += 2;
+      unit.boostUsed = true;
+      events.push({ type: "boosted", seat, instanceId: unit.instanceId });
+      break;
+    }
+    case "attack": {
+      requireTurn(next, seat);
+      next.phase = "battle";
+      resolveAttack(next, seat, command.attackerId, command.target, events);
+      break;
+    }
     case "end_turn": {
-      if (next.status !== "active") throw new CommandError("wrong_phase");
-      if (seat !== next.activeSeat) throw new CommandError("not_your_turn");
+      requireTurn(next, seat);
+      for (const u of me.units) {
+        u.tempAtk = 0;
+        u.boostUsed = false;
+      }
       events.push({ type: "turn_ended", seat });
       startTurn(next, other(seat), events);
       break;
@@ -216,9 +264,114 @@ export function applyCommand(state: MatchState, command: Command, rng: RandomSou
   return { state: next, events };
 }
 
+function requireTurn(state: MatchState, seat: Seat): void {
+  if (state.status !== "active") throw new CommandError("wrong_phase");
+  if (seat !== state.activeSeat) throw new CommandError("not_your_turn");
+}
+
+function requireMain(state: MatchState, seat: Seat): void {
+  requireTurn(state, seat);
+  if (state.phase !== "main") throw new CommandError("wrong_phase");
+}
+
+function findUnit(units: readonly UnitInstance[], instanceId: string): UnitInstance {
+  const unit = units.find((u) => u.instanceId === instanceId);
+  if (!unit) throw new CommandError("unknown_unit");
+  return unit;
+}
+
+/** Ready Guards that the attacker must hit first (spec §5.18 GUARD; R2-4). */
+function forcingGuards(attacker: UnitInstance, defenders: readonly UnitInstance[]): UnitInstance[] {
+  const flies = unitKeywords(attacker).has("flying");
+  return defenders.filter((d) => {
+    const k = unitKeywords(d);
+    return k.has("guard") && !d.exhausted && (flies || !k.has("flying"));
+  });
+}
+
+function canTarget(
+  attacker: UnitInstance,
+  defenders: readonly UnitInstance[],
+  target: string,
+): CommandErrorCode | null {
+  const guards = forcingGuards(attacker, defenders);
+  if (target === "player") return guards.length > 0 ? "guard_blocks" : null;
+  const def = defenders.find((d) => d.instanceId === target);
+  if (!def) return "unknown_unit";
+  if (unitKeywords(def).has("flying") && !unitKeywords(attacker).has("flying"))
+    return "flying_target";
+  if (guards.length > 0 && !guards.includes(def)) return "guard_blocks";
+  return null;
+}
+
+/** Simultaneous damage; Piercing excess = max(0, ATK − defender HP before damage) (spec §4.7, §5.14). */
+function resolveAttack(
+  state: MatchState,
+  seat: Seat,
+  attackerId: string,
+  target: string,
+  events: GameEvent[],
+): void {
+  const me = state.players[seat];
+  const foeSeat = other(seat);
+  const foe = state.players[foeSeat];
+  const attacker = findUnit(me.units, attackerId);
+  if (attacker.exhausted) throw new CommandError("unit_exhausted");
+  const error = canTarget(attacker, foe.units, target);
+  if (error) throw new CommandError(error);
+
+  const atk = unitAtk(attacker);
+  attacker.exhausted = true;
+  if (target === "player") {
+    foe.hp -= atk;
+    events.push({
+      type: "attacked",
+      seat,
+      attackerId,
+      target,
+      damageDealt: atk,
+      damageTaken: 0,
+      piercing: 0,
+    });
+  } else {
+    const defender = findUnit(foe.units, target);
+    const counter = unitAtk(defender);
+    const piercing = unitKeywords(attacker).has("piercing")
+      ? Math.max(0, atk - unitHp(defender))
+      : 0;
+    defender.damage += atk;
+    attacker.damage += counter;
+    foe.hp -= piercing;
+    events.push({
+      type: "attacked",
+      seat,
+      attackerId,
+      target,
+      damageDealt: atk,
+      damageTaken: counter,
+      piercing,
+    });
+    destroyDead(state, foeSeat, events);
+    destroyDead(state, seat, events);
+  }
+  checkEnd(state, events);
+}
+
+/** Units at HP <= 0 go to Discard with their equipment (spec §4.7). */
+function destroyDead(state: MatchState, seat: Seat, events: GameEvent[]): void {
+  const p = state.players[seat];
+  for (const u of p.units.filter((x) => unitHp(x) <= 0)) {
+    p.discard.push({ instanceId: u.instanceId, cardId: u.cardId }, ...u.equipment);
+    events.push({ type: "unit_destroyed", seat, instanceId: u.instanceId });
+  }
+  p.units = p.units.filter((x) => unitHp(x) > 0);
+}
+
 export type LegalCommand =
   | { readonly type: "mulligan" }
   | { readonly type: "summon"; readonly instanceId: string }
+  | { readonly type: "boost"; readonly instanceId: string }
+  | { readonly type: "attack"; readonly attackerId: string; readonly target: string }
   | { readonly type: "end_turn" };
 
 /** Commands the seat may send now (the bot picks only from these). */
@@ -227,13 +380,26 @@ export function getLegalCommands(state: MatchState, seat: Seat): LegalCommand[] 
   const me = state.players[seat];
   if (state.status === "mulligan") return me.mulliganDone ? [] : [{ type: "mulligan" }];
   if (seat !== state.activeSeat) return [];
+  const foe = state.players[other(seat)];
   const out: LegalCommand[] = [];
-  if (me.units.length < RULESET_V2.maxUnits)
-    for (const c of me.hand) {
-      const def = getCardDefinition(c.cardId);
-      if (def.cardType === "unit" && def.cost <= me.spark)
-        out.push({ type: "summon", instanceId: c.instanceId });
-    }
+  if (state.phase === "main") {
+    if (me.units.length < RULESET_V2.maxUnits)
+      for (const c of me.hand) {
+        const def = getCardDefinition(c.cardId);
+        if (def.cardType === "unit" && def.cost <= me.spark)
+          out.push({ type: "summon", instanceId: c.instanceId });
+      }
+    if (me.spark >= 1)
+      for (const u of me.units)
+        if (!u.exhausted && !u.boostUsed && unitKeywords(u).has("boost"))
+          out.push({ type: "boost", instanceId: u.instanceId });
+  }
+  for (const u of me.units) {
+    if (u.exhausted) continue;
+    for (const target of ["player", ...foe.units.map((d) => d.instanceId)])
+      if (!canTarget(u, foe.units, target))
+        out.push({ type: "attack", attackerId: u.instanceId, target });
+  }
   out.push({ type: "end_turn" });
   return out;
 }
