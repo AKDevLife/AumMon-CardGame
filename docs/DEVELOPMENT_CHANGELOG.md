@@ -2,6 +2,12 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-20 — 7.1 Security review
+
+- **Files:** `docs/SECURITY_REVIEW.md`, `vercel.json` (CSP, HSTS, Permissions-Policy), `_shared/matches.ts` (match read rate limit 240/min)
+- **Tests:** `pnpm audit` clean; full check suite; headers + CSP verified on the deployed preview (no CSP violations during a full solo match).
+- **Open before production:** email confirmation ON + SMTP, Vercel protection decision (see review).
+
 ## 2026-11-20 — Stable playtest URL
 
 - Branch `playtest` mirrors `main` (fast-forward by `.github/workflows/sync-playtest.yml`); Vercel Preview URL: https://aum-mon-card-game-git-playtest-aum-mon.vercel.app

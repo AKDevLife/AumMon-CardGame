@@ -17,6 +17,7 @@ import {
 import { db } from "./db.ts";
 import { advance, currentSeat, type Runtime } from "./flow.ts";
 import { HttpError } from "./http.ts";
+import { rateLimit } from "./ratelimit.ts";
 import {
   encodeRng,
   lockMatch,
@@ -277,6 +278,7 @@ export async function withMatch(
   ) => { state: GameState; events: GameEvent[]; rng?: RngState },
   options: { reveal?: boolean } = {},
 ): Promise<MatchResponse> {
+  await rateLimit(userId, "match.read", 240, 60); // ~4/s: covers 2 s polling + realtime refreshes
   return db().begin(async (tx) => {
     const locked = await lockMatch(tx, matchId, userId);
     const current = advance(locked, Date.now());
