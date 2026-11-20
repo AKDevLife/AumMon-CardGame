@@ -1,4 +1,4 @@
-import type { RandomSource } from "../../domain/types.ts";
+import type { RandomSource } from "../../rng/seeded-random.ts";
 import { getCardDefinition } from "./cards.ts";
 import type { LegalCommand } from "./match.ts";
 import type { UnitInstance } from "./state.ts";

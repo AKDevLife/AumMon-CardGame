@@ -1,4 +1,4 @@
-import type { RandomSource } from "../../domain/types.ts";
+import type { RandomSource } from "../../rng/seeded-random.ts";
 import { getCardDefinition } from "./cards.ts";
 import { RULESET_V2 } from "./constants.ts";
 import { EVOLUTION_RECIPES_V2, FUSION_RECIPES_V2 } from "./recipes.ts";

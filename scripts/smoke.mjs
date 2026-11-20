@@ -53,14 +53,14 @@ await check("SPA deep link works", async () => {
 });
 await check("engine-health", async () => {
   const body = await (await fetch(`${supabase}/functions/v1/engine-health`)).json();
-  assert(body.rulesetVersion === "1", JSON.stringify(body));
+  assert(body.rulesetVersion === "2", JSON.stringify(body));
 });
 await check("API rejects unauthenticated commands", async () => {
-  const res = await fetch(`${supabase}/functions/v1/matches-view`, { method: "POST", body: "{}" });
+  const res = await fetch(`${supabase}/functions/v1/tcg-view`, { method: "POST", body: "{}" });
   assert(res.status === 401, `status ${res.status}`);
 });
 await check("CORS allows the site origin", async () => {
-  const res = await fetch(`${supabase}/functions/v1/matches-view`, {
+  const res = await fetch(`${supabase}/functions/v1/tcg-view`, {
     method: "OPTIONS",
     headers: { Origin: new URL(site).origin, "Access-Control-Request-Method": "POST" },
   });
