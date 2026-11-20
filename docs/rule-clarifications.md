@@ -97,3 +97,17 @@
 ### Q12 — Bot difficulty
 
 - v1 มีระดับเดียว `normal` (heuristic ตาม Blueprint §5.6); โครงสร้างรองรับ `easy`/`hard` ภายหลังผ่าน weights
+
+## C1 — CONFLICT: Master Handoff (1v1 TCG) vs Rulebook v1 (2–4 player) — needs owner decision
+
+Recorded 2026-11-20. Not resolved; no code changed.
+
+- `AumMon_Master_Project_Handoff.md` §3–5 defines a **1v1 TCG** (HP 30, SPARK resource, Units/Equipment/Field zones, Evolution/Fusion, 12 Keywords, 3-copy deck building) and treats the 2–4 player spec as "Legacy".
+- `aummon_game_spec.md` §7 **Rulebook v1** (locked, `ruleset_version = "1"`) defines a **2–4 player Last Survivor shared-deck** game — which is what the engine, database, backend, UI and tests implement (Phases 1–7).
+- Adopting the handoff = new game rules + new data model (card definitions/instances, recipes, match events) + new engine/UI → requires owner approval (locked rules + architecture change).
+
+Options for owner:
+
+1. Keep Rulebook v1 as the product; handoff stays a future design document.
+2. Build the 1v1 TCG as a new `ruleset_version = "2"` alongside v1 (new roadmap phase).
+3. Replace v1 with the 1v1 TCG (largest change; most existing game code rewritten).

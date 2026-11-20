@@ -7,7 +7,7 @@
 - **Status:** ⏸ Paused by owner — development complete on **Dev**; production work deferred.
 - **Phase:** 7 — 6/8 done; remaining tasks are production-only (6.8, 7.3, 7.8).
 - **Current task:** none in progress
-- **Next:** game/UI adjustments requested by the owner after playtesting; production (6.8 → 7.3 → 7.8) later.
+- **Next:** owner decision on C1 (`docs/rule-clarifications.md`): Master Handoff 1v1 TCG vs Rulebook v1; production (6.8 → 7.3 → 7.8) later.
 - **Playtest URL (latest `main`):** https://aum-mon-card-game-git-playtest-aum-mon.vercel.app
 - **Dev backend:** Supabase `AumMon-Dev` (ref `yaxtzdhryctfjaspxvix`, ap-northeast-1), email confirmation OFF for playtesting.
 
