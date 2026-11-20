@@ -2,6 +2,12 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-20 — 8.7 Ruleset 2 simulation + acceptance
+
+- **Files:** `tests/v2-simulation.test.ts`.
+- **Tests:** 200 seeded random matches all finish (both seats win some); invariants each command (30 deck-origin cards, ≤3 units, ≤10 hand, SPARK 0–8); determinism; views leak no opponent hand/deck. Scenarios T-001–T-007 covered in 8.4–8.6.
+- **Remaining:** spec §5.17 #11/#12/#15 apply once triggered effects exist.
+
 ## 2026-11-20 — 8.6 Ruleset 2 evolution + fusion
 
 - **Files:** `rules/v2/match.ts` (`evolve`, `fuse`), `tests/v2-evolution.test.ts`.
