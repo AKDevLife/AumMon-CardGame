@@ -136,7 +136,7 @@ Owner decision 2026-11-20: replace the 2–4 player game with the 1v1 TCG in `au
 - [x] **8.10** Backend: turn-based commands, 90 s turn timer → auto end turn, idempotency — deps: 8.8, 8.9 — PR #51 (2026-11-20)
 - [x] **8.11** UI: 1v1 board + Solo mode — deps: 8.10 — PR #52 (2026-11-20)
 - [x] **8.12** Pass & Play 1v1 (privacy handoff per turn, no timer) — deps: 8.11 — PR #53 (2026-11-20)
-- [ ] **8.13** Online 1v1 (lobby 2 seats, realtime, resume, forfeit, timer) — deps: 8.11
+- [x] **8.13** Online 1v1 (lobby 2 seats, realtime, resume, forfeit, timer) — deps: 8.11 — PR #54 (2026-11-20)
 - [ ] **8.14** Retire ruleset 1 code paths; E2E + smoke + load test on Dev — deps: 8.12, 8.13
 
 **Acceptance:** all three modes playable 1v1 to the end on Dev · scenario tests T-001–T-007 pass · no hidden info leaks (hand, deck order, search) · `pnpm check`, E2E and CI green

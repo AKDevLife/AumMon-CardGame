@@ -26,9 +26,8 @@ Deno.serve(
     const mode = oneOf(body, "mode", ["solo", "pass_play", "online"] as const);
     if (mode === "pass_play")
       return { roomId: await createPassPlayRoom(userId, localSeats(body["seats"])) };
+    if (mode === "online") return createOnlineRoom(userId); // ruleset 2: 1v1, no characters
     const characterId = typeof body["characterId"] === "string" ? body["characterId"] : "";
-    if (mode === "online")
-      return createOnlineRoom(userId, characterId, int(body, "maxPlayers", 2, 4));
     const botCount = int(body, "botCount", 1, 3);
     return { roomId: await createSoloRoom(userId, characterId, botCount) };
   }),
