@@ -1,6 +1,6 @@
 import type { CardDefinition, CardEffect, Keyword, Rarity, Trait } from "./types.ts";
 
-/** Sample Card Library V1.1 (aummon_game_spec.md §6.5.4). */
+/** Sample Card Library V1.1 (aummon_game_spec.md §6.5.4). Thai names: owner decision 2026-11-20. */
 const DEF_VERSION = "1.1.0";
 const RULESET = "1.1.0";
 
@@ -94,13 +94,13 @@ const evoDiscount: CardEffect = { type: "MODIFY_COST", scope: "own_evolution", a
 const anyEquip: CardEffect = { type: "ATTACH_EQUIPMENT", scope: "any_compatibility" };
 
 export const CARD_DEFINITIONS_V2: readonly CardDefinition[] = [
-  unit("U001", "U001_RUBBER_DUCKLING", "Rubber Duckling", 0, 1, 2, 3, ["haste"], ["TOY"]),
-  unit("U002", "U002_TIN_CAN_GUARDIAN", "Tin Can Guardian", 0, 1, 1, 4, ["guard"], ["METAL"]),
-  unit("U003", "U003_PAPER_GLIDER", "Paper Glider", 0, 1, 2, 2, ["flying"], ["PAPER"]),
+  unit("U001", "U001_RUBBER_DUCKLING", "เป็ดยางจิ๋ว", 0, 1, 2, 3, ["haste"], ["TOY"]),
+  unit("U002", "U002_TIN_CAN_GUARDIAN", "ผู้พิทักษ์กระป๋อง", 0, 1, 1, 4, ["guard"], ["METAL"]),
+  unit("U003", "U003_PAPER_GLIDER", "เครื่องร่อนกระดาษ", 0, 1, 2, 2, ["flying"], ["PAPER"]),
   unit(
     "U004",
     "U004_POCKET_FLASHLIGHT",
-    "Pocket Flashlight",
+    "ไฟฉายพกพา",
     0,
     2,
     2,
@@ -109,48 +109,18 @@ export const CARD_DEFINITIONS_V2: readonly CardDefinition[] = [
     ["LIGHT_SOURCE"],
     [evoDiscount],
   ),
-  unit("U005", "U005_MINI_SKATEBOARD", "Mini Skateboard", 0, 2, 3, 3, ["boost"], ["RIDEABLE"]),
-  unit(
-    "U006",
-    "U006_THERMOS_GOLEM",
-    "Thermos Golem",
-    0,
-    2,
-    2,
-    5,
-    ["guard"],
-    ["CONTAINER", "METAL"],
-  ),
-  unit("U007", "U007_BATTERY_BUDDY", "Battery Buddy", 0, 2, 2, 4, [], ["POWER"], [anyEquip]),
-  unit("U008", "U008_WINDUP_ROBOT", "Wind-up Robot", 0, 2, 3, 3, ["haste"], ["CLOCKWORK"]),
-  unit(
-    "U101",
-    "U101_TURBO_BATH_DUCK",
-    "Turbo Bath Duck",
-    1,
-    2,
-    4,
-    5,
-    ["haste", "piercing"],
-    ["TOY"],
-  ),
-  unit("U102", "U102_STEEL_CAN_BASTION", "Steel Can Bastion", 1, 2, 2, 7, ["guard"], ["METAL"]),
-  unit("U103", "U103_PAPER_JET", "Paper Jet", 1, 2, 4, 4, ["flying", "piercing"], ["PAPER"]),
-  unit(
-    "U104",
-    "U104_SOLAR_SEARCHLIGHT",
-    "Solar Searchlight",
-    1,
-    2,
-    3,
-    6,
-    ["guard"],
-    ["LIGHT_SOURCE"],
-  ),
+  unit("U005", "U005_MINI_SKATEBOARD", "สเก็ตบอร์ดจิ๋ว", 0, 2, 3, 3, ["boost"], ["RIDEABLE"]),
+  unit("U006", "U006_THERMOS_GOLEM", "โกเลมกระติกน้ำ", 0, 2, 2, 5, ["guard"], ["CONTAINER", "METAL"]),
+  unit("U007", "U007_BATTERY_BUDDY", "เพื่อนถ่านไฟฉาย", 0, 2, 2, 4, [], ["POWER"], [anyEquip]),
+  unit("U008", "U008_WINDUP_ROBOT", "หุ่นยนต์ไขลาน", 0, 2, 3, 3, ["haste"], ["CLOCKWORK"]),
+  unit("U101", "U101_TURBO_BATH_DUCK", "เป็ดยางเทอร์โบ", 1, 2, 4, 5, ["haste", "piercing"], ["TOY"]),
+  unit("U102", "U102_STEEL_CAN_BASTION", "ป้อมกระป๋องเหล็ก", 1, 2, 2, 7, ["guard"], ["METAL"]),
+  unit("U103", "U103_PAPER_JET", "เจ็ตกระดาษ", 1, 2, 4, 4, ["flying", "piercing"], ["PAPER"]),
+  unit("U104", "U104_SOLAR_SEARCHLIGHT", "ไฟฉายสุริยะ", 1, 2, 3, 6, ["guard"], ["LIGHT_SOURCE"]),
   unit(
     "U105",
     "U105_ROCKET_SKATEBOARD",
-    "Rocket Skateboard",
+    "สเก็ตบอร์ดจรวด",
     1,
     3,
     5,
@@ -161,7 +131,7 @@ export const CARD_DEFINITIONS_V2: readonly CardDefinition[] = [
   unit(
     "U106",
     "U106_PRESSURE_TANK_GOLEM",
-    "Pressure Tank Golem",
+    "โกเลมถังแรงดัน",
     1,
     3,
     3,
@@ -169,22 +139,11 @@ export const CARD_DEFINITIONS_V2: readonly CardDefinition[] = [
     ["guard"],
     ["CONTAINER", "METAL"],
   ),
-  unit(
-    "U107",
-    "U107_PORTABLE_POWER_HUB",
-    "Portable Power Hub",
-    1,
-    2,
-    3,
-    6,
-    [],
-    ["POWER"],
-    [anyEquip],
-  ),
+  unit("U107", "U107_PORTABLE_POWER_HUB", "พาวเวอร์แบงก์ยักษ์", 1, 2, 3, 6, [], ["POWER"], [anyEquip]),
   unit(
     "U108",
     "U108_OVERWOUND_CLOCKWORK",
-    "Overwound Clockwork",
+    "หุ่นไขลานคลั่ง",
     1,
     2,
     4,
@@ -192,26 +151,21 @@ export const CARD_DEFINITIONS_V2: readonly CardDefinition[] = [
     ["haste", "piercing"],
     ["CLOCKWORK"],
   ),
-  unit("U201", "U201_AMPHIBIOUS_GLIDER", "Amphibious Glider", 2, 3, 6, 7, ["flying"], ["FUSION"]),
+  unit("U201", "U201_AMPHIBIOUS_GLIDER", "เป็ดร่อนสะเทินน้ำ", 2, 3, 6, 7, ["flying"], ["FUSION"]),
   // U202/U203 keywords are conditional: granted only via Fusion inheritance (FU-002/FU-003).
-  unit("U202", "U202_FORTRESS_KETTLE", "Fortress Kettle", 2, 4, 4, 9, [], ["FUSION"]),
-  unit("U203", "U203_ELECTRIC_RIDE", "Electric Ride", 2, 4, 6, 8, [], ["FUSION"]),
-  action("A001", "Quick Doodle", [{ type: "DRAW_CARD", count: 2 }]),
-  action("A002", "Lost & Found", [{ type: "SEARCH_CARD", cardType: "equipment", count: 1 }]),
-  action("A003", "Scrap Return", [{ type: "RECYCLE_CARD", cardType: "equipment", count: 1 }]),
-  equipment(
-    "E001",
-    "Clip-on Propeller",
-    ["TOY", "PAPER"],
-    [{ type: "ADD_KEYWORD", keyword: "flying" }],
-  ),
+  unit("U202", "U202_FORTRESS_KETTLE", "กาต้มน้ำป้อมปราการ", 2, 4, 4, 9, [], ["FUSION"]),
+  unit("U203", "U203_ELECTRIC_RIDE", "สเก็ตสายฟ้า", 2, 4, 6, 8, [], ["FUSION"]),
+  action("A001", "ขีดเขียนด่วน", [{ type: "DRAW_CARD", count: 2 }]),
+  action("A002", "ของหายได้คืน", [{ type: "SEARCH_CARD", cardType: "equipment", count: 1 }]),
+  action("A003", "เก็บเศษมาใช้ใหม่", [{ type: "RECYCLE_CARD", cardType: "equipment", count: 1 }]),
+  equipment("E001", "ใบพัดหนีบ", ["TOY", "PAPER"], [{ type: "ADD_KEYWORD", keyword: "flying" }]),
   equipment(
     "E002",
-    "Reinforced Lid",
+    "ฝาเสริมเกราะ",
     ["CONTAINER", "METAL"],
     [{ type: "MODIFY_STAT", stat: "hp", amount: 2 }],
   ),
-  equipment("E003", "Power Charger", [], [{ type: "MODIFY_STAT", stat: "atk", amount: 1 }]),
+  equipment("E003", "ที่ชาร์จพลัง", [], [{ type: "MODIFY_STAT", stat: "atk", amount: 1 }]),
 ];
 
 const BY_ID = new Map(CARD_DEFINITIONS_V2.map((c) => [c.cardId, c]));

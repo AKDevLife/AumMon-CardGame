@@ -18,14 +18,14 @@ describe("ruleset 2 labels", () => {
         },
         names,
       ),
-    ).toBe("Bot ลง Rubber Duckling");
+    ).toBe("Bot ลง เป็ดยางจิ๋ว");
     expect(describeEvent({ type: "match_ended", result: { winner: 0 } }, names)).toBe(
       "จบเกม: Aum ชนะ",
     );
   });
 
   it("explains equipment and actions", () => {
-    expect(cardText("E002")).toBe("+2 HP · ติดกับ CONTAINER/METAL");
+    expect(cardText("E002")).toBe("พลังชีวิต +2 · ติดกับสายภาชนะ/สายโลหะ");
     expect(cardText("A001")).toBe("จั่ว 2 ใบ");
   });
 
@@ -41,7 +41,7 @@ describe("ruleset 2 labels", () => {
       "⚔️ โจมตีผู้เล่น",
     );
     expect(commandLabel({ type: "play_action", instanceId: "h", choice: "E003" }, view)).toBe(
-      "ใช้: Power Charger",
+      "ใช้: ที่ชาร์จพลัง",
     );
     expect(commandSubjects({ type: "fuse", unitIds: ["a", "b"] })).toEqual(["a", "b"]);
     expect(commandSubjects({ type: "end_turn" })).toEqual([]);

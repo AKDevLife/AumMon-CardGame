@@ -70,7 +70,7 @@ function UnitTile({
           🔧 {unit.equipment.map((e) => cardName(e.cardId)).join(", ")}
         </span>
       )}
-      {unit.exhausted && <span className="text-[11px] text-am-muted">💤 Exhausted</span>}
+      {unit.exhausted && <span className="text-[11px] text-am-muted">💤 เหนื่อย (โจมตีไม่ได้)</span>}
     </button>
   );
 }
@@ -100,7 +100,7 @@ function HandCard({
       <span className="flex items-center justify-between gap-1">
         <span className="font-display text-sm font-bold leading-tight">{def.name}</span>
         <span
-          aria-label={`Cost ${def.cost}`}
+          aria-label={`ใช้พลังงาน ${String(def.cost)}`}
           className="rounded-full bg-am-title px-2 text-xs font-bold"
         >
           {def.cost}
@@ -327,7 +327,7 @@ export function TcgMatchPage() {
         </span>
         <span className="font-display font-bold">❤️ {Math.max(0, me.hp)}</span>
         <span className="font-display font-bold">
-          ⚡ SPARK {me.spark}/{me.maxSpark}
+          ⚡ พลังงาน {me.spark}/{me.maxSpark}
         </span>
         <span className="text-sm">🂠 {me.deckCount}</span>
       </div>

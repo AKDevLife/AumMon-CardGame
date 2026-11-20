@@ -43,10 +43,10 @@ export function SoloSetupPage() {
     <section className="flex flex-col gap-5">
       <h1 className="font-display text-3xl font-bold">Solo vs Bot</h1>
       <div className="am-sticker flex flex-col gap-2 bg-am-card p-4">
-        <p>ดวล 1 ต่อ 1 กับ Bot ด้วย Starter Deck 30 ใบ</p>
+        <p>ดวล 1 ต่อ 1 กับ Bot ด้วยชุดการ์ดเริ่มต้น 30 ใบ</p>
         <ul className="list-disc pl-5 text-sm text-am-muted">
-          <li>HP เริ่มต้น 20 · SPARK เพิ่มทุกเทิร์น (สูงสุด 8)</li>
-          <li>ลง Unit, ติด Equipment, Evolution และ Fusion ใน Main Phase แล้วค่อยโจมตี</li>
+          <li>พลังชีวิตเริ่มต้น 20 · พลังงานเพิ่มทุกเทิร์น (สูงสุด 8)</li>
+          <li>ลงตัวละคร ติดอุปกรณ์ พัฒนาร่าง และรวมร่าง แล้วค่อยโจมตี</li>
           <li>มีเวลา 90 วินาทีต่อเทิร์น</li>
         </ul>
       </div>
