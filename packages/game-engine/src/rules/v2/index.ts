@@ -18,3 +18,4 @@ export {
 } from "./match.ts";
 export { canEquip, unitAtk, unitHp, unitKeywords, unitMaxHp, usedSlots } from "./stats.ts";
 export { getPlayerView, type PlayerView, type PublicPlayer } from "./view.ts";
+export { chooseBotCommand } from "./bot.ts";
