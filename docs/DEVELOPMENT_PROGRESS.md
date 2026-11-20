@@ -4,10 +4,10 @@
 
 ## Current
 
-- **Status:** ⏳ Phase 9 (Developer Admin) — code done on Dev; waiting for the owner to create the admin user (9.3).
+- **Status:** ⏳ Phase 9 — Dev admin role granted; waiting for the owner's first login + MFA setup (9.3).
 - **Phase:** 9 — Developer Admin (2/3); production tasks (6.8, 7.3, 7.8) still deferred.
 - **Current task:** none in progress
-- **Next:** 9.3 — owner creates the Dev admin user (steps in `docs/ADMIN.md`), then I grant `super_admin`; then owner playtest.
+- **Next:** owner logs in at `/login` → `/admin` → scans the MFA QR; then 9.3 is verified.
 - **Playtest URL (latest `main`):** https://aum-mon-card-game-git-playtest-aum-mon.vercel.app
 - **Dev backend:** Supabase `AumMon-Dev` (ref `yaxtzdhryctfjaspxvix`, ap-northeast-1), email confirmation OFF for playtesting.
 
@@ -44,9 +44,9 @@ None
 
 ## Blocked (owner)
 
-| Task | Owner steps                                                                                                                                             |
-| ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 9.3  | Supabase Dashboard → AumMon-Dev → Authentication → Users → Add user → Create new user (own email + strong password, Auto Confirm) → send the email only |
+| Task | Owner steps                                                                                                                     |
+| ---- | ------------------------------------------------------------------------------------------------------------------------------- |
+| 9.3  | Log in on the playtest site → open `/admin` → scan the QR with an authenticator app → enter the 6-digit code → confirm it works |
 
 ## Deferred (production — owner decision)
 
