@@ -45,7 +45,7 @@ export default tseslint.config(
     languageOptions: {
       parserOptions: {
         projectService: {
-          allowDefaultProject: ["eslint.config.js", "scripts/*.mjs"],
+          allowDefaultProject: ["eslint.config.js", "scripts/*.mjs", "tests/load/*.mjs"],
         },
         tsconfigRootDir: import.meta.dirname,
       },
@@ -56,7 +56,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ["eslint.config.js", "scripts/**/*.mjs"],
+    files: ["eslint.config.js", "scripts/**/*.mjs", "tests/load/**/*.mjs"],
     ...tseslint.configs.disableTypeChecked,
     languageOptions: { globals: globals.node },
   },
