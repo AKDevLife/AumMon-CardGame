@@ -2,6 +2,13 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-20 — 1.10 Supabase Dev project (AumMon-Dev)
+
+- **Cloud:** project `AumMon-Dev` (ref `yaxtzdhryctfjaspxvix`, ap-northeast-1) — verified by name as Dev; 7 migrations + seed applied via Management API with migration history; 11 Edge Functions deployed; secret `ALLOWED_ORIGINS`; Auth redirect allow-list for Vercel previews + localhost.
+- **Files:** `supabase/config.toml` (per-function `verify_jwt = false`, import map), `supabase/functions/_shared/origins.ts` (+ tests), `RegisterPage` `emailRedirectTo`, README Dev section.
+- **Verification (cloud):** 16 tables, RLS on all public tables, `private` not exposed (`db_schema = public,graphql_public`), 11 policies + realtime policy, 40-card deck; `engine-health` OK; no token → 401; CORS allows `*-aum-mon.vercel.app`, rejects others.
+- **Notes:** Supabase CLI labels the project's main branch "production" — it is still the Dev project. Email confirmation is ON (Supabase default mailer only delivers to team members, ~2 emails/hour).
+
 ## 2026-11-19 — Phase 6 Online Multiplayer (local Supabase)
 
 - **Files:** migrations `20261119000500_online.sql`, `20261119000600_realtime_private_channels.sql`; functions `rooms-join`, `rooms-ready`, `rooms-leave`, `matches-resume`, `matches-forfeit`, online mode in `rooms-create`/`matches-start`; `_shared/{lobby,ratelimit}.ts`; engine `forfeit`; UI `src/features/online/{OnlinePage,LobbyPage}.tsx`, Realtime + Presence + forfeit in `MatchPage`; tests `tests/backend/online.test.ts`, `tests/e2e/online.spec.ts`, `supabase/tests/database/007_online.test.sql`

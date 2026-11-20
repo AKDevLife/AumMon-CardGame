@@ -1,10 +1,10 @@
 # AumMon — Development Progress
 
-> Updated: 2026-11-19 · Numbers from `pnpm progress` (top-level roadmap tasks; verified tasks only)
+> Updated: 2026-11-20 · Numbers from `pnpm progress` (top-level roadmap tasks; verified tasks only)
 
 ## Current
 
-- **Phase:** 7 — Public Launch & Scale Evaluation (Phases 2–6 complete locally; cloud link pending 1.10)
+- **Phase:** 7 — Public Launch & Scale Evaluation (Dev cloud project live)
 - **Current task:** none in progress
 - **Next task:** 7.1 Security review + abuse checks
 
@@ -12,18 +12,19 @@
 
 | Phase                   |   Done |  Total |       % |
 | ----------------------- | -----: | -----: | ------: |
-| 1 Project Foundation    |     14 |     16 |     88% |
+| 1 Project Foundation    |     15 |     16 |     94% |
 | 2 Auth & Database       |     10 |     10 |    100% |
 | 3 Pure Game Engine      |     13 |     13 |    100% |
 | 4 Solo Vertical Slice   |     12 |     12 |    100% |
 | 5 Pass & Play           |      5 |      5 |    100% |
 | 6 Online Multiplayer    |      7 |      8 |     88% |
 | 7 Public Launch & Scale |      0 |      8 |      0% |
-| **Overall**             | **61** | **72** | **85%** |
+| **Overall**             | **62** | **72** | **86%** |
 
 ## Completed
 
 - 1.1–1.9 foundation, CI, operating rules, tracking
+- 1.10 Supabase Dev project linked (migrations, seed, functions, CORS, auth redirects)
 - 1.11 Vercel Preview per PR (verified)
 - 1.13–1.16 UI Preview (layout, Home/Login/Register UI-only, `vercel.json`, iPhone E2E)
 - 2.1 core schema migration (15 tables, constraints, indexes, schema separation, RLS deny-by-default)
@@ -50,12 +51,11 @@ None
 
 ## Blocked
 
-| Task | Reason                                       | Owner action                                                        |
-| ---- | -------------------------------------------- | ------------------------------------------------------------------- |
-| 1.10 | No project ref / token / network to Supabase | Send project ref; approve network hosts; enter token in secret form |
-| 1.12 | Repo settings                                | Enable branch protection on `main` requiring CI                     |
-| 6.8  | Staging project may exceed free tier         | Approve cost / create project                                       |
-| 7.8  | Production deploy                            | Approval at launch                                                  |
+| Task | Reason                               | Owner action                                    |
+| ---- | ------------------------------------ | ----------------------------------------------- |
+| 1.12 | Repo settings                        | Enable branch protection on `main` requiring CI |
+| 6.8  | Staging project may exceed free tier | Approve cost / create project                   |
+| 7.8  | Production deploy                    | Approval at launch                              |
 
 ## Latest verification
 
