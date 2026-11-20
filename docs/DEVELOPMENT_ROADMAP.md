@@ -147,6 +147,8 @@ Owner request 2026-11-20 (dev tooling; production tasks 6.8/7.3/7.8 stay deferre
 
 - [x] **9.1** RBAC foundation: `private.admin_roles`, append-only `private.admin_audit_log`, idempotent `grant_admin`/`revoke_admin` bootstrap, `admin-api` with server-side role + MFA (aal2) checks — deps: 8.14 — PR #57 (2026-11-20)
 - [x] **9.2** Admin dashboard UI (`/admin`): MFA enroll/verify, Overview, Players, Cards, Decks, Rooms, Matches, Bots, Logs, Settings (iPhone + desktop) — deps: 9.1 — PR #57 (2026-11-20)
-- [~] **9.3** Bootstrap the Dev admin + `AUMMON_ENV` on Dev; owner logs in with MFA — deps: 9.1, 9.2 — role granted 2026-11-20 (audited); waiting for owner first login + MFA
+- [x] **9.3** Bootstrap the Dev admin + `AUMMON_ENV` on Dev; owner logs in with MFA — deps: 9.1, 9.2 — PR #59 (2026-11-20) — owner confirmed login with MFA
+
+- [x] **9.4** Readable admin dashboard: Thai labels/explanations, stat cards, card lists instead of raw tables, system health page — deps: 9.3 — PR #60 (2026-11-20)
 
 **Acceptance:** admin logs in without Register · non-admins get 403 on every admin action · players cannot self-grant · MFA enforced server-side · audited mutations · no secret in the client bundle · per-environment bootstrap documented (`docs/ADMIN.md`)
