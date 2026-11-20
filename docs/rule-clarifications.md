@@ -21,3 +21,4 @@
 - **R2-4 Direct Attack:** ตีผู้เล่นได้เมื่อฝ่ายตรงข้ามไม่มี Guard ที่ Ready (ใช้ในงาน 8.4)
 - **R2-5 First player:** Server สุ่ม (seeded RNG)
 - Mulligan: ทั้งสองฝ่ายทำก่อนเริ่มเทิร์นแรก (ส่งรายการว่างได้)
+- **R2-6 Phase order:** Main → Battle ทางเดียว; การโจมตีครั้งแรกเข้าสู่ Battle Phase แล้วลงการ์ด/Boost/Evolution ไม่ได้จนจบเทิร์น

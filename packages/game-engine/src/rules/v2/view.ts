@@ -4,6 +4,7 @@ import type {
   MatchStatus,
   MatchState,
   Seat,
+  TurnPhase,
   UnitInstance,
 } from "./state.ts";
 
@@ -24,6 +25,7 @@ export interface PlayerView {
   readonly status: MatchStatus;
   readonly turn: number;
   readonly activeSeat: Seat;
+  readonly phase: TurnPhase;
   readonly firstSeat: Seat;
   readonly myHand: readonly CardInstance[];
   readonly mulliganDone: boolean;
@@ -41,7 +43,12 @@ export function getPlayerView(state: MatchState, seat: Seat): PlayerView {
       maxSpark: p.maxSpark,
       handCount: p.hand.length,
       deckCount: p.deck.length,
-      units: p.units.map((u) => ({ ...u, equipment: [...u.equipment], history: [...u.history] })),
+      units: p.units.map((u) => ({
+        ...u,
+        equipment: [...u.equipment],
+        history: [...u.history],
+        bonusKeywords: [...u.bonusKeywords],
+      })),
       discard: [...p.discard],
     };
   };
@@ -50,6 +57,7 @@ export function getPlayerView(state: MatchState, seat: Seat): PlayerView {
     status: state.status,
     turn: state.turn,
     activeSeat: state.activeSeat,
+    phase: state.phase,
     firstSeat: state.firstSeat,
     myHand: [...state.players[seat].hand],
     mulliganDone: state.players[seat].mulliganDone,

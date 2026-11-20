@@ -1,4 +1,6 @@
 /** Ruleset 2 match state (spec §3.3, §4). Plain data only — safe to serialize. */
+import type { Keyword } from "./types.ts";
+
 export type Seat = 0 | 1;
 
 export interface CardInstance {
@@ -12,6 +14,11 @@ export interface UnitInstance extends CardInstance {
   equipment: CardInstance[];
   /** Previous card ids (Evolution history, spec §3.1). */
   history: string[];
+  /** Keywords granted by Fusion inheritance (spec §4.11). */
+  bonusKeywords: Keyword[];
+  /** "Until end of turn" ATK bonus (Boost) and its once-per-turn flag. */
+  tempAtk: number;
+  boostUsed: boolean;
 }
 
 export interface PlayerState {
@@ -29,6 +36,8 @@ export interface PlayerState {
 }
 
 export type MatchStatus = "mulligan" | "active" | "finished";
+/** Main → Battle is one-way within a turn (owner decision R2-6). */
+export type TurnPhase = "main" | "battle";
 export type MatchResult = { readonly winner: Seat } | { readonly draw: true };
 
 export interface MatchState {
@@ -36,6 +45,7 @@ export interface MatchState {
   status: MatchStatus;
   readonly firstSeat: Seat;
   activeSeat: Seat;
+  phase: TurnPhase;
   turn: number;
   players: [PlayerState, PlayerState];
   result: MatchResult | null;
@@ -48,6 +58,17 @@ export type GameEvent =
   | { type: "fatigue"; seat: Seat; damage: number }
   | { type: "mulligan"; seat: Seat; count: number }
   | { type: "unit_summoned"; seat: Seat; instanceId: string; cardId: string; exhausted: boolean }
+  | { type: "boosted"; seat: Seat; instanceId: string }
+  | {
+      type: "attacked";
+      seat: Seat;
+      attackerId: string;
+      target: string;
+      damageDealt: number;
+      damageTaken: number;
+      piercing: number;
+    }
+  | { type: "unit_destroyed"; seat: Seat; instanceId: string }
   | { type: "turn_ended"; seat: Seat }
   | { type: "forfeit"; seat: Seat }
   | { type: "match_ended"; result: MatchResult };
@@ -60,7 +81,12 @@ export function cloneState(s: MatchState): MatchState {
     deck: [...p.deck],
     hand: [...p.hand],
     discard: [...p.discard],
-    units: p.units.map((u) => ({ ...u, equipment: [...u.equipment], history: [...u.history] })),
+    units: p.units.map((u) => ({
+      ...u,
+      equipment: [...u.equipment],
+      history: [...u.history],
+      bonusKeywords: [...u.bonusKeywords],
+    })),
   });
   return { ...s, players: [copyPlayer(s.players[0]), copyPlayer(s.players[1])] };
 }

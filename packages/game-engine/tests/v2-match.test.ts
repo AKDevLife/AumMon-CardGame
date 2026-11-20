@@ -172,7 +172,7 @@ describe("summon (spec §4.6)", () => {
     expect(
       codeOf(() => applyCommand(t, { type: "summon", playerId: id, instanceId: "t5" }, rng())),
     ).toBe("unit_zone_full");
-    expect(getLegalCommands(t, t.activeSeat)).toEqual([{ type: "end_turn" }]);
+    expect(getLegalCommands(t, t.activeSeat).some((c) => c.type === "summon")).toBe(false);
   });
 
   it("units ready again at their owner's next Start Phase", () => {
