@@ -13,3 +13,11 @@
 ## R2-1 — V1.0 leftovers in spec — ✅ Resolved 2026-11-20
 
 เจ้าของยืนยัน: ยึดกติกาใหม่ (V1.1) เท่านั้น ตัดกติกาเก่าทิ้ง. ลบข้อความ V1.0 ใน Spec §5.12, §5.14, §5.17, §11 แล้ว.
+
+## R2-2 … R2-5 — Core flow decisions — ✅ Owner decided 2026-11-20 (provisional until playtest)
+
+- **R2-2 SPARK:** เทิร์นแรกของแต่ละคนมี 1 SPARK (Max เริ่ม 0 แล้ว +1 ทุก Start Phase ของตัวเอง, สูงสุด 8)
+- **R2-3 Hand limit:** สูงสุด 10 ใบ; จั่วตอนมือเต็ม → การ์ดใบนั้นลง Discard
+- **R2-4 Direct Attack:** ตีผู้เล่นได้เมื่อฝ่ายตรงข้ามไม่มี Guard ที่ Ready (ใช้ในงาน 8.4)
+- **R2-5 First player:** Server สุ่ม (seeded RNG)
+- Mulligan: ทั้งสองฝ่ายทำก่อนเริ่มเทิร์นแรก (ส่งรายการว่างได้)

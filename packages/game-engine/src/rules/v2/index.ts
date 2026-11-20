@@ -4,3 +4,16 @@ export { CARD_DEFINITIONS_V2, getCardDefinition } from "./cards.ts";
 export { EVOLUTION_RECIPES_V2, FUSION_RECIPES_V2 } from "./recipes.ts";
 export { POWER_BUDGET_V2, RULESET_V2, STARTER_DECK_V2 } from "./constants.ts";
 export { validateCardData, type DataReport } from "./validate.ts";
+export type * from "./state.ts";
+export {
+  applyCommand,
+  CommandError,
+  getLegalCommands,
+  initializeMatch,
+  type Command,
+  type CommandErrorCode,
+  type LegalCommand,
+  type MatchInput,
+  type Transition,
+} from "./match.ts";
+export { getPlayerView, type PlayerView, type PublicPlayer } from "./view.ts";

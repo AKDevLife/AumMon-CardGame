@@ -2,6 +2,12 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-20 — 8.3 Ruleset 2 engine core
+
+- **Files:** `packages/game-engine/src/rules/v2/` (`state.ts`, `match.ts`, `view.ts`), `tests/v2-match.test.ts`.
+- **Behaviour:** seeded setup, random first player, mulligan, SPARK 1→8, Start/Main/End flow, summon (Haste ready), hand limit 10 (burn), fatigue, win/draw, forfeit, legal commands, client-safe view; state never mutated.
+- **Tests:** 16 new. **Decisions (owner):** R2-2…R2-5 in `docs/rule-clarifications.md`.
+
 ## 2026-11-20 — 8.2 Ruleset 2 card data
 
 - **Files:** `packages/game-engine/src/rules/v2/` (types, cards, recipes, constants, validate), `tests/v2-card-data.test.ts`; exported as `v2` namespace.
