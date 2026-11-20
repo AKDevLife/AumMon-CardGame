@@ -1,0 +1,236 @@
+// POST { action, ...params } → admin data. Every call: session + super_admin role + MFA (aal2),
+// checked server-side in requireAdmin. Mutations are audited. Catalog data is read-only
+// (owner decision 2026-11-20: rule changes go through the spec + PR, not the dashboard).
+import { createSeededRandom, ENGINE_VERSION, RULESET_VERSION, v2 } from "@aummon/game-engine";
+import { appEnv, audit, authAdmin, requireAdmin, type AdminContext } from "../_shared/admin.ts";
+import { db } from "../_shared/db.ts";
+import { handler, HttpError, readJson } from "../_shared/http.ts";
+import { uuid } from "../_shared/input.ts";
+import { rateLimit } from "../_shared/ratelimit.ts";
+
+type Body = Record<string, unknown>;
+type Action = (admin: AdminContext, body: Body) => Promise<unknown>;
+
+const limit = (body: Body, max = 100) => {
+  const n = Number(body["limit"] ?? 50);
+  return Number.isInteger(n) && n > 0 ? Math.min(n, max) : 50;
+};
+
+const actions: Record<string, Action> = {
+  me: (admin) =>
+    Promise.resolve({ userId: admin.userId, role: admin.role, aal: admin.aal, env: appEnv() }),
+
+  overview: async () => {
+    const [counts] = await db()<
+      { players: number; active_rooms: number; active_matches: number; finished_24h: number }[]
+    >`
+      select
+        (select count(*)::int from public.profiles) as players,
+        (select count(*)::int from public.game_rooms where status in ('lobby','playing')) as active_rooms,
+        (select count(*)::int from public.matches where status = 'active') as active_matches,
+        (select count(*)::int from public.matches where status = 'finished' and finished_at > now() - interval '24 hours') as finished_24h`;
+    const events = await db()`
+      select e.match_id, e.event_type, e.created_at from public.match_events e
+      order by e.id desc limit 15`;
+    const [errors] = await db()<{ errors: number; requests: number }[]>`
+      select count(*) filter (where status >= 500)::int as errors, count(*)::int as requests
+      from private.function_metrics where created_at > now() - interval '1 hour'`;
+    return {
+      counts,
+      recentEvents: events,
+      system: {
+        env: appEnv(),
+        engineVersion: ENGINE_VERSION,
+        rulesetVersion: RULESET_VERSION,
+        db: "ok",
+        lastHour: errors,
+      },
+    };
+  },
+
+  players: async (_a, body) => {
+    const q = typeof body["query"] === "string" ? body["query"].trim().slice(0, 64) : "";
+    const pattern = `%${q.replace(/[%_\\]/g, "")}%`;
+    return db()`
+      select p.id, p.display_name, u.email, p.created_at, u.last_sign_in_at,
+             (u.banned_until is not null and u.banned_until > now()) as disabled,
+             exists (select 1 from private.admin_roles r where r.user_id = p.id) as is_admin,
+             (select count(*)::int from public.match_players mp where mp.user_id = p.id) as matches
+      from public.profiles p join auth.users u on u.id = p.id
+      where ${q === ""} or p.display_name ilike ${pattern} or u.email ilike ${pattern}
+      order by p.created_at desc limit ${limit(body)}`;
+  },
+
+  "player.set_disabled": async (admin, body) => {
+    const userId = uuid(body, "userId");
+    const disabled = body["disabled"] === true;
+    if (userId === admin.userId)
+      throw new HttpError(409, "cannot_disable_self", "Cannot disable your own account");
+    const [target] = await db()`select 1 from private.admin_roles where user_id = ${userId}`;
+    if (target) throw new HttpError(409, "target_is_admin", "Revoke admin first (SQL bootstrap)");
+    await authAdmin(`users/${userId}`, "PUT", { ban_duration: disabled ? "876000h" : "none" });
+    await db().begin((tx) =>
+      audit(tx, admin, disabled ? "player.disabled" : "player.enabled", "user", userId),
+    );
+    return { ok: true };
+  },
+
+  cards: async () => ({
+    cards: await db()`
+      select id, name, card_type, rarity, stage, cost, atk, hp, traits, keywords, slot_cost, deckable, is_enabled
+      from public.card_definitions where ruleset_version = '2' order by stage, id`,
+    evolutions: await db()`select * from public.evolution_recipes order by id`,
+    fusions: await db()`select * from public.fusion_recipes order by id`,
+  }),
+
+  decks: async () =>
+    db()`
+      select t.id, t.version, t.is_active, t.ruleset_version, c.card_definition_id, c.quantity
+      from public.deck_templates t join public.deck_template_cards c
+        on c.deck_template_id = t.id and c.deck_template_version = t.version
+      where t.ruleset_version = '2' order by t.id, c.card_definition_id`,
+
+  rooms: async (_a, body) =>
+    db()`
+      select r.id, r.mode, r.status, r.ruleset_version, r.created_at, r.expires_at,
+             (select count(*)::int from public.room_players rp where rp.room_id = r.id and rp.status <> 'left') as players
+      from public.game_rooms r where r.status in ('lobby','playing')
+      order by r.created_at desc limit ${limit(body)}`,
+
+  "room.close": async (admin, body) => {
+    const roomId = uuid(body, "roomId");
+    return db().begin(async (tx) => {
+      const rows =
+        await tx`update public.game_rooms set status = 'closed' where id = ${roomId} and status = 'lobby' returning id`;
+      if (rows.length === 0)
+        throw new HttpError(409, "not_closable", "Only open lobbies can be closed");
+      await audit(tx, admin, "room.closed", "room", roomId);
+      return { ok: true };
+    });
+  },
+
+  matches: async (_a, body) => {
+    const status = body["status"] === "finished" ? "finished" : "active";
+    return db()`
+      select m.id, m.status, m.phase, m.round_number as turn, m.ruleset_version, m.started_at, m.finished_at, r.mode,
+             (select json_agg(json_build_object('seat', mp.seat, 'type', mp.player_type, 'hp', mp.hp) order by mp.seat)
+                from public.match_players mp where mp.match_id = m.id) as players
+      from public.matches m join public.game_rooms r on r.id = m.room_id
+      where m.status = ${status} order by m.created_at desc limit ${limit(body)}`;
+  },
+
+  /** Public information only (no hands, deck order or RNG) — no impersonation of players. */
+  "match.view": async (_a, body) => {
+    const matchId = uuid(body, "matchId");
+    const [match] =
+      await db()`select id, status, phase, round_number, ruleset_version, started_at from public.matches where id = ${matchId}`;
+    if (!match) throw new HttpError(404, "not_found", "Match not found");
+    const players =
+      await db()`select seat, player_type, hp, status from public.match_players where match_id = ${matchId} order by seat`;
+    const events =
+      await db()`select event_seq, round_number, event_type, public_payload from public.match_events where match_id = ${matchId} order by event_seq desc limit 100`;
+    return { match, players, events };
+  },
+
+  "match.abandon": async (admin, body) => {
+    const matchId = uuid(body, "matchId");
+    return db().begin(async (tx) => {
+      const rows = await tx`
+        update public.matches set status = 'abandoned', finished_at = now()
+        where id = ${matchId} and status = 'active' returning room_id`;
+      const room = rows[0] as { room_id: string } | undefined;
+      if (!room) throw new HttpError(409, "not_active", "Match is not active");
+      await tx`update public.game_rooms set status = 'closed' where id = ${room.room_id}`;
+      await audit(tx, admin, "match.abandoned", "match", matchId);
+      return { ok: true };
+    });
+  },
+
+  /** Bot-vs-bot simulation in memory (no data written). Development only. */
+  "bots.simulate": async (admin, body) => {
+    if (appEnv() !== "development")
+      throw new HttpError(403, "dev_only", "Development tools are disabled here");
+    const games = Math.min(Math.max(Number(body["games"] ?? 10) || 10, 1), 50);
+    const result = { seat0: 0, seat1: 0, draw: 0, avgTurns: 0 };
+    let turns = 0;
+    for (let g = 0; g < games; g++) {
+      const seed = crypto.getRandomValues(new Uint32Array(4));
+      const rng = createSeededRandom([
+        (seed[0] ?? 0) === 0 ? 1 : (seed[0] ?? 1),
+        seed[1] ?? 0,
+        seed[2] ?? 0,
+        seed[3] ?? 0,
+      ]);
+      let s = v2.initializeMatch(
+        { playerIds: ["a", "b"], decks: [v2.STARTER_DECK_V2, v2.STARTER_DECK_V2] },
+        rng,
+      );
+      for (let n = 0; n < 3000 && s.status !== "finished"; n++) {
+        const seat: v2.Seat =
+          s.status === "mulligan" ? (s.players[0].mulliganDone ? 1 : 0) : s.activeSeat;
+        const pick = v2.chooseBotCommand(
+          v2.getPlayerView(s, seat),
+          v2.getLegalCommands(s, seat),
+          rng,
+        );
+        const playerId = s.players[seat].playerId;
+        s = v2.applyCommand(
+          s,
+          pick.type === "mulligan"
+            ? { type: "mulligan", playerId, instanceIds: [] }
+            : { ...pick, playerId },
+          rng,
+        ).state;
+      }
+      turns += s.turn;
+      if (!s.result || "draw" in s.result) result.draw++;
+      else if (s.result.winner === 0) result.seat0++;
+      else result.seat1++;
+    }
+    result.avgTurns = Math.round(turns / games);
+    await db().begin((tx) => audit(tx, admin, "bots.simulated", null, null, { games }));
+    return { games, ...result };
+  },
+
+  "logs.game": async (_a, body) =>
+    db()`select match_id, event_seq, round_number, event_type, created_at from public.match_events order by id desc limit ${limit(body, 200)}`,
+
+  "logs.security": async (_a, body) => ({
+    audit:
+      await db()`select id, actor_user_id, action, target_type, target_id, details, created_at from private.admin_audit_log order by id desc limit ${limit(body, 200)}`,
+    rejected: await db()`
+      select function_name, status, error_code, created_at from private.function_metrics
+      where status in (401, 403, 429) or status >= 500 order by id desc limit ${limit(body, 200)}`,
+  }),
+
+  health: async () => ({
+    functions: await db()`select * from private.metrics_functions_24h order by requests desc`,
+    matchesDaily: await db()`select * from private.metrics_matches_daily limit 7`,
+    tables: await db()`
+      select relname as table, n_live_tup::int as rows from pg_stat_user_tables
+      where schemaname in ('public','private') order by n_live_tup desc limit 30`,
+    db: (await db()`select version() as version, now() as now`)[0],
+  }),
+
+  settings: () =>
+    Promise.resolve({
+      env: appEnv(),
+      engineVersion: ENGINE_VERSION,
+      rulesetVersion: RULESET_VERSION,
+      turnTimeoutMs: v2.RULESET_V2.turnTimeoutMs,
+      devToolsEnabled: appEnv() === "development",
+      mfaRequired: true,
+    }),
+};
+
+Deno.serve(
+  handler(async (request) => {
+    const body = await readJson(request);
+    const name = typeof body["action"] === "string" ? body["action"] : "";
+    const action = Object.hasOwn(actions, name) ? actions[name] : undefined;
+    if (!action) throw new HttpError(400, "unknown_action", "Unknown admin action");
+    const admin = await requireAdmin(request, name === "me");
+    await rateLimit(admin.userId, "admin", 300, 60);
+    return action(admin, body);
+  }),
+);

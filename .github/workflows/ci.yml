@@ -105,7 +105,7 @@ jobs:
       - name: Serve Edge Functions and check the engine boots under Deno
         run: |
           pnpm sync:engine
-          nohup pnpm exec supabase functions serve --no-verify-jwt > /tmp/functions.log 2>&1 &
+          nohup pnpm exec supabase functions serve --no-verify-jwt --env-file supabase/functions/ci-dev.env > /tmp/functions.log 2>&1 &
           for i in $(seq 1 30); do
             if curl -sf http://127.0.0.1:54321/functions/v1/engine-health | grep -q '"rulesetVersion":"2"'; then exit 0; fi
             sleep 3
