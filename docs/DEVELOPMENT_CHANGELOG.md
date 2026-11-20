@@ -2,6 +2,11 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-20 — Dev playtest setup
+
+- Owner set Vercel Preview env (`VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`).
+- Owner approved: email confirmation **off on AumMon-Dev only** (`mailer_autoconfirm = true`) for playtesting. Must stay ON for production (tracked in 7.1).
+
 ## 2026-11-20 — 1.10 Supabase Dev project (AumMon-Dev)
 
 - **Cloud:** project `AumMon-Dev` (ref `yaxtzdhryctfjaspxvix`, ap-northeast-1) — verified by name as Dev; 7 migrations + seed applied via Management API with migration history; 11 Edge Functions deployed; secret `ALLOWED_ORIGINS`; Auth redirect allow-list for Vercel previews + localhost.
