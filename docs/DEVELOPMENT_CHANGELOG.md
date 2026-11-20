@@ -2,6 +2,12 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-20 — 8.10 Ruleset 2 backend
+
+- **Files:** `supabase/functions/_shared/tcg.ts` (create/start, lock → advance → command → save, per-seat view), `_shared/tcg-flow.ts` (pure: bots + 90 s timer), Edge Functions `tcg-create`, `tcg-start`, `tcg-command`, `tcg-view`; migration `20261120000300_ruleset2_rooms.sql`; `tests/integration/tcg-flow.test.ts`, `tests/backend/tcg.test.ts`.
+- **Behaviour:** intent-only commands (shape-validated, server picks the seat), row lock per match, expected-version check, idempotency receipts in the same transaction, engine errors → 409 codes; bots mulligan/play on the server; human turn timeout → auto end turn (mulligan: keep hand); Pass & Play has no timer and hides the hand until reveal. Ruleset 1 endpoints untouched until 8.14.
+- **Tests:** 5 flow tests; 4 backend tests run in CI (local Edge Runtime cannot reach npm through the sandbox proxy).
+
 ## 2026-11-20 — 8.9 Ruleset 2 database catalog
 
 - **Files:** `supabase/migrations/20261120000200_ruleset2_catalog.sql`, `supabase/seed.sql`, `supabase/tests/database/010_ruleset2_catalog.test.sql`, `tests/architecture/seed-v2.test.ts`.

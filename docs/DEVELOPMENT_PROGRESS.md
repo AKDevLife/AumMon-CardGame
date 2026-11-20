@@ -7,7 +7,7 @@
 - **Status:** ▶ Phase 8 — game rules replaced by 1v1 TCG (Spec v3.0); platform kept.
 - **Phase:** 8 — 1v1 TCG Ruleset (`ruleset_version = "2"`)
 - **Current task:** none in progress
-- **Next:** 8.10 backend turn-based commands + 90 s timer; production (6.8 → 7.3 → 7.8) still deferred.
+- **Next:** 8.11 UI 1v1 board + Solo; production (6.8 → 7.3 → 7.8) still deferred.
 - **Playtest URL (latest `main`):** https://aum-mon-card-game-git-playtest-aum-mon.vercel.app
 - **Dev backend:** Supabase `AumMon-Dev` (ref `yaxtzdhryctfjaspxvix`, ap-northeast-1), email confirmation OFF for playtesting.
 
@@ -22,8 +22,8 @@
 | 5 Pass & Play           |      5 |      5 |    100% |
 | 6 Online Multiplayer    |      7 |      8 |     88% |
 | 7 Public Launch & Scale |      6 |      8 |     75% |
-| 8 1v1 TCG Ruleset       |      9 |     14 |     64% |
-| **Overall**             | **78** | **86** | **91%** |
+| 8 1v1 TCG Ruleset       |     10 |     14 |     71% |
+| **Overall**             | **79** | **86** | **92%** |
 
 ## Completed (summary)
 
@@ -33,7 +33,7 @@
 - **Phase 4:** solo backend (Edge Functions, row-locked transactions, idempotency, timeouts) + UI.
 - **Phase 5:** Pass & Play with server-chosen seat and privacy handoff.
 - **Phase 6:** online lobby, join codes, rate limits, Realtime + Presence, resume, forfeit.
-- **Phase 8:** 8.1 single spec v3.0 (1v1 TCG) + docs aligned; 8.2 card data + validation; 8.3 engine core; 8.4 combat + keywords; 8.5 actions + equipment; 8.6 evolution + fusion; 8.7 simulation; 8.8 bot; 8.9 DB catalog (`packages/game-engine/src/rules/v2`).
+- **Phase 8:** 8.1 single spec v3.0 (1v1 TCG) + docs aligned; 8.2 card data + validation; 8.3 engine core; 8.4 combat + keywords; 8.5 actions + equipment; 8.6 evolution + fusion; 8.7 simulation; 8.8 bot; 8.9 DB catalog; 8.10 backend `tcg-*` functions (`packages/game-engine/src/rules/v2`).
 - **Phase 7:** security review + CSP/headers, no-cost monitoring, account deletion + draft legal pages, WCAG 2.1 AA, load test (20 players) + region fix, smoke test + runbook.
 
 ## In progress
@@ -50,7 +50,7 @@ None
 
 ## Latest verification (2026-11-20)
 
-- Local: `pnpm check` ✅ 236 unit/integration tests · pgTAP ✅ (10 suites) · backend ✅ 21 · E2E ✅ 16 (incl. axe a11y, solo, pass & play, two-browser online)
+- Local: `pnpm check` ✅ 241 unit/integration tests · pgTAP ✅ (10 suites) · backend ✅ 21 · E2E ✅ 16 (incl. axe a11y, solo, pass & play, two-browser online)
 - Cloud (AumMon-Dev + playtest): smoke ✅ 8/8 · load test ✅ 20/20 matches, submit p50 261 ms
 - CI on `main`: ✅
 
