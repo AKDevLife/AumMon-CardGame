@@ -1,7 +1,7 @@
 import type { RandomSource } from "../../domain/types.ts";
 import { getCardDefinition } from "./cards.ts";
 import { RULESET_V2 } from "./constants.ts";
-import { unitAtk, unitHp, unitKeywords } from "./stats.ts";
+import { canEquip, unitAtk, unitHp, unitKeywords, usedSlots } from "./stats.ts";
 import {
   cloneState,
   other,
@@ -33,7 +33,13 @@ export type CommandErrorCode =
   | "no_boost"
   | "boost_used"
   | "flying_target"
-  | "guard_blocks";
+  | "guard_blocks"
+  | "not_an_action"
+  | "not_equipment"
+  | "invalid_choice"
+  | "no_valid_target"
+  | "incompatible"
+  | "no_free_slot";
 
 export class CommandError extends Error {
   constructor(readonly code: CommandErrorCode) {
@@ -56,6 +62,19 @@ export type Command =
       readonly playerId: string;
       readonly attackerId: string;
       readonly target: string;
+    }
+  /** choice: Search → equipment card id in deck; Recycle → instance id in discard. */
+  | {
+      readonly type: "play_action";
+      readonly playerId: string;
+      readonly instanceId: string;
+      readonly choice?: string;
+    }
+  | {
+      readonly type: "attach";
+      readonly playerId: string;
+      readonly instanceId: string;
+      readonly unitId: string;
     }
   | { readonly type: "end_turn"; readonly playerId: string }
   | { readonly type: "forfeit"; readonly playerId: string };
@@ -250,6 +269,35 @@ export function applyCommand(state: MatchState, command: Command, rng: RandomSou
       resolveAttack(next, seat, command.attackerId, command.target, events);
       break;
     }
+    case "play_action": {
+      requireMain(next, seat);
+      const card = takeFromHand(me, command.instanceId, "action");
+      playAction(next, seat, card, command.choice, events, rng);
+      break;
+    }
+    case "attach": {
+      requireMain(next, seat);
+      const card = me.hand.find((c) => c.instanceId === command.instanceId);
+      if (!card) throw new CommandError("card_not_in_hand");
+      const def = getCardDefinition(card.cardId);
+      if (def.cardType !== "equipment") throw new CommandError("not_equipment");
+      const unit = findUnit(me.units, command.unitId);
+      if (!canEquip(unit, card.cardId)) throw new CommandError("incompatible");
+      if (usedSlots(unit) + def.slotCost > RULESET_V2.maxEquipmentSlots)
+        throw new CommandError("no_free_slot");
+      if (me.spark < def.cost) throw new CommandError("not_enough_spark");
+      me.spark -= def.cost;
+      me.hand = me.hand.filter((c) => c !== card);
+      unit.equipment.push(card);
+      events.push({
+        type: "equipment_attached",
+        seat,
+        instanceId: card.instanceId,
+        cardId: card.cardId,
+        unitId: unit.instanceId,
+      });
+      break;
+    }
     case "end_turn": {
       requireTurn(next, seat);
       for (const u of me.units) {
@@ -262,6 +310,88 @@ export function applyCommand(state: MatchState, command: Command, rng: RandomSou
     }
   }
   return { state: next, events };
+}
+
+/** Removes an Action from hand after checking type and cost; the caller resolves it. */
+function takeFromHand(p: PlayerState, instanceId: string, kind: "action"): CardInstance {
+  const card = p.hand.find((c) => c.instanceId === instanceId);
+  if (!card) throw new CommandError("card_not_in_hand");
+  const def = getCardDefinition(card.cardId);
+  if (def.cardType !== kind) throw new CommandError("not_an_action");
+  if (p.spark < def.cost) throw new CommandError("not_enough_spark");
+  return card;
+}
+
+/** Valid choices for an Action; [] means it cannot be played (owner decision R2-8). */
+function actionChoices(p: PlayerState, cardId: string): (string | undefined)[] {
+  const out: (string | undefined)[] = [];
+  for (const fx of getCardDefinition(cardId).effects) {
+    if (fx.type === "DRAW_CARD") out.push(undefined);
+    if (fx.type === "SEARCH_CARD")
+      for (const id of new Set(p.deck.map((c) => c.cardId)))
+        if (getCardDefinition(id).cardType === fx.cardType) out.push(id);
+    if (fx.type === "RECYCLE_CARD")
+      for (const c of p.discard)
+        if (getCardDefinition(c.cardId).cardType === fx.cardType) out.push(c.instanceId);
+  }
+  return out;
+}
+
+/** Action effects (spec §4.4, §5.18; Search choice by player — R2-7); card goes to Discard after. */
+function playAction(
+  state: MatchState,
+  seat: Seat,
+  card: CardInstance,
+  choice: string | undefined,
+  events: GameEvent[],
+  rng: RandomSource,
+): void {
+  const p = state.players[seat];
+  const choices = actionChoices(p, card.cardId);
+  if (choices.length === 0) throw new CommandError("no_valid_target");
+  if (!choices.includes(choice)) throw new CommandError("invalid_choice");
+  const def = getCardDefinition(card.cardId);
+  p.spark -= def.cost;
+  p.hand = p.hand.filter((c) => c !== card);
+  events.push({ type: "action_played", seat, instanceId: card.instanceId, cardId: card.cardId });
+  for (const fx of def.effects) {
+    if (fx.type === "DRAW_CARD") for (let i = 0; i < fx.count; i++) draw(state, seat, events);
+    if (fx.type === "SEARCH_CARD") {
+      const found = p.deck.find((c) => c.cardId === choice);
+      if (!found) throw new CommandError("invalid_choice");
+      p.deck = shuffle(
+        p.deck.filter((c) => c !== found),
+        rng,
+      );
+      addToHand(p, found);
+      events.push({
+        type: "card_searched",
+        seat,
+        instanceId: found.instanceId,
+        cardId: found.cardId,
+      });
+    }
+    if (fx.type === "RECYCLE_CARD") {
+      const back = p.discard.find((c) => c.instanceId === choice);
+      if (!back) throw new CommandError("invalid_choice");
+      p.discard = p.discard.filter((c) => c !== back);
+      addToHand(p, back);
+      events.push({
+        type: "card_recycled",
+        seat,
+        instanceId: back.instanceId,
+        cardId: back.cardId,
+      });
+    }
+  }
+  p.discard.push(card);
+  checkEnd(state, events);
+}
+
+/** Hand limit applies to every card that joins the hand (R2-3). */
+function addToHand(p: PlayerState, card: CardInstance): void {
+  if (p.hand.length >= RULESET_V2.maxHand) p.discard.push(card);
+  else p.hand.push(card);
 }
 
 function requireTurn(state: MatchState, seat: Seat): void {
@@ -372,6 +502,8 @@ export type LegalCommand =
   | { readonly type: "summon"; readonly instanceId: string }
   | { readonly type: "boost"; readonly instanceId: string }
   | { readonly type: "attack"; readonly attackerId: string; readonly target: string }
+  | { readonly type: "play_action"; readonly instanceId: string; readonly choice?: string }
+  | { readonly type: "attach"; readonly instanceId: string; readonly unitId: string }
   | { readonly type: "end_turn" };
 
 /** Commands the seat may send now (the bot picks only from these). */
@@ -389,6 +521,21 @@ export function getLegalCommands(state: MatchState, seat: Seat): LegalCommand[] 
         if (def.cardType === "unit" && def.cost <= me.spark)
           out.push({ type: "summon", instanceId: c.instanceId });
       }
+    for (const c of me.hand) {
+      const def = getCardDefinition(c.cardId);
+      if (def.cost > me.spark) continue;
+      if (def.cardType === "action")
+        for (const choice of actionChoices(me, c.cardId))
+          out.push(
+            choice === undefined
+              ? { type: "play_action", instanceId: c.instanceId }
+              : { type: "play_action", instanceId: c.instanceId, choice },
+          );
+      if (def.cardType === "equipment")
+        for (const u of me.units)
+          if (canEquip(u, c.cardId) && usedSlots(u) + def.slotCost <= RULESET_V2.maxEquipmentSlots)
+            out.push({ type: "attach", instanceId: c.instanceId, unitId: u.instanceId });
+    }
     if (me.spark >= 1)
       for (const u of me.units)
         if (!u.exhausted && !u.boostUsed && unitKeywords(u).has("boost"))

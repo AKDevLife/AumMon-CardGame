@@ -2,6 +2,12 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-20 — 8.5 Ruleset 2 actions + equipment
+
+- **Files:** `rules/v2/match.ts` (`play_action`, `attach`), `stats.ts` (`canEquip`, `usedSlots`), `tests/v2-actions.test.ts`, `tests/v2-fixtures.ts`.
+- **Behaviour:** Draw 2, Search (player picks, revealed, deck shuffled), Scrap Return; equipment cost, trait compatibility (Battery Buddy any), 2 slots, stat/keyword bonuses.
+- **Tests:** 10 new. **Decisions (owner):** R2-7 Search choice, R2-8 no-target actions not playable.
+
 ## 2026-11-20 — 8.4 Ruleset 2 combat + keywords
 
 - **Files:** `rules/v2/stats.ts` (effective ATK/HP/keywords incl. equipment), `match.ts` (`boost`, `attack`, Main → Battle phase), `tests/v2-combat.test.ts`.

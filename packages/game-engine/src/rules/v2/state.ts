@@ -69,6 +69,11 @@ export type GameEvent =
       piercing: number;
     }
   | { type: "unit_destroyed"; seat: Seat; instanceId: string }
+  | { type: "action_played"; seat: Seat; instanceId: string; cardId: string }
+  /** Search reveals the found card (spec §5.18). */
+  | { type: "card_searched"; seat: Seat; instanceId: string; cardId: string }
+  | { type: "card_recycled"; seat: Seat; instanceId: string; cardId: string }
+  | { type: "equipment_attached"; seat: Seat; instanceId: string; cardId: string; unitId: string }
   | { type: "turn_ended"; seat: Seat }
   | { type: "forfeit"; seat: Seat }
   | { type: "match_ended"; result: MatchResult };

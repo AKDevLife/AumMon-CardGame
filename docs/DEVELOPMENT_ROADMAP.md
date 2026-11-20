@@ -128,7 +128,7 @@ Owner decision 2026-11-20: replace the 2–4 player game with the 1v1 TCG in `au
 - [x] **8.2** Card data: 25 card definitions, 11 recipes, Starter Deck as typed data + validation tests (power budget, ≤3 copies, recipe graph) — deps: 8.1 — PR #43 (2026-11-20)
 - [x] **8.3** Engine v2 core: setup, mulligan, SPARK, 3-phase turn, summon, fatigue, win/draw, client-safe view — deps: 8.2 — PR #44 (2026-11-20)
 - [x] **8.4** Combat + keywords (Haste, Guard, Flying, Piercing, Boost) — deps: 8.3 — PR #45 (2026-11-20)
-- [ ] **8.5** Actions + Equipment (Draw, Search, Scrap Return, slots, compatibility) — deps: 8.3
+- [x] **8.5** Actions + Equipment (Draw, Search, Scrap Return, slots, compatibility) — deps: 8.3 — PR #46 (2026-11-20)
 - [ ] **8.6** Evolution + Fusion (instance rules, full HP, equipment handling, inheritance) — deps: 8.4, 8.5
 - [ ] **8.7** Scenario tests T-001–T-007 + spec §5.17 acceptance + determinism/simulation — deps: 8.6
 - [ ] **8.8** Server bot v2 (legal actions only, seat-visible data) — deps: 8.7
