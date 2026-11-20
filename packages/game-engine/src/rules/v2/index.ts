@@ -16,5 +16,5 @@ export {
   type MatchInput,
   type Transition,
 } from "./match.ts";
-export { unitAtk, unitHp, unitKeywords, unitMaxHp } from "./stats.ts";
+export { canEquip, unitAtk, unitHp, unitKeywords, unitMaxHp, usedSlots } from "./stats.ts";
 export { getPlayerView, type PlayerView, type PublicPlayer } from "./view.ts";
