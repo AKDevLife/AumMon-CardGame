@@ -140,3 +140,13 @@ Owner decision 2026-11-20: replace the 2–4 player game with the 1v1 TCG in `au
 - [x] **8.14** Retire ruleset 1 code paths; E2E + smoke + load test on Dev — deps: 8.12, 8.13 — PR #55, #56 (2026-11-20) — DB tables of ruleset 1 kept (no destructive migration)
 
 **Acceptance:** all three modes playable 1v1 to the end on Dev · scenario tests T-001–T-007 pass · no hidden info leaks (hand, deck order, search) · `pnpm check`, E2E and CI green
+
+## Phase 9 — Developer Admin
+
+Owner request 2026-11-20 (dev tooling; production tasks 6.8/7.3/7.8 stay deferred). Owner decisions: catalog read-only, no character management, admin created in the Supabase Dashboard + server-side grant, MFA required.
+
+- [~] **9.1** RBAC foundation: `private.admin_roles`, append-only `private.admin_audit_log`, idempotent `grant_admin`/`revoke_admin` bootstrap, `admin-api` with server-side role + MFA (aal2) checks — deps: 8.14
+- [~] **9.2** Admin dashboard UI (`/admin`): MFA enroll/verify, Overview, Players, Cards, Decks, Rooms, Matches, Bots, Logs, Settings (iPhone + desktop) — deps: 9.1
+- [ ] **9.3** Bootstrap the Dev admin + `AUMMON_ENV` on Dev; owner logs in with MFA — deps: 9.1, 9.2 — needs owner (Dashboard user + email)
+
+**Acceptance:** admin logs in without Register · non-admins get 403 on every admin action · players cannot self-grant · MFA enforced server-side · audited mutations · no secret in the client bundle · per-environment bootstrap documented (`docs/ADMIN.md`)
