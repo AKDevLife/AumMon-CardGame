@@ -401,32 +401,68 @@ export function AdminPage() {
           </Section>
         );
       }
-      case "rooms":
+      case "rooms": {
+        const rows = asRows(data);
+        const stale = rows.filter(
+          (r) => r["stale_reason"] !== null && r["stale_reason"] !== undefined,
+        ).length;
         return (
-          <RowList
-            rows={asRows(data)}
-            empty="ไม่มีห้องที่เปิดอยู่"
-            title={(r) => `ห้อง ${shortId(r["id"])} · ${label("mode", r["mode"])}`}
-            columns={[
-              { label: "สถานะ", value: (r) => label("roomStatus", r["status"]) },
-              { label: "ผู้เล่นในห้อง", value: (r) => `${text(r["players"])} / 2` },
-              { label: "สร้างเมื่อ", value: (r) => ago(r["created_at"]) },
-            ]}
-            actions={(r) =>
-              r["status"] === "lobby" ? (
+          <>
+            <p className="text-sm">
+              การปิดห้องจะนำห้องออกจากรายการและยุติเกมที่ยังไม่จบในห้องนั้น (เกมนั้นไม่มีผู้ชนะ) — ประวัติยังเก็บไว้
+            </p>
+            <StickerButton
+              variant="danger"
+              disabled={pending || stale === 0}
+              onClick={() =>
+                void run(`ปิดห้องที่ค้างทั้งหมด ${String(stale)} ห้อง?`, "rooms.close_stale", {})
+              }
+            >
+              ปิดห้องที่ค้างทั้งหมด ({stale.toLocaleString("th-TH")})
+            </StickerButton>
+            <RowList
+              rows={rows}
+              empty="ไม่มีห้องที่เปิดอยู่"
+              title={(r) => `ห้อง ${shortId(r["id"])} · ${label("mode", r["mode"])}`}
+              columns={[
+                { label: "สถานะ", value: (r) => label("roomStatus", r["status"]) },
+                {
+                  label: "ห้องค้าง?",
+                  value: (r) =>
+                    typeof r["stale_reason"] === "string"
+                      ? `⚠️ ${label("stale", r["stale_reason"])}`
+                      : "ไม่ ✅ ใช้งานปกติ",
+                },
+                { label: "ผู้เล่นในห้อง", value: (r) => `${text(r["players"])} / 2` },
+                {
+                  label: "เกมในห้อง",
+                  value: (r) =>
+                    r["match_status"] ? label("matchStatus", r["match_status"]) : "ยังไม่เริ่ม",
+                },
+                { label: "ความเคลื่อนไหวล่าสุด", value: (r) => ago(r["last_activity"]) },
+                { label: "สร้างเมื่อ", value: (r) => ago(r["created_at"]) },
+              ]}
+              actions={(r) => (
                 <SmallButton
                   danger
                   disabled={pending}
                   onClick={() =>
-                    void run("ปิดห้องนี้? ผู้เล่นที่รออยู่จะเข้าไม่ได้", "room.close", { roomId: r["id"] })
+                    void run(
+                      r["match_status"] === "active"
+                        ? "ปิดห้องนี้? เกมที่กำลังเล่นอยู่จะถูกยุติทันที (ไม่มีผู้ชนะ)"
+                        : "ปิดห้องนี้?",
+                      "room.close",
+                      { roomId: r["id"] },
+                    )
                   }
                 >
                   ปิดห้อง
                 </SmallButton>
-              ) : null
-            }
-          />
+              )}
+            />
+          </>
         );
+      }
       case "matches":
         return (
           <RowList

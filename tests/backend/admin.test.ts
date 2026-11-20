@@ -158,6 +158,29 @@ describe.runIf(run)("admin RBAC via Edge Functions", () => {
       .filter((a) => a.target_id === player.id)
       .map((a) => a.action);
     expect(actions).toEqual(expect.arrayContaining(["player.disabled", "player.enabled"]));
+    // Room cleanup: an open solo room is listed, can be closed (its game is abandoned), and is audited.
+    const created = await fetch(`${url}/functions/v1/tcg-create`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        authorization: `Bearer ${(await player.client.auth.getSession()).data.session?.access_token ?? ""}`,
+        apikey: key ?? "",
+      },
+      body: JSON.stringify({ mode: "solo" }),
+    });
+    expect(created.status).toBe(200);
+    const rooms = (await admin.call({ action: "rooms" })).body as unknown as {
+      id: string;
+      match_status: string;
+    }[];
+    const open = rooms.find((r) => r.match_status === "active");
+    if (!open) throw new Error("open room not listed");
+    expect((await admin.call({ action: "room.close", roomId: open.id })).status).toBe(200);
+    expect((await admin.call({ action: "room.close", roomId: open.id })).body["error"]).toBe(
+      "not_closable",
+    );
+    expect((await admin.call({ action: "rooms.close_stale" })).status).toBe(200);
+    expect((await player.call({ action: "rooms.close_stale" })).status).toBe(403);
     const sim = await admin.call({ action: "bots.simulate", games: 3 });
     expect(sim.body["games"]).toBe(3);
   }, 60_000);

@@ -44,8 +44,15 @@ const MAPS: Record<string, Record<string, string>> = {
     "player.disabled": "ระงับบัญชีผู้เล่น",
     "player.enabled": "เปิดใช้บัญชีผู้เล่น",
     "room.closed": "ปิดห้อง",
+    "rooms.closed_stale": "ปิดห้องที่ค้างทั้งหมด",
     "match.abandoned": "ยุติแมตช์",
     "bots.simulated": "ทดสอบ Bot",
+  },
+  stale: {
+    empty: "ไม่มีผู้เล่นในห้องแล้ว",
+    expired: "รหัสห้องหมดอายุ ไม่มีใครเข้าร่วม",
+    finished: "เกมจบหรือถูกยุติแล้ว แต่ห้องยังเปิดค้าง",
+    idle: "ไม่มีความเคลื่อนไหวเกิน 2 ชั่วโมง",
   },
   httpStatus: {
     "401": "ไม่ได้ล็อกอิน / Session หมดอายุ",
