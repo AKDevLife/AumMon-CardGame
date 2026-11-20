@@ -126,7 +126,7 @@ Owner decision 2026-11-20: replace the 2–4 player game with the 1v1 TCG in `au
 
 - [x] **8.1** Consolidate spec into `aummon_game_spec.md` v3.0; align blueprint, rules and docs — deps: — — PR #41 (2026-11-20)
 - [x] **8.2** Card data: 25 card definitions, 11 recipes, Starter Deck as typed data + validation tests (power budget, ≤3 copies, recipe graph) — deps: 8.1 — PR #43 (2026-11-20)
-- [ ] **8.3** Engine v2 core: setup, mulligan, SPARK, 3-phase turn, summon, fatigue, win/draw, client-safe view — deps: 8.2
+- [x] **8.3** Engine v2 core: setup, mulligan, SPARK, 3-phase turn, summon, fatigue, win/draw, client-safe view — deps: 8.2 — PR #44 (2026-11-20)
 - [ ] **8.4** Combat + keywords (Haste, Guard, Flying, Piercing, Boost) — deps: 8.3
 - [ ] **8.5** Actions + Equipment (Draw, Search, Scrap Return, slots, compatibility) — deps: 8.3
 - [ ] **8.6** Evolution + Fusion (instance rules, full HP, equipment handling, inheritance) — deps: 8.4, 8.5

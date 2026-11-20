@@ -5,6 +5,8 @@ export const RULESET_V2 = {
   deckSize: 30,
   initialHand: 5,
   maxCopies: 3,
+  /** Owner decision 2026-11-20 (clarification R2-3): overdraw goes to Discard. */
+  maxHand: 10,
   maxUnits: 3,
   maxEquipmentSlots: 2,
   startSpark: 1,
