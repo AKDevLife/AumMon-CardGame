@@ -22,7 +22,7 @@ test("pass & play 1v1: privacy handoff between turns, then forfeit ends the matc
   const idle = page.getByRole("button", { name: "กำลังส่ง…" });
   let handoffs = 0;
   // A full 1v1 game is long; check several handoffs/turns (incl. mulligans), then forfeit.
-  for (let step = 0; step < 200 && handoffs < 5; step++) {
+  for (let step = 0; step < 120 && handoffs < 5; step++) {
     if (await result.isVisible()) break;
     const reveal = page.getByRole("button", { name: /แสดงการ์ด/ });
     if (await reveal.isEnabled().catch(() => false)) {
@@ -71,6 +71,7 @@ test("pass & play 1v1: privacy handoff between turns, then forfeit ends the matc
       } else await page.waitForTimeout(300);
     }
   }
+  if (handoffs < 5) console.log("PASSPLAY-STUCK", await page.locator("main").innerText());
   expect(handoffs).toBe(5);
   page.once("dialog", (d) => void d.accept());
   await page.getByRole("button", { name: "ยอมแพ้" }).click();
