@@ -1,6 +1,9 @@
+import { useState } from "react";
 import { Link } from "react-router";
 import { StickerButton } from "../components/StickerButton.tsx";
 import { useAuth } from "../features/auth/auth-context.ts";
+import { Popup } from "../features/tcg/Popup.tsx";
+import { RulesText } from "../features/tcg/RulesText.tsx";
 
 const MODES = [
   { id: "solo", label: "Solo vs Bot" },
@@ -11,6 +14,7 @@ const MODES = [
 export function HomePage() {
   const auth = useAuth();
   const signedIn = auth.mode === "live" && auth.session !== null;
+  const [rules, setRules] = useState(false);
   return (
     <div className="flex flex-1 flex-col justify-center gap-8">
       <section className="am-sticker bg-am-title px-6 py-6 text-center">
@@ -49,6 +53,35 @@ export function HomePage() {
           {signedIn ? "เลือกโหมดที่ต้องการเล่น" : "ต้องเข้าสู่ระบบก่อนเริ่มเล่น"}
         </p>
       </nav>
+
+      {/* Secondary action: visually lighter than the play modes, always available (even signed out). */}
+      <button
+        type="button"
+        onClick={() => {
+          setRules(true);
+        }}
+        className="am-pressable mx-auto flex min-h-11 items-center gap-2 rounded-full border-[3px] border-am-ink bg-am-deco-purple px-5 py-2 font-display font-semibold"
+      >
+        <span aria-hidden="true">📖</span> วิธีเล่น &amp; กติกา
+      </button>
+
+      <Popup
+        title="วิธีเล่น & กติกา"
+        open={rules}
+        onClose={() => {
+          setRules(false);
+        }}
+      >
+        <RulesText />
+        <StickerButton
+          variant="confirm"
+          onClick={() => {
+            setRules(false);
+          }}
+        >
+          เข้าใจแล้ว
+        </StickerButton>
+      </Popup>
 
       {!signedIn && (
         <Link

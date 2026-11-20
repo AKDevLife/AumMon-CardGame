@@ -2,6 +2,10 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-20 — 9.12 Home rules popup (owner request)
+
+- `HomePage`: secondary pill button "📖 วิธีเล่น & กติกา" under the mode buttons (lighter than play actions, available signed out) opens the shared rules popup with a "เข้าใจแล้ว" close button. Test in `routes.test.tsx`.
+
 ## 2026-11-20 — 9.11 Admin sound settings (owner request)
 
 - Admin "เสียง" page: for each of 11 game moments pick one of 17 synthesized sounds (ป๊อป, ฟองสบู่, เหรียญ, คลิก, ตุ๊บ, ฟันดาบ, เลเซอร์, กลอง, ระเบิด, วิบวับ, เวทมนตร์, วูช, พลังขึ้น, กระดิ่ง, ระฆัง, แฟนแฟร์, เศร้า), volume 0–200 %, on/off, ▶ preview, reset to defaults. Applies to every player.
