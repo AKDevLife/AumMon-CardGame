@@ -2,6 +2,13 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-20 — 8.14 Ruleset 1 retired
+
+- **Removed:** engine ruleset 1 (domain, characters, views, bots, rules/v1 + tests), Edge Functions `matches-*` (also deleted from Dev), `flow.ts`, `matches.ts`, old match page/route. Engine 0.2.0, `RULESET_VERSION = "2"`.
+- **Changed:** `rooms-create` online-only; `account-delete` forfeits 1v1 matches, abandons leftover ruleset 1 matches; smoke/load/CI health check use ruleset 2.
+- **Kept:** ruleset 1 tables/rows (characters, old matches) — removing data needs owner approval.
+- **Verification (Dev):** smoke 8/8; E2E solo, pass & play, online on the playtest URL; load 20/20 (`tcg-command` server p50 138 ms / p95 360 ms; baseline in `docs/OPERATIONS.md`).
+
 ## 2026-11-20 — 8.13 Ruleset 2 Online
 
 - **Files:** `_shared/lobby.ts`, `rooms-create`, `rooms-join` (online rooms are ruleset 2: 2 seats, no characters), `OnlinePage.tsx`, `LobbyPage.tsx` (start via `tcg-start`, → `/game/:id`), `TcgMatchPage.tsx` (private Realtime channel + Presence dot), tests `tests/backend/online.test.ts`, E2E `online.spec.ts`.
