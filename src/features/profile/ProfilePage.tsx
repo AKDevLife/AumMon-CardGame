@@ -54,7 +54,7 @@ export function ProfilePage() {
   if (load.status === "loading") return <p className="text-center text-am-muted">กำลังโหลด…</p>;
   if (load.status === "error") {
     return (
-      <p role="alert" className="text-center text-am-danger">
+      <p role="alert" className="border-l-4 border-am-danger pl-2 text-center">
         โหลดโปรไฟล์ไม่สำเร็จ
       </p>
     );

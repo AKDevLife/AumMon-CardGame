@@ -74,9 +74,7 @@ function PlayerBoard({
             {CHARACTER_NAME[p.characterId] ?? p.characterId}
           </div>
           <Hearts hp={Math.max(0, p.hp)} max={p.maxHp} />
-          {p.status !== "alive" && (
-            <div className="text-xs font-semibold text-am-danger">ถูกคัดออก</div>
-          )}
+          {p.status !== "alive" && <div className="text-xs font-semibold">💥 ถูกคัดออก</div>}
         </li>
       ))}
     </ul>
@@ -219,7 +217,7 @@ export function MatchPage() {
   return (
     <section className="flex flex-col gap-4">
       <div className="flex items-center justify-between gap-2">
-        <span className="rounded-full bg-am-round px-3 py-1 text-sm font-bold text-white">
+        <span className="rounded-full bg-am-round px-3 py-1 text-sm font-bold text-am-ink">
           รอบ {view.round}
         </span>
         <span className="font-semibold">{PHASE_LABEL[view.phase] ?? view.phase}</span>
@@ -361,7 +359,7 @@ export function MatchPage() {
       )}
 
       {error && (
-        <p role="alert" className="font-semibold text-am-danger">
+        <p role="alert" className="border-l-4 border-am-danger pl-2 font-semibold">
           {error}
         </p>
       )}

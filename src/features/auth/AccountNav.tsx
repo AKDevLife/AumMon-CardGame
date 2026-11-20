@@ -27,7 +27,7 @@ export function AccountNav() {
           ออกจากระบบ
         </button>
         {error && (
-          <span role="alert" className="text-xs text-am-danger">
+          <span role="alert" className="border-l-4 border-am-danger pl-1 text-xs">
             ออกจากระบบไม่สำเร็จ
           </span>
         )}
