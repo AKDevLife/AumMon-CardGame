@@ -96,10 +96,12 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - name: Sync engine into Edge Functions (import map target)
+        run: pnpm sync:engine
       - name: Start local Supabase (no cloud)
         run: >-
           pnpm exec supabase start -x
-          studio,imgproxy,inbucket,mailpit,logflare,vector,supavisor,postgres-meta,storage-api
+          studio,imgproxy,mailpit,logflare,vector,supavisor,postgres-meta,storage-api
       - name: Serve Edge Functions and check the engine boots under Deno
         run: |
           pnpm sync:engine
