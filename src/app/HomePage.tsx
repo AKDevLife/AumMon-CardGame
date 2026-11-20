@@ -15,7 +15,7 @@ export function HomePage() {
     <div className="flex flex-1 flex-col justify-center gap-8">
       <section className="am-sticker bg-am-title px-6 py-6 text-center">
         <h1 className="font-display text-5xl font-bold tracking-wide">AumMon</h1>
-        <p className="mt-2 text-am-muted">Multiplayer card battle · Last Survivor · 2–4 ผู้เล่น</p>
+        <p className="mt-2">Multiplayer card battle · Last Survivor · 2–4 ผู้เล่น</p>
       </section>
 
       <nav aria-label="Game modes" className="flex flex-col gap-4">
@@ -53,7 +53,7 @@ export function HomePage() {
       {!signedIn && (
         <Link
           to="/register"
-          className="am-sticker am-pressable block bg-am-confirm px-6 py-3 text-center font-display text-lg font-semibold text-white"
+          className="am-sticker am-pressable block bg-am-confirm px-6 py-3 text-center font-display text-lg font-semibold text-am-ink"
         >
           สร้างบัญชี
         </Link>

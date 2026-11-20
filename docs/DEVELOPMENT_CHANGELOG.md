@@ -2,6 +2,12 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-20 — 7.5 Accessibility + responsive
+
+- **Files:** `tests/e2e/a11y.spec.ts` (axe WCAG 2.1 AA), colour fixes in `StickerButton`, `HomePage`, `AppLayout`, `MatchPage`, alerts across features
+- **Tests:** axe: 5 public pages + signed-in profile, Pass & Play setup, Online, match screen — 0 violations; iPhone 13 responsive checks unchanged; full E2E 16/16.
+- **Decisions:** palette unchanged (spec §5); fixed contrast by using ink text on green/pink, large bold white text on danger buttons, and ink text with a danger border for error messages.
+
 ## 2026-11-20 — 7.4 Privacy/Terms drafts + account deletion
 
 - **Files:** migration `20261120000100_account_deletion.sql` (FKs → set null/cascade, anonymize trigger), function `account-delete`, `src/features/legal/LegalPages.tsx` (`/privacy`, `/terms`, marked DRAFT), `src/features/profile/DeleteAccount.tsx`, pgTAP 009, `tests/backend/account.test.ts`
