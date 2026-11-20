@@ -51,7 +51,7 @@ select throws_ok($$insert into public.matches (room_id, deck_template_id, deck_t
 
 -- Player constraints
 select throws_ok($$insert into public.room_players (room_id, user_id, seat, player_type, character_id, display_name_snapshot)
-  values ('10000000-0000-0000-0000-000000000001', null, 1, 'human', 'c1', 'x')$$, '23514', null, 'human seat requires user_id');
+  values ('10000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-00000000000a', 3, 'bot', 'c2', 'x')$$, '23514', null, 'bot seat cannot have user_id (human with null user_id = deleted account, task 7.4)');
 select lives_ok($$insert into public.room_players (room_id, seat, player_type, character_id, display_name_snapshot)
   values ('10000000-0000-0000-0000-000000000001', 1, 'bot', 'c1', 'Bot')$$, 'bot seat without user_id');
 select throws_ok($$insert into public.room_players (room_id, seat, player_type, character_id, display_name_snapshot)

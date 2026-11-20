@@ -4,6 +4,7 @@ import { TextField } from "../../components/TextField.tsx";
 import { AuthCard } from "../auth/AuthCard.tsx";
 import { useAuth } from "../auth/auth-context.ts";
 import { formText, validateDisplayName } from "../auth/validation.ts";
+import { DeleteAccount } from "./DeleteAccount.tsx";
 
 type LoadState =
   { status: "loading" } | { status: "ready"; displayName: string } | { status: "error" };
@@ -83,25 +84,28 @@ export function ProfilePage() {
   };
 
   return (
-    <AuthCard
-      title="โปรไฟล์"
-      submitLabel="บันทึก"
-      enabled
-      pending={pending}
-      error={error}
-      notice={notice}
-      onSubmit={(form) => void save(form)}
-      footer={<span className="text-am-muted">{auth.session?.user.email}</span>}
-    >
-      <TextField
-        label="ชื่อที่แสดง"
-        name="displayName"
-        defaultValue={load.displayName}
-        autoComplete="nickname"
-        minLength={2}
-        maxLength={24}
-        hint="2–24 ตัวอักษร"
-      />
-    </AuthCard>
+    <div className="flex flex-col gap-4">
+      <AuthCard
+        title="โปรไฟล์"
+        submitLabel="บันทึก"
+        enabled
+        pending={pending}
+        error={error}
+        notice={notice}
+        onSubmit={(form) => void save(form)}
+        footer={<span className="text-am-muted">{auth.session?.user.email}</span>}
+      >
+        <TextField
+          label="ชื่อที่แสดง"
+          name="displayName"
+          defaultValue={load.displayName}
+          autoComplete="nickname"
+          minLength={2}
+          maxLength={24}
+          hint="2–24 ตัวอักษร"
+        />
+      </AuthCard>
+      <DeleteAccount />
+    </div>
   );
 }

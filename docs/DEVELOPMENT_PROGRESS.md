@@ -6,7 +6,7 @@
 
 - **Phase:** 7 — Public Launch & Scale Evaluation (Dev cloud project live)
 - **Current task:** none in progress
-- **Next task:** 7.4 Privacy/Terms drafts + account deletion (owner choice 2B)
+- **Next task:** 7.5 Accessibility + responsive checks
 
 ## Completion
 
@@ -19,7 +19,7 @@
 | 5 Pass & Play           |      5 |      5 |    100% |
 | 6 Online Multiplayer    |      7 |      8 |     88% |
 | 7 Public Launch & Scale |      0 |      8 |      0% |
-| **Overall**             | **64** | **72** | **89%** |
+| **Overall**             | **65** | **72** | **90%** |
 
 ## Completed
 

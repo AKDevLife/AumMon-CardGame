@@ -22,7 +22,14 @@ export function AppLayout() {
         <span className="rounded-full bg-am-round px-3 py-1 font-semibold text-white">
           Rulebook v{RULESET_VERSION}
         </span>{" "}
-        · engine {ENGINE_VERSION}
+        · engine {ENGINE_VERSION} ·{" "}
+        <Link to="/privacy" className="underline">
+          ความเป็นส่วนตัว
+        </Link>{" "}
+        ·{" "}
+        <Link to="/terms" className="underline">
+          ข้อกำหนด
+        </Link>
       </footer>
     </div>
   );
