@@ -2,6 +2,12 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-20 — 8.2 Ruleset 2 card data
+
+- **Files:** `packages/game-engine/src/rules/v2/` (types, cards, recipes, constants, validate), `tests/v2-card-data.test.ts`; exported as `v2` namespace.
+- **Tests:** 9 new — counts, validation clean, power budget clean, deckability, Starter Deck 30/≤3, spec stats, bad-data rejection.
+- **Decisions (owner):** rarity by stage (provisional, cosmetic); English card names. U202/U203 keywords come only from Fusion inheritance.
+
 ## 2026-11-20 — Old ruleset text removed (R2-1)
 
 - **Files:** `aummon_game_spec.md` §5.12/5.14/5.17/§11, `docs/rule-clarifications.md`

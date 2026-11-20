@@ -48,3 +48,4 @@ export {
 } from "./views/player-view.ts";
 export { normalBot, type BotDecisionContext, type BotStrategy } from "./bots/strategy.ts";
 export { autoSubmit, botContext, chooseBotAction } from "./bots/auto.ts";
+export * as v2 from "./rules/v2/index.ts";
