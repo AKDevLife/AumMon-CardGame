@@ -428,3 +428,49 @@ enabled = true
 # formatted with uppercase keywords, indent 2, max width 180, trailing commas,
 # and column/key alignment. Set to "null" to emit raw, unformatted SQL.
 # format_options = "{\"keywordCase\":\"upper\",\"indent\":2,\"maxWidth\":180,\"commaStyle\":\"trailing\"}"
+
+# Edge Functions verify the JWT themselves (requireUser); gateway verification is off so CORS preflight works.
+
+[functions.engine-health]
+verify_jwt = false
+import_map = "./functions/deno.json"
+
+[functions.matches-forfeit]
+verify_jwt = false
+import_map = "./functions/deno.json"
+
+[functions.matches-resume]
+verify_jwt = false
+import_map = "./functions/deno.json"
+
+[functions.matches-start]
+verify_jwt = false
+import_map = "./functions/deno.json"
+
+[functions.matches-submit-action]
+verify_jwt = false
+import_map = "./functions/deno.json"
+
+[functions.matches-use-skill]
+verify_jwt = false
+import_map = "./functions/deno.json"
+
+[functions.matches-view]
+verify_jwt = false
+import_map = "./functions/deno.json"
+
+[functions.rooms-create]
+verify_jwt = false
+import_map = "./functions/deno.json"
+
+[functions.rooms-join]
+verify_jwt = false
+import_map = "./functions/deno.json"
+
+[functions.rooms-leave]
+verify_jwt = false
+import_map = "./functions/deno.json"
+
+[functions.rooms-ready]
+verify_jwt = false
+import_map = "./functions/deno.json"

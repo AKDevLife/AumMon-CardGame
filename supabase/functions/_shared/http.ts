@@ -1,4 +1,5 @@
 /** HTTP helpers: CORS allow-list, JSON responses, safe body parsing. */
+import { originAllowed } from "./origins.ts";
 
 const DEFAULT_ORIGINS = ["http://localhost:5173", "http://127.0.0.1:5173", "http://127.0.0.1:4173"];
 const MAX_BODY_BYTES = 8 * 1024;
@@ -20,12 +21,7 @@ function allowedOrigin(origin: string | null): string | null {
     .map((o) => o.trim())
     .filter(Boolean);
   const patterns = configured.length > 0 ? configured : DEFAULT_ORIGINS;
-  const ok = patterns.some((p) =>
-    p.startsWith("https://*.")
-      ? origin.startsWith("https://") && origin.endsWith(p.slice(9))
-      : p === origin,
-  );
-  return ok ? origin : null;
+  return originAllowed(origin, patterns) ? origin : null;
 }
 
 function corsHeaders(request: Request): Record<string, string> {

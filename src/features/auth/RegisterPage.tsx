@@ -33,7 +33,8 @@ export function RegisterPage() {
     const { data, error: signUpError } = await auth.client.auth.signUp({
       email,
       password,
-      options: { data: { display_name: displayName } },
+      // After email confirmation, return to this deployment (must be in Auth redirect allow-list).
+      options: { data: { display_name: displayName }, emailRedirectTo: window.location.origin },
     });
     setPending(false);
     if (signUpError) {

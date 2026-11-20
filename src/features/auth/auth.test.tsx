@@ -98,7 +98,7 @@ describe("auth (live mode)", () => {
     expect(auth.signUp).toHaveBeenCalledWith({
       email: "a@test.local",
       password: "secret123",
-      options: { data: { display_name: "Aum" } },
+      options: { data: { display_name: "Aum" }, emailRedirectTo: window.location.origin },
     });
   });
 

@@ -15,7 +15,7 @@ Percentages: `pnpm progress` (top-level tasks only). Phase 0 (Rulebook v1 decisi
 - [x] **1.7** GitHub Actions CI: typecheck, lint, format, test, build, secret scan, E2E — deps: 1.4 — PR #1 (2026-11-19)
 - [x] **1.8** Secret guard script, README, `.env.example` — deps: 1.7 — PR #1 (2026-11-19)
 - [x] **1.9** Claude operating rules + progress tracking system — PR #2, #3 (2026-11-19)
-- [!] **1.10** Supabase Dev project + `supabase link` — Blocked: needs project ref, access token and network access to Supabase
+- [x] **1.10** Supabase Dev project `AumMon-Dev` linked: 7 migrations + seed applied, 11 Edge Functions deployed, CORS/Auth redirects set — PR #25 (2026-11-20)
 - [x] **1.11** Vercel Preview per PR (verified PR #9); Production auto-deploy disabled via `vercel.json` — PR #9 (2026-11-19)
 - [!] **1.12** Branch protection on `main` requiring CI — Blocked: owner repo settings
 
