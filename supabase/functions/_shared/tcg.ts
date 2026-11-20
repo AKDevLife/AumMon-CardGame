@@ -225,6 +225,7 @@ export async function withTcg(
     const kinds = kindsOf(locked);
     let rt = advanceTcg(locked, kinds, locked.mode, now);
     const events = [...rt.events];
+    const actingBefore = actingSeat(rt.state);
     if (options.act) {
       if (options.expectedVersion !== undefined && options.expectedVersion !== locked.version)
         throw new HttpError(409, "stale_version", "State changed; refresh and retry");
@@ -250,7 +251,16 @@ export async function withTcg(
     }
     const changed = events.length > 0 || rt.deadline !== locked.deadline;
     const version = changed ? await saveTcg(tx, locked, rt, events) : locked.version;
-    const response = await respondTcg(tx, locked, rt, version, options.reveal ?? false);
+    // Pass & Play: after a command the hand stays visible while the same seat keeps acting;
+    // a seat change hides it until the next privacy handoff (task 8.12).
+    const keepRevealed = options.act !== undefined && actingSeat(rt.state) === actingBefore;
+    const response = await respondTcg(
+      tx,
+      locked,
+      rt,
+      version,
+      (options.reveal ?? false) || keepRevealed,
+    );
     if (options.receipt)
       await storeReceipt(tx, matchId, userId, options.receipt.key, options.receipt.hash, {
         status: "accepted",

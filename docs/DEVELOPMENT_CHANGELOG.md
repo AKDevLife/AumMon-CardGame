@@ -2,6 +2,11 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-20 — 8.12 Ruleset 2 Pass & Play
+
+- **Files:** `PassPlaySetupPage.tsx` (2 names → `tcg-create`), `_shared/tcg.ts` (hand stays visible while the same seat keeps acting; hidden on seat change), E2E `pass-play.spec.ts`, backend test.
+- **Behaviour:** privacy handoff before every seat change (mulligan and turns), no timer, nothing private rendered before reveal.
+
 ## 2026-11-20 — 8.11 Ruleset 2 board UI + Solo
 
 - **Files:** `src/features/tcg/` (`TcgMatchPage.tsx`, `labels.ts`, `types.ts`), route `/game/:matchId`, `SoloSetupPage` (1v1 vs bot via `tcg-create`), home/footer text (Ruleset 2 · 1v1), E2E `solo.spec.ts`, `a11y.spec.ts`.

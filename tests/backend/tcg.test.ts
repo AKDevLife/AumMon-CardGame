@@ -148,6 +148,17 @@ describe.runIf(run)("ruleset 2 matches via Edge Functions", () => {
     const next = (await send(a, shown, { type: "mulligan", instanceIds: [] }))
       .body as unknown as Tcg;
     expect(next.actingSeat).toBe(1);
+    expect(next.seat).toBeNull(); // seat changed → hidden until the next handoff
+    let v = (await a("tcg-view", { matchId, reveal: true })).body as unknown as Tcg;
+    v = (await send(a, v, { type: "mulligan", instanceIds: [] })).body as unknown as Tcg;
+    const first = v.actingSeat;
+    v = (await a("tcg-view", { matchId, reveal: true })).body as unknown as Tcg;
+    const summon = v.legal.find((c) => c.type === "summon");
+    if (summon) {
+      const after = (await send(a, v, summon)).body as unknown as Tcg;
+      expect(after.actingSeat).toBe(first);
+      expect(after.seat).toBe(first); // same seat keeps acting → hand stays visible
+    }
   });
 
   it("forfeit ends the match", async () => {
