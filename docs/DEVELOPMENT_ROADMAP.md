@@ -17,7 +17,7 @@ Percentages: `pnpm progress` (top-level tasks only). Phase 0 (Rulebook v1 decisi
 - [x] **1.9** Claude operating rules + progress tracking system — PR #2, #3 (2026-11-19)
 - [x] **1.10** Supabase Dev project `AumMon-Dev` linked: 7 migrations + seed applied, 11 Edge Functions deployed, CORS/Auth redirects set — PR #25 (2026-11-20)
 - [x] **1.11** Vercel Preview per PR (verified PR #9); Production auto-deploy disabled via `vercel.json` — PR #9 (2026-11-19)
-- [!] **1.12** Branch protection on `main` requiring CI — Blocked: ruleset exists but a merge with pending checks succeeded (PR #35) → admin bypass or required checks not selected
+- [x] **1.12** Branch protection on `main` — rule configured (4 required checks, no required approvals) but **not enforced on a private repo on the Free plan**; accepted by owner (option A): Claude merges only after all CI checks pass — PR #37 (2026-11-20)
 
 ### UI Preview track (parallel; no backend, engine or DB work)
 

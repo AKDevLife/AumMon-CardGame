@@ -2,6 +2,11 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-20 — 1.12 Branch protection (accepted limitation)
+
+- Owner configured a rule for `main` (4 required CI checks; "Require approvals" removed so self-merge stays possible).
+- GitHub does not enforce branch protection on private repositories on the Free plan (verified: PR #35 merged with checks pending). Owner chose option A: keep the rule ready, rely on the documented merge conditions (all CI checks green before merge). Upgrade to GitHub Pro to enforce.
+
 ## 2026-11-20 — 7.7 Smoke tests + runbook
 
 - **Files:** `scripts/smoke.mjs` (`pnpm smoke <site> <supabase>`; read-only), `docs/OPERATIONS.md` (deploy, rollback, incident checklist)
