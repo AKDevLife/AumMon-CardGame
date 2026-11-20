@@ -2,7 +2,9 @@ import { expect, test } from "@playwright/test";
 
 test.skip(!process.env["VITE_SUPABASE_URL"], "Supabase backend not configured");
 
-test("pass & play 1v1: privacy handoff between turns, play to the end", async ({ page }) => {
+test("pass & play 1v1: privacy handoff between turns, then forfeit ends the match", async ({
+  page,
+}) => {
   test.setTimeout(240_000);
   await page.goto("/register");
   await page.getByLabel("ชื่อที่แสดง").fill("Host");
@@ -18,12 +20,16 @@ test("pass & play 1v1: privacy handoff between turns, play to the end", async ({
 
   const result = page.getByRole("heading", { name: /ชนะ|เสมอ/ });
   const idle = page.getByRole("button", { name: "กำลังส่ง…" });
-  for (let step = 0; step < 300; step++) {
+  let handoffs = 0;
+  // A full 1v1 game is long; check several handoffs/turns (incl. mulligans), then forfeit.
+  for (let step = 0; step < 200 && handoffs < 5; step++) {
     if (await result.isVisible()) break;
     const reveal = page.getByRole("button", { name: /แสดงการ์ด/ });
-    if (await reveal.isVisible().catch(() => false)) {
+    if (await reveal.isEnabled().catch(() => false)) {
       await expect(page.getByRole("group", { name: "Hand" })).toHaveCount(0); // nothing private before handoff
       await reveal.click();
+      await expect(page.getByRole("group", { name: "Hand" })).toBeVisible();
+      handoffs++;
       continue;
     }
     const keep = page.getByRole("button", { name: "เก็บมือนี้" });
@@ -65,6 +71,9 @@ test("pass & play 1v1: privacy handoff between turns, play to the end", async ({
       } else await page.waitForTimeout(300);
     }
   }
+  expect(handoffs).toBe(5);
+  page.once("dialog", (d) => void d.accept());
+  await page.getByRole("button", { name: "ยอมแพ้" }).click();
   await expect(result).toBeVisible();
   await expect(page.getByRole("alert")).toHaveCount(0);
 });
