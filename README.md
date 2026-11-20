@@ -1,15 +1,15 @@
 # AumMon
 
-Multiplayer card battle แบบ **Last Survivor** สำหรับ 2–4 ผู้เล่น — Solo vs Server Bots, Pass & Play และ Online Multiplayer
-Server-authoritative · Rulebook v1 (`ruleset_version = "1"`)
+Digital TCG แบบ **1v1** ธีมสิ่งของในชีวิตประจำวัน — Solo vs Server Bot, Pass & Play และ Online
+Server-authoritative · Spec v3.0 / Core Rules V1.1 (`ruleset_version = "2"`, กำลังพัฒนาใน Phase 8)
 
 ## เอกสารหลัก
 
-| เอกสาร                                                         | ขอบเขต                                             |
-| -------------------------------------------------------------- | -------------------------------------------------- |
-| [`aummon_game_spec.md`](./aummon_game_spec.md)                 | กติกาเกมและข้อกำหนดผลิตภัณฑ์ (Rulebook v1 — **ล็อกแล้ว**) |
-| [`aummon_project_blueprint.md`](./aummon_project_blueprint.md) | Architecture, Database, Security, Stack, Roadmap   |
-| [`docs/rule-clarifications.md`](./docs/rule-clarifications.md) | ประเด็นกติกาที่รอคำตอบ (ไม่ใช่กติกา)                      |
+| เอกสาร                                                         | ขอบเขต                                           |
+| -------------------------------------------------------------- | ------------------------------------------------ |
+| [`aummon_game_spec.md`](./aummon_game_spec.md)                 | กติกาเกม การ์ด และข้อกำหนดผลิตภัณฑ์ (ไฟล์เดียว)          |
+| [`aummon_project_blueprint.md`](./aummon_project_blueprint.md) | Architecture, Database, Security, Stack, Roadmap |
+| [`docs/rule-clarifications.md`](./docs/rule-clarifications.md) | ประเด็นกติกาที่รอคำตอบ (ไม่ใช่กติกา)                    |
 
 ## Tech stack
 

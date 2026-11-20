@@ -2,6 +2,12 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-20 — 8.1 Spec v3.0: 1v1 TCG consolidation
+
+- **Files:** `aummon_game_spec.md` (v3.0, single spec), `aummon_project_blueprint.md` (v1.2), roadmap Phase 8, `docs/rule-clarifications.md` (C1 resolved, R2-1), `.claude/rules/*`, `CLAUDE.md`, `README.md`; removed `AumMon_Master_Project_Handoff.md` (merged).
+- **Decisions (owner):** 1v1 TCG replaces 2–4 player game (`ruleset_version = "2"`); keep auth/menus/platform; Solo + Pass & Play + Online as 1v1; provisional Starter Deck 30 cards; 90 s turn timer → auto end turn.
+- **Remaining:** R2-1 (V1.0 leftovers in spec §5.12/5.14/5.17) needs confirmation before 8.4; game code still ruleset 1 until Phase 8.
+
 ## 2026-11-20 — Handoff conflict recorded
 
 - **Files:** `docs/rule-clarifications.md` (C1), `docs/DEVELOPMENT_PROGRESS.md`

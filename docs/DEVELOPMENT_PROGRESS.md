@@ -4,10 +4,10 @@
 
 ## Current
 
-- **Status:** ⏸ Paused by owner — development complete on **Dev**; production work deferred.
-- **Phase:** 7 — 6/8 done; remaining tasks are production-only (6.8, 7.3, 7.8).
+- **Status:** ▶ Phase 8 — game rules replaced by 1v1 TCG (Spec v3.0); platform kept.
+- **Phase:** 8 — 1v1 TCG Ruleset (`ruleset_version = "2"`)
 - **Current task:** none in progress
-- **Next:** owner decision on C1 (`docs/rule-clarifications.md`): Master Handoff 1v1 TCG vs Rulebook v1; production (6.8 → 7.3 → 7.8) later.
+- **Next:** 8.2 card data (25 definitions, 11 recipes, Starter Deck); production (6.8 → 7.3 → 7.8) still deferred.
 - **Playtest URL (latest `main`):** https://aum-mon-card-game-git-playtest-aum-mon.vercel.app
 - **Dev backend:** Supabase `AumMon-Dev` (ref `yaxtzdhryctfjaspxvix`, ap-northeast-1), email confirmation OFF for playtesting.
 
@@ -22,7 +22,8 @@
 | 5 Pass & Play           |      5 |      5 |    100% |
 | 6 Online Multiplayer    |      7 |      8 |     88% |
 | 7 Public Launch & Scale |      6 |      8 |     75% |
-| **Overall**             | **69** | **72** | **96%** |
+| 8 1v1 TCG Ruleset       |      1 |     14 |      7% |
+| **Overall**             | **70** | **86** | **81%** |
 
 ## Completed (summary)
 
@@ -32,6 +33,7 @@
 - **Phase 4:** solo backend (Edge Functions, row-locked transactions, idempotency, timeouts) + UI.
 - **Phase 5:** Pass & Play with server-chosen seat and privacy handoff.
 - **Phase 6:** online lobby, join codes, rate limits, Realtime + Presence, resume, forfeit.
+- **Phase 8:** 8.1 single spec v3.0 (1v1 TCG) + docs aligned.
 - **Phase 7:** security review + CSP/headers, no-cost monitoring, account deletion + draft legal pages, WCAG 2.1 AA, load test (20 players) + region fix, smoke test + runbook.
 
 ## In progress

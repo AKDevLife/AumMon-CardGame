@@ -1,4 +1,6 @@
-# Rulebook v1 — Clarifications
+# Rule Clarifications
+
+> **2026-11-20:** เกมเปลี่ยนเป็น TCG 1v1 (Spec v3.0, `ruleset_version = "2"`). Q1–Q12 ด้านล่างใช้กับ ruleset 1 (2–4 คน, เลิกใช้) — เก็บไว้เป็นประวัติ. ประเด็นของ ruleset 2 อยู่ในหัวข้อ R2-*
 
 > ไฟล์นี้ **ไม่แก้ไข** กติกา 15 ข้อใน `aummon_game_spec.md` §7 — เป็นการตีความรายละเอียดที่ Spec ยังไม่ได้ระบุ
 > **Provisional** = เจ้าของผลิตภัณฑ์มอบหมายให้เลือกวิธีที่เหมาะสมไปก่อน (2026-11-19) และจะปรับหลัง Playtest
@@ -98,16 +100,13 @@
 
 - v1 มีระดับเดียว `normal` (heuristic ตาม Blueprint §5.6); โครงสร้างรองรับ `easy`/`hard` ภายหลังผ่าน weights
 
-## C1 — CONFLICT: Master Handoff (1v1 TCG) vs Rulebook v1 (2–4 player) — needs owner decision
+## C1 — Master Handoff (1v1 TCG) vs Rulebook v1 — ✅ Resolved 2026-11-20
 
-Recorded 2026-11-20. Not resolved; no code changed.
+เจ้าของเลือกเปลี่ยนเกมทั้งหมดเป็น TCG 1v1 ตาม Handoff v1.1 และรวมเป็น `aummon_game_spec.md` v3.0 ไฟล์เดียว; คงเมนู/Auth/ระบบอื่นเดิม. คงทั้ง 3 โหมด (1v1), Starter Deck สำเร็จรูป, Turn timer 90 วินาที → จบเทิร์นอัตโนมัติ.
 
-- `AumMon_Master_Project_Handoff.md` §3–5 defines a **1v1 TCG** (HP 30, SPARK resource, Units/Equipment/Field zones, Evolution/Fusion, 12 Keywords, 3-copy deck building) and treats the 2–4 player spec as "Legacy".
-- `aummon_game_spec.md` §7 **Rulebook v1** (locked, `ruleset_version = "1"`) defines a **2–4 player Last Survivor shared-deck** game — which is what the engine, database, backend, UI and tests implement (Phases 1–7).
-- Adopting the handoff = new game rules + new data model (card definitions/instances, recipes, match events) + new engine/UI → requires owner approval (locked rules + architecture change).
+## R2-1 — Spec v3.0 internal leftovers from V1.0 — ⏳ open (blocks 8.4 combat details only)
 
-Options for owner:
+Spec §5.12, §5.14 และ §5.17 ยังอ้าง DEF, Overclock, Reinforce, Unstable, Modular, Ancient, Recycle ของ Design V1.0 ซึ่งขัดกับ §4.7 (ATK/HP เท่านั้น) และ §5.2/§5.18 (6 Keywords).
 
-1. Keep Rulebook v1 as the product; handoff stays a future design document.
-2. Build the 1v1 TCG as a new `ruleset_version = "2"` alongside v1 (new roadmap phase).
-3. Replace v1 with the 1v1 TCG (largest change; most existing game code rewritten).
+- **Provisional:** ยึด §4 (Core Rules V1.1), §5.18 และ §6.5–6.6 เป็นหลัก; ข้อความ V1.0 ที่ขัดกันไม่นำมา Implement (ตัวอย่าง: Boost +2 ATK ไม่ใช่ Overclock; Piercing = ATK − HP ปัจจุบัน ไม่มี DEF)
+- ให้เจ้าของยืนยันก่อนเริ่มงาน 8.4

@@ -119,3 +119,24 @@ Percentages: `pnpm progress` (top-level tasks only). Phase 0 (Rulebook v1 decisi
 - [!] **7.8** Production deploy — Deferred by owner (2026-11-20) — requires owner approval + pre-launch items in `docs/SECURITY_REVIEW.md`
 
 **Acceptance:** no open Critical/High issues · test suite passes on staging · baseline scaling metrics recorded
+
+## Phase 8 — 1v1 TCG Ruleset (Spec v3.0, `ruleset_version = "2"`)
+
+Owner decision 2026-11-20: replace the 2–4 player game with the 1v1 TCG in `aummon_game_spec.md` (Core Rules V1.1). Auth, menus, lobby, UI design system and platform stay as they are.
+
+- [x] **8.1** Consolidate spec into `aummon_game_spec.md` v3.0; align blueprint, rules and docs — deps: — — PR #41 (2026-11-20)
+- [ ] **8.2** Card data: 25 card definitions, 11 recipes, Starter Deck as typed data + validation tests (power budget, ≤3 copies, recipe graph) — deps: 8.1
+- [ ] **8.3** Engine v2 core: setup, mulligan, SPARK, 3-phase turn, summon, fatigue, win/draw, client-safe view — deps: 8.2
+- [ ] **8.4** Combat + keywords (Haste, Guard, Flying, Piercing, Boost) — deps: 8.3
+- [ ] **8.5** Actions + Equipment (Draw, Search, Scrap Return, slots, compatibility) — deps: 8.3
+- [ ] **8.6** Evolution + Fusion (instance rules, full HP, equipment handling, inheritance) — deps: 8.4, 8.5
+- [ ] **8.7** Scenario tests T-001–T-007 + spec §5.17 acceptance + determinism/simulation — deps: 8.6
+- [ ] **8.8** Server bot v2 (legal actions only, seat-visible data) — deps: 8.7
+- [ ] **8.9** DB migration + seed for ruleset 2 (definitions, recipes, match state/events, RLS) — deps: 8.2
+- [ ] **8.10** Backend: turn-based commands, 90 s turn timer → auto end turn, idempotency — deps: 8.8, 8.9
+- [ ] **8.11** UI: 1v1 board + Solo mode — deps: 8.10
+- [ ] **8.12** Pass & Play 1v1 (privacy handoff per turn, no timer) — deps: 8.11
+- [ ] **8.13** Online 1v1 (lobby 2 seats, realtime, resume, forfeit, timer) — deps: 8.11
+- [ ] **8.14** Retire ruleset 1 code paths; E2E + smoke + load test on Dev — deps: 8.12, 8.13
+
+**Acceptance:** all three modes playable 1v1 to the end on Dev · scenario tests T-001–T-007 pass · no hidden info leaks (hand, deck order, search) · `pnpm check`, E2E and CI green
