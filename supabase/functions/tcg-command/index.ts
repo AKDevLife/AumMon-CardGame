@@ -77,7 +77,9 @@ Deno.serve(
     const hash = await hashRequest({ matchId, expectedVersion, intent });
     await rateLimit(userId, "match.submit", 120, 60);
     const response = await withTcg(userId, matchId, {
-      expectedVersion,
+      // Forfeit is valid at any moment, so it must not fail on a stale view; the
+      // idempotency key still prevents a duplicate.
+      ...(intent.type !== "forfeit" && { expectedVersion }),
       receipt: { key, hash },
       act: (state, seat, rng) =>
         // Shape validated above; the engine validates every rule and throws CommandError otherwise.

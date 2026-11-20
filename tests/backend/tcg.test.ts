@@ -164,7 +164,8 @@ describe.runIf(run)("ruleset 2 matches via Edge Functions", () => {
   it("forfeit ends the match", async () => {
     const matchId = (await a("tcg-create", { mode: "solo" })).body["matchId"] as string;
     const v = (await a("tcg-view", { matchId })).body as unknown as Tcg;
-    const res = (await send(a, v, { type: "forfeit" })).body as unknown as Tcg;
+    const res = (await send(a, { ...v, version: v.version - 1 }, { type: "forfeit" }))
+      .body as unknown as Tcg; // stale view still forfeits
     expect(res.view.status).toBe("finished");
     expect(res.view.result).toEqual({ winner: 1 });
   });
