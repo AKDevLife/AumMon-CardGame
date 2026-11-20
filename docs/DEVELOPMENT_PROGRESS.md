@@ -12,14 +12,14 @@
 
 | Phase                   |   Done |  Total |       % |
 | ----------------------- | -----: | -----: | ------: |
-| 1 Project Foundation    |     15 |     16 |     94% |
+| 1 Project Foundation    |     16 |     16 |    100% |
 | 2 Auth & Database       |     10 |     10 |    100% |
 | 3 Pure Game Engine      |     13 |     13 |    100% |
 | 4 Solo Vertical Slice   |     12 |     12 |    100% |
 | 5 Pass & Play           |      5 |      5 |    100% |
 | 6 Online Multiplayer    |      7 |      8 |     88% |
 | 7 Public Launch & Scale |      0 |      8 |      0% |
-| **Overall**             | **68** | **72** | **94%** |
+| **Overall**             | **69** | **72** | **96%** |
 
 ## Completed
 
@@ -51,12 +51,11 @@ None
 
 ## Blocked
 
-| Task | Reason                                                                        | Owner action                                |
-| ---- | ----------------------------------------------------------------------------- | ------------------------------------------- |
-| 7.3  | Backup/restore needs a separate project (Free plan has no restorable backups) | Decide with 6.8                             |
-| 1.12 | Ruleset not enforced for the merging account                                  | Remove admin bypass; select required checks |
-| 6.8  | Staging project may exceed free tier                                          | Approve cost / create project               |
-| 7.8  | Production deploy                                                             | Approval at launch                          |
+| Task | Reason                                                                        | Owner action                  |
+| ---- | ----------------------------------------------------------------------------- | ----------------------------- |
+| 7.3  | Backup/restore needs a separate project (Free plan has no restorable backups) | Decide with 6.8               |
+| 6.8  | Staging project may exceed free tier                                          | Approve cost / create project |
+| 7.8  | Production deploy                                                             | Approval at launch            |
 
 ## Latest verification
 
