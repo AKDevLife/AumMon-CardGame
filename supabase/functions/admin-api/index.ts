@@ -28,10 +28,14 @@ const actions: Record<string, Action> = {
         (select count(*)::int from public.profiles) as players,
         (select count(*)::int from public.game_rooms where status in ('lobby','playing')) as active_rooms,
         (select count(*)::int from public.matches where status = 'active') as active_matches,
-        (select count(*)::int from public.matches where status = 'finished' and finished_at > now() - interval '24 hours') as finished_24h`;
+        (select count(*)::int from public.matches where status = 'finished' and finished_at > now() - interval '24 hours') as finished_24h,
+        -- Signed-in users whose session was used/refreshed in the last hour (access tokens refresh hourly).
+        (select count(distinct user_id)::int from auth.sessions
+           where coalesce(refreshed_at, updated_at, created_at) > now() - interval '1 hour'
+             and (not_after is null or not_after > now())) as online_now`;
     const events = await db()`
       select e.match_id, e.event_type, e.public_payload, e.created_at from public.match_events e
-      order by e.id desc limit 15`;
+      order by e.id desc limit 10`;
     const [errors] = await db()<{ errors: number; requests: number }[]>`
       select count(*) filter (where status >= 500)::int as errors, count(*)::int as requests
       from private.function_metrics where created_at > now() - interval '1 hour'`;

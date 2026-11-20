@@ -2,6 +2,10 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-20 — 9.5 Admin overview tweaks (owner request)
+
+- Overview card "กำลังล็อกอินอยู่": distinct users with an Auth session used/refreshed in the last hour (`auth.sessions`, server-side only); recent game events limited to 10.
+
 ## 2026-11-20 — 9.3–9.4 Admin live + readable dashboard
 
 - **9.3:** owner's Dev account granted `super_admin` (audited); owner confirmed login with MFA.
