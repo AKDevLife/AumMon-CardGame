@@ -57,6 +57,14 @@ test("sign up → solo 1v1 vs bot → play until the match ends", async ({ page 
         acted = true;
         break;
       }
+      // Popup opened with other commands only (e.g. evolve): close it before trying the next card.
+      if (
+        await page
+          .getByRole("dialog")
+          .isVisible()
+          .catch(() => false)
+      )
+        await page.keyboard.press("Escape");
     }
     if (!acted) {
       await endTurn.click();

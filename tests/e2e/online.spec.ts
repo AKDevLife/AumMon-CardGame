@@ -39,6 +39,13 @@ async function act(page: Page): Promise<boolean> {
       await expect(idle).toHaveCount(0);
       return true;
     }
+    if (
+      await page
+        .getByRole("dialog")
+        .isVisible()
+        .catch(() => false)
+    )
+      await page.keyboard.press("Escape");
   }
   await endTurn.click();
   await expect(idle).toHaveCount(0);
@@ -78,6 +85,7 @@ test("two browsers 1v1: lobby → ready → start → turns → forfeit", async 
   await expect(turn(ann)).toHaveText(/เทิร์น ([5-9]|\d{2,})/);
 
   ben.once("dialog", (d) => void d.accept());
+  await ben.getByRole("button", { name: "ตั้งค่า" }).click();
   await ben.getByRole("button", { name: "ยอมแพ้" }).click();
   await expect(ben.getByRole("heading", { name: "Ann ชนะ" })).toBeVisible();
   await expect(ann.getByRole("heading", { name: "คุณชนะ! 🎉" })).toBeVisible({ timeout: 15_000 });

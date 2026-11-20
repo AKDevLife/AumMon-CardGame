@@ -16,6 +16,9 @@ import {
   KEYWORD_LABEL,
   phaseLabel,
 } from "./labels.ts";
+import { CardBack, DeckPile, HeartIcon, SparkIcon } from "./GameIcons.tsx";
+import { Popup } from "./Popup.tsx";
+import { RulesText } from "./RulesText.tsx";
 import type { TcgResponse } from "./types.ts";
 
 const POLL_MS = 2000;
@@ -127,6 +130,7 @@ export function TcgMatchPage() {
   const [pending, setPending] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
   const [mulligan, setMulligan] = useState<Set<string>>(new Set());
+  const [popup, setPopup] = useState<"history" | "settings" | "rules" | null>(null);
   const idem = useRef<{ key: string; body: string } | null>(null);
   const passPlay = useRef(false);
   const seconds = useCountdown(data?.deadline ?? null);
@@ -207,6 +211,12 @@ export function TcgMatchPage() {
   const handoff =
     data.mode === "pass_play" && !finished && data.seat === null && data.actingSeat !== null;
   const myTurn = data.legal.length > 0;
+  const selectedName = (() => {
+    const inHand = view.myHand.find((c) => c.instanceId === selected);
+    const onBoard = me.units.find((u) => u.instanceId === selected);
+    const id = inHand?.cardId ?? onBoard?.cardId;
+    return id ? cardName(id) : "";
+  })();
   const choices = data.legal.filter(
     (c) => selected !== null && commandSubjects(c).includes(selected),
   );
@@ -243,7 +253,7 @@ export function TcgMatchPage() {
   const log = data.events
     .map((e) => describeEvent(e, data.names))
     .filter((line): line is string => line !== null)
-    .slice(-10);
+    .slice(-40);
 
   const winner = view.result && "winner" in view.result ? view.result.winner : null;
 
@@ -257,6 +267,28 @@ export function TcgMatchPage() {
         {seconds !== null && (
           <span className="font-display font-bold tabular-nums">⏱ {seconds}s</span>
         )}
+        <span className="flex gap-2">
+          <button
+            type="button"
+            aria-label="ประวัติ"
+            onClick={() => {
+              setPopup("history");
+            }}
+            className="am-sticker am-pressable bg-am-card px-2.5 py-1.5 text-lg"
+          >
+            📜
+          </button>
+          <button
+            type="button"
+            aria-label="ตั้งค่า"
+            onClick={() => {
+              setPopup("settings");
+            }}
+            className="am-sticker am-pressable bg-am-card px-2.5 py-1.5 text-lg"
+          >
+            ⚙️
+          </button>
+        </span>
       </div>
 
       {finished && (
@@ -287,9 +319,19 @@ export function TcgMatchPage() {
             />
           )}
         </span>
-        <span className="font-display font-bold">❤️ {Math.max(0, foe.hp)}</span>
-        <span className="text-sm">
-          ✋ {foe.handCount} · 🂠 {foe.deckCount} · ⚡ {foe.spark}/{foe.maxSpark}
+        <span className="flex items-center gap-2">
+          <HeartIcon value={Math.max(0, foe.hp)} />
+          <SparkIcon value={foe.spark} max={foe.maxSpark} />
+          <DeckPile count={foe.deckCount} />
+        </span>
+        <span
+          role="img"
+          aria-label={`การ์ดในมือคู่ต่อสู้ ${String(foe.handCount)} ใบ`}
+          className="flex w-full flex-wrap gap-1"
+        >
+          {Array.from({ length: foe.handCount }, (_, i) => (
+            <CardBack key={i} small />
+          ))}
         </span>
       </div>
       <div role="group" aria-label="Opponent units" className="grid min-h-28 grid-cols-3 gap-2">
@@ -325,11 +367,11 @@ export function TcgMatchPage() {
         <span className="font-display font-bold">
           {data.mode === "pass_play" ? data.names[mySeat] : `${data.names[mySeat]} (คุณ)`}
         </span>
-        <span className="font-display font-bold">❤️ {Math.max(0, me.hp)}</span>
-        <span className="font-display font-bold">
-          ⚡ พลังงาน {me.spark}/{me.maxSpark}
+        <span className="flex items-center gap-2">
+          <HeartIcon value={Math.max(0, me.hp)} />
+          <SparkIcon value={me.spark} max={me.maxSpark} />
+          <DeckPile count={me.deckCount} />
         </span>
-        <span className="text-sm">🂠 {me.deckCount}</span>
       </div>
 
       {handoff && data.actingSeat !== null && (
@@ -383,15 +425,21 @@ export function TcgMatchPage() {
         </StickerButton>
       )}
 
-      {!handoff && choices.length > 0 && (
-        <div role="group" aria-label="Actions" className="flex flex-wrap gap-2">
+      <Popup
+        title={selected ? `คำสั่ง: ${selectedName}` : "คำสั่ง"}
+        open={!handoff && choices.length > 0}
+        onClose={() => {
+          setSelected(null);
+        }}
+      >
+        <div role="group" aria-label="Actions" className="flex flex-col gap-2">
           {choices.map((c, i) => (
             <StickerButton key={i} disabled={pending} onClick={() => void send(c)}>
               {commandLabel(c, view, selected ?? undefined)}
             </StickerButton>
           ))}
         </div>
-      )}
+      </Popup>
 
       {!handoff && endTurn && (
         <StickerButton
@@ -413,26 +461,63 @@ export function TcgMatchPage() {
         </p>
       )}
 
-      {!finished && !handoff && (
+      <Popup
+        title="ประวัติการเล่น"
+        open={popup === "history"}
+        onClose={() => {
+          setPopup(null);
+        }}
+      >
+        {log.length === 0 ? (
+          <p className="text-sm text-am-muted">ยังไม่มีเหตุการณ์</p>
+        ) : (
+          <ol className="flex flex-col gap-1 text-sm" aria-label="Event log">
+            {log.map((line, i) => (
+              <li key={i}>{line}</li>
+            ))}
+          </ol>
+        )}
+      </Popup>
+
+      <Popup
+        title="ตั้งค่า"
+        open={popup === "settings"}
+        onClose={() => {
+          setPopup(null);
+        }}
+      >
         <StickerButton
-          variant="danger"
-          disabled={pending}
           onClick={() => {
-            if (window.confirm("ยอมแพ้และออกจากเกมนี้?")) void send({ type: "forfeit" });
+            setPopup("rules");
           }}
         >
-          ยอมแพ้
+          📖 กติกา
         </StickerButton>
-      )}
+        {!finished && (
+          <StickerButton
+            variant="danger"
+            disabled={pending}
+            onClick={() => {
+              if (window.confirm("ยอมแพ้และออกจากเกมนี้?")) {
+                setPopup(null);
+                void send({ type: "forfeit" });
+              }
+            }}
+          >
+            ยอมแพ้
+          </StickerButton>
+        )}
+      </Popup>
 
-      <div className="am-sticker bg-am-card p-3">
-        <h2 className="mb-1 font-display font-semibold">เหตุการณ์ล่าสุด</h2>
-        <ol className="flex flex-col gap-1 text-sm" aria-label="Event log">
-          {log.map((line, i) => (
-            <li key={i}>{line}</li>
-          ))}
-        </ol>
-      </div>
+      <Popup
+        title="กติกา"
+        open={popup === "rules"}
+        onClose={() => {
+          setPopup(null);
+        }}
+      >
+        <RulesText />
+      </Popup>
     </section>
   );
 }

@@ -62,6 +62,14 @@ test("pass & play 1v1: privacy handoff between turns, then forfeit ends the matc
         acted = true;
         break;
       }
+      // Popup opened with other commands only (e.g. evolve): close it before trying the next card.
+      if (
+        await page
+          .getByRole("dialog")
+          .isVisible()
+          .catch(() => false)
+      )
+        await page.keyboard.press("Escape");
     }
     if (!acted) {
       const endTurn = page.getByRole("button", { name: "จบเทิร์น" });
@@ -73,6 +81,7 @@ test("pass & play 1v1: privacy handoff between turns, then forfeit ends the matc
   }
   expect(handoffs).toBe(5);
   page.once("dialog", (d) => void d.accept());
+  await page.getByRole("button", { name: "ตั้งค่า" }).click();
   await page.getByRole("button", { name: "ยอมแพ้" }).click();
   await expect(result).toBeVisible();
   await expect(page.getByRole("alert")).toHaveCount(0);
