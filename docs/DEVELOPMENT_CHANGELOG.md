@@ -2,6 +2,10 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-20 — Sound volume +50% (owner request)
+
+- `src/features/tcg/sound.ts`: master `VOLUME = 1.5` on every effect.
+
 ## 2026-11-20 — 9.9 Popup fix + sound effects (owner request)
 
 - **Bug:** ⚙️ → กติกา/ยอมแพ้ did nothing — closing the settings dialog programmatically fired its `onClose`, which cleared the popup just opened; forfeit relied on `window.confirm` over a modal. Fix: `Popup` ignores programmatic closes; forfeit confirms inside its own popup. E2E now covers settings → rules → forfeit.

@@ -14,6 +14,8 @@ interface Note {
 }
 
 const MUTE_KEY = "aummon.muted";
+/** Master loudness (owner 2026-11-20: +50%). */
+const VOLUME = 1.5;
 let ctx: AudioContext | null = null;
 
 export function isMuted(): boolean {
@@ -45,7 +47,7 @@ function play(notes: Note[]): void {
       osc.frequency.setValueAtTime(n.f, now + n.t);
       if (n.to) osc.frequency.exponentialRampToValueAtTime(n.to, now + n.t + n.d);
       gain.gain.setValueAtTime(0.0001, now + n.t);
-      gain.gain.exponentialRampToValueAtTime(n.v ?? 0.18, now + n.t + 0.01);
+      gain.gain.exponentialRampToValueAtTime((n.v ?? 0.18) * VOLUME, now + n.t + 0.01);
       gain.gain.exponentialRampToValueAtTime(0.0001, now + n.t + n.d);
       osc.connect(gain).connect(ctx.destination);
       osc.start(now + n.t);
