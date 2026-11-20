@@ -1,40 +1,15 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { StickerButton } from "../../components/StickerButton.tsx";
 import { ApiError, callFunction } from "../../lib/api.ts";
 import { useAuth } from "../auth/auth-context.ts";
-import type { MatchResponse } from "../game/types.ts";
-
-interface CharacterRow {
-  id: string;
-  name: string;
-  element: string;
-  base_hp: number;
-  speed: number;
-  description: string;
-}
 
 export function SoloSetupPage() {
   const auth = useAuth();
   const navigate = useNavigate();
-  const [characters, setCharacters] = useState<CharacterRow[]>([]);
-  const [characterId, setCharacterId] = useState<string>("");
-  const [bots, setBots] = useState(1);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const signedIn = auth.mode === "live" && auth.session !== null;
-
-  useEffect(() => {
-    if (auth.mode !== "live" || !signedIn) return;
-    void auth.client
-      .from("characters")
-      .select("id, name, element, base_hp, speed, description")
-      .order("speed", { ascending: false })
-      .then(({ data, error: loadError }) => {
-        if (loadError) setError("โหลดตัวละครไม่สำเร็จ");
-        else setCharacters(data);
-      });
-  }, [auth, signedIn]);
 
   if (auth.mode !== "live")
     return <p className="text-center text-am-muted">ต้องเชื่อมระบบก่อนเล่น (Preview)</p>;
@@ -54,17 +29,10 @@ export function SoloSetupPage() {
     setPending(true);
     setError(null);
     try {
-      const { roomId } = await callFunction<{ roomId: string }>(auth.client, "rooms-create", {
+      const { matchId } = await callFunction<{ matchId: string }>(auth.client, "tcg-create", {
         mode: "solo",
-        characterId,
-        botCount: bots,
       });
-      const { matchId } = await callFunction<MatchResponse & { matchId: string }>(
-        auth.client,
-        "matches-start",
-        { roomId },
-      );
-      void navigate(`/match/${matchId}`);
+      void navigate(`/game/${matchId}`);
     } catch (e) {
       setError(e instanceof ApiError ? e.message : "เริ่มเกมไม่สำเร็จ");
       setPending(false);
@@ -73,46 +41,14 @@ export function SoloSetupPage() {
 
   return (
     <section className="flex flex-col gap-5">
-      <h1 className="font-display text-3xl font-bold">Solo vs Bots</h1>
-      <div>
-        <h2 className="mb-2 font-display text-lg font-semibold">เลือกตัวละคร</h2>
-        <div className="grid grid-cols-2 gap-3">
-          {characters.map((c) => (
-            <button
-              key={c.id}
-              type="button"
-              aria-pressed={characterId === c.id}
-              onClick={() => {
-                setCharacterId(c.id);
-              }}
-              className={`am-sticker am-pressable flex flex-col gap-1 p-3 text-left ${characterId === c.id ? "bg-am-hover" : "bg-am-card"}`}
-            >
-              <span className="font-display font-bold">{c.name}</span>
-              <span className="text-xs text-am-muted">
-                HP {c.base_hp} · Speed {c.speed} · {c.element}
-              </span>
-              <span className="text-xs">{c.description}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-      <div>
-        <h2 className="mb-2 font-display text-lg font-semibold">จำนวน Bot</h2>
-        <div className="flex gap-3">
-          {[1, 2, 3].map((n) => (
-            <button
-              key={n}
-              type="button"
-              aria-pressed={bots === n}
-              onClick={() => {
-                setBots(n);
-              }}
-              className={`am-sticker am-pressable min-h-12 flex-1 font-display font-bold ${bots === n ? "bg-am-hover" : "bg-am-card"}`}
-            >
-              {n}
-            </button>
-          ))}
-        </div>
+      <h1 className="font-display text-3xl font-bold">Solo vs Bot</h1>
+      <div className="am-sticker flex flex-col gap-2 bg-am-card p-4">
+        <p>ดวล 1 ต่อ 1 กับ Bot ด้วย Starter Deck 30 ใบ</p>
+        <ul className="list-disc pl-5 text-sm text-am-muted">
+          <li>HP เริ่มต้น 20 · SPARK เพิ่มทุกเทิร์น (สูงสุด 8)</li>
+          <li>ลง Unit, ติด Equipment, Evolution และ Fusion ใน Main Phase แล้วค่อยโจมตี</li>
+          <li>มีเวลา 90 วินาทีต่อเทิร์น</li>
+        </ul>
       </div>
       {error && (
         <p role="alert" className="border-l-4 border-am-danger pl-2 font-semibold">
@@ -121,7 +57,7 @@ export function SoloSetupPage() {
       )}
       <StickerButton
         variant="confirm"
-        disabled={!characterId || pending}
+        disabled={pending}
         onClick={() => void start()}
         className="min-h-14"
       >

@@ -3,7 +3,7 @@ import { StickerButton } from "../components/StickerButton.tsx";
 import { useAuth } from "../features/auth/auth-context.ts";
 
 const MODES = [
-  { id: "solo", label: "Solo vs Bots" },
+  { id: "solo", label: "Solo vs Bot" },
   { id: "pass_play", label: "Pass & Play" },
   { id: "online", label: "Online" },
 ] as const;
@@ -15,7 +15,7 @@ export function HomePage() {
     <div className="flex flex-1 flex-col justify-center gap-8">
       <section className="am-sticker bg-am-title px-6 py-6 text-center">
         <h1 className="font-display text-5xl font-bold tracking-wide">AumMon</h1>
-        <p className="mt-2">Multiplayer card battle · Last Survivor · 2–4 ผู้เล่น</p>
+        <p className="mt-2">การ์ดเกมดวล 1 ต่อ 1 · สิ่งของรอบตัวมีชีวิต</p>
       </section>
 
       <nav aria-label="Game modes" className="flex flex-col gap-4">

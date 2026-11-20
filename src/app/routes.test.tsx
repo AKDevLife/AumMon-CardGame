@@ -16,8 +16,8 @@ describe("app routes", () => {
   it("home shows title, ruleset and disabled modes", () => {
     renderAt("/");
     expect(screen.getByRole("heading", { level: 1, name: "AumMon" })).toBeInTheDocument();
-    expect(screen.getByText("Rulebook v1")).toBeInTheDocument();
-    for (const name of ["Solo vs Bots", "Pass & Play", "Online"]) {
+    expect(screen.getByText("Ruleset 2 · 1v1")).toBeInTheDocument();
+    for (const name of ["Solo vs Bot", "Pass & Play", "Online"]) {
       expect(screen.getByRole("button", { name })).toBeDisabled();
     }
   });
