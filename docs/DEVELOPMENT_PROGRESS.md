@@ -6,7 +6,7 @@
 
 - **Phase:** 7 — Public Launch & Scale Evaluation (Dev cloud project live)
 - **Current task:** none in progress
-- **Next task:** 7.6 Load test on AumMon-Dev (owner choice 3A)
+- **Next task:** 7.7 Smoke tests + incident/rollback runbook
 
 ## Completion
 
@@ -19,7 +19,7 @@
 | 5 Pass & Play           |      5 |      5 |    100% |
 | 6 Online Multiplayer    |      7 |      8 |     88% |
 | 7 Public Launch & Scale |      0 |      8 |      0% |
-| **Overall**             | **66** | **72** | **92%** |
+| **Overall**             | **67** | **72** | **93%** |
 
 ## Completed
 

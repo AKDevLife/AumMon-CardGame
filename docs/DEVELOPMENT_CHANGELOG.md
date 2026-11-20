@@ -2,6 +2,13 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-20 — 7.6 Load test + region fix
+
+- **Files:** `tests/load/solo-load.mjs`, `src/lib/api.ts` (`x-region` header), `_shared/http.ts` (CORS allows `x-region`), `docs/OPERATIONS.md` (baseline)
+- **Result:** 20 concurrent players on AumMon-Dev, 20/20 matches finished, 0 errors. Server p50/p95: submit 261/673 ms, rooms-create 408/926 ms, matches-start 1740/2936 ms.
+- **Bug found:** Edge Functions ran near the caller (US) while the DB is in Tokyo → submit p50 ≈ 12 s. Fixed by pinning functions to the DB region via `x-region` (≈ 46× faster).
+- **Scaling note:** no need for a dedicated game server at this load; `matches-start` is the slowest step (sequential inserts) — candidate for batching later.
+
 ## 2026-11-20 — 7.5 Accessibility + responsive
 
 - **Files:** `tests/e2e/a11y.spec.ts` (axe WCAG 2.1 AA), colour fixes in `StickerButton`, `HomePage`, `AppLayout`, `MatchPage`, alerts across features
