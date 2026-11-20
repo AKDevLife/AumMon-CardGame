@@ -2,6 +2,12 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-20 — 8.8 Ruleset 2 bot
+
+- **Files:** `rules/v2/bot.ts` (`chooseBotCommand`), `tests/v2-bot.test.ts`.
+- **Behaviour:** scores legal commands from its own `PlayerView` only: fuse > evolve > summon > equip > actions > boost; attacks take lethal, favour good trades, avoid bad ones; ties via RNG.
+- **Tests:** 4 new — ≥80/100 wins vs random (seeded), bot-vs-bot always finishes, takes lethal, view-only input.
+
 ## 2026-11-20 — 8.7 Ruleset 2 simulation + acceptance
 
 - **Files:** `tests/v2-simulation.test.ts`.
