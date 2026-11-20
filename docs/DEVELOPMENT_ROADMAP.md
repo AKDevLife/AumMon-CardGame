@@ -103,7 +103,7 @@ Percentages: `pnpm progress` (top-level tasks only). Phase 0 (Rulebook v1 decisi
 - [x] **6.5** Disconnect/timeout 30s → server bot, regain control next round (Rule 14) — deps: 4.4, 6.4 — PR #24 (2026-11-19)
 - [x] **6.6** Concurrency tests: duplicate/simultaneous submits, single resolver — deps: 6.5 — PR #24 (2026-11-19)
 - [x] **6.7** E2E: two-browser online match — deps: 6.5 — PR #24 (2026-11-19)
-- [!] **6.8** Staging Supabase project separate from production — Blocked: owner account, may exceed free tier
+- [!] **6.8** Staging Supabase project separate from production — Deferred by owner (2026-11-20) until production launch — owner account, may exceed free tier
 
 **Acceptance:** 2–4 accounts on different devices · cannot read opponent hand/submission · duplicate/concurrent commands never double-resolve
 
@@ -111,11 +111,11 @@ Percentages: `pnpm progress` (top-level tasks only). Phase 0 (Rulebook v1 decisi
 
 - [x] **7.1** Security review + abuse checks (rate limits, CORS, CSP, headers; re-enable email confirmation for production) — deps: 6.7 — PR #29 (2026-11-20)
 - [x] **7.2** Error tracking / monitoring + scaling metrics (blueprint §11.4) — deps: 6.7 — Supabase logs + `private.metrics_*` views (owner choice 1A) — PR #30 (2026-11-20)
-- [!] **7.3** Backup + restore test — deps: 6.8 — Blocked: needs separate Staging/Prod project (6.8); Free plan has no restorable backups
+- [!] **7.3** Backup + restore test — deps: 6.8 — Deferred by owner (2026-11-20) — needs 6.8; Free plan has no restorable backups
 - [x] **7.4** Privacy Policy, Terms, account deletion flow — deps: 2.9 — draft texts marked for legal review (owner choice 2B) — PR #31 (2026-11-20)
 - [x] **7.5** Accessibility + responsive checks — deps: 4.9 — PR #32 (2026-11-20)
 - [x] **7.6** Load test & benchmark: submit→resolve p50/95/99, DB locks, Realtime latency — deps: 6.6 — Dev baseline, 20 concurrent players (owner choice 3A) — PR #33 (2026-11-20)
 - [x] **7.7** Production smoke tests + incident/rollback runbook — deps: 7.1 — PR #34 (2026-11-20)
-- [!] **7.8** Production deploy — Blocked: requires owner approval
+- [!] **7.8** Production deploy — Deferred by owner (2026-11-20) — requires owner approval + pre-launch items in `docs/SECURITY_REVIEW.md`
 
 **Acceptance:** no open Critical/High issues · test suite passes on staging · baseline scaling metrics recorded
