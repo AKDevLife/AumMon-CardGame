@@ -19,6 +19,7 @@ import {
 import { CardBack, DeckPile, HeartIcon, SparkIcon } from "./GameIcons.tsx";
 import { Popup } from "./Popup.tsx";
 import { RulesText } from "./RulesText.tsx";
+import { isMuted, playSound, setMuted, soundFor } from "./sound.ts";
 import type { TcgResponse } from "./types.ts";
 
 const POLL_MS = 2000;
@@ -130,7 +131,9 @@ export function TcgMatchPage() {
   const [pending, setPending] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
   const [mulligan, setMulligan] = useState<Set<string>>(new Set());
-  const [popup, setPopup] = useState<"history" | "settings" | "rules" | null>(null);
+  const [muted, setMutedState] = useState(isMuted);
+  const lastEvent = useRef<string | null>(null);
+  const [popup, setPopup] = useState<"history" | "settings" | "rules" | "forfeit" | null>(null);
   const idem = useRef<{ key: string; body: string } | null>(null);
   const passPlay = useRef(false);
   const seconds = useCountdown(data?.deadline ?? null);
@@ -189,6 +192,25 @@ export function TcgMatchPage() {
       void client.removeChannel(channel);
     };
   }, [client, mode, presenceKey, matchId, refresh]);
+
+  // Sound effects for events that arrived since the last response (first load is silent).
+  useEffect(() => {
+    if (!data) return;
+    const keys = data.events.map((e) => JSON.stringify(e));
+    const last = keys.at(-1) ?? null;
+    if (lastEvent.current !== null && last !== lastEvent.current) {
+      const from = keys.lastIndexOf(lastEvent.current);
+      const fresh = data.events.slice(from + 1);
+      const seat = data.mode === "pass_play" ? null : data.seat;
+      const names = [...new Set(fresh.map((e) => soundFor(e, seat)).filter((n) => n !== null))];
+      names.slice(0, 3).forEach((n, i) => {
+        setTimeout(() => {
+          playSound(n);
+        }, i * 180);
+      });
+    }
+    lastEvent.current = last;
+  }, [data]);
 
   // Server applies the turn timeout when asked after the deadline.
   useEffect(() => {
@@ -493,20 +515,53 @@ export function TcgMatchPage() {
         >
           📖 กติกา
         </StickerButton>
+        <StickerButton
+          onClick={() => {
+            const next = !muted;
+            setMutedState(next);
+            setMuted(next);
+          }}
+        >
+          {muted ? "🔇 เปิดเสียง" : "🔊 ปิดเสียง"}
+        </StickerButton>
         {!finished && (
           <StickerButton
             variant="danger"
             disabled={pending}
             onClick={() => {
-              if (window.confirm("ยอมแพ้และออกจากเกมนี้?")) {
-                setPopup(null);
-                void send({ type: "forfeit" });
-              }
+              setPopup("forfeit");
             }}
           >
             ยอมแพ้
           </StickerButton>
         )}
+      </Popup>
+
+      <Popup
+        title="ยืนยันการยอมแพ้"
+        open={popup === "forfeit"}
+        onClose={() => {
+          setPopup(null);
+        }}
+      >
+        <p>ยอมแพ้แล้วเกมจะจบทันที และคู่ต่อสู้เป็นฝ่ายชนะ</p>
+        <StickerButton
+          variant="danger"
+          disabled={pending}
+          onClick={() => {
+            setPopup(null);
+            void send({ type: "forfeit" });
+          }}
+        >
+          ยืนยันยอมแพ้
+        </StickerButton>
+        <StickerButton
+          onClick={() => {
+            setPopup(null);
+          }}
+        >
+          เล่นต่อ
+        </StickerButton>
       </Popup>
 
       <Popup

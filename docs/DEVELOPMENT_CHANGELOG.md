@@ -2,6 +2,11 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-20 — 9.9 Popup fix + sound effects (owner request)
+
+- **Bug:** ⚙️ → กติกา/ยอมแพ้ did nothing — closing the settings dialog programmatically fired its `onClose`, which cleared the popup just opened; forfeit relied on `window.confirm` over a modal. Fix: `Popup` ignores programmatic closes; forfeit confirms inside its own popup. E2E now covers settings → rules → forfeit.
+- **Sounds:** Web Audio effects (no files) for summon, attack, destroy, evolve, fuse, equip, action, boost, your turn, win/lose; 🔊/🔇 toggle in settings (remembered per browser). Files: `src/features/tcg/sound.ts` (+ test), `Popup.tsx`, `TcgMatchPage.tsx`.
+
 ## 2026-11-20 — 9.8 Game screen UI (owner request)
 
 - Tap a card or unit → popup with only its legal commands (chosen over drag-and-drop: easier and safer on phones). Top-right 📜 history popup (moved from the bottom) and ⚙️ settings popup with กติกา (rules summary) and ยอมแพ้. HP as heart icons, energy as bolt icons with numbers, opponent hand as card backs, deck pile showing cards left. Files: `src/features/tcg/` (`TcgMatchPage`, `GameIcons`, `Popup`, `RulesText`), E2E specs.
