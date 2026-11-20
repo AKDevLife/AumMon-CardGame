@@ -1,4 +1,5 @@
 /** HTTP helpers: CORS allow-list, JSON responses, safe body parsing. */
+import { recordMetric } from "./metrics.ts";
 import { originAllowed } from "./origins.ts";
 
 const DEFAULT_ORIGINS = ["http://localhost:5173", "http://127.0.0.1:5173", "http://127.0.0.1:4173"];
@@ -71,15 +72,24 @@ export function handler(
     if (request.method === "OPTIONS")
       return new Response(null, { status: 204, headers: corsHeaders(request) });
     if (request.method !== "POST") return json(request, { error: "method_not_allowed" }, 405);
+    const startedAt = performance.now();
+    let status = 200;
+    let code: string | null = null;
     try {
       return json(request, await fn(request));
     } catch (error) {
       if (error instanceof HttpError) {
+        status = error.status;
+        code = error.code;
         return json(request, { error: error.code, message: error.message }, error.status);
       }
       // Never leak internals (state, SQL, stack) to the client.
       console.error("Unhandled error", error instanceof Error ? error.message : error);
+      status = 500;
+      code = "internal_error";
       return json(request, { error: "internal_error" }, 500);
+    } finally {
+      await recordMetric(request, status, code, startedAt);
     }
   };
 }
