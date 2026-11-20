@@ -238,6 +238,12 @@ export function AdminPage() {
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
               <Stat title="ผู้เล่นทั้งหมด" value={text(field(c, "players"))} note="บัญชีที่สมัครแล้ว" />
               <Stat
+                title="กำลังล็อกอินอยู่"
+                value={text(field(c, "online_now"))}
+                note="บัญชีที่ใช้งานภายใน 1 ชั่วโมงล่าสุด"
+                tone="bg-am-deco-green"
+              />
+              <Stat
                 title="ห้องที่เปิดอยู่"
                 value={text(field(c, "active_rooms"))}
                 note="รอผู้เล่นหรือกำลังเล่น"
@@ -256,7 +262,7 @@ export function AdminPage() {
                 note={`กติกาชุดที่ ${text(field(sys, "rulesetVersion"))} · เวอร์ชัน ${text(field(sys, "engineVersion"))}`}
               />
             </div>
-            <Section title="เหตุการณ์ล่าสุดในเกม">
+            <Section title="เหตุการณ์ล่าสุดในเกม (10 รายการ)">
               <RowList
                 rows={asRows(field(data, "recentEvents"))}
                 title={(r) => eventText(r["public_payload"])}

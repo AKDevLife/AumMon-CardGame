@@ -150,5 +150,6 @@ Owner request 2026-11-20 (dev tooling; production tasks 6.8/7.3/7.8 stay deferre
 - [x] **9.3** Bootstrap the Dev admin + `AUMMON_ENV` on Dev; owner logs in with MFA — deps: 9.1, 9.2 — PR #59 (2026-11-20) — owner confirmed login with MFA
 
 - [x] **9.4** Readable admin dashboard: Thai labels/explanations, stat cards, card lists instead of raw tables, system health page — deps: 9.3 — PR #60 (2026-11-20)
+- [x] **9.5** Overview: "logged in now" card (sessions active in the last hour) + recent events limited to 10 — deps: 9.4 — PR #61 (2026-11-20)
 
 **Acceptance:** admin logs in without Register · non-admins get 403 on every admin action · players cannot self-grant · MFA enforced server-side · audited mutations · no secret in the client bundle · per-environment bootstrap documented (`docs/ADMIN.md`)
