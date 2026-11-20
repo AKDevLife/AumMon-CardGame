@@ -22,6 +22,11 @@ describe("app routes", () => {
     }
   });
 
+  it("home offers the rules button", () => {
+    renderAt("/");
+    expect(screen.getByRole("button", { name: /วิธีเล่น & กติกา/ })).toBeEnabled();
+  });
+
   it("login form cannot be submitted in preview", () => {
     renderAt("/login");
     expect(screen.getByLabelText("อีเมล")).toBeInTheDocument();

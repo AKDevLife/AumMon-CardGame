@@ -23,8 +23,8 @@
 | 6 Online Multiplayer    |      7 |      8 |     88% |
 | 7 Public Launch & Scale |      6 |      8 |     75% |
 | 8 1v1 TCG Ruleset       |     14 |     14 |    100% |
-| 9 Developer Admin       |     10 |     10 |    100% |
-| **Overall**             | **93** | **96** | **97%** |
+| 9 Developer Admin       |     11 |     11 |    100% |
+| **Overall**             | **94** | **97** | **97%** |
 
 ## Completed (summary)
 
