@@ -2,6 +2,11 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-20 — 9.3–9.4 Admin live + readable dashboard
+
+- **9.3:** owner's Dev account granted `super_admin` (audited); owner confirmed login with MFA.
+- **9.4 (owner request):** every admin page in plain Thai — menu names and a one-line explanation per page, Overview as stat cards (players, open rooms, live games, games finished 24 h, system status, environment), data shown as readable cards (Thai statuses, dates, card names, event sentences) instead of database tables; new "สุขภาพระบบ" page (speed/errors/daily games). Files: `src/features/admin/` (`AdminPage`, `format.ts` + tests, `guard.ts`), `admin-api` (event payloads, audit actor names).
+
 ## 2026-11-20 — 9.1–9.2 Developer Admin
 
 - **Files:** migration `20261120000400_admin.sql`, `supabase/functions/admin-api`, `_shared/admin.ts`, `_shared/env.ts`, `src/features/admin/` (`AdminPage`, `MfaPanel`, `guard`), `docs/ADMIN.md`, `supabase/functions/ci-dev.env`, config (local TOTP on).

@@ -3,62 +3,102 @@ import { Link, NavLink, useParams } from "react-router";
 import { StickerButton } from "../../components/StickerButton.tsx";
 import { ApiError, callFunction } from "../../lib/api.ts";
 import { useAuth } from "../auth/auth-context.ts";
+import {
+  ago,
+  card,
+  dateTime,
+  eventText,
+  keywords,
+  label,
+  seats,
+  shortId,
+  yesNo,
+} from "./format.ts";
 import { gateFromError, gateFromMe, SECTIONS, type AdminGate, type SectionId } from "./guard.ts";
 import { MfaPanel } from "./MfaPanel.tsx";
 
 type Row = Record<string, unknown>;
+interface Column {
+  label: string;
+  value: (r: Row) => ReactNode;
+}
 
-const show = (v: unknown): string => {
-  if (v === null || v === undefined) return "—";
-  if (typeof v === "string") return v;
-  if (typeof v === "number" || typeof v === "boolean") return String(v);
-  return JSON.stringify(v);
-};
+const text = (v: unknown): string =>
+  typeof v === "string" ? v : typeof v === "number" ? v.toLocaleString("th-TH") : "—";
+const asRows = (v: unknown): Row[] => (Array.isArray(v) ? (v as Row[]) : []);
+const field = (v: unknown, key: string): unknown =>
+  typeof v === "object" && v !== null ? (v as Row)[key] : undefined;
 
-/** Generic table; horizontally scrollable inside its card so the page never scrolls sideways. */
-function Table({ rows, actions }: { rows: Row[]; actions?: (row: Row) => ReactNode }) {
-  if (rows.length === 0) return <p className="text-sm text-am-muted">ไม่มีข้อมูล</p>;
-  const cols = Object.keys(rows[0] ?? {});
+/** One sticker card per row with "label: value" lines — readable on iPhone and desktop. */
+function RowList({
+  rows,
+  columns,
+  title,
+  actions,
+  empty = "ยังไม่มีข้อมูล",
+}: {
+  rows: Row[];
+  columns: Column[];
+  title: (r: Row) => ReactNode;
+  actions?: (r: Row) => ReactNode;
+  empty?: string;
+}) {
+  if (rows.length === 0) return <p className="text-sm text-am-muted">{empty}</p>;
   return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-left text-xs">
-        <thead>
-          <tr>
-            {cols.map((c) => (
-              <th key={c} className="border-b-2 border-am-ink px-2 py-1 font-display">
-                {c}
-              </th>
+    <ul className="grid gap-2 sm:grid-cols-2">
+      {rows.map((r, i) => (
+        <li key={i} className="am-sticker flex flex-col gap-1 bg-am-card p-3 text-sm">
+          <div className="font-display font-bold">{title(r)}</div>
+          <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5">
+            {columns.map((c) => (
+              <div key={c.label} className="contents">
+                <dt className="text-am-muted">{c.label}</dt>
+                <dd className="break-words">{c.value(r)}</dd>
+              </div>
             ))}
-            {actions && <th className="border-b-2 border-am-ink px-2 py-1" />}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((r, i) => (
-            <tr key={i} className="align-top odd:bg-am-bg">
-              {cols.map((c) => (
-                <td key={c} className="max-w-56 truncate px-2 py-1" title={show(r[c])}>
-                  {show(r[c])}
-                </td>
-              ))}
-              {actions && <td className="px-2 py-1">{actions(r)}</td>}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+          </dl>
+          {actions && <div className="mt-1 flex flex-wrap gap-2">{actions(r)}</div>}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function Stat({
+  title,
+  value,
+  note,
+  tone = "bg-am-card",
+}: {
+  title: string;
+  value: ReactNode;
+  note?: string;
+  tone?: string;
+}) {
+  return (
+    <div className={`am-sticker flex flex-col gap-1 p-3 ${tone}`}>
+      <span className="text-sm font-semibold text-am-muted">{title}</span>
+      <span className="font-display text-3xl font-bold tabular-nums">{value}</span>
+      {note && <span className="text-xs text-am-muted">{note}</span>}
     </div>
   );
 }
 
-const Card = ({ title, children }: { title: string; children: ReactNode }) => (
-  <section className="am-sticker flex flex-col gap-2 bg-am-card p-3">
-    <h2 className="font-display text-lg font-bold">{title}</h2>
+const Section = ({
+  title,
+  help,
+  children,
+}: {
+  title: string;
+  help?: string;
+  children: ReactNode;
+}) => (
+  <section className="flex flex-col gap-2">
+    <h2 className="font-display text-xl font-bold">{title}</h2>
+    {help && <p className="text-sm text-am-muted">{help}</p>}
     {children}
   </section>
 );
-
-const asRows = (v: unknown): Row[] => (Array.isArray(v) ? (v as Row[]) : []);
-const field = (v: unknown, key: string): unknown =>
-  typeof v === "object" && v !== null ? (v as Row)[key] : undefined;
 
 const ACTION: Record<SectionId, string> = {
   overview: "overview",
@@ -69,8 +109,25 @@ const ACTION: Record<SectionId, string> = {
   matches: "matches",
   bots: "settings",
   logs: "logs.security",
+  health: "health",
   settings: "settings",
 };
+
+const SmallButton = (props: {
+  onClick: () => void;
+  disabled: boolean;
+  children: ReactNode;
+  danger?: boolean;
+}) => (
+  <button
+    type="button"
+    disabled={props.disabled}
+    onClick={props.onClick}
+    className={`am-sticker am-pressable px-3 py-1 text-sm font-semibold ${props.danger ? "bg-am-danger text-white" : "bg-am-hover"}`}
+  >
+    {props.children}
+  </button>
+);
 
 export function AdminPage() {
   const { section = "overview" } = useParams();
@@ -79,6 +136,7 @@ export function AdminPage() {
   const [gate, setGate] = useState<AdminGate>("loading");
   const [env, setEnv] = useState("");
   const [data, setData] = useState<unknown>(null);
+  const [extra, setExtra] = useState<unknown>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [query, setQuery] = useState("");
@@ -108,15 +166,18 @@ export function AdminPage() {
     };
   }, [probe, auth]);
 
-  const current = SECTIONS.find((s) => s.id === section)?.id ?? "overview";
+  const meta = SECTIONS.find((s) => s.id === section) ?? SECTIONS[0];
+  const current: SectionId = meta.id;
 
   const load = useCallback(async () => {
     if (gate !== "ok") return;
     setError(null);
+    setExtra(null);
     try {
+      setData(null);
       setData(await api(ACTION[current], current === "players" ? { query } : {}));
     } catch (e) {
-      setError(e instanceof ApiError ? `${e.code}: ${e.message}` : "โหลดไม่สำเร็จ");
+      setError(e instanceof ApiError ? e.message : "โหลดข้อมูลไม่สำเร็จ");
       if (e instanceof ApiError && (e.status === 401 || e.status === 403))
         setGate(gateFromError(e));
     }
@@ -129,15 +190,15 @@ export function AdminPage() {
     };
   }, [load]);
 
-  const mutate = async (label: string, action: string, params: Row) => {
-    if (!window.confirm(`${label}?`)) return;
+  const run = async (question: string, action: string, params: Row, keep = false) => {
+    if (!window.confirm(question)) return;
     setPending(true);
     try {
       const out = await api(action, params);
-      if (action === "bots.simulate") setData({ simulation: out });
+      if (keep) setExtra(out);
       else await load();
     } catch (e) {
-      setError(e instanceof ApiError ? `${e.code}: ${e.message}` : "ไม่สำเร็จ");
+      setError(e instanceof ApiError ? e.message : "ทำรายการไม่สำเร็จ");
     } finally {
       setPending(false);
     }
@@ -166,149 +227,365 @@ export function AdminPage() {
 
   const body = (() => {
     switch (current) {
-      case "overview":
+      case "overview": {
+        const c = field(data, "counts");
+        const sys = field(data, "system");
+        const hour = field(sys, "lastHour");
+        const errors = Number(field(hour, "errors") ?? 0);
+        const requests = Number(field(hour, "requests") ?? 0);
         return (
           <>
-            <Card title="System">
-              <Table
-                rows={[{ ...(field(data, "counts") as Row), ...(field(data, "system") as Row) }]}
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              <Stat title="ผู้เล่นทั้งหมด" value={text(field(c, "players"))} note="บัญชีที่สมัครแล้ว" />
+              <Stat
+                title="ห้องที่เปิดอยู่"
+                value={text(field(c, "active_rooms"))}
+                note="รอผู้เล่นหรือกำลังเล่น"
               />
-            </Card>
-            <Card title="Recent game events">
-              <Table rows={asRows(field(data, "recentEvents"))} />
-            </Card>
+              <Stat title="เกมที่กำลังเล่น" value={text(field(c, "active_matches"))} note="ยังไม่จบ" />
+              <Stat title="เกมที่จบใน 24 ชม." value={text(field(c, "finished_24h"))} />
+              <Stat
+                title="สถานะระบบ"
+                value={errors === 0 ? "ปกติ ✅" : "มีปัญหา ⚠️"}
+                note={`1 ชม. ล่าสุด: คำขอ ${requests.toLocaleString("th-TH")} · ผิดพลาด ${errors.toLocaleString("th-TH")}`}
+                tone={errors === 0 ? "bg-am-deco-green" : "bg-am-deco-yellow"}
+              />
+              <Stat
+                title="สภาพแวดล้อม"
+                value={<span className="text-xl">{label("env", field(sys, "env"))}</span>}
+                note={`กติกาชุดที่ ${text(field(sys, "rulesetVersion"))} · เวอร์ชัน ${text(field(sys, "engineVersion"))}`}
+              />
+            </div>
+            <Section title="เหตุการณ์ล่าสุดในเกม">
+              <RowList
+                rows={asRows(field(data, "recentEvents"))}
+                title={(r) => eventText(r["public_payload"])}
+                columns={[
+                  { label: "เกม", value: (r) => shortId(r["match_id"]) },
+                  { label: "เวลา", value: (r) => ago(r["created_at"]) },
+                ]}
+              />
+            </Section>
           </>
         );
+      }
       case "players":
         return (
-          <Card title="Players">
+          <>
             <input
               aria-label="ค้นหาผู้เล่น"
-              placeholder="ค้นหาชื่อหรืออีเมล"
+              placeholder="ค้นหาด้วยชื่อหรืออีเมล"
               value={query}
               onChange={(e) => {
                 setQuery(e.target.value);
               }}
               className="am-sticker min-h-11 bg-am-card px-3 shadow-none"
             />
-            <Table
+            <RowList
               rows={asRows(data)}
+              title={(r) =>
+                `${text(r["display_name"])}${r["is_admin"] === true ? " 🛡️ Admin" : ""}`
+              }
+              columns={[
+                { label: "อีเมล", value: (r) => text(r["email"]) },
+                { label: "สมัครเมื่อ", value: (r) => dateTime(r["created_at"]) },
+                { label: "เข้าใช้ล่าสุด", value: (r) => ago(r["last_sign_in_at"]) },
+                { label: "จำนวนเกม", value: (r) => text(r["matches"]) },
+                {
+                  label: "สถานะ",
+                  value: (r) => (r["disabled"] === true ? "🚫 ถูกระงับ" : "✅ ใช้งานได้"),
+                },
+              ]}
               actions={(r) =>
-                r["is_admin"] === true ? null : (
-                  <button
-                    type="button"
+                r["is_admin"] === true ? null : r["disabled"] === true ? (
+                  <SmallButton
                     disabled={pending}
-                    className="underline"
                     onClick={() =>
-                      void mutate(
-                        r["disabled"] === true ? "เปิดใช้บัญชี" : "ระงับบัญชี",
+                      void run(
+                        `เปิดใช้บัญชี ${text(r["display_name"])} อีกครั้ง?`,
                         "player.set_disabled",
-                        {
-                          userId: r["id"],
-                          disabled: r["disabled"] !== true,
-                        },
+                        { userId: r["id"], disabled: false },
                       )
                     }
                   >
-                    {r["disabled"] === true ? "เปิดใช้" : "ระงับ"}
-                  </button>
+                    เปิดใช้บัญชี
+                  </SmallButton>
+                ) : (
+                  <SmallButton
+                    danger
+                    disabled={pending}
+                    onClick={() =>
+                      void run(
+                        `ระงับบัญชี ${text(r["display_name"])}? (ผู้เล่นจะล็อกอินไม่ได้)`,
+                        "player.set_disabled",
+                        { userId: r["id"], disabled: true },
+                      )
+                    }
+                  >
+                    ระงับบัญชี
+                  </SmallButton>
                 )
               }
             />
-          </Card>
+          </>
         );
       case "cards":
         return (
           <>
-            <p className="text-sm text-am-muted">ดูได้อย่างเดียว — แก้กติกา/การ์ดผ่าน Spec + PR</p>
-            <Card title="Cards">
-              <Table rows={asRows(field(data, "cards"))} />
-            </Card>
-            <Card title="Evolution recipes">
-              <Table rows={asRows(field(data, "evolutions"))} />
-            </Card>
-            <Card title="Fusion recipes">
-              <Table rows={asRows(field(data, "fusions"))} />
-            </Card>
+            <Section title="การ์ดทั้งหมด">
+              <RowList
+                rows={asRows(field(data, "cards"))}
+                title={(r) => text(r["name"])}
+                columns={[
+                  { label: "ประเภท", value: (r) => label("cardType", r["card_type"]) },
+                  {
+                    label: "ร่าง",
+                    value: (r) =>
+                      r["stage"] === 0
+                        ? "ร่างพื้นฐาน"
+                        : r["stage"] === 1
+                          ? "ร่างพัฒนา (Evolution)"
+                          : "ร่างรวม (Fusion)",
+                  },
+                  { label: "ค่าพลังงาน", value: (r) => `${text(r["cost"])} SPARK` },
+                  {
+                    label: "พลัง",
+                    value: (r) =>
+                      r["card_type"] === "unit"
+                        ? `โจมตี ${text(r["atk"])} · พลังชีวิต ${text(r["hp"])}`
+                        : "—",
+                  },
+                  { label: "ความสามารถ", value: (r) => keywords(r["keywords"]) },
+                  { label: "ความหายาก", value: (r) => label("rarity", r["rarity"]) },
+                  { label: "ใส่ใน Deck ได้", value: (r) => yesNo(r["deckable"]) },
+                ]}
+              />
+            </Section>
+            <Section title="สูตรพัฒนาร่าง (Evolution)" help="Unit ร่างพื้นฐานจ่าย SPARK เพื่อเปลี่ยนเป็นร่างใหม่">
+              <RowList
+                rows={asRows(field(data, "evolutions"))}
+                title={(r) => `${card(r["source_card_id"])} → ${card(r["target_card_id"])}`}
+                columns={[{ label: "ค่าพลังงาน", value: (r) => `${text(r["cost"])} SPARK` }]}
+              />
+            </Section>
+            <Section title="สูตรรวมร่าง (Fusion)" help="รวม Unit 2 ตัวบนสนามเป็นตัวใหม่">
+              <RowList
+                rows={asRows(field(data, "fusions"))}
+                title={(r) =>
+                  `${card(r["parent_a_card_id"])} + ${card(r["parent_b_card_id"])} → ${card(r["result_card_id"])}`
+                }
+                columns={[
+                  { label: "ค่าพลังงาน", value: (r) => `${text(r["cost"])} SPARK` },
+                  { label: "รับความสามารถ", value: (r) => keywords(r["inherited_keywords"]) },
+                ]}
+              />
+            </Section>
           </>
         );
-      case "decks":
+      case "decks": {
+        const rows = asRows(data);
+        const total = rows.reduce((n, r) => n + Number(r["quantity"] ?? 0), 0);
         return (
-          <Card title="Deck templates (read-only)">
-            <Table rows={asRows(data)} />
-          </Card>
+          <Section title={`Starter Deck (${total.toLocaleString("th-TH")} ใบ)`}>
+            <RowList
+              rows={rows}
+              title={(r) => card(r["card_definition_id"])}
+              columns={[{ label: "จำนวน", value: (r) => `${text(r["quantity"])} ใบ` }]}
+            />
+          </Section>
         );
+      }
       case "rooms":
         return (
-          <Card title="Open rooms">
-            <Table
-              rows={asRows(data)}
-              actions={(r) =>
-                r["status"] === "lobby" ? (
-                  <button
-                    type="button"
-                    className="underline"
-                    disabled={pending}
-                    onClick={() => void mutate("ปิดห้อง", "room.close", { roomId: r["id"] })}
-                  >
-                    ปิดห้อง
-                  </button>
-                ) : null
-              }
-            />
-          </Card>
+          <RowList
+            rows={asRows(data)}
+            empty="ไม่มีห้องที่เปิดอยู่"
+            title={(r) => `ห้อง ${shortId(r["id"])} · ${label("mode", r["mode"])}`}
+            columns={[
+              { label: "สถานะ", value: (r) => label("roomStatus", r["status"]) },
+              { label: "ผู้เล่นในห้อง", value: (r) => `${text(r["players"])} / 2` },
+              { label: "สร้างเมื่อ", value: (r) => ago(r["created_at"]) },
+            ]}
+            actions={(r) =>
+              r["status"] === "lobby" ? (
+                <SmallButton
+                  danger
+                  disabled={pending}
+                  onClick={() =>
+                    void run("ปิดห้องนี้? ผู้เล่นที่รออยู่จะเข้าไม่ได้", "room.close", { roomId: r["id"] })
+                  }
+                >
+                  ปิดห้อง
+                </SmallButton>
+              ) : null
+            }
+          />
         );
       case "matches":
         return (
-          <Card title="Active matches">
-            <Table
-              rows={asRows(data)}
-              actions={(r) => (
-                <button
-                  type="button"
-                  className="underline"
-                  disabled={pending}
-                  onClick={() => void mutate("ยุติแมตช์นี้", "match.abandon", { matchId: r["id"] })}
-                >
-                  ยุติ
-                </button>
-              )}
-            />
-          </Card>
+          <RowList
+            rows={asRows(data)}
+            empty="ไม่มีเกมที่กำลังเล่น"
+            title={(r) => `เกม ${shortId(r["id"])} · ${label("mode", r["mode"])}`}
+            columns={[
+              { label: "สถานะ", value: (r) => label("matchStatus", r["status"]) },
+              {
+                label: "ตอนนี้",
+                value: (r) => `เทิร์น ${text(r["turn"])} · ${label("phase", r["phase"])}`,
+              },
+              { label: "ผู้เล่น", value: (r) => seats(r["players"]) },
+              { label: "เริ่มเมื่อ", value: (r) => ago(r["started_at"]) },
+            ]}
+            actions={(r) => (
+              <SmallButton
+                danger
+                disabled={pending}
+                onClick={() =>
+                  void run("ยุติเกมนี้? เกมจะจบทันทีโดยไม่มีผู้ชนะ", "match.abandon", { matchId: r["id"] })
+                }
+              >
+                ยุติเกม
+              </SmallButton>
+            )}
+          />
         );
-      case "bots":
+      case "bots": {
+        const sim = extra;
         return (
-          <Card title="Bot testing">
-            <p className="text-sm">
-              จำลอง Bot vs Bot บน Server (ไม่บันทึกข้อมูลเกม) — ใช้ได้เฉพาะ Development
-            </p>
+          <>
+            {env !== "development" && <p className="font-semibold">ใช้ได้เฉพาะระบบทดสอบ (Dev)</p>}
             <StickerButton
               disabled={pending || env !== "development"}
-              onClick={() => void mutate("จำลอง 20 เกม", "bots.simulate", { games: 20 })}
+              onClick={() =>
+                void run("ให้ Bot แข่งกันเอง 20 เกม?", "bots.simulate", { games: 20 }, true)
+              }
             >
-              จำลอง 20 เกม
+              {pending ? "กำลังจำลอง…" : "เริ่มจำลอง 20 เกม"}
             </StickerButton>
-            {field(data, "simulation") !== undefined && (
-              <Table rows={[field(data, "simulation") as Row]} />
+            {sim !== null && (
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                <Stat title="จำนวนเกม" value={text(field(sim, "games"))} />
+                <Stat title="ฝั่งที่ 1 ชนะ" value={text(field(sim, "seat0"))} />
+                <Stat title="ฝั่งที่ 2 ชนะ" value={text(field(sim, "seat1"))} />
+                <Stat
+                  title="เฉลี่ยกี่เทิร์นต่อเกม"
+                  value={text(field(sim, "avgTurns"))}
+                  note={`เสมอ ${text(field(sim, "draw"))} เกม`}
+                />
+              </div>
             )}
-          </Card>
+          </>
         );
+      }
       case "logs":
         return (
           <>
-            <Card title="Admin audit log">
-              <Table rows={asRows(field(data, "audit"))} />
-            </Card>
-            <Card title="Security events (401/403/429/5xx)">
-              <Table rows={asRows(field(data, "rejected"))} />
-            </Card>
+            <Section title="สิ่งที่ Admin ทำ" help="บันทึกนี้แก้ไขหรือลบไม่ได้">
+              <RowList
+                rows={asRows(field(data, "audit"))}
+                title={(r) => label("action", r["action"])}
+                columns={[
+                  { label: "ทำโดย", value: (r) => text(r["actor"]) },
+                  { label: "เป้าหมาย", value: (r) => shortId(r["target_id"]) },
+                  { label: "เวลา", value: (r) => dateTime(r["created_at"]) },
+                ]}
+              />
+            </Section>
+            <Section title="คำขอที่ถูกปฏิเสธหรือผิดพลาด" help="เช่น ไม่ได้ล็อกอิน ไม่มีสิทธิ์ หรือส่งถี่เกินไป">
+              <RowList
+                rows={asRows(field(data, "rejected"))}
+                empty="ไม่มีรายการ"
+                title={(r) => label("httpStatus", r["status"])}
+                columns={[
+                  { label: "ส่วนของระบบ", value: (r) => text(r["function_name"]) },
+                  { label: "เวลา", value: (r) => dateTime(r["created_at"]) },
+                ]}
+              />
+            </Section>
+            <StickerButton
+              disabled={pending}
+              onClick={() =>
+                void api("logs.game").then((rows) => {
+                  setExtra(rows);
+                })
+              }
+            >
+              ดูเหตุการณ์ในเกมล่าสุด
+            </StickerButton>
+            {extra !== null && (
+              <RowList
+                rows={asRows(extra)}
+                title={(r) => eventText(r["public_payload"])}
+                columns={[
+                  {
+                    label: "เกม",
+                    value: (r) => `${shortId(r["match_id"])} · เทิร์น ${text(r["round_number"])}`,
+                  },
+                  { label: "เวลา", value: (r) => ago(r["created_at"]) },
+                ]}
+              />
+            )}
+          </>
+        );
+      case "health":
+        return (
+          <>
+            <Section title="ความเร็วของแต่ละส่วน (24 ชม.)" help="ยิ่งตัวเลขเวลาน้อยยิ่งเร็ว; ควรต่ำกว่า 800 ms">
+              <RowList
+                rows={asRows(field(data, "functions"))}
+                title={(r) => text(r["function_name"])}
+                columns={[
+                  { label: "จำนวนคำขอ", value: (r) => text(r["requests"]) },
+                  { label: "เวลาตอบปกติ", value: (r) => `${text(r["p50_ms"])} ms` },
+                  { label: "ช้าสุด (95%)", value: (r) => `${text(r["p95_ms"])} ms` },
+                  { label: "ผิดพลาด", value: (r) => text(r["server_errors"]) },
+                  { label: "ถูกจำกัดความถี่", value: (r) => text(r["rate_limited"]) },
+                ]}
+              />
+            </Section>
+            <Section title="เกมรายวัน">
+              <RowList
+                rows={asRows(field(data, "matchesDaily"))}
+                title={(r) => dateTime(r["day"]).split(" ")[0] ?? "—"}
+                columns={[
+                  { label: "เริ่ม", value: (r) => text(r["created"]) },
+                  { label: "จบ", value: (r) => text(r["finished"]) },
+                  { label: "ถูกยุติ", value: (r) => text(r["abandoned"]) },
+                  {
+                    label: "เวลาเฉลี่ยต่อเกม",
+                    value: (r) =>
+                      typeof r["avg_duration_s"] === "number"
+                        ? `${Math.round(r["avg_duration_s"] / 60)} นาที`
+                        : "—",
+                  },
+                ]}
+              />
+            </Section>
           </>
         );
       case "settings":
         return (
-          <Card title="Settings (read-only)">
-            <Table rows={[data as Row]} />
-          </Card>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <Stat
+              title="สภาพแวดล้อม"
+              value={<span className="text-xl">{label("env", field(data, "env"))}</span>}
+            />
+            <Stat title="กติกาชุดที่" value={text(field(data, "rulesetVersion"))} note="1v1 TCG" />
+            <Stat
+              title="เวอร์ชันระบบเกม"
+              value={<span className="text-xl">{text(field(data, "engineVersion"))}</span>}
+            />
+            <Stat
+              title="เวลาต่อเทิร์น"
+              value={`${String(Number(field(data, "turnTimeoutMs") ?? 0) / 1000)} วินาที`}
+            />
+            <Stat
+              title="เครื่องมือทดสอบ"
+              value={field(data, "devToolsEnabled") === true ? "เปิด" : "ปิด"}
+              note="เปิดเฉพาะ Dev"
+            />
+            <Stat title="ยืนยัน 2 ชั้น (MFA)" value="บังคับ" note="สำหรับ Admin ทุกคน" />
+          </div>
         );
     }
   })();
@@ -318,7 +595,7 @@ export function AdminPage() {
       <div className="flex items-center justify-between gap-2">
         <h1 className="font-display text-3xl font-bold">Admin</h1>
         <span className="rounded-full bg-am-round px-3 py-1 text-xs font-bold text-am-ink">
-          {env}
+          {label("env", env)}
         </span>
       </div>
       <nav aria-label="Admin sections" className="flex flex-wrap gap-2">
@@ -326,30 +603,18 @@ export function AdminPage() {
           <NavLink
             key={s.id}
             to={`/admin/${s.id}`}
-            className={({ isActive }) =>
-              `am-sticker am-pressable px-3 py-1.5 text-sm font-semibold ${isActive || (s.id === "overview" && section === "overview") ? "bg-am-hover" : "bg-am-card"}`
+            className={() =>
+              `am-sticker am-pressable px-3 py-1.5 text-sm font-semibold ${s.id === current ? "bg-am-hover" : "bg-am-card"}`
             }
           >
             {s.label}
           </NavLink>
         ))}
       </nav>
-      {current === "logs" && (
-        <StickerButton
-          onClick={() =>
-            void api("logs.game").then((rows) => {
-              setData({ audit: [], rejected: [], game: rows });
-            })
-          }
-        >
-          ดู Game events
-        </StickerButton>
-      )}
-      {current === "logs" && field(data, "game") !== undefined && (
-        <Card title="Game events">
-          <Table rows={asRows(field(data, "game"))} />
-        </Card>
-      )}
+      <div>
+        <h2 className="font-display text-2xl font-bold">{meta.label}</h2>
+        <p className="text-sm text-am-muted">{meta.help}</p>
+      </div>
       {error && (
         <p role="alert" className="border-l-4 border-am-danger pl-2 font-semibold">
           {error}

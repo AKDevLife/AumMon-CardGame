@@ -30,7 +30,7 @@ const actions: Record<string, Action> = {
         (select count(*)::int from public.matches where status = 'active') as active_matches,
         (select count(*)::int from public.matches where status = 'finished' and finished_at > now() - interval '24 hours') as finished_24h`;
     const events = await db()`
-      select e.match_id, e.event_type, e.created_at from public.match_events e
+      select e.match_id, e.event_type, e.public_payload, e.created_at from public.match_events e
       order by e.id desc limit 15`;
     const [errors] = await db()<{ errors: number; requests: number }[]>`
       select count(*) filter (where status >= 500)::int as errors, count(*)::int as requests
@@ -193,11 +193,11 @@ const actions: Record<string, Action> = {
   },
 
   "logs.game": async (_a, body) =>
-    db()`select match_id, event_seq, round_number, event_type, created_at from public.match_events order by id desc limit ${limit(body, 200)}`,
+    db()`select match_id, event_seq, round_number, event_type, public_payload, created_at from public.match_events order by id desc limit ${limit(body, 200)}`,
 
   "logs.security": async (_a, body) => ({
     audit:
-      await db()`select id, actor_user_id, action, target_type, target_id, details, created_at from private.admin_audit_log order by id desc limit ${limit(body, 200)}`,
+      await db()`select a.id, coalesce(p.display_name, 'ระบบ') as actor, a.action, a.target_type, a.target_id, a.details, a.created_at from private.admin_audit_log a left join public.profiles p on p.id = a.actor_user_id order by a.id desc limit ${limit(body, 200)}`,
     rejected: await db()`
       select function_name, status, error_code, created_at from private.function_metrics
       where status in (401, 403, 429) or status >= 500 order by id desc limit ${limit(body, 200)}`,

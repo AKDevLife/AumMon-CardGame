@@ -16,14 +16,27 @@ export function gateFromMe(me: { aal: string }): AdminGate {
 }
 
 export const SECTIONS = [
-  { id: "overview", label: "Overview" },
-  { id: "players", label: "Players" },
-  { id: "cards", label: "Cards" },
-  { id: "decks", label: "Decks" },
-  { id: "rooms", label: "Rooms" },
-  { id: "matches", label: "Matches" },
-  { id: "bots", label: "Bots" },
-  { id: "logs", label: "Logs" },
-  { id: "settings", label: "Settings" },
+  { id: "overview", label: "ภาพรวม", help: "สรุปตัวเลขสำคัญของระบบตอนนี้" },
+  { id: "players", label: "ผู้เล่น", help: "รายชื่อบัญชีผู้เล่น ค้นหา และระงับ/เปิดใช้บัญชี" },
+  {
+    id: "cards",
+    label: "การ์ด",
+    help: "การ์ดและสูตรพัฒนาร่าง/รวมร่างในเกม (ดูได้อย่างเดียว — แก้กติกาผ่าน Spec)",
+  },
+  { id: "decks", label: "Deck", help: "ชุดการ์ดเริ่มต้นที่ผู้เล่นทุกคนใช้ (ดูได้อย่างเดียว)" },
+  { id: "rooms", label: "ห้อง", help: "ห้องเล่นที่ยังเปิดอยู่ ปิดห้องที่ค้างได้" },
+  {
+    id: "matches",
+    label: "แมตช์",
+    help: "เกมที่กำลังเล่นอยู่ ยุติเกมที่ค้างได้ (เห็นเฉพาะข้อมูลที่เปิดเผย ไม่เห็นการ์ดในมือ)",
+  },
+  {
+    id: "bots",
+    label: "ทดสอบ Bot",
+    help: "ให้ Bot แข่งกันเองบน Server เพื่อดูความสมดุล (ไม่บันทึกเป็นเกมจริง)",
+  },
+  { id: "logs", label: "บันทึก", help: "ประวัติการกระทำของ Admin และคำขอที่ถูกปฏิเสธ" },
+  { id: "health", label: "สุขภาพระบบ", help: "ความเร็วและข้อผิดพลาดของระบบใน 24 ชั่วโมง" },
+  { id: "settings", label: "ตั้งค่า", help: "ค่าระบบปัจจุบัน (ดูได้อย่างเดียว)" },
 ] as const;
 export type SectionId = (typeof SECTIONS)[number]["id"];

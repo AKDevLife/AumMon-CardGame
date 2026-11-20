@@ -4,10 +4,10 @@
 
 ## Current
 
-- **Status:** ⏳ Phase 9 — Dev admin role granted; waiting for the owner's first login + MFA setup (9.3).
-- **Phase:** 9 — Developer Admin (2/3); production tasks (6.8, 7.3, 7.8) still deferred.
+- **Status:** ✅ Phase 9 complete — admin dashboard live on Dev (owner logged in with MFA).
+- **Phase:** 9 — complete; remaining tasks are production-only (6.8, 7.3, 7.8).
 - **Current task:** none in progress
-- **Next:** owner logs in at `/login` → `/admin` → scans the MFA QR; then 9.3 is verified.
+- **Next:** owner feedback on the admin dashboard and 1v1 playtest; production (6.8 → 7.3 → 7.8) later.
 - **Playtest URL (latest `main`):** https://aum-mon-card-game-git-playtest-aum-mon.vercel.app
 - **Dev backend:** Supabase `AumMon-Dev` (ref `yaxtzdhryctfjaspxvix`, ap-northeast-1), email confirmation OFF for playtesting.
 
@@ -23,8 +23,8 @@
 | 6 Online Multiplayer    |      7 |      8 |     88% |
 | 7 Public Launch & Scale |      6 |      8 |     75% |
 | 8 1v1 TCG Ruleset       |     14 |     14 |    100% |
-| 9 Developer Admin       |      2 |      3 |     67% |
-| **Overall**             | **85** | **89** | **96%** |
+| 9 Developer Admin       |      4 |      4 |    100% |
+| **Overall**             | **87** | **90** | **97%** |
 
 ## Completed (summary)
 
@@ -41,12 +41,6 @@
 ## In progress
 
 None
-
-## Blocked (owner)
-
-| Task | Owner steps                                                                                                                     |
-| ---- | ------------------------------------------------------------------------------------------------------------------------------- |
-| 9.3  | Log in on the playtest site → open `/admin` → scan the QR with an authenticator app → enter the 6-digit code → confirm it works |
 
 ## Deferred (production — owner decision)
 
