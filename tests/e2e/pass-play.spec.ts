@@ -71,7 +71,6 @@ test("pass & play 1v1: privacy handoff between turns, then forfeit ends the matc
       } else await page.waitForTimeout(300);
     }
   }
-  if (handoffs < 5) console.log("PASSPLAY-STUCK", await page.locator("main").innerText());
   expect(handoffs).toBe(5);
   page.once("dialog", (d) => void d.accept());
   await page.getByRole("button", { name: "ยอมแพ้" }).click();
