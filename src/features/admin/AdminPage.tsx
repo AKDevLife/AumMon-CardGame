@@ -16,6 +16,7 @@ import {
 } from "./format.ts";
 import { gateFromError, gateFromMe, SECTIONS, type AdminGate, type SectionId } from "./guard.ts";
 import { MfaPanel } from "./MfaPanel.tsx";
+import { SoundSettings } from "./SoundSettings.tsx";
 
 type Row = Record<string, unknown>;
 interface Column {
@@ -108,6 +109,7 @@ const ACTION: Record<SectionId, string> = {
   rooms: "rooms",
   matches: "matches",
   bots: "settings",
+  sounds: "sounds.get",
   logs: "logs.security",
   health: "health",
   settings: "settings",
@@ -515,6 +517,17 @@ export function AdminPage() {
           </>
         );
       }
+      case "sounds":
+        return (
+          <SoundSettings
+            stored={field(data, "value")}
+            updatedAt={field(data, "updatedAt")}
+            onSave={async (value) => {
+              await api("sounds.set", { value });
+              await load();
+            }}
+          />
+        );
       case "logs":
         return (
           <>

@@ -181,6 +181,40 @@ describe.runIf(run)("admin RBAC via Edge Functions", () => {
     );
     expect((await admin.call({ action: "rooms.close_stale" })).status).toBe(200);
     expect((await player.call({ action: "rooms.close_stale" })).status).toBe(403);
+    // Global sound settings: validated, admin-only, audited, readable by players.
+    const sounds = Object.fromEntries(
+      [
+        "summon",
+        "attack",
+        "destroyed",
+        "evolve",
+        "fuse",
+        "equip",
+        "action",
+        "boost",
+        "turn",
+        "win",
+        "lose",
+      ].map((k) => [k, { preset: "pop", volume: 1, enabled: true }]),
+    );
+    expect(
+      (
+        await admin.call({
+          action: "sounds.set",
+          value: { ...sounds, attack: { preset: "laser", volume: 9, enabled: true } },
+        })
+      ).status,
+    ).toBe(400);
+    expect((await player.call({ action: "sounds.set", value: sounds })).status).toBe(403);
+    expect((await admin.call({ action: "sounds.set", value: sounds })).status).toBe(200);
+    const read = await player.client
+      .from("game_settings")
+      .select("value")
+      .eq("key", "sounds")
+      .single();
+    expect(
+      (read.data as { value: Record<string, { preset: string }> }).value["attack"]?.preset,
+    ).toBe("pop");
     const sim = await admin.call({ action: "bots.simulate", games: 3 });
     expect(sim.body["games"]).toBe(3);
   }, 60_000);

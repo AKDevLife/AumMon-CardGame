@@ -7,6 +7,7 @@ import { db } from "../_shared/db.ts";
 import { handler, HttpError, readJson } from "../_shared/http.ts";
 import { uuid } from "../_shared/input.ts";
 import { rateLimit } from "../_shared/ratelimit.ts";
+import { validateSoundConfig } from "../_shared/sound-schema.ts";
 import type { Tx } from "../_shared/store.ts";
 
 type Body = Record<string, unknown>;
@@ -234,6 +235,25 @@ const actions: Record<string, Action> = {
     result.avgTurns = Math.round(turns / games);
     await db().begin((tx) => audit(tx, admin, "bots.simulated", null, null, { games }));
     return { games, ...result };
+  },
+
+  "sounds.get": async () => {
+    const [row] = await db()<{ value: unknown; updated_at: string }[]>`
+      select value, updated_at from public.game_settings where key = 'sounds'`;
+    return { value: row?.value ?? null, updatedAt: row?.updated_at ?? null };
+  },
+
+  /** Global sound settings for every player (validated + audited). */
+  "sounds.set": async (admin, body) => {
+    const value = validateSoundConfig(body["value"]);
+    if (!value) throw new HttpError(400, "invalid_sounds", "Invalid sound settings");
+    return db().begin(async (tx) => {
+      await tx`
+        insert into public.game_settings (key, value, updated_by) values ('sounds', ${tx.json(value)}, ${admin.userId})
+        on conflict (key) do update set value = excluded.value, updated_at = now(), updated_by = excluded.updated_by`;
+      await audit(tx, admin, "settings.sounds_updated", "setting", "sounds");
+      return { ok: true };
+    });
   },
 
   "logs.game": async (_a, body) =>
