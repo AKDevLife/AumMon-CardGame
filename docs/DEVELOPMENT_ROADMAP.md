@@ -130,7 +130,7 @@ Owner decision 2026-11-20: replace the 2–4 player game with the 1v1 TCG in `au
 - [x] **8.4** Combat + keywords (Haste, Guard, Flying, Piercing, Boost) — deps: 8.3 — PR #45 (2026-11-20)
 - [x] **8.5** Actions + Equipment (Draw, Search, Scrap Return, slots, compatibility) — deps: 8.3 — PR #46 (2026-11-20)
 - [x] **8.6** Evolution + Fusion (instance rules, full HP, equipment handling, inheritance) — deps: 8.4, 8.5 — PR #47 (2026-11-20)
-- [ ] **8.7** Scenario tests T-001–T-007 + spec §5.17 acceptance + determinism/simulation — deps: 8.6
+- [x] **8.7** Scenario tests T-001–T-007 + spec §5.17 acceptance + determinism/simulation — deps: 8.6 — PR #48 (2026-11-20) — §5.17 #11, #12, #15 (triggers, target loss, loop limit) N/A: no triggered effects in the V1.1 card set
 - [ ] **8.8** Server bot v2 (legal actions only, seat-visible data) — deps: 8.7
 - [ ] **8.9** DB migration + seed for ruleset 2 (definitions, recipes, match state/events, RLS) — deps: 8.2
 - [ ] **8.10** Backend: turn-based commands, 90 s turn timer → auto end turn, idempotency — deps: 8.8, 8.9
