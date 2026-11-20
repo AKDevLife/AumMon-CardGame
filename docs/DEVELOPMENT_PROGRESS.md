@@ -6,7 +6,7 @@
 
 - **Phase:** 7 — Public Launch & Scale Evaluation (Dev cloud project live)
 - **Current task:** none in progress
-- **Next task:** 7.2 Monitoring (needs owner decision on provider)
+- **Next task:** 7.4 Privacy/Terms drafts + account deletion (owner choice 2B)
 
 ## Completion
 
@@ -19,7 +19,7 @@
 | 5 Pass & Play           |      5 |      5 |    100% |
 | 6 Online Multiplayer    |      7 |      8 |     88% |
 | 7 Public Launch & Scale |      0 |      8 |      0% |
-| **Overall**             | **63** | **72** | **88%** |
+| **Overall**             | **64** | **72** | **89%** |
 
 ## Completed
 
@@ -51,11 +51,12 @@ None
 
 ## Blocked
 
-| Task | Reason                               | Owner action                                    |
-| ---- | ------------------------------------ | ----------------------------------------------- |
-| 1.12 | Repo settings                        | Enable branch protection on `main` requiring CI |
-| 6.8  | Staging project may exceed free tier | Approve cost / create project                   |
-| 7.8  | Production deploy                    | Approval at launch                              |
+| Task | Reason                                                                        | Owner action                                    |
+| ---- | ----------------------------------------------------------------------------- | ----------------------------------------------- |
+| 1.12 | Repo settings                                                                 | Enable branch protection on `main` requiring CI |
+| 7.3  | Backup/restore needs a separate project (Free plan has no restorable backups) | Decide with 6.8                                 |
+| 6.8  | Staging project may exceed free tier                                          | Approve cost / create project                   |
+| 7.8  | Production deploy                                                             | Approval at launch                              |
 
 ## Latest verification
 

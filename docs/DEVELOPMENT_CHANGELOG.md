@@ -2,6 +2,13 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-20 — 7.2 Monitoring (no-cost)
+
+- **Files:** migration `20261120000000_metrics.sql` (`private.function_metrics`, `metrics_functions_24h`, `metrics_matches_daily`), `_shared/metrics.ts`, `_shared/http.ts` (records status/latency per request), `docs/OPERATIONS.md`, pgTAP 008
+- **Tests:** pgTAP 4 new (server-only, aggregates, p50); applied to AumMon-Dev and verified rows recorded after real requests.
+- **Decision:** owner chose Supabase built-in logs + own metrics (no Sentry).
+- **7.3** marked blocked: backup/restore test needs a separate project / paid plan.
+
 ## 2026-11-20 — 7.1 Security review
 
 - **Files:** `docs/SECURITY_REVIEW.md`, `vercel.json` (CSP, HSTS, Permissions-Policy), `_shared/matches.ts` (match read rate limit 240/min)

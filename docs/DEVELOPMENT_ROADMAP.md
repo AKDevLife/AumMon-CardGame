@@ -110,8 +110,8 @@ Percentages: `pnpm progress` (top-level tasks only). Phase 0 (Rulebook v1 decisi
 ## Phase 7 — Public Launch & Scale Evaluation
 
 - [x] **7.1** Security review + abuse checks (rate limits, CORS, CSP, headers; re-enable email confirmation for production) — deps: 6.7 — PR #29 (2026-11-20)
-- [ ] **7.2** Error tracking / monitoring + scaling metrics (blueprint §11.4) — deps: 6.7
-- [ ] **7.3** Backup + restore test — deps: 6.8
+- [x] **7.2** Error tracking / monitoring + scaling metrics (blueprint §11.4) — deps: 6.7 — Supabase logs + `private.metrics_*` views (owner choice 1A) — PR #30 (2026-11-20)
+- [!] **7.3** Backup + restore test — deps: 6.8 — Blocked: needs separate Staging/Prod project (6.8); Free plan has no restorable backups
 - [ ] **7.4** Privacy Policy, Terms, account deletion flow — deps: 2.9
 - [ ] **7.5** Accessibility + responsive checks — deps: 4.9
 - [ ] **7.6** Load test & benchmark: submit→resolve p50/95/99, DB locks, Realtime latency — deps: 6.6
