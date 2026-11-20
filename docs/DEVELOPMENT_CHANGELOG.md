@@ -2,6 +2,11 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-20 — Status: paused before production
+
+- Owner paused production work (6.8, 7.3, 7.8 deferred). Next: game/UI adjustments after playtesting.
+- Progress 69/72 (96%); all non-production tasks verified.
+
 ## 2026-11-20 — 1.12 Branch protection (accepted limitation)
 
 - Owner configured a rule for `main` (4 required CI checks; "Require approvals" removed so self-merge stays possible).
