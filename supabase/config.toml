@@ -435,30 +435,6 @@ enabled = true
 verify_jwt = false
 import_map = "./functions/deno.json"
 
-[functions.matches-forfeit]
-verify_jwt = false
-import_map = "./functions/deno.json"
-
-[functions.matches-resume]
-verify_jwt = false
-import_map = "./functions/deno.json"
-
-[functions.matches-start]
-verify_jwt = false
-import_map = "./functions/deno.json"
-
-[functions.matches-submit-action]
-verify_jwt = false
-import_map = "./functions/deno.json"
-
-[functions.matches-use-skill]
-verify_jwt = false
-import_map = "./functions/deno.json"
-
-[functions.matches-view]
-verify_jwt = false
-import_map = "./functions/deno.json"
-
 [functions.rooms-create]
 verify_jwt = false
 import_map = "./functions/deno.json"

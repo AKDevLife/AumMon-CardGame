@@ -47,34 +47,28 @@ async function player(i) {
     return { status: res.status, body: json };
   };
 
-  const room = await call("rooms-create", { mode: "solo", characterId: "pyro_pup", botCount: 1 });
-  let r = (await call("matches-start", { roomId: room.body.roomId })).body;
-  const matchId = r.matchId;
-  for (let turn = 0; turn < 100 && r.view?.result?.status === "ongoing"; turn++) {
-    const me = r.viewerPlayerId;
-    const alive = r.view.players.find((p) => p.id === me)?.status === "alive";
-    if (!alive) break;
-    if (r.view.phase === "turn_start") {
-      r = (await call("matches-use-skill", { matchId })).body;
+  const created = await call("tcg-create", { mode: "solo" });
+  const matchId = created.body.matchId;
+  let r = (await call("tcg-view", { matchId })).body;
+  // Human plays the simplest legal line (attack > summon > mulligan > end turn) vs the server bot.
+  const order = ["attack", "summon", "mulligan", "end_turn"];
+  for (let step = 0; step < 300 && r.view?.status !== "finished"; step++) {
+    const pick = order.map((t) => r.legal?.find((c) => c.type === t)).find(Boolean);
+    if (!pick) {
+      r = (await call("tcg-view", { matchId })).body;
       continue;
     }
-    const card = r.view.myHand[0];
-    const target = r.view.players.find((p) => p.id !== me && p.status === "alive");
-    const res = await call("matches-submit-action", {
+    const command = pick.type === "mulligan" ? { type: "mulligan", instanceIds: [] } : pick;
+    const res = await call("tcg-command", {
       matchId,
-      roundNumber: r.view.round,
-      expectedVersion: r.view.version,
-      cardInstanceId: card.instanceId,
+      expectedVersion: r.version,
       idempotencyKey: randomUUID(),
-      ...(["attack", "chaos_disrupt", "chaos_redirect"].includes(card.definitionId) && {
-        targetPlayerId: target.id,
-      }),
-      ...(card.definitionId === "support" && { choice: "draw" }),
+      command,
     });
-    r = res.status === 200 ? res.body : (await call("matches-view", { matchId })).body;
+    r = res.status === 200 ? res.body : (await call("tcg-view", { matchId })).body;
   }
   await call("account-delete", { confirm: "DELETE" }); // clean up test account
-  return r.view?.result?.status ?? "unknown";
+  return r.view?.status === "finished" ? "finished" : "ongoing";
 }
 
 const pct = (arr, p) =>

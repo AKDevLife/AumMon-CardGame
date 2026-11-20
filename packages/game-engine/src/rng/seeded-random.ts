@@ -1,4 +1,7 @@
-import type { RandomSource } from "../domain/types.ts";
+/** Injected randomness: the engine never calls Math.random. */
+export interface RandomSource {
+  nextInt(maxExclusive: number): number;
+}
 
 /** Serializable PRNG state (stored server-side in private.match_runtime.rng_state). */
 export type RngState = [number, number, number, number];

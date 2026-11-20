@@ -1,7 +1,6 @@
 import type { RouteObject } from "react-router";
 import { LoginPage } from "../features/auth/LoginPage.tsx";
 import { RegisterPage } from "../features/auth/RegisterPage.tsx";
-import { MatchPage } from "../features/game/MatchPage.tsx";
 import { PrivacyPage, TermsPage } from "../features/legal/LegalPages.tsx";
 import { ProfilePage } from "../features/profile/ProfilePage.tsx";
 import { LobbyPage } from "../features/online/LobbyPage.tsx";
@@ -27,7 +26,6 @@ export const routes: RouteObject[] = [
       { path: "play/pass", element: <PassPlaySetupPage /> },
       { path: "play/online", element: <OnlinePage /> },
       { path: "lobby/:roomId", element: <LobbyPage /> },
-      { path: "match/:matchId", element: <MatchPage /> },
       { path: "game/:matchId", element: <TcgMatchPage /> },
       { path: "*", element: <NotFoundPage /> },
     ],

@@ -1,6 +1,6 @@
 # @aummon/game-engine
 
-Pure TypeScript game engine for AumMon (Rulebook v1).
+Pure TypeScript game engine for AumMon — ruleset 2 (1v1 TCG, `aummon_game_spec.md` v3.0).
 
 ## Isolation rules (enforced)
 
@@ -16,22 +16,12 @@ Pure TypeScript game engine for AumMon (Rulebook v1).
 
 ```text
 src/
-├── domain/      # types and state models (blueprint 5.2)
-├── rules/v1/    # Rulebook v1 implementation (Phase 3)
-├── cards/       # card effect registry (Phase 3)
-├── characters/  # character definitions + effectKey handlers (Phase 3)
-├── hooks/       # five hook dispatchers (Phase 3)
-├── resolver/    # round resolution pipeline (Phase 3)
-├── bots/        # bot strategy interfaces (Phase 3/4)
-├── views/       # client-safe player view (blueprint 5.3)
-├── version.ts   # ENGINE_VERSION / RULESET_VERSION
-└── index.ts     # public API
-tests/           # Vitest unit / scenario tests
+├── rng/          # seeded PRNG (injected randomness)
+├── rules/v2/     # ruleset 2: cards, recipes, match flow, combat, bot, views
+├── version.ts    # ENGINE_VERSION / RULESET_VERSION
+└── index.ts      # public API (`v2` namespace)
+tests/            # Vitest unit / scenario / simulation tests
 ```
 
 Relative imports use explicit `.ts` extensions so the same source runs in
 Vite, Vitest, Node.js and Deno (Supabase Edge Functions).
-
-The `GameEngine` interface (blueprint 5.4) and bot contracts (5.6) depend on
-types not yet specified (`InitializeMatchInput`, `LegalAction`,
-`ValidationResult`, `SubmittedAction`); they will be added in Phase 3.

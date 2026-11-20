@@ -25,8 +25,7 @@ describe.runIf(run)("account deletion", () => {
       });
       return { status: res.status, body: (await res.json()) as Record<string, unknown> };
     };
-    const room = await call("rooms-create", { mode: "solo", characterId: "pyro_pup", botCount: 1 });
-    const start = await call("matches-start", { roomId: room.body["roomId"] });
+    const start = await call("tcg-create", { mode: "solo" });
     expect(start.status).toBe(200);
 
     expect((await call("account-delete", {})).status).toBe(400); // explicit confirmation required
@@ -34,6 +33,6 @@ describe.runIf(run)("account deletion", () => {
 
     const login = await client.auth.signInWithPassword({ email, password: "secret123" });
     expect(login.error).not.toBeNull();
-    expect((await call("matches-view", { matchId: start.body["matchId"] })).status).toBe(401);
+    expect((await call("tcg-view", { matchId: start.body["matchId"] })).status).toBe(401);
   }, 30_000);
 });
