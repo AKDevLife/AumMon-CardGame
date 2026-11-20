@@ -4,8 +4,8 @@ type Variant = "default" | "confirm" | "danger";
 
 const VARIANT_CLASSES: Record<Variant, string> = {
   default: "bg-am-card enabled:hover:bg-am-hover",
-  confirm: "bg-am-confirm text-white enabled:hover:brightness-105",
-  danger: "bg-am-danger text-white enabled:hover:brightness-105",
+  confirm: "bg-am-confirm text-am-ink enabled:hover:brightness-105",
+  danger: "bg-am-danger text-white !text-xl !font-bold enabled:hover:brightness-105", // large bold text: white passes 3:1
 };
 
 export interface StickerButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {

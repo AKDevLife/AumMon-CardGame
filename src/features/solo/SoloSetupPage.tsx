@@ -115,7 +115,7 @@ export function SoloSetupPage() {
         </div>
       </div>
       {error && (
-        <p role="alert" className="font-semibold text-am-danger">
+        <p role="alert" className="border-l-4 border-am-danger pl-2 font-semibold">
           {error}
         </p>
       )}

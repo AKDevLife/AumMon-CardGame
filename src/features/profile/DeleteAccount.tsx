@@ -28,7 +28,7 @@ export function DeleteAccount() {
 
   return (
     <section className="am-sticker flex flex-col gap-2 bg-am-card p-4">
-      <h2 className="font-display text-lg font-bold text-am-danger">ลบบัญชี</h2>
+      <h2 className="font-display text-xl font-bold text-am-danger">ลบบัญชี</h2>
       <p className="text-sm">เกมที่กำลังเล่นจะถูกยอมแพ้ ประวัติการแข่งขันจะเก็บแบบไม่ระบุตัวตน การลบย้อนกลับไม่ได้</p>
       <label className="flex flex-col gap-1 text-sm font-semibold">
         พิมพ์ DELETE เพื่อยืนยัน
@@ -49,7 +49,7 @@ export function DeleteAccount() {
         {pending ? "กำลังลบ…" : "ลบบัญชีถาวร"}
       </StickerButton>
       {error && (
-        <p role="alert" className="font-semibold text-am-danger">
+        <p role="alert" className="border-l-4 border-am-danger pl-2 font-semibold">
           {error}
         </p>
       )}

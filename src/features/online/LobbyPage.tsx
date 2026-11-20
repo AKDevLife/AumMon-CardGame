@@ -177,7 +177,7 @@ export function LobbyPage() {
         {isOwner ? "ปิดห้อง" : "ออกจากห้อง"}
       </StickerButton>
       {error && (
-        <p role="alert" className="font-semibold text-am-danger">
+        <p role="alert" className="border-l-4 border-am-danger pl-2 font-semibold">
           {error}
         </p>
       )}
