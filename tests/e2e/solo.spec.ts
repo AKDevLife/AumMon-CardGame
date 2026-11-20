@@ -22,6 +22,7 @@ test("sign up → solo 1v1 vs bot → play until the match ends", async ({ page 
 
   const result = page.getByRole("heading", { name: /ชนะ|เสมอ/ });
   const idle = page.getByRole("button", { name: "กำลังส่ง…" });
+  let summoned = 0;
   for (let step = 0; step < 400; step++) {
     if (await result.isVisible()) break;
     const endTurn = page.getByRole("button", { name: "จบเทิร์น" });
@@ -29,26 +30,28 @@ test("sign up → solo 1v1 vs bot → play until the match ends", async ({ page 
       await page.waitForTimeout(500);
       continue;
     }
-    // Prefer attacking with a ready unit, else summon from hand, else end the turn.
-    const unit = page
-      .getByRole("group", { name: "Your units" })
-      .getByRole("button")
-      .and(page.locator(":enabled"))
-      .first();
-    const hand = page
-      .getByRole("group", { name: "Hand" })
-      .getByRole("button")
-      .and(page.locator(":enabled"))
-      .first();
+    // Prefer attacking with a ready unit, else summon a unit from hand, else end the turn.
+    const subjects = [
+      ...(await page
+        .getByRole("group", { name: "Your units" })
+        .getByRole("button")
+        .and(page.locator(":enabled"))
+        .all()),
+      ...(await page
+        .getByRole("group", { name: "Hand" })
+        .getByRole("button")
+        .and(page.locator(":enabled"))
+        .all()),
+    ];
     let acted = false;
-    for (const subject of [unit, hand]) {
-      if (!(await subject.isVisible().catch(() => false))) continue;
+    for (const subject of subjects) {
       await subject.click();
       const action = page
         .getByRole("group", { name: "Actions" })
         .getByRole("button", { name: /โจมตี|ลงสนาม/ })
         .first();
       if (await action.isVisible().catch(() => false)) {
+        if ((await action.innerText()).includes("ลงสนาม")) summoned++;
         await action.click();
         await expect(idle).toHaveCount(0);
         acted = true;
@@ -61,5 +64,6 @@ test("sign up → solo 1v1 vs bot → play until the match ends", async ({ page 
     }
   }
   await expect(result).toBeVisible();
+  expect(summoned).toBeGreaterThan(0);
   await expect(page.getByRole("alert")).toHaveCount(0);
 });
