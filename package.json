@@ -23,7 +23,8 @@
     "progress": "node scripts/progress.mjs",
     "db:test": "bash scripts/db-test.sh",
     "sync:engine": "node scripts/sync-engine.mjs",
-    "functions:serve": "pnpm sync:engine && supabase functions serve"
+    "functions:serve": "pnpm sync:engine && supabase functions serve",
+    "smoke": "node scripts/smoke.mjs"
   },
   "dependencies": {
     "@aummon/game-engine": "workspace:*",

@@ -115,7 +115,7 @@ Percentages: `pnpm progress` (top-level tasks only). Phase 0 (Rulebook v1 decisi
 - [x] **7.4** Privacy Policy, Terms, account deletion flow — deps: 2.9 — draft texts marked for legal review (owner choice 2B) — PR #31 (2026-11-20)
 - [x] **7.5** Accessibility + responsive checks — deps: 4.9 — PR #32 (2026-11-20)
 - [x] **7.6** Load test & benchmark: submit→resolve p50/95/99, DB locks, Realtime latency — deps: 6.6 — Dev baseline, 20 concurrent players (owner choice 3A) — PR #33 (2026-11-20)
-- [ ] **7.7** Production smoke tests + incident/rollback runbook — deps: 7.1
+- [x] **7.7** Production smoke tests + incident/rollback runbook — deps: 7.1 — PR #34 (2026-11-20)
 - [!] **7.8** Production deploy — Blocked: requires owner approval
 
 **Acceptance:** no open Critical/High issues · test suite passes on staging · baseline scaling metrics recorded
