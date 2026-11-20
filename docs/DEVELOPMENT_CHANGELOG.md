@@ -2,6 +2,12 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-20 — Stable playtest URL
+
+- Branch `playtest` mirrors `main` (fast-forward by `.github/workflows/sync-playtest.yml`); Vercel Preview URL: https://aum-mon-card-game-git-playtest-aum-mon.vercel.app
+- Root cause of the earlier "UI Preview" banner: the old preview was built before Vercel had the env vars; build log now prints `[aummon] VITE_SUPABASE_*: set/MISSING`.
+- Verified on cloud: sign up → Solo vs 1 bot → match finished (iPhone viewport).
+
 ## 2026-11-20 — Dev playtest setup
 
 - Owner set Vercel Preview env (`VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`).

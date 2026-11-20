@@ -71,4 +71,5 @@ Phase 1 Foundation → 2 Auth & DB → 3 Pure Engine → 4 Solo slice → 5 Pass
 - Migrations: applied in order from `supabase/migrations/` and recorded in `supabase_migrations.schema_migrations`; never edit an applied migration.
 - Edge Functions: `pnpm sync:engine && supabase functions deploy --remote=<ref> --use-api` (`verify_jwt = false` + import map are set per function in `config.toml`; functions verify JWTs themselves).
 - Function secret `ALLOWED_ORIGINS` = Vercel preview pattern `https://*-aum-mon.vercel.app` + localhost.
+- Playtest URL (always latest `main`): https://aum-mon-card-game-git-playtest-aum-mon.vercel.app
 - Vercel **Preview** env: `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` (publishable key only).

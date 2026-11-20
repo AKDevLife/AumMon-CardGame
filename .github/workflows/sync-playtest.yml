@@ -23,4 +23,4 @@ jobs:
         with:
           fetch-depth: 0
       - name: Fast-forward playtest to main
-        run: git push origin HEAD:refs/heads/playtest --force-with-lease=playtest
+        run: git push origin HEAD:refs/heads/playtest # fast-forward only; fails if playtest diverged
