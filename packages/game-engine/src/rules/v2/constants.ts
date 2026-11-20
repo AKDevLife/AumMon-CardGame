@@ -1,5 +1,6 @@
 /** Ruleset 2 constants (aummon_game_spec.md §1.3, §4.1–4.2, §4.10, §4.12). */
 export const RULESET_V2 = {
+  version: "2",
   players: 2,
   playerHp: 20,
   deckSize: 30,

@@ -2,6 +2,12 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-20 — 8.11 Ruleset 2 board UI + Solo
+
+- **Files:** `src/features/tcg/` (`TcgMatchPage.tsx`, `labels.ts`, `types.ts`), route `/game/:matchId`, `SoloSetupPage` (1v1 vs bot via `tcg-create`), home/footer text (Ruleset 2 · 1v1), E2E `solo.spec.ts`, `a11y.spec.ts`.
+- **Behaviour:** board with both players (HP, SPARK, hand/deck counts), units with effective ATK/HP/keywords/equipment, hand with cost/stats; tap a card/unit → buttons built only from server `legal` commands; mulligan picker; 90 s countdown; event log; forfeit; Pass & Play handoff hook ready for 8.12.
+- **Tests:** 3 label tests; E2E solo plays a full match (CI).
+
 ## 2026-11-20 — 8.10 Ruleset 2 backend
 
 - **Files:** `supabase/functions/_shared/tcg.ts` (create/start, lock → advance → command → save, per-seat view), `_shared/tcg-flow.ts` (pure: bots + 90 s timer), Edge Functions `tcg-create`, `tcg-start`, `tcg-command`, `tcg-view`; migration `20261120000300_ruleset2_rooms.sql`; `tests/integration/tcg-flow.test.ts`, `tests/backend/tcg.test.ts`.

@@ -11,42 +11,55 @@ async function signUp(page: Page) {
   await expect(page.getByRole("link", { name: "โปรไฟล์" })).toBeVisible();
 }
 
-test("sign up → solo vs 1 bot → play until the match ends", async ({ page }) => {
-  test.setTimeout(180_000);
+test("sign up → solo 1v1 vs bot → play until the match ends", async ({ page }) => {
+  test.setTimeout(240_000);
   await signUp(page);
-  await page.getByRole("link", { name: "Solo vs Bots" }).click();
-  await page.getByRole("button", { name: /ปิโร่/ }).click();
-  await page.getByRole("button", { name: "1", exact: true }).click();
+  await page.getByRole("link", { name: "Solo vs Bot" }).click();
   await page.getByRole("button", { name: "เริ่มเกม" }).click();
-  await expect(page).toHaveURL(/\/match\//);
-  await expect(page.getByText(/รอบ \d+/)).toBeVisible();
+  await expect(page).toHaveURL(/\/game\//);
+  await page.getByRole("button", { name: "เก็บมือนี้" }).click();
+  await expect(page.getByText(/เทิร์น \d+/)).toBeVisible();
 
   const result = page.getByRole("heading", { name: /ชนะ|เสมอ/ });
-  for (let turn = 0; turn < 80; turn++) {
+  const idle = page.getByRole("button", { name: "กำลังส่ง…" });
+  for (let step = 0; step < 400; step++) {
     if (await result.isVisible()) break;
-    const skip = page.getByRole("button", { name: "ข้าม" });
-    if (await skip.isVisible()) {
-      await skip.click();
+    const endTurn = page.getByRole("button", { name: "จบเทิร์น" });
+    if (!(await endTurn.isVisible().catch(() => false))) {
+      await page.waitForTimeout(500);
       continue;
     }
-    const card = page
+    // Prefer attacking with a ready unit, else summon from hand, else end the turn.
+    const unit = page
+      .getByRole("group", { name: "Your units" })
+      .getByRole("button")
+      .and(page.locator(":enabled"))
+      .first();
+    const hand = page
       .getByRole("group", { name: "Hand" })
       .getByRole("button")
       .and(page.locator(":enabled"))
       .first();
-    if (!(await card.isVisible().catch(() => false))) {
-      await page.waitForTimeout(500);
-      continue;
+    let acted = false;
+    for (const subject of [unit, hand]) {
+      if (!(await subject.isVisible().catch(() => false))) continue;
+      await subject.click();
+      const action = page
+        .getByRole("group", { name: "Actions" })
+        .getByRole("button", { name: /โจมตี|ลงสนาม/ })
+        .first();
+      if (await action.isVisible().catch(() => false)) {
+        await action.click();
+        await expect(idle).toHaveCount(0);
+        acted = true;
+        break;
+      }
     }
-    await card.click();
-    const target = page.getByRole("group", { name: "Target" }).getByRole("button").first();
-    if (await target.isVisible().catch(() => false)) await target.click();
-    const draw = page.getByRole("button", { name: "จั่วการ์ด" });
-    if (await draw.isVisible().catch(() => false)) await draw.click();
-    await page.getByRole("button", { name: "ยืนยันการ์ด (คว่ำหน้า)" }).click();
-    await expect(page.getByRole("button", { name: "กำลังส่ง…" })).toHaveCount(0);
+    if (!acted) {
+      await endTurn.click();
+      await expect(idle).toHaveCount(0);
+    }
   }
   await expect(result).toBeVisible();
-  await expect(page.getByRole("list", { name: "Players" })).toBeVisible();
   await expect(page.getByRole("alert")).toHaveCount(0);
 });
