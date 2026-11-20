@@ -1,6 +1,7 @@
 import type { RandomSource } from "../../domain/types.ts";
 import { getCardDefinition } from "./cards.ts";
 import { RULESET_V2 } from "./constants.ts";
+import { EVOLUTION_RECIPES_V2, FUSION_RECIPES_V2 } from "./recipes.ts";
 import { canEquip, unitAtk, unitHp, unitKeywords, usedSlots } from "./stats.ts";
 import {
   cloneState,
@@ -39,7 +40,8 @@ export type CommandErrorCode =
   | "invalid_choice"
   | "no_valid_target"
   | "incompatible"
-  | "no_free_slot";
+  | "no_free_slot"
+  | "no_recipe";
 
 export class CommandError extends Error {
   constructor(readonly code: CommandErrorCode) {
@@ -75,6 +77,12 @@ export type Command =
       readonly playerId: string;
       readonly instanceId: string;
       readonly unitId: string;
+    }
+  | { readonly type: "evolve"; readonly playerId: string; readonly unitId: string }
+  | {
+      readonly type: "fuse";
+      readonly playerId: string;
+      readonly unitIds: readonly [string, string];
     }
   | { readonly type: "end_turn"; readonly playerId: string }
   | { readonly type: "forfeit"; readonly playerId: string };
@@ -298,6 +306,16 @@ export function applyCommand(state: MatchState, command: Command, rng: RandomSou
       });
       break;
     }
+    case "evolve": {
+      requireMain(next, seat);
+      evolve(next, seat, command.unitId, events);
+      break;
+    }
+    case "fuse": {
+      requireMain(next, seat);
+      fuse(next, seat, command.unitIds, events);
+      break;
+    }
     case "end_turn": {
       requireTurn(next, seat);
       for (const u of me.units) {
@@ -392,6 +410,100 @@ function playAction(
 function addToHand(p: PlayerState, card: CardInstance): void {
   if (p.hand.length >= RULESET_V2.maxHand) p.discard.push(card);
   else p.hand.push(card);
+}
+
+function evolutionFor(u: UnitInstance) {
+  return EVOLUTION_RECIPES_V2.find(
+    (r) => r.sourceCardId === u.cardId && getCardDefinition(u.cardId).stage === r.requiredStage,
+  );
+}
+
+/** Recipe cost with MODIFY_COST own_evolution (U004), floored at 1 (spec §4.2). */
+function evolutionCost(u: UnitInstance, recipeCost: number): number {
+  let cost = recipeCost;
+  for (const fx of getCardDefinition(u.cardId).effects)
+    if (fx.type === "MODIFY_COST") cost += fx.amount;
+  return Math.max(RULESET_V2.minCost, cost);
+}
+
+/** Evolution (spec §3.1, §4.9): same instance, full HP of new form, exhaustion kept, incompatible equipment discarded. */
+function evolve(state: MatchState, seat: Seat, unitId: string, events: GameEvent[]): void {
+  const p = state.players[seat];
+  const unit = findUnit(p.units, unitId);
+  const recipe = evolutionFor(unit);
+  if (!recipe) throw new CommandError("no_recipe");
+  const cost = evolutionCost(unit, recipe.cost);
+  if (p.spark < cost) throw new CommandError("not_enough_spark");
+  p.spark -= cost;
+  const fromCardId = unit.cardId;
+  const evolved: UnitInstance = {
+    ...unit,
+    cardId: recipe.targetCardId,
+    damage: 0,
+    history: [...unit.history, fromCardId],
+  };
+  evolved.equipment = unit.equipment.filter((e) => canEquip(evolved, e.cardId));
+  p.discard.push(...unit.equipment.filter((e) => !evolved.equipment.includes(e)));
+  p.units = p.units.map((u) => (u === unit ? evolved : u));
+  events.push({
+    type: "unit_evolved",
+    seat,
+    instanceId: unit.instanceId,
+    fromCardId,
+    toCardId: recipe.targetCardId,
+    recipeId: recipe.recipeId,
+  });
+}
+
+function fusionFor(a: UnitInstance, b: UnitInstance) {
+  return FUSION_RECIPES_V2.find(
+    (r) =>
+      (r.parentCardIds[0] === a.cardId && r.parentCardIds[1] === b.cardId) ||
+      (r.parentCardIds[0] === b.cardId && r.parentCardIds[1] === a.cardId),
+  );
+}
+
+/** Fusion (spec §4.11): parents + equipment to Discard, new instance with full HP, Exhausted unless Haste. */
+function fuse(
+  state: MatchState,
+  seat: Seat,
+  unitIds: readonly [string, string],
+  events: GameEvent[],
+): void {
+  const p = state.players[seat];
+  if (unitIds[0] === unitIds[1]) throw new CommandError("duplicate_card");
+  const a = findUnit(p.units, unitIds[0]);
+  const b = findUnit(p.units, unitIds[1]);
+  const recipe = fusionFor(a, b);
+  if (!recipe) throw new CommandError("no_recipe");
+  if (p.spark < recipe.cost) throw new CommandError("not_enough_spark");
+  p.spark -= recipe.cost;
+  const inherited = recipe.inheritedKeywords
+    .filter((k) => unitKeywords(a).has(k) || unitKeywords(b).has(k))
+    .slice(0, RULESET_V2.maxFusionInheritedKeywords);
+  const result = getCardDefinition(recipe.resultCardId);
+  const fused: UnitInstance = {
+    instanceId: `fusion:${a.instanceId}+${b.instanceId}`,
+    cardId: recipe.resultCardId,
+    damage: 0,
+    exhausted: !(result.keywords.includes("haste") || inherited.includes("haste")),
+    equipment: [],
+    history: [a.instanceId, b.instanceId],
+    bonusKeywords: inherited,
+    tempAtk: 0,
+    boostUsed: false,
+  };
+  for (const parent of [a, b])
+    p.discard.push({ instanceId: parent.instanceId, cardId: parent.cardId }, ...parent.equipment);
+  p.units = [...p.units.filter((u) => u !== a && u !== b), fused];
+  events.push({
+    type: "unit_fused",
+    seat,
+    instanceId: fused.instanceId,
+    cardId: fused.cardId,
+    parentIds: [a.instanceId, b.instanceId],
+    recipeId: recipe.recipeId,
+  });
 }
 
 function requireTurn(state: MatchState, seat: Seat): void {
@@ -504,6 +616,8 @@ export type LegalCommand =
   | { readonly type: "attack"; readonly attackerId: string; readonly target: string }
   | { readonly type: "play_action"; readonly instanceId: string; readonly choice?: string }
   | { readonly type: "attach"; readonly instanceId: string; readonly unitId: string }
+  | { readonly type: "evolve"; readonly unitId: string }
+  | { readonly type: "fuse"; readonly unitIds: readonly [string, string] }
   | { readonly type: "end_turn" };
 
 /** Commands the seat may send now (the bot picks only from these). */
@@ -536,6 +650,18 @@ export function getLegalCommands(state: MatchState, seat: Seat): LegalCommand[] 
           if (canEquip(u, c.cardId) && usedSlots(u) + def.slotCost <= RULESET_V2.maxEquipmentSlots)
             out.push({ type: "attach", instanceId: c.instanceId, unitId: u.instanceId });
     }
+    for (const u of me.units) {
+      const recipe = evolutionFor(u);
+      if (recipe && evolutionCost(u, recipe.cost) <= me.spark)
+        out.push({ type: "evolve", unitId: u.instanceId });
+    }
+    me.units.forEach((a, i) => {
+      for (const b of me.units.slice(i + 1)) {
+        const recipe = fusionFor(a, b);
+        if (recipe && recipe.cost <= me.spark)
+          out.push({ type: "fuse", unitIds: [a.instanceId, b.instanceId] });
+      }
+    });
     if (me.spark >= 1)
       for (const u of me.units)
         if (!u.exhausted && !u.boostUsed && unitKeywords(u).has("boost"))

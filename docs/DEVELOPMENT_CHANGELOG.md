@@ -2,6 +2,12 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-20 — 8.6 Ruleset 2 evolution + fusion
+
+- **Files:** `rules/v2/match.ts` (`evolve`, `fuse`), `tests/v2-evolution.test.ts`.
+- **Behaviour:** Evolution keeps instance + exhaustion, full HP of new form, history, compatible equipment (U004 cost −1, floor 1). Fusion consumes 2 parents + equipment to Discard, new instance with parent history, full HP, Exhausted unless Haste, recipe-only keyword inheritance.
+- **Tests:** 8 new incl. spec scenarios T-006, T-007.
+
 ## 2026-11-20 — 8.5 Ruleset 2 actions + equipment
 
 - **Files:** `rules/v2/match.ts` (`play_action`, `attach`), `stats.ts` (`canEquip`, `usedSlots`), `tests/v2-actions.test.ts`, `tests/v2-fixtures.ts`.
