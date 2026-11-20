@@ -74,6 +74,22 @@ export type GameEvent =
   | { type: "card_searched"; seat: Seat; instanceId: string; cardId: string }
   | { type: "card_recycled"; seat: Seat; instanceId: string; cardId: string }
   | { type: "equipment_attached"; seat: Seat; instanceId: string; cardId: string; unitId: string }
+  | {
+      type: "unit_evolved";
+      seat: Seat;
+      instanceId: string;
+      fromCardId: string;
+      toCardId: string;
+      recipeId: string;
+    }
+  | {
+      type: "unit_fused";
+      seat: Seat;
+      instanceId: string;
+      cardId: string;
+      parentIds: [string, string];
+      recipeId: string;
+    }
   | { type: "turn_ended"; seat: Seat }
   | { type: "forfeit"; seat: Seat }
   | { type: "match_ended"; result: MatchResult };
