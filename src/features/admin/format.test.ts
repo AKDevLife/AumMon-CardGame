@@ -9,6 +9,7 @@ describe("admin readable formatting", () => {
     expect(label("httpStatus", 429)).toBe("ส่งคำขอถี่เกินไป");
     expect(label("mode", "unknown")).toBe("unknown");
     expect(yesNo(true)).toBe("ใช่");
+    expect(label("stale", "finished")).toBe("เกมจบหรือถูกยุติแล้ว แต่ห้องยังเปิดค้าง");
   });
 
   it("formats game data", () => {

@@ -7,8 +7,42 @@ import { db } from "../_shared/db.ts";
 import { handler, HttpError, readJson } from "../_shared/http.ts";
 import { uuid } from "../_shared/input.ts";
 import { rateLimit } from "../_shared/ratelimit.ts";
+import type { Tx } from "../_shared/store.ts";
 
 type Body = Record<string, unknown>;
+
+/** Why an open room is stale (or null). Idle = no game event / creation for 2 hours. */
+function roomsQuery(sql: Tx | ReturnType<typeof db> = db()) {
+  return sql`
+    select * from (
+      select r.id, r.mode, r.status, r.created_at, r.expires_at, players, m.id as match_id, m.status as match_status, last_activity,
+        case
+          when players = 0 then 'empty'
+          when r.status = 'lobby' and r.expires_at is not null and r.expires_at < now() then 'expired'
+          when r.status = 'playing' and (m.id is null or m.status <> 'active') then 'finished'
+          when last_activity < now() - interval '2 hours' then 'idle'
+        end as stale_reason
+      from public.game_rooms r
+      cross join lateral (select count(*)::int as players from public.room_players rp
+                          where rp.room_id = r.id and rp.status <> 'left') pc
+      left join lateral (select id, status, started_at from public.matches where room_id = r.id
+                         order by created_at desc limit 1) m on true
+      cross join lateral (select coalesce(
+          (select max(e.created_at) from public.match_events e where e.match_id = m.id),
+          m.started_at, r.created_at) as last_activity) la
+      where r.status in ('lobby','playing')
+    ) q`;
+}
+
+async function closeRoom(tx: Tx, roomId: string): Promise<Record<string, unknown> | null> {
+  const rows = await tx<{ id: string }[]>`
+    update public.game_rooms set status = 'closed' where id = ${roomId} and status in ('lobby','playing') returning id`;
+  if (rows.length === 0) return null;
+  const abandoned = await tx`
+    update public.matches set status = 'abandoned', finished_at = now()
+    where room_id = ${roomId} and status = 'active' returning id`;
+  return { abandonedMatches: abandoned.length };
+}
 type Action = (admin: AdminContext, body: Body) => Promise<unknown>;
 
 const limit = (body: Body, max = 100) => {
@@ -94,24 +128,30 @@ const actions: Record<string, Action> = {
         on c.deck_template_id = t.id and c.deck_template_version = t.version
       where t.ruleset_version = '2' order by t.id, c.card_definition_id`,
 
+  /** Open rooms with a server-computed `stale_reason` (null = healthy). */
   rooms: async (_a, body) =>
-    db()`
-      select r.id, r.mode, r.status, r.ruleset_version, r.created_at, r.expires_at,
-             (select count(*)::int from public.room_players rp where rp.room_id = r.id and rp.status <> 'left') as players
-      from public.game_rooms r where r.status in ('lobby','playing')
-      order by r.created_at desc limit ${limit(body)}`,
+    db()`${roomsQuery()} order by stale_reason is null, created_at desc limit ${limit(body)}`,
 
+  /** Close one room (lobby or playing). An unfinished game in it is abandoned first. */
   "room.close": async (admin, body) => {
     const roomId = uuid(body, "roomId");
     return db().begin(async (tx) => {
-      const rows =
-        await tx`update public.game_rooms set status = 'closed' where id = ${roomId} and status = 'lobby' returning id`;
-      if (rows.length === 0)
-        throw new HttpError(409, "not_closable", "Only open lobbies can be closed");
-      await audit(tx, admin, "room.closed", "room", roomId);
+      const closed = await closeRoom(tx, roomId);
+      if (!closed) throw new HttpError(409, "not_closable", "Room is already closed");
+      await audit(tx, admin, "room.closed", "room", roomId, closed);
       return { ok: true };
     });
   },
+
+  /** Close every stale room at once (expired, empty, finished or idle > 2 h). */
+  "rooms.close_stale": async (admin) =>
+    db().begin(async (tx) => {
+      const stale = await tx<{ id: string }[]>`
+        select id from (${roomsQuery(tx)}) s where stale_reason is not null`;
+      for (const r of stale) await closeRoom(tx, r.id);
+      await audit(tx, admin, "rooms.closed_stale", null, null, { count: stale.length });
+      return { closed: stale.length };
+    }),
 
   matches: async (_a, body) => {
     const status = body["status"] === "finished" ? "finished" : "active";

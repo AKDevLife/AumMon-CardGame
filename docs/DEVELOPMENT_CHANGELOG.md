@@ -2,6 +2,10 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-20 — 9.6 Admin room cleanup (owner request)
+
+- Rooms page: every open room can be closed (lobby or playing; an unfinished game is abandoned with no winner, history kept — rows are closed, not deleted). Server marks stale rooms with a reason: no players, expired code, game already finished, or no activity for 2 hours; "ปิดห้องที่ค้างทั้งหมด" closes them in one audited action.
+
 ## 2026-11-20 — 9.5 Admin overview tweaks (owner request)
 
 - Overview card "กำลังล็อกอินอยู่": distinct users with an Auth session used/refreshed in the last hour (`auth.sessions`, server-side only); recent game events limited to 10.
