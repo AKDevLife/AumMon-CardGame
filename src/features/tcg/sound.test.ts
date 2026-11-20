@@ -22,3 +22,22 @@ describe("game sounds", () => {
     expect(soundFor({ type: "card_drawn", seat: 0, instanceId: "x" }, 0)).toBeNull();
   });
 });
+
+import { defaultSoundConfig, normalizeSoundConfig, PRESETS, SOUND_EVENTS } from "./sound.ts";
+
+describe("sound settings", () => {
+  it("every default preset exists and the library offers many sounds", () => {
+    for (const e of Object.values(SOUND_EVENTS)) expect(PRESETS[e.preset]).toBeDefined();
+    expect(Object.keys(PRESETS).length).toBeGreaterThanOrEqual(15);
+  });
+
+  it("normalizes stored config and rejects bad values", () => {
+    const c = normalizeSoundConfig({
+      attack: { preset: "laser", volume: 1.5, enabled: false },
+      summon: { preset: "nope", volume: 9 },
+    });
+    expect(c.attack).toEqual({ preset: "laser", volume: 1.5, enabled: false });
+    expect(c.summon).toEqual(defaultSoundConfig().summon);
+    expect(normalizeSoundConfig(null)).toEqual(defaultSoundConfig());
+  });
+});

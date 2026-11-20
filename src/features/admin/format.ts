@@ -47,6 +47,7 @@ const MAPS: Record<string, Record<string, string>> = {
     "rooms.closed_stale": "ปิดห้องที่ค้างทั้งหมด",
     "match.abandoned": "ยุติแมตช์",
     "bots.simulated": "ทดสอบ Bot",
+    "settings.sounds_updated": "แก้ไขการตั้งค่าเสียง",
   },
   stale: {
     empty: "ไม่มีผู้เล่นในห้องแล้ว",

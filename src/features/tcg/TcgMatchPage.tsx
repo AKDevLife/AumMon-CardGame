@@ -19,7 +19,14 @@ import {
 import { CardBack, DeckPile, HeartIcon, SparkIcon } from "./GameIcons.tsx";
 import { Popup } from "./Popup.tsx";
 import { RulesText } from "./RulesText.tsx";
-import { isMuted, playSound, setMuted, soundFor } from "./sound.ts";
+import {
+  isMuted,
+  normalizeSoundConfig,
+  playSound,
+  setMuted,
+  setSoundConfig,
+  soundFor,
+} from "./sound.ts";
 import type { TcgResponse } from "./types.ts";
 
 const POLL_MS = 2000;
@@ -192,6 +199,19 @@ export function TcgMatchPage() {
       void client.removeChannel(channel);
     };
   }, [client, mode, presenceKey, matchId, refresh]);
+
+  // Admin-chosen sound settings (public.game_settings 'sounds'); defaults if missing.
+  useEffect(() => {
+    if (!client) return;
+    void client
+      .from("game_settings")
+      .select("value")
+      .eq("key", "sounds")
+      .maybeSingle<{ value: unknown }>()
+      .then(({ data: row }) => {
+        setSoundConfig(normalizeSoundConfig(row?.value));
+      });
+  }, [client]);
 
   // Sound effects for events that arrived since the last response (first load is silent).
   useEffect(() => {
