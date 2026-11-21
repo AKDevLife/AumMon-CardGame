@@ -1,9 +1,13 @@
 name: CI
 
+# Actions minutes are limited on this private repo (2,000/month): CI runs once per PR
+# (main only receives squash merges of PRs that already passed), and docs-only changes skip it.
 on:
   pull_request:
-  push:
-    branches: [main]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+  workflow_dispatch:
 
 permissions:
   contents: read
