@@ -11,6 +11,10 @@ export const SOUND_EVENT_IDS = [
   "turn",
   "win",
   "lose",
+  "tap",
+  "card_tap",
+  "hand_open",
+  "hand_close",
 ] as const;
 export const SOUND_PRESET_IDS = [
   "pop",
@@ -30,6 +34,10 @@ export const SOUND_PRESET_IDS = [
   "bell",
   "fanfare",
   "sad",
+  "tap",
+  "flip",
+  "slide_up",
+  "slide_down",
 ] as const;
 
 export type SoundValue = Record<string, { preset: string; volume: number; enabled: boolean }>;

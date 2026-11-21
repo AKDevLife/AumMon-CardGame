@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { installAudioUnlock, soundFor } from "./sound.ts";
+import { installAudioUnlock, installTapSounds, soundFor } from "./sound.ts";
 
 describe("game sounds", () => {
   it("maps events to sounds", () => {
@@ -45,6 +45,14 @@ describe("sound settings", () => {
 describe("installAudioUnlock", () => {
   it("adds and removes gesture listeners without throwing", () => {
     const cleanup = installAudioUnlock();
+    expect(typeof cleanup).toBe("function");
+    cleanup();
+  });
+});
+
+describe("installTapSounds", () => {
+  it("registers and cleans up the click listener", () => {
+    const cleanup = installTapSounds();
     expect(typeof cleanup).toBe("function");
     cleanup();
   });

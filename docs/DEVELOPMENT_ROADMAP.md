@@ -162,5 +162,6 @@ Owner request 2026-11-20 (dev tooling; production tasks 6.8/7.3/7.8 stay deferre
 - [x] **9.15** Game screen: history grouped by turn (newest first); server bot paced one action per step (700 ms); drag & drop from hand (unit → empty slot summons, equipment → your unit attaches, actions → command popup); playable cards sorted first — deps: 9.14 — PR #71 (2026-11-21)
 - [x] **9.16** Game screen tweaks: rules button in top bar (left of history, removed from settings); exhausted label shows only "💤 เหนื่อย"; folded hand drawer opens by tapping anywhere incl. cards — deps: 9.15 — PR #72 (2026-11-21)
 - [x] **9.17** Fix: game sounds silent (browser audio lock) — audio unlocked/resumed on every tap so server-driven sounds (bot steps, polls) can play — deps: 9.16 — PR #73 (2026-11-21)
+- [x] **9.18** Tap sounds on the game screen: one shared tap sound for every button; separate sounds for card tap, hand open, hand close (admin-configurable) — deps: 9.17 — PR #74 (2026-11-21)
 
 **Acceptance:** admin logs in without Register · non-admins get 403 on every admin action · players cannot self-grant · MFA enforced server-side · audited mutations · no secret in the client bundle · per-environment bootstrap documented (`docs/ADMIN.md`)

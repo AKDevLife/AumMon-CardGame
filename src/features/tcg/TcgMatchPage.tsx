@@ -14,6 +14,7 @@ import { RulesText } from "./RulesText.tsx";
 import { DraggableCard, type DropTarget } from "./DraggableCard.tsx";
 import {
   installAudioUnlock,
+  installTapSounds,
   isMuted,
   normalizeSoundConfig,
   playSound,
@@ -120,6 +121,7 @@ export function TcgMatchPage() {
   }, [client, mode, presenceKey, matchId, refresh]);
 
   useEffect(() => installAudioUnlock(), []);
+  useEffect(() => installTapSounds(), []);
 
   // Admin-chosen sound settings (public.game_settings 'sounds'); defaults if missing.
   useEffect(() => {
@@ -499,6 +501,7 @@ export function TcgMatchPage() {
           <button
             type="button"
             aria-expanded={handOpen}
+            data-sound={handOpen ? "hand_close" : "hand_open"}
             onClick={() => {
               setHandOpen(!handOpen);
             }}
@@ -559,6 +562,7 @@ export function TcgMatchPage() {
             <button
               type="button"
               aria-label="เปิดการ์ดในมือ"
+              data-sound="hand_open"
               onClick={() => {
                 setHandOpen(true);
               }}

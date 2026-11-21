@@ -98,6 +98,7 @@ export function CardFrame({
   return (
     <button
       type="button"
+      data-sound="card_tap"
       disabled={disabled ?? !onSelect}
       aria-pressed={selected === true || marked === true}
       onClick={onSelect}

@@ -103,6 +103,22 @@ export const PRESETS = {
     ],
   },
   fanfare: { label: "แฟนแฟร์", notes: arp([523, 659, 784, 1047, 1319], 0.12, 0.22) },
+  tap: { label: "แตะเบาๆ", notes: [{ f: 900, to: 700, t: 0, d: 0.05, type: "sine", v: 0.12 }] },
+  flip: {
+    label: "พลิกการ์ด",
+    notes: [
+      { f: 500, to: 1100, t: 0, d: 0.07, type: "triangle", v: 0.12 },
+      { f: 1300, t: 0.06, d: 0.06, type: "sine", v: 0.08 },
+    ],
+  },
+  slide_up: {
+    label: "เลื่อนขึ้น",
+    notes: [{ f: 350, to: 900, t: 0, d: 0.16, type: "sine", v: 0.14 }],
+  },
+  slide_down: {
+    label: "เลื่อนลง",
+    notes: [{ f: 900, to: 350, t: 0, d: 0.16, type: "sine", v: 0.14 }],
+  },
   sad: { label: "เศร้า", notes: arp([440, 392, 330, 262], 0.16, 0.25, "sine") },
 } satisfies Record<string, { label: string; notes: Note[] }>;
 export type PresetId = keyof typeof PRESETS;
@@ -119,6 +135,10 @@ export const SOUND_EVENTS = {
   boost: { label: "เร่งพลัง", preset: "powerup" },
   turn: { label: "เริ่มเทิร์นของคุณ", preset: "chime" },
   win: { label: "ชนะ", preset: "fanfare" },
+  tap: { label: "กดปุ่มทั่วไป", preset: "tap" },
+  card_tap: { label: "แตะการ์ด", preset: "flip" },
+  hand_open: { label: "เปิดการ์ดในมือ", preset: "slide_up" },
+  hand_close: { label: "พับการ์ดในมือ", preset: "slide_down" },
   lose: { label: "แพ้", preset: "sad" },
 } satisfies Record<string, { label: string; preset: PresetId }>;
 export type SoundEvent = keyof typeof SOUND_EVENTS;
@@ -271,6 +291,34 @@ export function soundFor(e: v2.GameEvent, mySeat: v2.Seat | null): SoundEvent | 
     default:
       return null;
   }
+}
+
+/**
+ * Tap sound for any button on the game screen: `data-sound` picks a special one, else "tap".
+ * The sound is chosen in the capture phase (before React re-renders the button, e.g. the
+ * drawer's open/close label) and played in the bubble phase unless a drag cancelled the click.
+ */
+export function installTapSounds(): () => void {
+  if (typeof document === "undefined") return () => undefined;
+  let chosen: SoundEvent | null = null;
+  const pick = (e: MouseEvent): void => {
+    chosen = null;
+    if (!(e.target instanceof Element)) return;
+    const el = e.target.closest("button, [role=button], a[href], input, select, summary");
+    if (!el || el.matches(":disabled")) return;
+    const special = el.closest("[data-sound]")?.getAttribute("data-sound");
+    chosen = special && special in SOUND_EVENTS ? (special as SoundEvent) : "tap";
+  };
+  const fire = (e: MouseEvent): void => {
+    if (chosen && !e.defaultPrevented) playSound(chosen);
+    chosen = null;
+  };
+  document.addEventListener("click", pick, true);
+  document.addEventListener("click", fire);
+  return () => {
+    document.removeEventListener("click", pick, true);
+    document.removeEventListener("click", fire);
+  };
 }
 
 export function playSound(event: SoundEvent): void {
