@@ -36,7 +36,7 @@ export function Popup({
       onClick={(e) => {
         if (e.target === ref.current) onClose();
       }}
-      className="am-sticker m-auto w-[min(92vw,28rem)] bg-am-card p-0 text-am-ink backdrop:bg-black/40"
+      className="am-sticker m-auto w-[min(92vw,28rem)] bg-am-card p-0 text-am-text backdrop:bg-[rgb(36_20_63/0.5)]"
     >
       <div className="flex max-h-[80vh] flex-col gap-3 overflow-y-auto p-4">
         <div className="flex items-center justify-between gap-2">

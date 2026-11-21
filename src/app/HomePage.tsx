@@ -17,9 +17,19 @@ export function HomePage() {
   const [rules, setRules] = useState(false);
   return (
     <div className="flex flex-1 flex-col justify-center gap-8">
-      <section className="am-sticker bg-am-title px-6 py-6 text-center">
-        <h1 className="font-display text-5xl font-bold tracking-wide">AumMon</h1>
-        <p className="mt-2">การ์ดเกมดวล 1 ต่อ 1 · สิ่งของรอบตัวมีชีวิต</p>
+      <section className="am-sticker relative overflow-hidden bg-am-brand px-6 py-6 text-center text-am-inverse">
+        <span
+          aria-hidden="true"
+          className="absolute -left-6 -top-6 h-14 w-14 rounded-full bg-am-pink/50"
+        />
+        <span
+          aria-hidden="true"
+          className="absolute -bottom-8 -right-6 h-14 w-14 rounded-full bg-am-blue/40"
+        />
+        <h1 className="relative font-display text-5xl font-bold tracking-wide text-am-title">
+          AumMon
+        </h1>
+        <p className="relative mt-2">การ์ดเกมดวล 1 ต่อ 1 · สิ่งของรอบตัวมีชีวิต</p>
       </section>
 
       <nav aria-label="Game modes" className="flex flex-col gap-4">
@@ -34,7 +44,7 @@ export function HomePage() {
                     ? "/play/pass"
                     : "/play/online"
               }
-              className="am-sticker am-pressable flex min-h-14 items-center justify-center bg-am-card px-6 py-3 font-display text-lg font-semibold hover:bg-am-hover"
+              className="am-sticker am-pressable flex min-h-14 items-center justify-center bg-am-title px-6 py-3 font-display text-lg font-semibold text-am-text hover:bg-am-hover"
             >
               {mode.label}
             </Link>
@@ -86,7 +96,7 @@ export function HomePage() {
       {!signedIn && (
         <Link
           to="/register"
-          className="am-sticker am-pressable block bg-am-confirm px-6 py-3 text-center font-display text-lg font-semibold text-am-ink"
+          className="am-sticker am-pressable block bg-am-green px-6 py-3 text-center font-display text-lg font-semibold text-am-success-text"
         >
           สร้างบัญชี
         </Link>

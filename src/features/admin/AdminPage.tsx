@@ -125,7 +125,7 @@ const SmallButton = (props: {
     type="button"
     disabled={props.disabled}
     onClick={props.onClick}
-    className={`am-sticker am-pressable px-3 py-1 text-sm font-semibold ${props.danger ? "bg-am-danger text-white" : "bg-am-hover"}`}
+    className={`am-sticker am-pressable px-3 py-1 text-sm font-semibold ${props.danger ? "bg-am-error-bg text-am-danger-text" : "bg-am-title text-am-text"}`}
   >
     {props.children}
   </button>
@@ -667,7 +667,10 @@ export function AdminPage() {
         <p className="text-sm text-am-muted">{meta.help}</p>
       </div>
       {error && (
-        <p role="alert" className="border-l-4 border-am-danger pl-2 font-semibold">
+        <p
+          role="alert"
+          className="rounded-lg border-l-4 border-am-red bg-am-error-bg px-2 py-1 font-semibold text-am-danger-text"
+        >
           {error}
         </p>
       )}

@@ -1,26 +1,111 @@
 @import "tailwindcss";
 
 /*
- * AumMon UI tokens — aummon_game_spec.md section 5 / blueprint Appendix A.
- * Change the theme here only.
+ * AumMon Color Design System — Theme A "Playful Cartoon / Candy Fantasy", Balanced.
+ * Single source of truth: docs/color_design_system.md. Components use only these tokens
+ * (Tailwind classes `bg-am-*`, `text-am-*`, `border-am-*`). Change colors here only.
  */
 :root {
-  --am-bg: #f6f0ff;
-  --am-deco-purple: #e6d8ff;
-  --am-deco-green: #d3f5e8;
-  --am-deco-yellow: #ffe6a8;
-  --am-ink: #2a1650;
-  --am-muted: #6d5a9a;
-  --am-accent: #5b2fb8;
-  --am-round: #ff2d9b;
-  --am-title: #ffc21a;
-  --am-card: #fffbe6;
-  --am-hover: #ffe36e;
-  --am-confirm: #4cc35e;
-  --am-danger: #e8244f;
-  --am-border: 3px solid var(--am-ink);
-  --am-shadow: 0 5px 0 var(--am-ink);
-  --am-shadow-pressed: 0 2px 0 var(--am-ink);
+  /* Palette (approved HEX) */
+  --color-brand-primary: #30205b;
+  --color-brand-deep: #24143f;
+  --color-brand-accent: #ffc83d;
+  --color-purple: #8064c8;
+  --color-pink: #ff4f9a;
+  --color-blue: #55c9f4;
+  --color-green: #65d69a;
+  --color-orange: #ff914d;
+  --color-red: #ed4966;
+  --color-soft-purple: #e9dfff;
+  --color-lavender: #d8c6fa;
+  --color-cream: #fffbeb;
+
+  /* Background & surfaces */
+  --color-bg-main: #f6f0ff;
+  --color-bg-secondary: var(--color-soft-purple);
+  --color-bg-soft: var(--color-lavender);
+  --color-surface: var(--color-cream);
+
+  /* Text */
+  --color-text-primary: #30205b;
+  --color-text-secondary: #75658f;
+  --color-text-muted: #8b809a;
+  --color-text-inverse: #fffbeb;
+  --color-text-accent: #5b2fb8;
+  --color-text-danger: #b9284a;
+  --color-text-success: #164e35;
+  --color-text-info: #173c55;
+
+  /* Battlefield */
+  --color-battlefield-bg: var(--color-soft-purple);
+  --color-player-area: #ddf5ff;
+  --color-opponent-area: #ffe0ef;
+  --color-slot: var(--color-bg-main);
+  --color-slot-empty: var(--color-soft-purple);
+  --color-selection: var(--color-brand-accent);
+  --color-target-valid: var(--color-green);
+  --color-target-invalid: var(--color-red);
+  --color-exhausted: #75658f;
+
+  /* Card frame */
+  --color-card-title-bg: var(--color-soft-purple);
+  --color-card-stat-bg: #fff0c2;
+  --color-atk: var(--color-orange);
+  --color-hp: var(--color-pink);
+  --color-keyword: var(--color-blue);
+  --color-evolution: var(--color-green);
+  --color-fusion: var(--color-purple);
+
+  /* Resources */
+  --color-player-hp: var(--color-pink);
+  --color-player-hp-bg: #ffe0ef;
+  --color-hp-damage: var(--color-red);
+  --color-hp-heal: var(--color-green);
+  --color-spark: var(--color-blue);
+  --color-spark-bg: #ddf5ff;
+  --color-spark-inactive: #c7d8e5;
+
+  /* Keywords */
+  --color-haste: var(--color-orange);
+  --color-guard: var(--color-green);
+  --color-flying: var(--color-blue);
+  --color-piercing: var(--color-red);
+  --color-boost: var(--color-brand-accent);
+  --color-draw: var(--color-purple);
+
+  /* Feedback */
+  --color-heal-soft: #ddf8e9;
+  --color-error-bg: #ffe0ef;
+
+  /* Interaction */
+  --color-hover: #ffe36e;
+  --color-disabled: #ddd6e8;
+  --color-focus: var(--color-text-accent);
+
+  /* Identity (unchanged): border + sticker shadow */
+  --border-color: #2a1650;
+  --border-width: 3px;
+  --sticker-shadow: 0 5px 0 var(--border-color);
+  --pressed-shadow: 0 2px 0 var(--border-color);
+
+  /* Legacy aliases (kept so existing classes keep working; mapped to the new palette) */
+  --am-bg: var(--color-bg-main);
+  --am-deco-purple: var(--color-bg-secondary);
+  --am-deco-green: var(--color-heal-soft);
+  --am-deco-yellow: var(--color-card-stat-bg);
+  --am-ink: var(--border-color);
+  --am-text: var(--color-text-primary);
+  --am-muted: var(--color-text-secondary);
+  --am-accent: var(--color-text-accent);
+  --am-round: var(--color-pink);
+  --am-title: var(--color-brand-accent);
+  --am-card: var(--color-surface);
+  --am-hover: var(--color-hover);
+  --am-confirm: var(--color-green);
+  --am-danger: var(--color-red);
+  --am-border: var(--border-width) solid var(--border-color);
+  --am-shadow: var(--sticker-shadow);
+  --am-shadow-pressed: var(--pressed-shadow);
 }
 
 @theme inline {
@@ -29,7 +114,9 @@
   --color-am-deco-green: var(--am-deco-green);
   --color-am-deco-yellow: var(--am-deco-yellow);
   --color-am-ink: var(--am-ink);
+  --color-am-text: var(--am-text);
   --color-am-muted: var(--am-muted);
+  --color-am-faint: var(--color-text-muted);
   --color-am-accent: var(--am-accent);
   --color-am-round: var(--am-round);
   --color-am-title: var(--am-title);
@@ -37,6 +124,31 @@
   --color-am-hover: var(--am-hover);
   --color-am-confirm: var(--am-confirm);
   --color-am-danger: var(--am-danger);
+
+  --color-am-brand: var(--color-brand-primary);
+  --color-am-brand-deep: var(--color-brand-deep);
+  --color-am-purple: var(--color-purple);
+  --color-am-lavender: var(--color-lavender);
+  --color-am-pink: var(--color-pink);
+  --color-am-blue: var(--color-blue);
+  --color-am-green: var(--color-green);
+  --color-am-orange: var(--color-orange);
+  --color-am-red: var(--color-red);
+  --color-am-inverse: var(--color-text-inverse);
+  --color-am-danger-text: var(--color-text-danger);
+  --color-am-success-text: var(--color-text-success);
+  --color-am-info-text: var(--color-text-info);
+  --color-am-field: var(--color-battlefield-bg);
+  --color-am-player: var(--color-player-area);
+  --color-am-opponent: var(--color-opponent-area);
+  --color-am-slot: var(--color-slot);
+  --color-am-stat: var(--color-card-stat-bg);
+  --color-am-hp-bg: var(--color-player-hp-bg);
+  --color-am-spark-bg: var(--color-spark-bg);
+  --color-am-spark-off: var(--color-spark-inactive);
+  --color-am-exhausted: var(--color-exhausted);
+  --color-am-error-bg: var(--color-error-bg);
+  --color-am-disabled: var(--color-disabled);
 
   --shadow-sticker: var(--am-shadow);
   --shadow-sticker-pressed: var(--am-shadow-pressed);
@@ -48,7 +160,7 @@
 @layer base {
   html {
     background-color: var(--am-bg);
-    color: var(--am-ink);
+    color: var(--color-text-primary);
     font-family: var(--font-body);
   }
 
@@ -56,6 +168,12 @@
     margin: 0;
     min-height: 100dvh;
     background-color: var(--am-bg);
+  }
+
+  /* Visible focus ring for keyboard users on every interactive element. */
+  :focus-visible {
+    outline: 3px solid var(--color-focus);
+    outline-offset: 2px;
   }
 }
 
@@ -76,5 +194,52 @@
   .am-pressable:not(:disabled):active {
     transform: translateY(3px);
     box-shadow: var(--am-shadow-pressed);
+  }
+}
+
+/* Game feedback (Battlefield). Short, transform/opacity-only for iPhone performance. */
+@layer utilities {
+  @keyframes am-hit {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    25% {
+      transform: translateX(-3px);
+    }
+    75% {
+      transform: translateX(3px);
+    }
+  }
+  @keyframes am-pulse {
+    0% {
+      box-shadow: 0 0 0 0 var(--am-fx, var(--color-brand-accent));
+    }
+    100% {
+      box-shadow: 0 0 0 10px transparent;
+    }
+  }
+  .am-fx-damage {
+    --am-fx: var(--color-hp-damage);
+    animation:
+      am-hit 300ms ease-out,
+      am-pulse 600ms ease-out;
+    border-radius: 999px;
+  }
+  .am-fx-heal {
+    --am-fx: var(--color-hp-heal);
+    animation: am-pulse 700ms ease-out;
+    border-radius: 999px;
+  }
+  .am-fx-attack {
+    --am-fx: var(--color-atk);
+    animation: am-pulse 500ms ease-out;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .am-fx-damage,
+    .am-fx-heal,
+    .am-fx-attack {
+      animation: none;
+    }
   }
 }
