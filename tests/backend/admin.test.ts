@@ -6,6 +6,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { createHmac, randomUUID } from "node:crypto";
 import postgres from "postgres";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { SOUND_EVENT_IDS } from "../../supabase/functions/_shared/sound-schema.ts";
 
 const url = process.env["VITE_SUPABASE_URL"];
 const key = process.env["VITE_SUPABASE_PUBLISHABLE_KEY"];
@@ -183,19 +184,7 @@ describe.runIf(run)("admin RBAC via Edge Functions", () => {
     expect((await player.call({ action: "rooms.close_stale" })).status).toBe(403);
     // Global sound settings: validated, admin-only, audited, readable by players.
     const sounds = Object.fromEntries(
-      [
-        "summon",
-        "attack",
-        "destroyed",
-        "evolve",
-        "fuse",
-        "equip",
-        "action",
-        "boost",
-        "turn",
-        "win",
-        "lose",
-      ].map((k) => [k, { preset: "pop", volume: 1, enabled: true }]),
+      SOUND_EVENT_IDS.map((k) => [k, { preset: "pop", volume: 1, enabled: true }]),
     );
     expect(
       (
