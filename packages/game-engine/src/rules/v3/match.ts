@@ -17,8 +17,8 @@ import {
 import type { Active, AutoTarget, Duration, Effect, Trigger, TriggeredPassive } from "./types.ts";
 
 /**
- * Ruleset 3 flow: core rules of spec v3.0 §4 (1v1, SPARK, Ready/Exhausted, combat,
- * Guard/Flying/Piercing/Haste) + Object abilities (docs/design/object-ability-framework.md §3).
+ * Ruleset 3 flow: core rules of spec v4.0 §4 (1v1, SPARK, Ready/Exhausted, combat,
+ * Guard/Flying/Piercing/Haste) + Object abilities (aummon_game_spec.md §5).
  */
 export type CommandErrorCode =
   | "match_finished"
@@ -424,7 +424,7 @@ function activate(ctx: Ctx, seat: Seat, instanceId: string, choice: string | und
   if (unit.exhausted) throw new CommandError("unit_exhausted");
   if (unit.activeUsed) throw new CommandError("active_used");
   if (me.spark < a.cost) throw new CommandError("not_enough_spark");
-  // Targets are validated before anything is paid (framework §3.1 step 4).
+  // Targets are validated before anything is paid (spec §5.3 step 4).
   const options = pickOptions(state, seat, unit, a);
   let targets: Target[];
   if (options) {
@@ -585,7 +585,7 @@ function findUnit(units: readonly UnitInstance[], instanceId: string): UnitInsta
 
 // ---------------------------------------------------------------- combat
 
-/** Ready Guards the attacker must hit first (spec §5.18 GUARD; R2-4). */
+/** Ready Guards the attacker must hit first (spec §5.1 GUARD; R2-4). */
 function forcingGuards(attacker: UnitInstance, defenders: readonly UnitInstance[]): UnitInstance[] {
   const flies = unitKeywords(attacker).has("flying");
   return defenders.filter((d) => {
@@ -609,7 +609,7 @@ function canTarget(
   return null;
 }
 
-/** on_attack triggers resolve before damage; then simultaneous damage + Piercing (spec §4.7, §5.14). */
+/** on_attack triggers resolve before damage; then simultaneous damage + Piercing (spec §4.6). */
 function resolveAttack(ctx: Ctx, seat: Seat, attackerId: string, target: string): void {
   const { state } = ctx;
   const me = state.players[seat];

@@ -2,6 +2,12 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-21 — 10.5 Ruleset 2 removed · Game Spec v4.0
+
+- `aummon_game_spec.md` v4.0 is the single rule source (Object Cards, Passive/Active rules, 4 keywords, 24 cards, Starter Deck v3); the temporary framework doc merged into it and deleted.
+- Removed `rules/v2` engine + tests, ruleset 2 seed rows and drift test; migration `20261121000100_drop_ruleset2_recipes.sql` drops the Evolution/Fusion recipe tables. Ruleset 2 card/deck rows on Dev stay (inactive) because finished matches reference them — history kept.
+- pgTAP: ruleset 3 catalog test replaces the ruleset 2 one. Blueprint, README and domain rules point to ruleset "3".
+
 ## 2026-11-21 — 10.3 + 10.4 Ruleset 3 live: server + UI (shipped together)
 
 - Migration `20261121000000_ruleset3.sql`: ruleset "3" allowed for cards / decks / rooms, 24 Object rows (abilities in `effect_spec`), `starter_v3`; ruleset 2 retired on the server (unfinished matches abandoned, rooms closed, `starter_v2` inactive — owner approved). Drift test `tests/architecture/seed-v3.test.ts`.

@@ -1,6 +1,6 @@
 # Rule Clarifications
 
-> เกมใช้ TCG 1v1 (Spec v3.0, `ruleset_version = "2"`) เท่านั้น. กติกาเก่า 2–4 คนและคำตีความ Q1–Q12 ถูกยกเลิก (ดูได้จาก Git history)
+> เกมใช้ Everyday Objects Battle (Spec v4.0, `ruleset_version = "3"`) เท่านั้น. Ruleset 1 (2–4 คน) และ 2 (Evolution/Fusion/Equipment) ถูกยกเลิก — R2-x ที่ยังใช้: R2-2 SPARK, R2-3 มือ 10 ใบ, R2-4 Direct Attack/Guard, R2-5 สุ่มคนเริ่ม, R2-6 Main→Battle; R2-7/R2-8 (Action) ไม่ใช้แล้ว
 
 > ไฟล์นี้ **ไม่แก้ไข** กติกาใน `aummon_game_spec.md` — บันทึกเฉพาะประเด็นที่ Spec ยังไม่ระบุหรือขัดกัน
 > **Provisional** = วิธีที่เลือกไปก่อน และจะปรับหลัง Playtest
@@ -31,7 +31,7 @@
 
 ## R3 — New direction "Everyday Objects Battle" — ✅ Owner decided 2026-11-21 (provisional until playtest)
 
-Owner approved every recommendation of the audit ("ทำตามคำแนะนำทั้งหมด") and asked to focus on the new rules, then delete the old ones. Design: `docs/design/object-ability-framework.md`; source brief: `docs/design/AumMon_New_Game_Direction_Handoff.zip`. New results need `ruleset_version = "3"`; ruleset "2" code is removed after the switch.
+Owner approved every recommendation of the audit ("ทำตามคำแนะนำทั้งหมด") and asked to focus on the new rules, then delete the old ones. Rules now in `aummon_game_spec.md` v4.0 (task 10.5); source brief: `docs/design/AumMon_New_Game_Direction_Handoff.zip`. New results need `ruleset_version = "3"`; ruleset "2" code is removed after the switch.
 
 - **D1 DEF:** not reintroduced — ATK / HP only.
 - **D2 Active:** Main Phase only, source Ready, pay SPARK (≥1), source becomes Exhausted unless the card says "no exhaust", once per turn per Object, targets checked before paying.

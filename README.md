@@ -1,7 +1,7 @@
 # AumMon
 
 Digital TCG แบบ **1v1** ธีมสิ่งของในชีวิตประจำวัน — Solo vs Server Bot, Pass & Play และ Online
-Server-authoritative · Spec v3.0 / Core Rules V1.1 (`ruleset_version = "2"`, กำลังพัฒนาใน Phase 8)
+Server-authoritative · Spec v4.0 Everyday Objects Battle (`ruleset_version = "3"`)
 
 ## เอกสารหลัก
 
@@ -58,7 +58,7 @@ Supabase local (ต้องมี Docker): `pnpm exec supabase start`
 - **Game Engine isolation:** `packages/game-engine` ห้าม import React, Supabase, `node:*`, โค้ดใน `src/` หรือ `supabase/` และห้ามใช้ `Math.random`/`Date.now` — บังคับด้วย ESLint, tsconfig (`lib: ES2022`, `types: []`) และ architecture test
 - **Server-authoritative:** Client ส่งเฉพาะเจตนา (card instance, target, choice, idempotency key) — ห้ามคำนวณผลเกมฝั่ง Client
 - **Secrets:** ตัวแปร `VITE_*` ถูก bundle ไปที่ Browser — ใส่ได้เฉพาะค่า public; Secret/Service-role key อยู่ฝั่ง Edge Functions เท่านั้น; ห้าม commit ไฟล์ `.env*` (ยกเว้น `.env.example`)
-- **Rulebook v1 ห้ามแก้:** การเปลี่ยนกติกาที่กระทบผลเกมต้องเพิ่ม `ruleset_version`
+- **กติกาที่ล็อก:** การเปลี่ยนกติกาที่กระทบผลเกมต้องได้รับอนุมัติและเพิ่ม `ruleset_version`
 - **Git:** ห้าม push ตรงเข้า `main`; ใช้ feature branch + Pull Request ที่ผ่าน CI
 
 ## Roadmap
