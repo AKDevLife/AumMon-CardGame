@@ -7,7 +7,7 @@ describe("card gallery", () => {
     render(<CardGallery />);
     expect(screen.getByText(/^24 ใบ/)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "พาหนะ" }));
-    expect(screen.getByText(/^4 ใบ/)).toBeInTheDocument();
+    expect(screen.getByText(/^3 ใบ/)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /จักรยาน/ }));
     expect(screen.getByText(/ปั่นเป็นขบวน/)).toBeInTheDocument();
     expect(screen.getByText(/^พาหนะ$/)).toBeInTheDocument();

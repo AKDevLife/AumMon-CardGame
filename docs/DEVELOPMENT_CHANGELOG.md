@@ -2,6 +2,10 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-21 — 11.2 Category rework (owner request)
+
+- CONTAINER label "ที่เก็บของ"; HOUSEHOLD replaced by FREE "อิสระ" (Objects in no other category: Umbrella, Helmet, Wooden Door, Bottle Rocket); Bottle Rocket no longer VEHICLE (affects Bicycle bonus / Toy Truck search); Vacuum ELECTRONIC only. Owner chose to keep `ruleset_version` "4" for this playtest-stage change. Migration `20261121000300_trait_rework.sql` updates the card rows; spec v5.1.
+
 ## 2026-11-21 — 11.1 Free Actives (ruleset 4) + card gallery (owner request)
 
 - Owner decisions: Active abilities cost no SPARK (other Active rules unchanged); strong cards cost more to summon (O02, O03, O05, O06, O12, O13, O14, O17, O20, O21, O24 with stats kept inside the power budget); Toy Racer's Turbo keeps the car ready to attack and puts it to sleep at end of turn; `ruleset_version` 3 → 4 (engine folder `rules/v4`, migration `20261121000200_ruleset4.sql`, unfinished ruleset 3 matches abandoned); Game Spec v5.0.

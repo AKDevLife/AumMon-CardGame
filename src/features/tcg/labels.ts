@@ -25,11 +25,12 @@ export const KEYWORD_HELP: Record<v4.Keyword, string> = {
 
 export const TRAIT_LABEL: Record<v4.Trait, string> = {
   STATIONERY: "เครื่องเขียน",
-  CONTAINER: "ภาชนะ",
+  CONTAINER: "ที่เก็บของ",
   VEHICLE: "พาหนะ",
   ELECTRONIC: "เครื่องไฟฟ้า",
   TOOL: "เครื่องมือ",
-  HOUSEHOLD: "ของใช้ในบ้าน",
+  /** Objects that belong to no other category (owner 2026-11-21). */
+  FREE: "อิสระ",
 };
 
 /** Placeholder "Living Objects" art until real illustrations exist (decision D10). */

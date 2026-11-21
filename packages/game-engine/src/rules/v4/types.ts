@@ -3,7 +3,7 @@
  * (aummon_game_spec.md v5.0, owner decisions R3 D1–D11).
  */
 export type Keyword = "haste" | "guard" | "flying" | "piercing";
-export type Trait = "STATIONERY" | "CONTAINER" | "VEHICLE" | "ELECTRONIC" | "TOOL" | "HOUSEHOLD";
+export type Trait = "STATIONERY" | "CONTAINER" | "VEHICLE" | "ELECTRONIC" | "TOOL" | "FREE";
 export type Archetype = "aggro" | "defensive" | "control" | "synergy";
 export type Rarity = "normal" | "rare" | "super_rare";
 
