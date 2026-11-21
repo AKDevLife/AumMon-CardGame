@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { soundFor } from "./sound.ts";
+import { installAudioUnlock, soundFor } from "./sound.ts";
 
 describe("game sounds", () => {
   it("maps events to sounds", () => {
@@ -39,5 +39,13 @@ describe("sound settings", () => {
     expect(c.attack).toEqual({ preset: "laser", volume: 1.5, enabled: false });
     expect(c.summon).toEqual(defaultSoundConfig().summon);
     expect(normalizeSoundConfig(null)).toEqual(defaultSoundConfig());
+  });
+});
+
+describe("installAudioUnlock", () => {
+  it("adds and removes gesture listeners without throwing", () => {
+    const cleanup = installAudioUnlock();
+    expect(typeof cleanup).toBe("function");
+    cleanup();
   });
 });

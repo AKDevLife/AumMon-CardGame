@@ -2,6 +2,10 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-21 — 9.17 Fix silent game sounds (owner report)
+
+- Stored admin sound config on Dev checked: valid, all enabled (not the cause). Cause: sounds now play from server responses (paced bot steps, polls) outside user gestures, and browsers (iOS Safari) keep the AudioContext suspended/interrupted. `installAudioUnlock()` resumes + unlocks audio on every tap/key; `play` resumes any non-running context. Owner confirmed keeping the current Guard rule.
+
 ## 2026-11-21 — 9.16 Game screen tweaks (owner request)
 
 - 📖 rules button moved to the top bar left of history (removed from settings popup); exhausted label now "💤 เหนื่อย"; folded hand drawer opens from a tap anywhere on it (cards included), closes from the header as before. E2E updated.
