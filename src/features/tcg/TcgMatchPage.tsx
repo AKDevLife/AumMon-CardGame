@@ -482,7 +482,7 @@ export function TcgMatchPage() {
           />
         )}
         {!handoff && !myTurn && !finished && (
-          <p className="text-center text-am-muted">
+          <p className="text-center font-semibold text-am-ink">
             {botActing ? "🤖 Bot กำลังเล่น…" : "รอฝ่ายตรงข้าม…"}
           </p>
         )}
