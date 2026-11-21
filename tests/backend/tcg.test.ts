@@ -107,6 +107,7 @@ describe.runIf(run)("ruleset 2 matches via Edge Functions", () => {
     for (let i = 0; i < 1500 && v.view.status !== "finished" && ownTurns < 3; i++) {
       const pick =
         v.legal.find((c) => c.type === "attack") ??
+        v.legal.find((c) => c.type === "activate") ??
         v.legal.find((c) => c.type === "summon") ??
         v.legal.find((c) => c.type === "end_turn");
       if (!pick) {

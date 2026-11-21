@@ -172,8 +172,8 @@ Owner-approved direction 2026-11-21 (R3 in `docs/rule-clarifications.md`, design
 
 - [x] **10.1** Decisions D1–D11 recorded; Object/Ability framework + 24-card prototype set + Starter Deck v3 designed; Phase 10 plan — deps: 9.18 — PR #75 (2026-11-21)
 - [x] **10.2** Engine ruleset 3 (pure TS): Object cards, 1 Passive + 1 Active, triggers, effects, durations, safety limits, card data validation, bot; simulation of the framework cards then the 24-card set — deps: 10.1 — PR #76 (2026-11-21)
-- [ ] **10.3** Database + server: additive migration for ruleset 3 cards / starter deck, seed, Edge Functions run ruleset 3 for new matches (`activate` command) — deps: 10.2
-- [ ] **10.4** UI: Object card frame with Passive/Active text, activate flow with targets, rules popup, sounds, placeholder Living-Objects art — deps: 10.3
+- [x] **10.3** Database + server: additive migration for ruleset 3 cards / starter deck, seed, Edge Functions run ruleset 3 for new matches (`activate` command) — deps: 10.2 — PR #77 (2026-11-21)
+- [x] **10.4** UI: Object card frame with Passive/Active text, activate flow with targets, rules popup, sounds, placeholder Living-Objects art — deps: 10.3 — PR #77 (2026-11-21)
 - [ ] **10.5** Remove ruleset 2 (Evolution, Fusion, Equipment, Action, recipes tables, old cards, tests); Game Spec v4.0 + blueprint/domain rules updated — deps: 10.4
 - [ ] **10.6** Owner playtest on Dev; balance pass — deps: 10.5
 

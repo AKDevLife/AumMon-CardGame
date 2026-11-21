@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { card, eventText, keywords, label, seats, shortId, yesNo } from "./format.ts";
+import { abilities, card, eventText, keywords, label, seats, shortId, yesNo } from "./format.ts";
 
 describe("admin readable formatting", () => {
   it("translates codes into Thai", () => {
@@ -13,7 +13,10 @@ describe("admin readable formatting", () => {
   });
 
   it("formats game data", () => {
-    expect(card("U001_RUBBER_DUCKLING")).toBe("เป็ดยางจิ๋ว");
+    expect(card("O01")).toBe("ดินสอไม้");
+    expect(abilities({ passive: { name: "ไส้หัก" }, active: { name: "ดีด", cost: 1 } })).toBe(
+      "🔁 ไส้หัก · ✨ ดีด (⚡1)",
+    );
     expect(keywords(["haste", "guard"])).toBe("โจมตีทันที, โล่กำบัง");
     expect(eventText({ type: "turn_ended", seat: 0 })).toBe("จบเทิร์น / จั่วการ์ด");
     expect(eventText({ type: "forfeit", seat: 1 })).toBe("ผู้เล่น 2 ยอมแพ้");

@@ -1,6 +1,6 @@
 // POST { matchId, expectedVersion, idempotencyKey, command: { type, ... } } → TcgResponse
 // Intent only: the server picks the acting seat and computes every result (spec §1.3).
-import { v2 } from "@aummon/game-engine";
+import { v3 } from "@aummon/game-engine";
 import { requireUser } from "../_shared/auth.ts";
 import { handler, HttpError, readJson } from "../_shared/http.ts";
 import { int, rejectServerFields, uuid } from "../_shared/input.ts";
@@ -31,32 +31,21 @@ function parseCommand(raw: unknown): Intent {
     case "mulligan":
       return { type: "mulligan", instanceIds: idList(c["instanceIds"], "instanceIds", 0, 5) };
     case "summon":
-    case "boost":
-      return { type: c["type"], instanceId: idValue(c["instanceId"], "instanceId") };
-    case "play_action":
-      return c["choice"] === undefined
-        ? { type: "play_action", instanceId: idValue(c["instanceId"], "instanceId") }
+      return { type: "summon", instanceId: idValue(c["instanceId"], "instanceId") };
+    case "activate":
+      return c["target"] === undefined
+        ? { type: "activate", instanceId: idValue(c["instanceId"], "instanceId") }
         : {
-            type: "play_action",
+            type: "activate",
             instanceId: idValue(c["instanceId"], "instanceId"),
-            choice: idValue(c["choice"], "choice"),
+            target: idValue(c["target"], "target"),
           };
-    case "attach":
-      return {
-        type: "attach",
-        instanceId: idValue(c["instanceId"], "instanceId"),
-        unitId: idValue(c["unitId"], "unitId"),
-      };
     case "attack":
       return {
         type: "attack",
         attackerId: idValue(c["attackerId"], "attackerId"),
         target: idValue(c["target"], "target"),
       };
-    case "evolve":
-      return { type: "evolve", unitId: idValue(c["unitId"], "unitId") };
-    case "fuse":
-      return { type: "fuse", unitIds: idList(c["unitIds"], "unitIds", 2, 2) };
     case "end_turn":
     case "forfeit":
       return { type: c["type"] };
@@ -83,9 +72,9 @@ Deno.serve(
       receipt: { key, hash },
       act: (state, seat, rng) =>
         // Shape validated above; the engine validates every rule and throws CommandError otherwise.
-        v2.applyCommand(
+        v3.applyCommand(
           state,
-          { ...intent, playerId: state.players[seat].playerId } as v2.Command,
+          { ...intent, playerId: state.players[seat].playerId } as v3.Command,
           rng,
         ),
     });

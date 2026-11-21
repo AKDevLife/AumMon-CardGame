@@ -1,4 +1,4 @@
-// POST { mode: "solo" } | { mode: "pass_play", names: [string, string] } → { matchId }   (ruleset 2)
+// POST { mode: "solo" } | { mode: "pass_play", names: [string, string] } → { matchId }   (ruleset 3)
 import { requireUser } from "../_shared/auth.ts";
 import { handler, HttpError, readJson } from "../_shared/http.ts";
 import { oneOf } from "../_shared/input.ts";

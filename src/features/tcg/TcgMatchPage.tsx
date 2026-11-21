@@ -1,4 +1,4 @@
-import { v2 } from "@aummon/game-engine";
+import { v3 } from "@aummon/game-engine";
 import { REALTIME_SUBSCRIBE_STATES } from "@supabase/supabase-js";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router";
@@ -6,7 +6,14 @@ import { StickerButton } from "../../components/StickerButton.tsx";
 import { ApiError, callFunction } from "../../lib/api.ts";
 import { useAuth } from "../auth/auth-context.ts";
 import { HandoffScreen } from "../passplay/HandoffScreen.tsx";
-import { cardName, commandLabel, commandSubjects, historyByTurn, phaseLabel } from "./labels.ts";
+import {
+  cardName,
+  commandLabel,
+  commandSubjects,
+  commandTarget,
+  historyByTurn,
+  phaseLabel,
+} from "./labels.ts";
 import { CardFrame, EmptySlot } from "./CardFrame.tsx";
 import { CardBack, DeckPile, HeartIcon, SparkIcon } from "./GameIcons.tsx";
 import { Popup } from "./Popup.tsx";
@@ -48,6 +55,8 @@ export function TcgMatchPage() {
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
+  /** Card shown in the read-only info popup (tap any Object to read its abilities). */
+  const [info, setInfo] = useState<string | null>(null);
   const [mulligan, setMulligan] = useState<Set<string>>(new Set());
   const [muted, setMutedState] = useState(isMuted);
   const lastEvent = useRef<string | null>(null);
@@ -200,26 +209,26 @@ export function TcgMatchPage() {
 
   const { view } = data;
   const mySeat = data.seat ?? view.seat;
-  const foeSeat: v2.Seat = mySeat === 0 ? 1 : 0;
+  const foeSeat: v3.Seat = mySeat === 0 ? 1 : 0;
   const me = view.players[mySeat];
   const foe = view.players[foeSeat];
   const finished = view.status === "finished";
   const handoff =
     data.mode === "pass_play" && !finished && data.seat === null && data.actingSeat !== null;
   const myTurn = data.legal.length > 0;
-  const selectedName = (() => {
-    const inHand = view.myHand.find((c) => c.instanceId === selected);
-    const onBoard = me.units.find((u) => u.instanceId === selected);
-    const id = inHand?.cardId ?? onBoard?.cardId;
-    return id ? cardName(id) : "";
-  })();
+  const selectedCardId =
+    view.myHand.find((c) => c.instanceId === selected)?.cardId ??
+    me.units.find((u) => u.instanceId === selected)?.cardId ??
+    null;
+  const selectedName = selectedCardId ? cardName(selectedCardId) : "";
   const choicesFor = (id: string | null) =>
     data.legal.filter((c) => id !== null && commandSubjects(c).includes(id));
   /** Units the selected attacker may hit (green "valid target" ring). */
   const targetIds = new Set(
-    choicesFor(selected).flatMap((c) =>
-      c.type === "attack" && c.target !== "player" ? [c.target] : [],
-    ),
+    choicesFor(selected).flatMap((c) => {
+      const t = commandTarget(c);
+      return t ? [t] : [];
+    }),
   );
   const choices = data.legal.filter(
     (c) => selected !== null && commandSubjects(c).includes(selected),
@@ -231,31 +240,16 @@ export function TcgMatchPage() {
   const sortedHand = [...view.myHand].sort(
     (a, b) => Number(playableIds.has(b.instanceId)) - Number(playableIds.has(a.instanceId)),
   );
-  const draggedDef = drag ? v2.getCardDefinition(drag.cardId) : null;
   const dragSummon = drag
     ? data.legal.find((c) => c.type === "summon" && c.instanceId === drag.instanceId)
     : undefined;
 
-  /** Drag & drop: unit → empty slot summons; equipment → one of your units attaches; others open the command popup. */
-  const onDrop = (instanceId: string, cardId: string, target: DropTarget) => {
+  /** Drag & drop: an Object dropped on an empty slot / the field is summoned. */
+  const onDrop = (instanceId: string, target: DropTarget) => {
     if (!target) return;
-    const def = v2.getCardDefinition(cardId);
-    const mine = data.legal.filter((c) => commandSubjects(c).includes(instanceId));
-    if (def.cardType === "unit") {
-      const summon = mine.find((c) => c.type === "summon");
-      if (summon && (target.kind === "slot" || target.kind === "field")) void send(summon);
-      else if (!summon) setError("ยังลงตัวละครนี้ไม่ได้ (พลังงานไม่พอ / สนามเต็ม / ไม่ใช่ช่วงลงการ์ด)");
-      return;
-    }
-    if (def.cardType === "equipment" && target.kind === "unit") {
-      const attach = mine.find((c) => c.type === "attach" && c.unitId === target.unitId);
-      if (attach) {
-        void send(attach);
-        return;
-      }
-    }
-    if (mine.length > 0) setSelected(instanceId);
-    else setError("ยังใช้การ์ดนี้ไม่ได้ตอนนี้");
+    const summon = data.legal.find((c) => c.type === "summon" && c.instanceId === instanceId);
+    if (summon && (target.kind === "slot" || target.kind === "field")) void send(summon);
+    else if (!summon) setError("ยังลงการ์ดนี้ไม่ได้ (พลังงานไม่พอ / สนามเต็ม / ไม่ใช่ช่วงลงการ์ด)");
   };
 
   const send = async (command: Record<string, unknown>) => {
@@ -401,11 +395,15 @@ export function TcgMatchPage() {
               compact
               cardId={u.cardId}
               unit={u}
+              side={foe.units}
               validTarget={targetIds.has(u.instanceId)}
+              onSelect={() => {
+                setInfo(u.cardId);
+              }}
             />
           ))}
           {Array.from(
-            { length: Math.max(0, v2.RULESET_V2.maxUnits - foe.units.length) },
+            { length: Math.max(0, v3.RULESET_V3.maxUnits - foe.units.length) },
             (_, i) => (
               <EmptySlot key={i} />
             ),
@@ -424,25 +422,18 @@ export function TcgMatchPage() {
                 cardId={u.cardId}
                 unit={u}
                 selected={selected === u.instanceId}
-                validTarget={
-                  drag !== null &&
-                  data.legal.some(
-                    (c) =>
-                      c.type === "attach" &&
-                      c.instanceId === drag.instanceId &&
-                      c.unitId === u.instanceId,
-                  )
-                }
-                {...(!handoff &&
-                  playableIds.has(u.instanceId) && {
-                    onSelect: () => {
-                      setSelected(u.instanceId);
-                    },
-                  })}
+                side={me.units}
+                validTarget={targetIds.has(u.instanceId)}
+                {...(!handoff && {
+                  onSelect: () => {
+                    if (playableIds.has(u.instanceId)) setSelected(u.instanceId);
+                    else setInfo(u.cardId);
+                  },
+                })}
               />
             </div>
           ))}
-          {Array.from({ length: Math.max(0, v2.RULESET_V2.maxUnits - me.units.length) }, (_, i) => (
+          {Array.from({ length: Math.max(0, v3.RULESET_V3.maxUnits - me.units.length) }, (_, i) => (
             <EmptySlot key={i} drop active={dragSummon !== undefined} />
           ))}
         </div>
@@ -509,7 +500,7 @@ export function TcgMatchPage() {
           >
             <span aria-hidden="true" className="h-1.5 w-11 rounded-full bg-am-lavender" />
             <span className="text-xs font-semibold">
-              การ์ดในมือ {view.myHand.length}/{v2.RULESET_V2.maxHand} ·{" "}
+              การ์ดในมือ {view.myHand.length}/{v3.RULESET_V3.maxHand} ·{" "}
               {handOpen ? "แตะเพื่อพับเก็บ" : "แตะเพื่อเปิด"}
             </span>
           </button>
@@ -525,7 +516,7 @@ export function TcgMatchPage() {
                       setDrag(p ? { instanceId: c.instanceId, cardId: c.cardId, ...p } : null);
                     }}
                     onDrop={(target) => {
-                      onDrop(c.instanceId, c.cardId, target);
+                      onDrop(c.instanceId, target);
                     }}
                   >
                     <CardFrame
@@ -588,20 +579,14 @@ export function TcgMatchPage() {
         </div>
       )}
 
-      {drag && draggedDef && (
+      {drag && (
         <div
           aria-hidden="true"
           className="am-sticker pointer-events-none fixed z-30 w-24 -translate-x-1/2 -translate-y-full rotate-3 bg-am-card p-2 text-xs font-bold shadow-sticker"
           style={{ left: drag.x, top: drag.y }}
         >
           {cardName(drag.cardId)}
-          <div className="mt-1 text-[10px] font-semibold text-am-muted">
-            {draggedDef.cardType === "unit"
-              ? "วางในช่องว่าง"
-              : draggedDef.cardType === "equipment"
-                ? "วางบนตัวละคร"
-                : "วางบนสนาม"}
-          </div>
+          <div className="mt-1 text-[10px] font-semibold text-am-muted">วางในช่องว่าง</div>
         </div>
       )}
 
@@ -612,13 +597,24 @@ export function TcgMatchPage() {
           setSelected(null);
         }}
       >
-        <div role="group" aria-label="Actions" className="flex flex-col gap-2">
+        {selectedCardId && <CardFrame cardId={selectedCardId} />}
+        <div role="group" aria-label="Actions" className="mt-2 flex flex-col gap-2">
           {choices.map((c, i) => (
             <StickerButton key={i} disabled={pending} onClick={() => void send(c)}>
-              {commandLabel(c, view, selected ?? undefined)}
+              {commandLabel(c, view)}
             </StickerButton>
           ))}
         </div>
+      </Popup>
+
+      <Popup
+        title={info ? cardName(info) : "การ์ด"}
+        open={info !== null}
+        onClose={() => {
+          setInfo(null);
+        }}
+      >
+        {info && <CardFrame cardId={info} />}
       </Popup>
 
       <Popup

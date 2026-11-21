@@ -2,6 +2,12 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-21 — 10.3 + 10.4 Ruleset 3 live: server + UI (shipped together)
+
+- Migration `20261121000000_ruleset3.sql`: ruleset "3" allowed for cards / decks / rooms, 24 Object rows (abilities in `effect_spec`), `starter_v3`; ruleset 2 retired on the server (unfinished matches abandoned, rooms closed, `starter_v2` inactive — owner approved). Drift test `tests/architecture/seed-v3.test.ts`.
+- Edge Functions (`tcg-*`, lobby, account-delete, admin-api) run ruleset 3; `tcg-command` accepts `activate` (instance + optional target) and drops Action/Equipment/Evolution/Fusion/Boost commands. `RULESET_VERSION = "3"`.
+- UI: card frame with placeholder Living-Objects art (emoji), 🔁 Passive / ✨ Active lines, effective stats with static auras; tap any Object (own or opponent) for an info popup; command popup shows the full card + ability targets; drag & drop summons; rules text rewritten; sounds `ability` / `passive` replace evolve / fuse / equip / action / boost; admin card list shows abilities.
+
 ## 2026-11-21 — 10.2 Engine ruleset 3 (Everyday Objects)
 
 - `packages/game-engine/src/rules/v3` (exported as `v3`, engine 0.3.0): 24 Object cards, Starter Deck v3, Passive (static auras / triggered on_summon, on_attack, on_destroyed, on_turn_start, on_turn_end) + Active (`activate` command: Main Phase, Ready, SPARK, exhaust unless no-exhaust, once per turn, targets validated before paying), 9 effect types, 3 durations, trigger queue (active player first, by slot), destroy-until-stable state checks, 100-effects-per-command loop guard, card data validator, normal bot.

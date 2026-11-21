@@ -1,4 +1,4 @@
-import { createSeededRandom, v2 } from "@aummon/game-engine";
+import { createSeededRandom, v3 } from "@aummon/game-engine";
 import { describe, expect, it } from "vitest";
 import {
   actingSeat,
@@ -8,12 +8,12 @@ import {
   type TcgRuntime,
 } from "../../supabase/functions/_shared/tcg-flow.ts";
 
-const T = v2.RULESET_V2.turnTimeoutMs;
+const T = v3.RULESET_V3.turnTimeoutMs;
 
 function runtime(): TcgRuntime {
   const rng = createSeededRandom([3, 1, 4, 1]);
-  const state = v2.initializeMatch(
-    { playerIds: ["h", "b"], decks: [v2.STARTER_DECK_V2, v2.STARTER_DECK_V2] },
+  const state = v3.initializeMatch(
+    { playerIds: ["h", "b"], decks: [v3.STARTER_DECK_V3, v3.STARTER_DECK_V3] },
     rng,
   );
   return { state, rng: rng.getState(), deadline: null };
@@ -52,7 +52,7 @@ describe("ruleset 2 server flow", () => {
     rt = advanceTcg(
       {
         ...rt,
-        state: v2.applyCommand(
+        state: v3.applyCommand(
           rt.state,
           { type: "mulligan", playerId: human, instanceIds: [] },
           rng,
@@ -66,7 +66,7 @@ describe("ruleset 2 server flow", () => {
       rt = advanceTcg(
         {
           ...rt,
-          state: v2.applyCommand(rt.state, { type: "end_turn", playerId: human }, rng).state,
+          state: v3.applyCommand(rt.state, { type: "end_turn", playerId: human }, rng).state,
           deadline: null,
         },
         kinds,

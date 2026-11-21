@@ -4,6 +4,7 @@ import { StickerButton } from "../../components/StickerButton.tsx";
 import { ApiError, callFunction } from "../../lib/api.ts";
 import { useAuth } from "../auth/auth-context.ts";
 import {
+  abilities,
   ago,
   card,
   dateTime,
@@ -12,7 +13,6 @@ import {
   label,
   seats,
   shortId,
-  yesNo,
 } from "./format.ts";
 import { gateFromError, gateFromMe, SECTIONS, type AdminGate, type SectionId } from "./guard.ts";
 import { MfaPanel } from "./MfaPanel.tsx";
@@ -340,47 +340,19 @@ export function AdminPage() {
       case "cards":
         return (
           <>
-            <Section title="การ์ดทั้งหมด">
+            <Section title="การ์ดทั้งหมด (สิ่งของมีชีวิต)">
               <RowList
                 rows={asRows(field(data, "cards"))}
                 title={(r) => text(r["name"])}
                 columns={[
-                  { label: "ประเภท", value: (r) => label("cardType", r["card_type"]) },
-                  {
-                    label: "ร่าง",
-                    value: (r) =>
-                      r["stage"] === 0 ? "ร่างพื้นฐาน" : r["stage"] === 1 ? "ร่างพัฒนา" : "ร่างรวม",
-                  },
                   { label: "ค่าพลังงาน", value: (r) => `${text(r["cost"])} พลังงาน` },
                   {
                     label: "พลัง",
-                    value: (r) =>
-                      r["card_type"] === "unit"
-                        ? `โจมตี ${text(r["atk"])} · พลังชีวิต ${text(r["hp"])}`
-                        : "—",
+                    value: (r) => `โจมตี ${text(r["atk"])} · พลังชีวิต ${text(r["hp"])}`,
                   },
-                  { label: "ความสามารถ", value: (r) => keywords(r["keywords"]) },
+                  { label: "คำสำคัญ", value: (r) => keywords(r["keywords"]) },
+                  { label: "ความสามารถ", value: (r) => abilities(r["effect_spec"]) },
                   { label: "ความหายาก", value: (r) => label("rarity", r["rarity"]) },
-                  { label: "ใส่ใน Deck ได้", value: (r) => yesNo(r["deckable"]) },
-                ]}
-              />
-            </Section>
-            <Section title="สูตรพัฒนาร่าง" help="ตัวละครร่างพื้นฐานจ่ายพลังงานเพื่อเปลี่ยนเป็นร่างใหม่">
-              <RowList
-                rows={asRows(field(data, "evolutions"))}
-                title={(r) => `${card(r["source_card_id"])} → ${card(r["target_card_id"])}`}
-                columns={[{ label: "ค่าพลังงาน", value: (r) => `${text(r["cost"])} พลังงาน` }]}
-              />
-            </Section>
-            <Section title="สูตรรวมร่าง" help="รวมตัวละคร 2 ตัวบนสนามเป็นตัวใหม่">
-              <RowList
-                rows={asRows(field(data, "fusions"))}
-                title={(r) =>
-                  `${card(r["parent_a_card_id"])} + ${card(r["parent_b_card_id"])} → ${card(r["result_card_id"])}`
-                }
-                columns={[
-                  { label: "ค่าพลังงาน", value: (r) => `${text(r["cost"])} พลังงาน` },
-                  { label: "รับความสามารถ", value: (r) => keywords(r["inherited_keywords"]) },
                 ]}
               />
             </Section>

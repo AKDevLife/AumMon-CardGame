@@ -129,7 +129,7 @@ describe.runIf(run)("admin RBAC via Edge Functions", () => {
     expect(overview.status).toBe(200);
     expect(JSON.stringify(overview.body)).not.toMatch(/internal_state|rng_state|service_role/);
     const cards = await admin.call({ action: "cards" });
-    expect((cards.body["cards"] as unknown[]).length).toBe(25);
+    expect((cards.body["cards"] as unknown[]).length).toBe(24);
     expect((await admin.call({ action: "settings" })).body["env"]).toBe("development");
   });
 
