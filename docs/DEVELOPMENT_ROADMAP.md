@@ -157,5 +157,6 @@ Owner request 2026-11-20 (dev tooling; production tasks 6.8/7.3/7.8 stay deferre
 - [x] **9.9** Fix settings → rules/forfeit doing nothing; in-popup forfeit confirmation; synthesized sound effects for game actions with mute toggle — deps: 9.8 — PR #65 (2026-11-20)
 - [x] **9.11** Admin sound settings: 17-sound library, per game moment choose sound / volume 0–200% / on-off with preview; global for all players (`public.game_settings`, admin-only audited writes) — deps: 9.9 — PR #67 (2026-11-20)
 - [x] **9.12** Home: "วิธีเล่น & กติกา" button → rules popup (secondary style, works signed out) — deps: 9.9 — PR #68 (2026-11-20)
+- [x] **9.13** Color Design System — Theme A Balanced: global + semantic tokens, lobby, battlefield (player/opponent areas, slots, targets), card frame, buttons, HP/SPARK, 6 keyword badges, effects, alerts, popups; `docs/color_design_system.md` — deps: 9.12 — PR #69 (2026-11-21)
 
 **Acceptance:** admin logs in without Register · non-admins get 403 on every admin action · players cannot self-grant · MFA enforced server-side · audited mutations · no secret in the client bundle · per-environment bootstrap documented (`docs/ADMIN.md`)

@@ -2,6 +2,12 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-21 — 9.13 Color Design System (Theme A · Balanced, owner approved)
+
+- Tokens: approved palette + semantic tokens in `src/styles/index.css` (legacy `--am-*` aliases remapped, so every page follows); global focus ring; feedback animations (damage/heal/attack, reduced-motion safe).
+- Applied: home hero (deep purple + golden title), yellow Play CTAs, button variants with disabled/hover/pressed/focus states; battlefield with pink opponent / blue player areas, dashed empty slots, yellow selection + green valid-target rings; new `CardFrame` (title band, ATK/HP stat chips, SPARK cost, Evolution/Fusion stripes, exhausted label); keyword badges with icon + Thai text + color (6 incl. Draw/Search); HP pink heart, SPARK blue bolt with pips; victory/defeat panels; alerts and popups.
+- Doc: `docs/color_design_system.md` (palette, mappings, contrast table, usage rules). Display only — engine, rules, schema, auth and game flow untouched.
+
 ## 2026-11-20 — 9.12 Home rules popup (owner request)
 
 - `HomePage`: secondary pill button "📖 วิธีเล่น & กติกา" under the mode buttons (lighter than play actions, available signed out) opens the shared rules popup with a "เข้าใจแล้ว" close button. Test in `routes.test.tsx`.

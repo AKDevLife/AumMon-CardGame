@@ -71,7 +71,10 @@ export function PassPlaySetupPage() {
         </label>
       ))}
       {error && (
-        <p role="alert" className="border-l-4 border-am-danger pl-2 font-semibold">
+        <p
+          role="alert"
+          className="rounded-lg border-l-4 border-am-red bg-am-error-bg px-2 py-1 font-semibold text-am-danger-text"
+        >
           {error}
         </p>
       )}

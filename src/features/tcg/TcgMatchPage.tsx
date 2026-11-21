@@ -6,16 +6,8 @@ import { StickerButton } from "../../components/StickerButton.tsx";
 import { ApiError, callFunction } from "../../lib/api.ts";
 import { useAuth } from "../auth/auth-context.ts";
 import { HandoffScreen } from "../passplay/HandoffScreen.tsx";
-import {
-  cardName,
-  cardText,
-  commandLabel,
-  commandSubjects,
-  describeEvent,
-  KEYWORD_HELP,
-  KEYWORD_LABEL,
-  phaseLabel,
-} from "./labels.ts";
+import { cardName, commandLabel, commandSubjects, describeEvent, phaseLabel } from "./labels.ts";
+import { CardFrame, EmptySlot } from "./CardFrame.tsx";
 import { CardBack, DeckPile, HeartIcon, SparkIcon } from "./GameIcons.tsx";
 import { Popup } from "./Popup.tsx";
 import { RulesText } from "./RulesText.tsx";
@@ -45,90 +37,6 @@ function useCountdown(deadline: string | null): number | null {
   return deadline ? Math.max(0, Math.ceil((Date.parse(deadline) - now) / 1000)) : null;
 }
 
-function UnitTile({
-  unit,
-  selected,
-  onSelect,
-}: {
-  unit: v2.UnitInstance;
-  selected: boolean;
-  onSelect?: () => void;
-}) {
-  const keywords = [...v2.unitKeywords(unit)];
-  return (
-    <button
-      type="button"
-      disabled={!onSelect}
-      aria-pressed={selected}
-      onClick={onSelect}
-      className={`am-sticker am-pressable flex min-h-28 flex-col gap-0.5 p-2 text-left ${selected ? "bg-am-hover" : "bg-am-card"} ${unit.exhausted ? "opacity-70" : ""}`}
-    >
-      <span className="font-display text-sm font-bold leading-tight">{cardName(unit.cardId)}</span>
-      <span className="font-display font-bold tabular-nums">
-        ⚔️ {v2.unitAtk(unit)} · ❤️ {v2.unitHp(unit)}/{v2.unitMaxHp(unit)}
-      </span>
-      {keywords.length > 0 && (
-        <span className="text-[11px] font-semibold text-am-accent">
-          {keywords.map((k) => (
-            <abbr key={k} title={KEYWORD_HELP[k]} className="mr-1 no-underline">
-              {KEYWORD_LABEL[k]}
-            </abbr>
-          ))}
-        </span>
-      )}
-      {unit.equipment.length > 0 && (
-        <span className="text-[11px] text-am-muted">
-          🔧 {unit.equipment.map((e) => cardName(e.cardId)).join(", ")}
-        </span>
-      )}
-      {unit.exhausted && <span className="text-[11px] text-am-muted">💤 เหนื่อย (โจมตีไม่ได้)</span>}
-    </button>
-  );
-}
-
-function HandCard({
-  card,
-  selected,
-  marked,
-  disabled,
-  onSelect,
-}: {
-  card: v2.CardInstance;
-  selected: boolean;
-  marked?: boolean;
-  disabled: boolean;
-  onSelect: () => void;
-}) {
-  const def = v2.getCardDefinition(card.cardId);
-  return (
-    <button
-      type="button"
-      disabled={disabled}
-      aria-pressed={selected || marked}
-      onClick={onSelect}
-      className={`am-sticker am-pressable flex min-h-28 flex-col gap-0.5 p-2 text-left disabled:opacity-60 ${selected || marked ? "bg-am-hover" : "bg-am-card"}`}
-    >
-      <span className="flex items-center justify-between gap-1">
-        <span className="font-display text-sm font-bold leading-tight">{def.name}</span>
-        <span
-          aria-label={`ใช้พลังงาน ${String(def.cost)}`}
-          className="rounded-full bg-am-title px-2 text-xs font-bold"
-        >
-          {def.cost}
-        </span>
-      </span>
-      {def.cardType === "unit" ? (
-        <span className="text-xs font-semibold">
-          ⚔️ {def.atk} · ❤️ {def.hp} {def.keywords.map((k) => KEYWORD_LABEL[k]).join(" ")}
-        </span>
-      ) : (
-        <span className="text-[11px] leading-tight text-am-muted">{cardText(card.cardId)}</span>
-      )}
-      {marked && <span className="text-[11px] font-bold">↩︎ เปลี่ยน</span>}
-    </button>
-  );
-}
-
 export function TcgMatchPage() {
   const { matchId = "" } = useParams();
   const auth = useAuth();
@@ -140,6 +48,7 @@ export function TcgMatchPage() {
   const [mulligan, setMulligan] = useState<Set<string>>(new Set());
   const [muted, setMutedState] = useState(isMuted);
   const lastEvent = useRef<string | null>(null);
+  const [attackFx, setAttackFx] = useState(false);
   const [popup, setPopup] = useState<"history" | "settings" | "rules" | "forfeit" | null>(null);
   const idem = useRef<{ key: string; body: string } | null>(null);
   const passPlay = useRef(false);
@@ -223,6 +132,14 @@ export function TcgMatchPage() {
       const fresh = data.events.slice(from + 1);
       const seat = data.mode === "pass_play" ? null : data.seat;
       const names = [...new Set(fresh.map((e) => soundFor(e, seat)).filter((n) => n !== null))];
+      if (fresh.some((e) => e.type === "attacked")) {
+        setTimeout(() => {
+          setAttackFx(true);
+        }, 0);
+        setTimeout(() => {
+          setAttackFx(false);
+        }, 550);
+      }
       names.slice(0, 3).forEach((n, i) => {
         setTimeout(() => {
           playSound(n);
@@ -259,6 +176,14 @@ export function TcgMatchPage() {
     const id = inHand?.cardId ?? onBoard?.cardId;
     return id ? cardName(id) : "";
   })();
+  const choicesFor = (id: string | null) =>
+    data.legal.filter((c) => id !== null && commandSubjects(c).includes(id));
+  /** Units the selected attacker may hit (green "valid target" ring). */
+  const targetIds = new Set(
+    choicesFor(selected).flatMap((c) =>
+      c.type === "attack" && c.target !== "player" ? [c.target] : [],
+    ),
+  );
   const choices = data.legal.filter(
     (c) => selected !== null && commandSubjects(c).includes(selected),
   );
@@ -334,7 +259,14 @@ export function TcgMatchPage() {
       </div>
 
       {finished && (
-        <div role="status" className="am-sticker bg-am-title p-4 text-center">
+        <div
+          role="status"
+          className={`am-sticker p-4 text-center ${
+            data.mode !== "pass_play" && winner !== null && winner !== mySeat
+              ? "bg-am-error-bg text-am-danger-text" /* defeat */
+              : "border-b-am-pink bg-am-title text-am-text" /* victory / draw */
+          }`}
+        >
           <h1 className="font-display text-3xl font-bold">
             {winner === null
               ? "เสมอ!"
@@ -349,71 +281,94 @@ export function TcgMatchPage() {
       )}
 
       <div
-        aria-label="Opponent"
-        className="am-sticker flex flex-wrap items-center justify-between gap-2 bg-am-deco-purple p-3"
+        className={`am-sticker flex flex-col gap-2 bg-am-field p-2 ${attackFx ? "am-fx-attack" : ""}`}
       >
-        <span className="font-display font-bold">
-          {data.names[foeSeat]}
-          {data.mode === "online" && (
-            <span
-              aria-label={online.has(String(foeSeat)) ? "ออนไลน์" : "ออฟไลน์"}
-              className={`ml-2 inline-block h-2.5 w-2.5 rounded-full ${online.has(String(foeSeat)) ? "bg-am-confirm" : "bg-am-muted"}`}
-            />
-          )}
-        </span>
-        <span className="flex items-center gap-2">
-          <HeartIcon value={Math.max(0, foe.hp)} />
-          <SparkIcon value={foe.spark} max={foe.maxSpark} />
-          <DeckPile count={foe.deckCount} />
-        </span>
-        <span
-          role="img"
-          aria-label={`การ์ดในมือคู่ต่อสู้ ${String(foe.handCount)} ใบ`}
-          className="flex w-full flex-wrap gap-1"
+        <div
+          aria-label="Opponent"
+          className="am-sticker flex flex-wrap items-center justify-between gap-2 bg-am-opponent p-3"
         >
-          {Array.from({ length: foe.handCount }, (_, i) => (
-            <CardBack key={i} small />
+          <span className="font-display font-bold">
+            {data.names[foeSeat]}
+            {data.mode === "online" && (
+              <span
+                aria-label={online.has(String(foeSeat)) ? "ออนไลน์" : "ออฟไลน์"}
+                className={`ml-2 inline-block h-2.5 w-2.5 rounded-full ${online.has(String(foeSeat)) ? "bg-am-green" : "bg-am-faint"}`}
+              />
+            )}
+          </span>
+          <span className="flex items-center gap-2">
+            <HeartIcon value={Math.max(0, foe.hp)} />
+            <SparkIcon value={foe.spark} max={foe.maxSpark} />
+            <DeckPile count={foe.deckCount} />
+          </span>
+          <span
+            role="img"
+            aria-label={`การ์ดในมือคู่ต่อสู้ ${String(foe.handCount)} ใบ`}
+            className="flex w-full flex-wrap gap-1"
+          >
+            {Array.from({ length: foe.handCount }, (_, i) => (
+              <CardBack key={i} small />
+            ))}
+          </span>
+        </div>
+        <div
+          role="group"
+          aria-label="Opponent units"
+          className="grid grid-cols-3 gap-2 rounded-2xl bg-am-opponent/50 p-2"
+        >
+          {foe.units.map((u) => (
+            <CardFrame
+              key={u.instanceId}
+              cardId={u.cardId}
+              unit={u}
+              validTarget={targetIds.has(u.instanceId)}
+            />
           ))}
-        </span>
-      </div>
-      <div role="group" aria-label="Opponent units" className="grid min-h-28 grid-cols-3 gap-2">
-        {foe.units.map((u) => (
-          <UnitTile key={u.instanceId} unit={u} selected={false} />
-        ))}
-      </div>
+          {Array.from(
+            { length: Math.max(0, v2.RULESET_V2.maxUnits - foe.units.length) },
+            (_, i) => (
+              <EmptySlot key={i} />
+            ),
+          )}
+        </div>
 
-      <div
-        role="group"
-        aria-label="Your units"
-        className="grid min-h-28 grid-cols-3 gap-2 border-t-[3px] border-dashed border-am-muted pt-3"
-      >
-        {me.units.map((u) => (
-          <UnitTile
-            key={u.instanceId}
-            unit={u}
-            selected={selected === u.instanceId}
-            {...(!handoff &&
-              playableIds.has(u.instanceId) && {
-                onSelect: () => {
-                  setSelected(u.instanceId);
-                },
-              })}
-          />
-        ))}
-      </div>
+        <div
+          role="group"
+          aria-label="Your units"
+          className="grid grid-cols-3 gap-2 rounded-2xl bg-am-player/60 p-2"
+        >
+          {me.units.map((u) => (
+            <CardFrame
+              key={u.instanceId}
+              cardId={u.cardId}
+              unit={u}
+              selected={selected === u.instanceId}
+              {...(!handoff &&
+                playableIds.has(u.instanceId) && {
+                  onSelect: () => {
+                    setSelected(u.instanceId);
+                  },
+                })}
+            />
+          ))}
+          {Array.from({ length: Math.max(0, v2.RULESET_V2.maxUnits - me.units.length) }, (_, i) => (
+            <EmptySlot key={i} />
+          ))}
+        </div>
 
-      <div
-        aria-label="You"
-        className="am-sticker flex flex-wrap items-center justify-between gap-2 bg-am-deco-green p-3"
-      >
-        <span className="font-display font-bold">
-          {data.mode === "pass_play" ? data.names[mySeat] : `${data.names[mySeat]} (คุณ)`}
-        </span>
-        <span className="flex items-center gap-2">
-          <HeartIcon value={Math.max(0, me.hp)} />
-          <SparkIcon value={me.spark} max={me.maxSpark} />
-          <DeckPile count={me.deckCount} />
-        </span>
+        <div
+          aria-label="You"
+          className="am-sticker flex flex-wrap items-center justify-between gap-2 bg-am-player p-3"
+        >
+          <span className="font-display font-bold">
+            {data.mode === "pass_play" ? data.names[mySeat] : `${data.names[mySeat]} (คุณ)`}
+          </span>
+          <span className="flex items-center gap-2">
+            <HeartIcon value={Math.max(0, me.hp)} />
+            <SparkIcon value={me.spark} max={me.maxSpark} />
+            <DeckPile count={me.deckCount} />
+          </span>
+        </div>
       </div>
 
       {handoff && data.actingSeat !== null && (
@@ -436,12 +391,13 @@ export function TcgMatchPage() {
           </h2>
           <div role="group" aria-label="Hand" className="grid grid-cols-3 gap-2">
             {view.myHand.map((c) => (
-              <HandCard
+              <CardFrame
                 key={c.instanceId}
-                card={c}
+                cardId={c.cardId}
                 selected={selected === c.instanceId}
                 marked={mulligan.has(c.instanceId)}
                 disabled={pending || (!canMulligan && !playableIds.has(c.instanceId))}
+                dimmed={!canMulligan && !playableIds.has(c.instanceId)}
                 onSelect={() => {
                   if (canMulligan) {
                     const next = new Set(mulligan);
@@ -498,7 +454,10 @@ export function TcgMatchPage() {
       )}
 
       {error && (
-        <p role="alert" className="border-l-4 border-am-danger pl-2 font-semibold">
+        <p
+          role="alert"
+          className="rounded-lg border-l-4 border-am-red bg-am-error-bg px-2 py-1 font-semibold text-am-danger-text"
+        >
           {error}
         </p>
       )}

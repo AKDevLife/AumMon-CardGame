@@ -9,6 +9,15 @@ export const KEYWORD_LABEL: Record<v2.Keyword, string> = {
   boost: "เร่งพลัง",
 };
 
+/** Keyword badge style: icon + color token (never color alone). */
+export const KEYWORD_STYLE: Record<v2.Keyword, { icon: string; color: string }> = {
+  haste: { icon: "💨", color: "var(--color-haste)" },
+  guard: { icon: "🛡️", color: "var(--color-guard)" },
+  flying: { icon: "🪽", color: "var(--color-flying)" },
+  piercing: { icon: "🎯", color: "var(--color-piercing)" },
+  boost: { icon: "🔥", color: "var(--color-boost)" },
+};
+
 export const KEYWORD_HELP: Record<v2.Keyword, string> = {
   haste: "โจมตีได้ทันทีในเทิร์นที่ลง",
   guard: "ต้องถูกโจมตีก่อน",

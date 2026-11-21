@@ -71,7 +71,7 @@ export function MfaPanel({
           <img
             src={qr}
             alt="QR code สำหรับแอป Authenticator"
-            className="mx-auto h-48 w-48 bg-white p-2"
+            className="mx-auto h-48 w-48 bg-am-card p-2"
           />
           <p className="break-all text-xs text-am-muted">หรือกรอกรหัสลับ: {secret}</p>
         </>
@@ -88,7 +88,10 @@ export function MfaPanel({
         }}
       />
       {error && (
-        <p role="alert" className="border-l-4 border-am-danger pl-2 font-semibold">
+        <p
+          role="alert"
+          className="rounded-lg border-l-4 border-am-red bg-am-error-bg px-2 py-1 font-semibold text-am-danger-text"
+        >
           {error}
         </p>
       )}
