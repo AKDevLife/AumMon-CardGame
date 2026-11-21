@@ -177,11 +177,46 @@ export function setMuted(muted: boolean): void {
   }
 }
 
+/**
+ * Browsers (iOS Safari especially) only let audio start inside a user gesture, and
+ * suspend/"interrupt" it after backgrounding. Game sounds play from server responses
+ * (bot steps, polls), not from taps, so unlock/resume audio on every tap instead.
+ */
+function wake(): AudioContext | null {
+  if (typeof window === "undefined" || !("AudioContext" in window)) return null;
+  ctx ??= new AudioContext();
+  if (ctx.state !== "running") void ctx.resume().catch(() => undefined);
+  return ctx;
+}
+
+export function installAudioUnlock(): () => void {
+  if (typeof window === "undefined") return () => undefined;
+  const unlock = (): void => {
+    try {
+      const c = wake();
+      if (!c) return;
+      // A silent one-sample buffer completes the unlock on iOS.
+      const src = c.createBufferSource();
+      src.buffer = c.createBuffer(1, 1, 22050);
+      src.connect(c.destination);
+      src.start();
+    } catch {
+      // Audio is optional.
+    }
+  };
+  window.addEventListener("pointerdown", unlock, true);
+  window.addEventListener("keydown", unlock, true);
+  return () => {
+    window.removeEventListener("pointerdown", unlock, true);
+    window.removeEventListener("keydown", unlock, true);
+  };
+}
+
 function play(notes: Note[], volume: number): void {
-  if (typeof window === "undefined" || !("AudioContext" in window) || volume <= 0) return;
+  if (volume <= 0) return;
   try {
-    ctx ??= new AudioContext();
-    if (ctx.state === "suspended") void ctx.resume();
+    const ctx = wake();
+    if (!ctx) return;
     const now = ctx.currentTime;
     for (const n of notes) {
       const osc = ctx.createOscillator();

@@ -13,6 +13,7 @@ import { Popup } from "./Popup.tsx";
 import { RulesText } from "./RulesText.tsx";
 import { DraggableCard, type DropTarget } from "./DraggableCard.tsx";
 import {
+  installAudioUnlock,
   isMuted,
   normalizeSoundConfig,
   playSound,
@@ -117,6 +118,8 @@ export function TcgMatchPage() {
       void client.removeChannel(channel);
     };
   }, [client, mode, presenceKey, matchId, refresh]);
+
+  useEffect(() => installAudioUnlock(), []);
 
   // Admin-chosen sound settings (public.game_settings 'sounds'); defaults if missing.
   useEffect(() => {
