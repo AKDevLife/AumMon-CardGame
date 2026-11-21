@@ -6,7 +6,7 @@ import {
   STARTER_DECK_V4,
 } from "../../packages/game-engine/src/rules/v4/index.ts";
 
-const sql = readFileSync("supabase/migrations/20261121000200_ruleset4.sql", "utf8");
+const sql = readFileSync("supabase/migrations/20261121000300_trait_rework.sql", "utf8");
 const q = (s: string) => `'${s.replace(/'/g, "''")}'`;
 const arr = (a: readonly string[]) => `'{${a.join(",")}}'`;
 
@@ -24,7 +24,8 @@ describe("ruleset 4 migration matches engine data", () => {
   });
 
   it("starter deck v4", () => {
+    const deckSql = readFileSync("supabase/migrations/20261121000200_ruleset4.sql", "utf8");
     for (const [id, n] of Object.entries(STARTER_DECK_V4))
-      expect(sql).toContain(`('starter_v4', 1, '${id}', ${n})`);
+      expect(deckSql).toContain(`('starter_v4', 1, '${id}', ${n})`);
   });
 });

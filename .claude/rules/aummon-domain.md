@@ -2,7 +2,7 @@
 
 ## Authoritative documents
 
-- `aummon_game_spec.md` — the single spec: game rules, abilities, cards, product/platform decisions (v5.0, Everyday Objects Battle, 1v1 TCG).
+- `aummon_game_spec.md` — the single spec: game rules, abilities, cards, product/platform decisions (v5.1, Everyday Objects Battle, 1v1 TCG).
 - `aummon_project_blueprint.md` — architecture, database, security, stack and roadmap (§9).
 - `docs/rule-clarifications.md` — open questions only; not rules.
 

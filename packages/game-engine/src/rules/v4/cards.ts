@@ -154,7 +154,7 @@ export const CARD_DEFINITIONS_V4: readonly CardDefinition[] = [
     3,
     5,
     ["flying"],
-    ["VEHICLE"],
+    ["FREE"],
     {
       kind: "triggered",
       name: "จุดชนวน",
@@ -228,7 +228,7 @@ export const CARD_DEFINITIONS_V4: readonly CardDefinition[] = [
     2,
     4,
     ["guard"],
-    ["HOUSEHOLD"],
+    ["FREE"],
     {
       kind: "triggered",
       name: "กางรับฝน",
@@ -268,7 +268,7 @@ export const CARD_DEFINITIONS_V4: readonly CardDefinition[] = [
     2,
     4,
     [],
-    ["HOUSEHOLD"],
+    ["FREE"],
     null,
     {
       name: "สวมกันกระแทก",
@@ -287,7 +287,7 @@ export const CARD_DEFINITIONS_V4: readonly CardDefinition[] = [
     2,
     8,
     ["guard"],
-    ["HOUSEHOLD"],
+    ["FREE"],
     {
       kind: "triggered",
       name: "ปิดบ้าน",
@@ -399,7 +399,7 @@ export const CARD_DEFINITIONS_V4: readonly CardDefinition[] = [
     5,
     7,
     [],
-    ["ELECTRONIC", "HOUSEHOLD"],
+    ["ELECTRONIC"],
     {
       kind: "triggered",
       name: "ดูดพลัง",
