@@ -28,3 +28,19 @@
 ## R2-9 — Card names in Thai — ✅ Owner decided 2026-11-20
 
 แทนการตัดสินใจเดิม (ชื่ออังกฤษ): ชื่อการ์ด ข้อความบนการ์ด และ Keyword แสดงเป็นภาษาไทยทั้งหมด (ดู Spec §1.6) — ข้อความแสดงผลเท่านั้น ไม่เปลี่ยนกติกา
+
+## R3 — New direction "Everyday Objects Battle" — ✅ Owner decided 2026-11-21 (provisional until playtest)
+
+Owner approved every recommendation of the audit ("ทำตามคำแนะนำทั้งหมด") and asked to focus on the new rules, then delete the old ones. Design: `docs/design/object-ability-framework.md`; source brief: `docs/design/AumMon_New_Game_Direction_Handoff.zip`. New results need `ruleset_version = "3"`; ruleset "2" code is removed after the switch.
+
+- **D1 DEF:** not reintroduced — ATK / HP only.
+- **D2 Active:** Main Phase only, source Ready, pay SPARK (≥1), source becomes Exhausted unless the card says "no exhaust", once per turn per Object, targets checked before paying.
+- **D3 Boost:** no longer a keyword — becomes card Active text.
+- **D4 Card types:** Object only; Action / Equipment / Field / Evolution / Fusion removed. Draw / Search live on abilities.
+- **D5 Abilities per card:** max 1 Passive + 1 Active.
+- **D6 Keywords:** Haste, Guard, Flying, Piercing kept unchanged.
+- **D7 Traits:** category tags that abilities may reference (synergy).
+- **D8 Framework check:** the first 6 cards are validated by engine simulation (a 30-card deck needs ≥ 10 card types), then the 24-card set.
+- **D9 Ruleset:** `"3"`; ruleset "2" retired after the switch (owner: delete old rules once the new ones work).
+- **D10 Art:** placeholder Living-Objects art by Claude until real art.
+- **D11 Rarity / launch set size / numeric power budget:** after playtest.

@@ -1,13 +1,13 @@
 # AumMon — Development Progress
 
-> Updated: 2026-11-20 · Numbers from `pnpm progress` (top-level roadmap tasks; verified tasks only)
+> Updated: 2026-11-21 · Numbers from `pnpm progress` (top-level roadmap tasks; verified tasks only)
 
 ## Current
 
-- **Status:** ✅ Phase 9 complete — admin dashboard live on Dev (owner logged in with MFA).
-- **Phase:** 9 — complete; remaining tasks are production-only (6.8, 7.3, 7.8).
-- **Current task:** none in progress
-- **Next:** owner feedback on the admin dashboard and 1v1 playtest; production (6.8 → 7.3 → 7.8) later.
+- **Status:** 🚧 Phase 10 — new direction "Everyday Objects Battle" (owner approved 2026-11-21).
+- **Phase:** 10 — ruleset 3 (Object cards, Passive + Active abilities).
+- **Current task:** 10.2 engine ruleset 3
+- **Next:** 10.3 DB + server → 10.4 UI → 10.5 remove ruleset 2 + spec v4.0 → 10.6 owner playtest.
 - **Playtest URL (latest `main`):** https://aum-mon-card-game-git-playtest-aum-mon.vercel.app
 - **Dev backend:** Supabase `AumMon-Dev` (ref `yaxtzdhryctfjaspxvix`, ap-northeast-1), email confirmation OFF for playtesting.
 

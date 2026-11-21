@@ -2,6 +2,11 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-21 — 10.1 New direction: Everyday Objects Battle (owner approved)
+
+- Audit of the new direction brief vs repository; owner approved all recommendations (D1–D11, `docs/rule-clarifications.md` R3): Object cards only (no Action/Equipment/Field/Evolution/Fusion), ATK/HP, 1 Passive + 1 Active (Active: Main Phase, Ready, SPARK ≥1, exhausts unless "no exhaust", once per turn), keywords Haste/Guard/Flying/Piercing, traits for synergy, `ruleset_version "3"`, ruleset 2 deleted after the switch.
+- `docs/design/object-ability-framework.md`: ability rules, effects, durations, safety limits, power budget, 24-card prototype set (8 Passive / 8 Active / 8 Dual, 4 archetypes), Starter Deck v3. Brief moved to `docs/design/`. Phase 10 roadmap added.
+
 ## 2026-11-21 — 9.18 Tap sounds (owner request)
 
 - Every button on the game screen makes a sound: shared "tap" (new preset แตะเบาๆ), with separate sounds for card tap (พลิกการ์ด), hand open (เลื่อนขึ้น) and hand close (เลื่อนลง). One document-level listener (`installTapSounds`, `data-sound` overrides; chosen in capture phase, skipped when a drag cancels the click). 4 new events + 4 presets also in admin sound settings and the server schema (drift test). Owner confirmed sounds work after 9.17.
