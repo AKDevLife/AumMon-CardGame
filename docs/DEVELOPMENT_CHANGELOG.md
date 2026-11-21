@@ -2,6 +2,10 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-21 — 9.18 Tap sounds (owner request)
+
+- Every button on the game screen makes a sound: shared "tap" (new preset แตะเบาๆ), with separate sounds for card tap (พลิกการ์ด), hand open (เลื่อนขึ้น) and hand close (เลื่อนลง). One document-level listener (`installTapSounds`, `data-sound` overrides; chosen in capture phase, skipped when a drag cancels the click). 4 new events + 4 presets also in admin sound settings and the server schema (drift test). Owner confirmed sounds work after 9.17.
+
 ## 2026-11-21 — 9.17 Fix silent game sounds (owner report)
 
 - Stored admin sound config on Dev checked: valid, all enabled (not the cause). Cause: sounds now play from server responses (paced bot steps, polls) outside user gestures, and browsers (iOS Safari) keep the AudioContext suspended/interrupted. `installAudioUnlock()` resumes + unlocks audio on every tap/key; `play` resumes any non-running context. Owner confirmed keeping the current Guard rule.
