@@ -6,5 +6,5 @@
  * - RULESET_VERSION is the 1v1 TCG (Core Rules V1.1). Any rule change that
  *   affects game results MUST bump it. Ruleset "1" (2–4 players) is retired.
  */
-export const ENGINE_VERSION = "0.2.0";
+export const ENGINE_VERSION = "0.3.0";
 export const RULESET_VERSION = "2";
