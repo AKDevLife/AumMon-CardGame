@@ -2,6 +2,10 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-21 — 9.14 Game screen layout B (owner choice)
+
+- Mockups of 3 layouts shared; owner chose B with A's deck chips and the end-turn button left of the player's HP. `TcgMatchPage` is now a full-screen layer: sticky top bar (turn, phase, timer, history, settings), field that fits without page scroll (compact unit frames), hand drawer at the bottom (folded = card fan, open = swipeable cards; auto-opens on your turn and for mulligan). Deck shown as a deep-purple count chip (contrast 13.65:1). Popups, commands and game flow unchanged.
+
 ## 2026-11-21 — 9.13 Color Design System (Theme A · Balanced, owner approved)
 
 - Tokens: approved palette + semantic tokens in `src/styles/index.css` (legacy `--am-*` aliases remapped, so every page follows); global focus ring; feedback animations (damage/heal/attack, reduced-motion safe).
