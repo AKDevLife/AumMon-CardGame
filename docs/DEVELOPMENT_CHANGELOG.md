@@ -2,6 +2,11 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-21 — 11.5 Balance pass (owner request)
+
+- Measured with 8,000 bot-vs-bot games (win rate when the card was drawn); range 38–56 % → 47–54 %. Exhaust-enemy actives were useless under ruleset 5 (enemies wake at their own turn start) and were redesigned (Door heals the player, Alarm Clock wakes a sleeping ally, Power Strip +2 ATK to another electronic). Strong cards toned down (Bottle Rocket, Vacuum, Cooler, Wooden Door), weak ones made cheaper / sturdier. Card data only (owner precedent for in-playtest card changes: ruleset stays "5"); migration `20261121000500_balance_pass.sql`; spec v6.1. Bot now uses self-targeted max-HP actives.
+- Open: first player wins ~68 % in simulation — needs a core-rule decision (R5).
+
 ## 2026-11-21 — 11.4 Rules update from the owner (ruleset 5)
 
 - Owner wrote the new rules; clarified with the owner: Active does not put the Object to sleep, Guard must be attacked first (awake or asleep), Guard and Flying never combine, bump to ruleset "5".

@@ -52,7 +52,7 @@ export function chooseBotCommand(
       case "keyword":
         return ally ? 25 : -1;
       case "max_hp":
-        return ally ? 24 : -1;
+        return ally || !c.target ? 24 : -1;
       case "draw":
       case "search":
         return view.myHand.length <= 6 ? 30 : -1;
