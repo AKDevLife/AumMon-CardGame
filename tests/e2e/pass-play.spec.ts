@@ -80,9 +80,8 @@ test("pass & play 1v1: privacy handoff between turns, then forfeit ends the matc
     }
   }
   expect(handoffs).toBe(5);
-  await page.getByRole("button", { name: "ตั้งค่า" }).click();
-  await page.getByRole("button", { name: "📖 กติกา" }).click();
-  await expect(page.getByRole("dialog", { name: "กติกา" })).toBeVisible(); // settings → rules opens (bug fix)
+  await page.getByRole("button", { name: "กติกา", exact: true }).click(); // top-bar rules button
+  await expect(page.getByRole("dialog", { name: "กติกา" })).toBeVisible();
   await page.getByRole("dialog", { name: "กติกา" }).getByRole("button", { name: "ปิด" }).click();
   await page.getByRole("button", { name: "ตั้งค่า" }).click();
   await page.getByRole("button", { name: "ยอมแพ้" }).click();

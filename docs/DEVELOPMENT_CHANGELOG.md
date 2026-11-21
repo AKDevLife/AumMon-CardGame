@@ -2,6 +2,11 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-21 — 9.16 Game screen tweaks (owner request)
+
+- 📖 rules button moved to the top bar left of history (removed from settings popup); exhausted label now "💤 เหนื่อย"; folded hand drawer opens from a tap anywhere on it (cards included), closes from the header as before. E2E updated.
+- Investigated "opponent hit face past our Guard": not a bug — spec §5.18 / R2-4, only a Ready Guard protects; a Guard that attacked stays exhausted until our next Start Phase.
+
 ## 2026-11-21 — 9.15 Paced bot, drag & drop, history order (owner request)
 
 - **Bot pacing (server):** `tcg-flow.ts` now runs one bot action per step, `BOT_STEP_MS = 700` apart (deadline holds the next step time; bot mulligan stays instant). `tcg-view` reports `botActing`; the client refreshes at each step and shows "🤖 Bot กำลังเล่น…". Flow/backend/load tests updated for paced turns. No rule change.

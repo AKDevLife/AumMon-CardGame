@@ -161,7 +161,7 @@ export function CardFrame({
         {marked && <span className="text-[11px] font-bold">↩︎ เปลี่ยน</span>}
         {unit?.exhausted && (
           <span className="mt-auto rounded-md bg-am-exhausted px-1 text-center text-[11px] font-semibold text-am-inverse">
-            💤 เหนื่อย (โจมตีไม่ได้)
+            💤 เหนื่อย
           </span>
         )}
       </span>
