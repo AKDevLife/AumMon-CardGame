@@ -1,4 +1,4 @@
-import type { v2 } from "@aummon/game-engine";
+import type { v3 } from "@aummon/game-engine";
 
 /**
  * Synthesized sound effects (Web Audio, no asset files). Each game event plays a preset
@@ -128,11 +128,8 @@ export const SOUND_EVENTS = {
   summon: { label: "ลงการ์ดตัวละคร", preset: "pop" },
   attack: { label: "โจมตี", preset: "thud" },
   destroyed: { label: "ตัวละครถูกทำลาย", preset: "explode" },
-  evolve: { label: "พัฒนาร่าง", preset: "sparkle" },
-  fuse: { label: "รวมร่าง", preset: "magic" },
-  equip: { label: "ติดอุปกรณ์", preset: "click" },
-  action: { label: "ใช้การ์ดคำสั่ง", preset: "whoosh" },
-  boost: { label: "เร่งพลัง", preset: "powerup" },
+  ability: { label: "ใช้ความสามารถ (กดใช้เอง)", preset: "magic" },
+  passive: { label: "ความสามารถทำงานเอง", preset: "sparkle" },
   turn: { label: "เริ่มเทิร์นของคุณ", preset: "chime" },
   win: { label: "ชนะ", preset: "fanfare" },
   tap: { label: "กดปุ่มทั่วไป", preset: "tap" },
@@ -265,7 +262,7 @@ export const previewPreset = (preset: PresetId, volume = 1): void => {
 };
 
 /** Which sound a public game event makes (null = silent). `mySeat` decides win/lose and turn chime. */
-export function soundFor(e: v2.GameEvent, mySeat: v2.Seat | null): SoundEvent | null {
+export function soundFor(e: v3.GameEvent, mySeat: v3.Seat | null): SoundEvent | null {
   switch (e.type) {
     case "unit_summoned":
       return "summon";
@@ -273,16 +270,10 @@ export function soundFor(e: v2.GameEvent, mySeat: v2.Seat | null): SoundEvent | 
       return "attack";
     case "unit_destroyed":
       return "destroyed";
-    case "unit_evolved":
-      return "evolve";
-    case "unit_fused":
-      return "fuse";
-    case "equipment_attached":
-      return "equip";
-    case "action_played":
-      return "action";
-    case "boosted":
-      return "boost";
+    case "ability_activated":
+      return "ability";
+    case "ability_triggered":
+      return "passive";
     case "turn_started":
       return e.seat === mySeat ? "turn" : null;
     case "match_ended":

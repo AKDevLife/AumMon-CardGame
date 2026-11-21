@@ -69,7 +69,7 @@ test("sign up → solo 1v1 vs paced bot → several turns → forfeit", async ({
         acted = true;
         break;
       }
-      // Popup opened with other commands only (e.g. evolve): close it before trying the next card.
+      // Popup opened with other commands only or an info card: close it before trying the next card.
       if (
         await page
           .getByRole("dialog")

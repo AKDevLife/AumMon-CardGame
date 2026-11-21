@@ -1,8 +1,8 @@
-import { v2 } from "@aummon/game-engine";
-import { cardName, cardText, KEYWORD_HELP, KEYWORD_LABEL, KEYWORD_STYLE } from "./labels.ts";
+import { v3 } from "@aummon/game-engine";
+import { CARD_ART, cardName, KEYWORD_HELP, KEYWORD_LABEL, KEYWORD_STYLE } from "./labels.ts";
 
 /** Keyword badge: icon + Thai text + color stripe (never color alone). */
-export function KeywordBadge({ k }: { k: v2.Keyword }) {
+export function KeywordBadge({ k }: { k: v3.Keyword }) {
   const s = KEYWORD_STYLE[k];
   return (
     <abbr
@@ -16,13 +16,25 @@ export function KeywordBadge({ k }: { k: v2.Keyword }) {
   );
 }
 
-function DrawBadge() {
+/** Ability line: 🔁 Passive (works by itself) / ✨ Active (tap to use, SPARK cost). */
+function AbilityLine({
+  kind,
+  name,
+  text,
+  cost,
+}: {
+  kind: "passive" | "active";
+  name: string;
+  text: string;
+  cost?: number;
+}) {
   return (
-    <span
-      className="inline-flex items-center gap-0.5 rounded-md border-l-4 bg-am-card px-1 text-[11px] font-semibold text-am-text"
-      style={{ borderLeftColor: "var(--color-draw)" }}
-    >
-      <span aria-hidden="true">🃏</span>จั่ว / ค้นหา
+    <span className="text-[11px] leading-tight text-am-text">
+      <b>
+        {kind === "passive" ? "🔁" : "✨"} {name}
+        {cost !== undefined && ` ⚡${String(cost)}`}
+      </b>{" "}
+      <span className="text-am-muted">{text}</span>
     </span>
   );
 }
@@ -48,21 +60,11 @@ const Stat = ({
   </span>
 );
 
-/** Top stripe marks special forms: Evolution = green, Fusion = purple (not rarity/power). */
-const stageStripe = (stage: number) =>
-  stage === 1 ? "var(--color-evolution)" : stage >= 2 ? "var(--color-fusion)" : "transparent";
-
-const TYPE_LABEL: Record<v2.CardType, string> = {
-  unit: "ตัวละคร",
-  action: "คำสั่ง",
-  equipment: "อุปกรณ์",
-  field: "สนาม",
-};
-
 export interface CardFrameProps {
   cardId: string;
-  /** On-board unit (effective stats, equipment, exhaustion). */
-  unit?: v2.UnitInstance;
+  /** On-board unit (effective stats, exhaustion) and its side (static Passives). */
+  unit?: v3.UnitInstance;
+  side?: readonly v3.UnitInstance[];
   selected?: boolean;
   /** This unit can be attacked by the selected attacker. */
   validTarget?: boolean;
@@ -78,6 +80,7 @@ export interface CardFrameProps {
 export function CardFrame({
   cardId,
   unit,
+  side = [],
   selected,
   validTarget,
   marked,
@@ -86,9 +89,9 @@ export function CardFrame({
   compact,
   onSelect,
 }: CardFrameProps) {
-  const def = v2.getCardDefinition(cardId);
-  const keywords = unit ? [...v2.unitKeywords(unit)] : def.keywords;
-  const draws = def.effects.some((fx) => fx.type === "DRAW_CARD" || fx.type === "SEARCH_CARD");
+  const def = v3.getCardDefinition(cardId);
+  const keywords = unit ? [...v3.unitKeywords(unit)] : def.keywords;
+  const units = unit && !side.includes(unit) ? [...side, unit] : side;
   const ring =
     selected === true || marked === true
       ? "ring-4 ring-am-title"
@@ -103,15 +106,16 @@ export function CardFrame({
       aria-pressed={selected === true || marked === true}
       onClick={onSelect}
       className={`am-sticker am-pressable relative flex ${compact ? "min-h-[5.75rem]" : "min-h-28"} flex-col overflow-hidden bg-am-card text-left disabled:cursor-default ${dimmed ? "opacity-60" : ""} ${ring}`}
-      style={{
-        borderTopColor: def.stage > 0 ? stageStripe(def.stage) : undefined,
-        borderTopWidth: def.stage > 0 ? 6 : undefined,
-      }}
     >
       <span className="flex flex-col gap-0.5 bg-am-deco-purple px-2 py-1">
         {/* Full-width title so Thai names wrap at word boundaries instead of mid-word. */}
-        <span className="font-display text-[13px] font-bold leading-tight [word-break:keep-all]">
-          {cardName(cardId)}
+        <span className="flex items-start gap-1">
+          <span aria-hidden="true" className={compact ? "text-base" : "text-2xl"}>
+            {CARD_ART[cardId] ?? "🧸"}
+          </span>
+          <span className="font-display text-[13px] font-bold leading-tight [word-break:keep-all]">
+            {cardName(cardId)}
+          </span>
         </span>
         {!unit && (
           <span
@@ -123,42 +127,50 @@ export function CardFrame({
         )}
       </span>
       <span className="flex flex-1 flex-col gap-1 p-2">
-        {def.cardType === "unit" ? (
-          <span className="flex flex-wrap gap-1">
-            <Stat
-              icon="⚔️"
-              label="พลังโจมตี"
-              value={String(unit ? v2.unitAtk(unit) : def.atk)}
-              color="var(--color-atk)"
-            />
-            <Stat
-              icon="❤️"
-              label="พลังชีวิต"
-              value={
-                unit ? `${String(v2.unitHp(unit))}/${String(v2.unitMaxHp(unit))}` : String(def.hp)
-              }
-              color="var(--color-hp)"
-            />
-          </span>
-        ) : (
-          <span className="text-[11px] leading-tight text-am-muted">
-            <span className="font-semibold text-am-text">{TYPE_LABEL[def.cardType]}</span> ·{" "}
-            {cardText(cardId)}
-          </span>
-        )}
-        {(keywords.length > 0 || draws) && (
+        <span className="flex flex-wrap gap-1">
+          <Stat
+            icon="⚔️"
+            label="พลังโจมตี"
+            value={String(unit ? v3.unitAtk(units, unit) : def.atk)}
+            color="var(--color-atk)"
+          />
+          <Stat
+            icon="❤️"
+            label="พลังชีวิต"
+            value={
+              unit
+                ? `${String(v3.unitHp(units, unit))}/${String(v3.unitMaxHp(units, unit))}`
+                : String(def.hp)
+            }
+            color="var(--color-hp)"
+          />
+        </span>
+        {keywords.length > 0 && (
           <span className="flex flex-wrap gap-1">
             {keywords.map((k) => (
               <KeywordBadge key={k} k={k} />
             ))}
-            {draws && <DrawBadge />}
           </span>
         )}
-        {unit && unit.equipment.length > 0 && (
-          <span className="text-[11px] text-am-muted">
-            🔧 {unit.equipment.map((e) => cardName(e.cardId)).join(", ")}
-          </span>
-        )}
+        {def.passive &&
+          (compact ? (
+            <span className="text-[11px] font-semibold">🔁 {def.passive.name}</span>
+          ) : (
+            <AbilityLine kind="passive" name={def.passive.name} text={def.passive.text} />
+          ))}
+        {def.active &&
+          (compact ? (
+            <span className="text-[11px] font-semibold">
+              ✨ {def.active.name} ⚡{String(def.active.cost)}
+            </span>
+          ) : (
+            <AbilityLine
+              kind="active"
+              name={def.active.name}
+              text={def.active.text}
+              cost={def.active.cost}
+            />
+          ))}
         {marked && <span className="text-[11px] font-bold">↩︎ เปลี่ยน</span>}
         {unit?.exhausted && (
           <span className="mt-auto rounded-md bg-am-exhausted px-1 text-center text-[11px] font-semibold text-am-inverse">

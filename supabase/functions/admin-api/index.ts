@@ -1,7 +1,7 @@
 // POST { action, ...params } → admin data. Every call: session + super_admin role + MFA (aal2),
 // checked server-side in requireAdmin. Mutations are audited. Catalog data is read-only
 // (owner decision 2026-11-20: rule changes go through the spec + PR, not the dashboard).
-import { createSeededRandom, ENGINE_VERSION, RULESET_VERSION, v2 } from "@aummon/game-engine";
+import { createSeededRandom, ENGINE_VERSION, RULESET_VERSION, v3 } from "@aummon/game-engine";
 import { appEnv, audit, authAdmin, requireAdmin, type AdminContext } from "../_shared/admin.ts";
 import { db } from "../_shared/db.ts";
 import { handler, HttpError, readJson } from "../_shared/http.ts";
@@ -116,10 +116,8 @@ const actions: Record<string, Action> = {
 
   cards: async () => ({
     cards: await db()`
-      select id, name, card_type, rarity, stage, cost, atk, hp, traits, keywords, slot_cost, deckable, is_enabled
-      from public.card_definitions where ruleset_version = '2' order by stage, id`,
-    evolutions: await db()`select * from public.evolution_recipes order by id`,
-    fusions: await db()`select * from public.fusion_recipes order by id`,
+      select id, name, description, effect_spec, rarity, cost, atk, hp, traits, keywords, is_enabled
+      from public.card_definitions where ruleset_version = '3' order by id`,
   }),
 
   decks: async () =>
@@ -127,7 +125,7 @@ const actions: Record<string, Action> = {
       select t.id, t.version, t.is_active, t.ruleset_version, c.card_definition_id, c.quantity
       from public.deck_templates t join public.deck_template_cards c
         on c.deck_template_id = t.id and c.deck_template_version = t.version
-      where t.ruleset_version = '2' order by t.id, c.card_definition_id`,
+      where t.ruleset_version = '3' order by t.id, c.card_definition_id`,
 
   /** Open rooms with a server-computed `stale_reason` (null = healthy). */
   rooms: async (_a, body) =>
@@ -206,20 +204,20 @@ const actions: Record<string, Action> = {
         seed[2] ?? 0,
         seed[3] ?? 0,
       ]);
-      let s = v2.initializeMatch(
-        { playerIds: ["a", "b"], decks: [v2.STARTER_DECK_V2, v2.STARTER_DECK_V2] },
+      let s = v3.initializeMatch(
+        { playerIds: ["a", "b"], decks: [v3.STARTER_DECK_V3, v3.STARTER_DECK_V3] },
         rng,
       );
       for (let n = 0; n < 3000 && s.status !== "finished"; n++) {
-        const seat: v2.Seat =
+        const seat: v3.Seat =
           s.status === "mulligan" ? (s.players[0].mulliganDone ? 1 : 0) : s.activeSeat;
-        const pick = v2.chooseBotCommand(
-          v2.getPlayerView(s, seat),
-          v2.getLegalCommands(s, seat),
+        const pick = v3.chooseBotCommand(
+          v3.getPlayerView(s, seat),
+          v3.getLegalCommands(s, seat),
           rng,
         );
         const playerId = s.players[seat].playerId;
-        s = v2.applyCommand(
+        s = v3.applyCommand(
           s,
           pick.type === "mulligan"
             ? { type: "mulligan", playerId, instanceIds: [] }
@@ -281,7 +279,7 @@ const actions: Record<string, Action> = {
       env: appEnv(),
       engineVersion: ENGINE_VERSION,
       rulesetVersion: RULESET_VERSION,
-      turnTimeoutMs: v2.RULESET_V2.turnTimeoutMs,
+      turnTimeoutMs: v3.RULESET_V3.turnTimeoutMs,
       devToolsEnabled: appEnv() === "development",
       mfaRequired: true,
     }),
