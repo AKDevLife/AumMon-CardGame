@@ -1,9 +1,9 @@
 /**
- * Ruleset 4 (1v1 TCG) server adapter: create/start, lock → advance (bots, 90 s turn
+ * Ruleset 5 (1v1 TCG) server adapter: create/start, lock → advance (bots, 90 s turn
  * timer) → command → advance → save, and per-seat views. `now` is passed in; the
  * engine stays pure. Clients send intent only (blueprint §1.3, spec §1.3).
  */
-import { createSeededRandom, ENGINE_VERSION, v4, type RngState } from "@aummon/game-engine";
+import { createSeededRandom, ENGINE_VERSION, v5, type RngState } from "@aummon/game-engine";
 import { db } from "./db.ts";
 import { HttpError } from "./http.ts";
 import { rateLimit } from "./ratelimit.ts";
@@ -11,7 +11,7 @@ import { findReceipt, storeReceipt } from "./receipts.ts";
 import { decodeRng, encodeRng, type Tx } from "./store.ts";
 import { actingSeat, advanceTcg, type Kind, type Mode, type TcgRuntime } from "./tcg-flow.ts";
 
-type Seat = v4.Seat;
+type Seat = v5.Seat;
 
 interface SeatRow {
   id: string;
@@ -42,14 +42,14 @@ function cryptoSeed(): RngState {
 
 async function lockTcg(tx: Tx, matchId: string, userId: string): Promise<Locked> {
   const lock =
-    await tx`select id from public.matches where id = ${matchId} and ruleset_version = '4' for update`;
+    await tx`select id from public.matches where id = ${matchId} and ruleset_version = '5' for update`;
   if (lock.length === 0) throw new HttpError(404, "not_found", "Match not found");
   const [row] = await tx<
     {
       owner_id: string;
       mode: Mode;
       version: string;
-      internal_state: v4.MatchState;
+      internal_state: v5.MatchState;
       rng_state: Uint8Array;
       phase_deadline: Date | null;
     }[]
@@ -83,7 +83,7 @@ async function saveTcg(
   tx: Tx,
   locked: Locked,
   rt: TcgRuntime,
-  events: v4.GameEvent[],
+  events: v5.GameEvent[],
 ): Promise<number> {
   const { state } = rt;
   const finished = state.status === "finished";
@@ -131,7 +131,7 @@ async function saveTcg(
 // ---------------------------------------------------------------- views
 
 /** Seat the caller controls now (own seat; Pass & Play owner → acting local seat). */
-function actorSeat(locked: Locked, state: v4.MatchState): Seat | null {
+function actorSeat(locked: Locked, state: v5.MatchState): Seat | null {
   if (locked.mode === "pass_play")
     return locked.ownerId === locked.userId ? actingSeat(state) : null;
   const own = locked.seats.find((s) => s.user_id === locked.userId);
@@ -140,7 +140,7 @@ function actorSeat(locked: Locked, state: v4.MatchState): Seat | null {
 
 export interface TcgResponse {
   matchId: string;
-  rulesetVersion: "4";
+  rulesetVersion: "5";
   mode: Mode;
   version: number;
   deadline: string | null;
@@ -150,8 +150,8 @@ export interface TcgResponse {
   /** A server bot is mid-turn; `deadline` is its next step time (client refreshes then). */
   botActing: boolean;
   names: [string, string];
-  view: v4.PlayerView;
-  legal: v4.LegalCommand[];
+  view: v5.PlayerView;
+  legal: v5.LegalCommand[];
   events: unknown[];
 }
 
@@ -166,7 +166,7 @@ async function respondTcg(
   const acting = actingSeat(state);
   const own = actorSeat(locked, state);
   const seat = locked.mode === "pass_play" ? (reveal ? own : null) : own;
-  const view = v4.getPlayerView(state, seat ?? 0);
+  const view = v5.getPlayerView(state, seat ?? 0);
   const safeView = seat === null ? { ...view, myHand: [] } : view;
   const events = await tx<{ public_payload: unknown }[]>`
     select public_payload from public.match_events where match_id = ${locked.matchId}
@@ -174,7 +174,7 @@ async function respondTcg(
   const name = (i: number) => locked.seats.find((s) => s.seat === i)?.display_name ?? "Player";
   return {
     matchId: locked.matchId,
-    rulesetVersion: "4",
+    rulesetVersion: "5",
     mode: locked.mode,
     version,
     deadline: rt.deadline === null ? null : new Date(rt.deadline).toISOString(),
@@ -184,7 +184,7 @@ async function respondTcg(
       acting !== null && locked.seats.find((s) => s.seat === acting + 1)?.player_type === "bot",
     names: [name(1), name(2)],
     view: safeView,
-    legal: seat !== null && seat === acting ? v4.getLegalCommands(state, seat) : [],
+    legal: seat !== null && seat === acting ? v5.getLegalCommands(state, seat) : [],
     events: events.map((e) => e.public_payload).reverse(),
   };
 }
@@ -203,10 +203,10 @@ export async function withTcg(
   options: {
     reveal?: boolean;
     act?: (
-      state: v4.MatchState,
+      state: v5.MatchState,
       seat: Seat,
       rng: ReturnType<typeof createSeededRandom>,
-    ) => v4.Transition;
+    ) => v5.Transition;
     expectedVersion?: number;
     /** Idempotency (blueprint §4.6): same key + payload → stored response. */
     receipt?: { key: string; hash: string };
@@ -236,11 +236,11 @@ export async function withTcg(
       const seat = actorSeat(locked, rt.state);
       if (seat === null) throw new HttpError(403, "not_your_turn", "You cannot act now");
       const rng = createSeededRandom(rt.rng);
-      let t: v4.Transition;
+      let t: v5.Transition;
       try {
         t = options.act(rt.state, seat, rng);
       } catch (e) {
-        if (e instanceof v4.CommandError) throw new HttpError(409, e.code, e.code);
+        if (e instanceof v5.CommandError) throw new HttpError(409, e.code, e.code);
         throw e;
       }
       events.push(...t.events);
@@ -274,7 +274,7 @@ export async function withTcg(
   });
 }
 
-/** Builds the engine state for a ruleset 4 room and stores it (room → playing). */
+/** Builds the engine state for a ruleset 5 room and stores it (room → playing). */
 async function startTcgMatch(tx: Tx, roomId: string): Promise<string> {
   const seats = await tx<{ id: string; seat: number; player_type: Kind; user_id: string | null }[]>`
     select id, seat, player_type, user_id from public.room_players
@@ -282,8 +282,8 @@ async function startTcgMatch(tx: Tx, roomId: string): Promise<string> {
   if (seats.length !== 2)
     throw new HttpError(409, "not_enough_players", "1v1 needs exactly 2 players");
   const [deck] = await tx<{ id: string; version: number }[]>`
-    select id, version from public.deck_templates where id = 'starter_v4' and is_active and ruleset_version = '4'`;
-  if (!deck) throw new Error("No active starter_v4 deck");
+    select id, version from public.deck_templates where id = 'starter_v5' and is_active and ruleset_version = '5'`;
+  if (!deck) throw new Error("No active starter_v5 deck");
   const cards = await tx<{ card_definition_id: string; quantity: number }[]>`
     select card_definition_id, quantity from public.deck_template_cards
     where deck_template_id = ${deck.id} and deck_template_version = ${deck.version}`;
@@ -291,16 +291,16 @@ async function startTcgMatch(tx: Tx, roomId: string): Promise<string> {
 
   const [match] = await tx<{ id: string }[]>`
     insert into public.matches (room_id, deck_template_id, deck_template_version, status, phase, engine_version, ruleset_version, started_at)
-    values (${roomId}, ${deck.id}, ${deck.version}, 'active', 'mulligan', ${ENGINE_VERSION}, '4', now()) returning id`;
+    values (${roomId}, ${deck.id}, ${deck.version}, 'active', 'mulligan', ${ENGINE_VERSION}, '5', now()) returning id`;
   if (!match) throw new Error("match insert failed");
   const playerIds = seats.map(() => crypto.randomUUID()) as [string, string];
   const rng = createSeededRandom(cryptoSeed());
-  const state = v4.initializeMatch({ playerIds, decks: [list, list] }, rng);
+  const state = v5.initializeMatch({ playerIds, decks: [list, list] }, rng);
   for (const [i, s] of seats.entries()) {
     await tx`
       insert into public.match_players (id, match_id, room_player_id, user_id, seat, player_type, hp, max_hp)
       values (${playerIds[i] ?? ""}, ${match.id}, ${s.id}, ${s.user_id}, ${s.seat}, ${s.player_type},
-              ${v4.RULESET_V4.playerHp}, ${v4.RULESET_V4.playerHp})`;
+              ${v5.RULESET_V5.playerHp}, ${v5.RULESET_V5.playerHp})`;
   }
   await tx`
     insert into private.match_runtime (match_id, rng_state, internal_state)
@@ -326,7 +326,7 @@ export async function createTcgMatch(
   return db().begin(async (tx) => {
     const [room] = await tx<{ id: string }[]>`
       insert into public.game_rooms (owner_id, mode, status, max_players, ruleset_version)
-      values (${userId}, ${mode}, 'lobby', 2, '4') returning id`;
+      values (${userId}, ${mode}, 'lobby', 2, '5') returning id`;
     if (!room) throw new Error("room insert failed");
     if (mode === "solo") {
       await tx`insert into public.room_players (room_id, user_id, seat, player_type, display_name_snapshot, status)
@@ -344,14 +344,14 @@ export async function createTcgMatch(
   });
 }
 
-/** Online: owner starts a ruleset 4 lobby room once both players are ready. */
+/** Online: owner starts a ruleset 5 lobby room once both players are ready. */
 export async function startOnlineTcg(userId: string, roomId: string): Promise<string> {
   return db().begin(async (tx) => {
     const [room] = await tx<
       { owner_id: string; status: string; ruleset_version: string; mode: Mode }[]
     >`
       select owner_id, status, ruleset_version, mode from public.game_rooms where id = ${roomId} for update`;
-    if (room?.owner_id !== userId || room.ruleset_version !== "4" || room.mode !== "online")
+    if (room?.owner_id !== userId || room.ruleset_version !== "5" || room.mode !== "online")
       throw new HttpError(404, "not_found", "Room not found");
     if (room.status !== "lobby")
       throw new HttpError(409, "room_not_in_lobby", "Room already started");

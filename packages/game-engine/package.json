@@ -1,6 +1,6 @@
 {
   "name": "@aummon/game-engine",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "private": true,
   "description": "AumMon pure TypeScript game engine (ruleset 2, 1v1 TCG). No React, Supabase, UI, network, database or runtime-specific dependencies.",
   "type": "module",

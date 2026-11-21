@@ -12,4 +12,4 @@ export {
   type RngState,
   type SeededRandom,
 } from "./rng/seeded-random.ts";
-export * as v4 from "./rules/v4/index.ts";
+export * as v5 from "./rules/v5/index.ts";

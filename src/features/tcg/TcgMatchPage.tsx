@@ -1,4 +1,4 @@
-import { v4 } from "@aummon/game-engine";
+import { v5 } from "@aummon/game-engine";
 import { REALTIME_SUBSCRIBE_STATES } from "@supabase/supabase-js";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router";
@@ -213,7 +213,7 @@ export function TcgMatchPage() {
 
   const { view } = data;
   const mySeat = data.seat ?? view.seat;
-  const foeSeat: v4.Seat = mySeat === 0 ? 1 : 0;
+  const foeSeat: v5.Seat = mySeat === 0 ? 1 : 0;
   const me = view.players[mySeat];
   const foe = view.players[foeSeat];
   const finished = view.status === "finished";
@@ -251,7 +251,7 @@ export function TcgMatchPage() {
     if (!target) return;
     const summon = data.legal.find((c) => c.type === "summon" && c.instanceId === instanceId);
     if (summon && (target.kind === "slot" || target.kind === "field")) void send(summon);
-    else if (!summon) setError("ยังลงการ์ดนี้ไม่ได้ (พลังงานไม่พอ / สนามเต็ม / ไม่ใช่ช่วงลงการ์ด)");
+    else if (!summon) setError("ยังลงการ์ดนี้ไม่ได้ (พลังงานไม่พอ / สนามเต็ม / ไม่ใช่เทิร์นของคุณ)");
   };
 
   const send = async (command: Record<string, unknown>) => {
@@ -409,7 +409,7 @@ export function TcgMatchPage() {
             />
           ))}
           {Array.from(
-            { length: Math.max(0, v4.RULESET_V4.maxUnits - foe.units.length) },
+            { length: Math.max(0, v5.RULESET_V5.maxUnits - foe.units.length) },
             (_, i) => (
               <EmptySlot key={i} />
             ),
@@ -439,7 +439,7 @@ export function TcgMatchPage() {
               />
             </div>
           ))}
-          {Array.from({ length: Math.max(0, v4.RULESET_V4.maxUnits - me.units.length) }, (_, i) => (
+          {Array.from({ length: Math.max(0, v5.RULESET_V5.maxUnits - me.units.length) }, (_, i) => (
             <EmptySlot key={i} drop active={dragSummon !== undefined} />
           ))}
         </div>
@@ -506,7 +506,7 @@ export function TcgMatchPage() {
           >
             <span aria-hidden="true" className="h-1.5 w-11 rounded-full bg-am-lavender" />
             <span className="text-xs font-semibold">
-              การ์ดในมือ {view.myHand.length}/{v4.RULESET_V4.maxHand} ·{" "}
+              การ์ดในมือ {view.myHand.length}/{v5.RULESET_V5.maxHand} ·{" "}
               {handOpen ? "แตะเพื่อพับเก็บ" : "แตะเพื่อเปิด"}
             </span>
           </button>

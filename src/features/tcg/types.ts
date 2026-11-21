@@ -1,17 +1,17 @@
-import type { v4 } from "@aummon/game-engine";
+import type { v5 } from "@aummon/game-engine";
 
 /** Response of the ruleset 4 Edge Functions (supabase/functions/_shared/tcg.ts). */
 export interface TcgResponse {
   matchId: string;
-  rulesetVersion: "4";
+  rulesetVersion: "5";
   mode: "solo" | "pass_play" | "online";
   version: number;
   deadline: string | null;
-  seat: v4.Seat | null;
-  actingSeat: v4.Seat | null;
+  seat: v5.Seat | null;
+  actingSeat: v5.Seat | null;
   botActing?: boolean;
   names: [string, string];
-  view: v4.PlayerView;
-  legal: v4.LegalCommand[];
-  events: v4.GameEvent[];
+  view: v5.PlayerView;
+  legal: v5.LegalCommand[];
+  events: v5.GameEvent[];
 }

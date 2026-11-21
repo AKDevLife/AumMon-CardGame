@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { unitAtk, unitHp, unitKeywords, type MatchState } from "../src/rules/v4/index.ts";
-import { at, board, errorOf, giveCard, obj, play } from "./v4-fixtures.ts";
+import { unitAtk, unitHp, unitKeywords, type MatchState } from "../src/rules/v5/index.ts";
+import { at, board, errorOf, giveCard, obj, play } from "./v5-fixtures.ts";
 
 const u = (s: MatchState, seat: 0 | 1, id: string) => {
   const x = s.players[seat].units.find((v) => v.instanceId === id);
@@ -9,20 +9,52 @@ const u = (s: MatchState, seat: 0 | 1, id: string) => {
 };
 
 describe("ruleset 3 — Active abilities (framework §3.1)", () => {
-  it("is free (no SPARK), exhausts the source, applies the effect", () => {
+  it("is free (no SPARK), does not put the source to sleep, applies the effect", () => {
     const s = board([obj("a", "O05")], [obj("x", "O09")]);
     s.players[0].spark = 0;
     const t = play(s, { type: "activate", instanceId: "a", target: "x" });
     expect(t.state.players[0].spark).toBe(0);
-    expect(u(t.state, 0, "a").exhausted).toBe(true);
+    expect(u(t.state, 0, "a").exhausted).toBe(false);
     expect(u(t.state, 1, "x").damage).toBe(2);
     expect(t.events.some((e) => e.type === "ability_activated")).toBe(true);
   });
 
-  it("requires a Ready source", () => {
-    const s = board([obj("a", "O05", true)], [obj("x", "O09")]);
-    expect(errorOf(() => play(s, { type: "activate", instanceId: "a", target: "x" }))).toBe(
-      "unit_exhausted",
+  it("a sleeping Object can use its Active; it may attack and then activate", () => {
+    const s = board([obj("a", "O05", true)], [obj("x", "O12")]);
+    const t = play(s, { type: "activate", instanceId: "a", target: "x" });
+    expect(u(t.state, 1, "x").damage).toBe(2);
+    const b = board([obj("a", "O05")], [obj("x", "O08")]);
+    const hit = play(b, { type: "attack", attackerId: "a", target: "x" });
+    const after = play(hit.state, { type: "activate", instanceId: "a", target: "x" });
+    expect(after.state.players[1].units).toHaveLength(0);
+  });
+
+  it("any action order: summon after attacking", () => {
+    const s = board([obj("a", "O05")], []);
+    const t = play(s, { type: "attack", attackerId: "a", target: "player" });
+    const id = giveCard(t.state, "O01");
+    expect(play(t.state, { type: "summon", instanceId: id }).state.players[0].units).toHaveLength(
+      2,
+    );
+  });
+
+  it("Guard (awake or asleep) must be attacked first", () => {
+    const s = board([obj("a", "O05")], [obj("g", "O09", true), obj("x", "O01")]);
+    expect(errorOf(() => play(s, { type: "attack", attackerId: "a", target: "player" }))).toBe(
+      "guard_blocks",
+    );
+    expect(errorOf(() => play(s, { type: "attack", attackerId: "a", target: "x" }))).toBe(
+      "guard_blocks",
+    );
+    expect(play(s, { type: "attack", attackerId: "a", target: "g" }).events.length).toBeGreaterThan(
+      0,
+    );
+  });
+
+  it("Guard and Flying never combine: Helmet cannot target a flying ally", () => {
+    const s = board([obj("h", "O11"), obj("r", "O06")], []);
+    expect(errorOf(() => play(s, { type: "activate", instanceId: "h", target: "r" }))).toBe(
+      "invalid_target",
     );
   });
 
@@ -52,11 +84,12 @@ describe("ruleset 3 — Active abilities (framework §3.1)", () => {
     );
   });
 
-  it("is Main Phase only and only for Objects with an Active", () => {
+  it("own turn only, and only for Objects with an Active", () => {
     const s = board([obj("a", "O05"), obj("p", "O01")], []);
     expect(errorOf(() => play(s, { type: "activate", instanceId: "p" }))).toBe("no_active");
-    s.phase = "battle";
-    expect(errorOf(() => play(s, { type: "activate", instanceId: "a" }))).toBe("wrong_phase");
+    expect(errorOf(() => play(s, { type: "activate", instanceId: "a" }, "foe"))).toBe(
+      "not_your_turn",
+    );
   });
 
   it("Active damage kills at HP 0 and fires on_destroyed", () => {
@@ -206,11 +239,11 @@ describe("ruleset 3 — Passive abilities (framework §3.2)", () => {
     expect(t.state.players[1].hp).toBe(18);
   });
 
-  it("duplicate requests are rejected by state (exhaust) — no double payment", () => {
+  it("duplicate requests are rejected by state (once per turn)", () => {
     const s = board([obj("a", "O05")], [obj("x", "O12")]);
     const t = play(s, { type: "activate", instanceId: "a", target: "x" });
     expect(errorOf(() => play(t.state, { type: "activate", instanceId: "a", target: "x" }))).toBe(
-      "unit_exhausted",
+      "active_used",
     );
   });
 });

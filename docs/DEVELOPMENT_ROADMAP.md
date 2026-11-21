@@ -180,5 +180,6 @@ Owner-approved direction 2026-11-21 (R3 in `docs/rule-clarifications.md`, rules 
 - [x] **11.1** Owner changes: free Active abilities (ruleset "4", spec v5.0) with higher summon costs for strong cards and Turbo "sleeps at end of turn"; "เหนื่อย" → "หลับ"; Thai category names; "All cards" gallery (home + in game, filter by category, tap for details); history button moved into settings — deps: 10.5 — PR #79 (2026-11-21)
 - [x] **11.2** Categories: ภาชนะ → ที่เก็บของ; ของใช้ในบ้าน → อิสระ (FREE: no other category); Bottle Rocket not a vehicle; Vacuum electronic only (ruleset stays "4", owner choice) — deps: 11.1 — PR #80 (2026-11-21)
 - [x] **11.3** Hand and "All cards" gallery sorted by SPARK cost, cheapest first (same cost: playable first) — deps: 11.2 — PR #81 (2026-11-21)
+- [x] **11.4** Owner rules update (ruleset "5", spec v6.0): actions in any order; Active usable while asleep, no sleep on use, once per turn; Guard works while asleep and must be hit first; no Guard + Flying; rules popup rewritten in the owner's words — deps: 11.3 — PR #82 (2026-11-21)
 
 **Acceptance:** only ruleset 3 playable in all 3 modes · every handoff §10.2 case covered by engine tests · 1,000 simulated bot matches without errors · E2E + a11y pass · spec v4.0 is the single authoritative rule source
