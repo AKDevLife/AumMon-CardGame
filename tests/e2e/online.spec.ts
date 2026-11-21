@@ -22,7 +22,7 @@ async function act(page: Page): Promise<boolean> {
     await expect(idle).toHaveCount(0);
     return true;
   }
-  const endTurn = page.getByRole("button", { name: "จบเทิร์น" });
+  const endTurn = page.getByRole("button", { name: "จบเทิร์น", exact: true });
   if (!(await endTurn.isVisible()) || !(await endTurn.isEnabled())) return false;
   const hand = await page
     .getByRole("group", { name: "Hand" })

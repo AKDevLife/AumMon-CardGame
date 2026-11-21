@@ -14,8 +14,8 @@ describe("admin readable formatting", () => {
 
   it("formats game data", () => {
     expect(card("O01")).toBe("ดินสอไม้");
-    expect(abilities({ passive: { name: "ไส้หัก" }, active: { name: "ดีด", cost: 1 } })).toBe(
-      "🔁 ไส้หัก · ✨ ดีด (⚡1)",
+    expect(abilities({ passive: { name: "ไส้หัก" }, active: { name: "ดีด" } })).toBe(
+      "🔁 ไส้หัก · ✨ ดีด",
     );
     expect(keywords(["haste", "guard"])).toBe("โจมตีทันที, โล่กำบัง");
     expect(eventText({ type: "turn_ended", seat: 0 })).toBe("จบเทิร์น / จั่วการ์ด");

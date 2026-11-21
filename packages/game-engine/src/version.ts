@@ -3,8 +3,8 @@
  *
  * - ENGINE_VERSION must match this package's `version` in package.json
  *   (enforced by tests/architecture/engine-isolation.test.ts).
- * - RULESET_VERSION "3" is Everyday Objects Battle (Object cards + abilities). Any rule change that
- *   affects game results MUST bump it. Rulesets "1" and "2" are retired.
+ * - RULESET_VERSION "4" is Everyday Objects Battle with free Active abilities. Any rule change that
+ *   affects game results MUST bump it. Rulesets "1"–"3" are retired.
  */
-export const ENGINE_VERSION = "0.3.0";
-export const RULESET_VERSION = "3";
+export const ENGINE_VERSION = "0.4.0";
+export const RULESET_VERSION = "4";

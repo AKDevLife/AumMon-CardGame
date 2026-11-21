@@ -33,8 +33,8 @@ select is((select count(*)::int from public.room_players), 2, 'owner sees own ro
 select ok(not public.is_room_member('10000000-0000-0000-0000-00000000b001'), 'A is not a member of B lobby');
 select is((select count(*)::int from public.game_rooms where id = '10000000-0000-0000-0000-00000000b001'), 0, 'A cannot read B lobby');
 select is((select count(*)::int from public.characters), 4, 'seeded characters readable');
-select is((select count(*)::int from public.card_definitions), 30, 'seeded cards readable (6 ruleset 1 + 24 ruleset 3)');
-select is((select count(*)::int from public.deck_template_cards), 30, 'deck composition readable (6 + 24)');
+select is((select count(*)::int from public.card_definitions), 30, 'seeded cards readable (6 ruleset 1 + 24 Objects)');
+select is((select count(*)::int from public.deck_template_cards), 54, 'deck composition readable (6 + 24 + 24)');
 -- private schema: every table denied, even for own hand
 select throws_ok(format('select * from private.%I', t), '42501', null, 'A cannot read private.' || t)
   from unnest(array['match_runtime','match_cards','match_player_runtime','round_submissions','command_receipts']) t;

@@ -6,7 +6,7 @@ import { unitAtk, unitHp, unitKeywords, unitMaxHp } from "./stats.ts";
 import type { PlayerView } from "./view.ts";
 
 /**
- * Rule-based `normal` bot for ruleset 3. It sees only its seat's PlayerView and the
+ * Rule-based `normal` bot for ruleset 4. It sees only its seat's PlayerView and the
  * legal commands, scores each one and picks the best (ties → RNG).
  */
 export function chooseBotCommand(

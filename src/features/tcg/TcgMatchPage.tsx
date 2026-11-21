@@ -1,4 +1,4 @@
-import { v3 } from "@aummon/game-engine";
+import { v4 } from "@aummon/game-engine";
 import { REALTIME_SUBSCRIBE_STATES } from "@supabase/supabase-js";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router";
@@ -15,6 +15,7 @@ import {
   phaseLabel,
 } from "./labels.ts";
 import { CardFrame, EmptySlot } from "./CardFrame.tsx";
+import { CardGallery } from "./CardGallery.tsx";
 import { CardBack, DeckPile, HeartIcon, SparkIcon } from "./GameIcons.tsx";
 import { Popup } from "./Popup.tsx";
 import { RulesText } from "./RulesText.tsx";
@@ -68,7 +69,9 @@ export function TcgMatchPage() {
     x: number;
     y: number;
   } | null>(null);
-  const [popup, setPopup] = useState<"history" | "settings" | "rules" | "forfeit" | null>(null);
+  const [popup, setPopup] = useState<"history" | "settings" | "rules" | "forfeit" | "cards" | null>(
+    null,
+  );
   const idem = useRef<{ key: string; body: string } | null>(null);
   const passPlay = useRef(false);
   const botActing = data?.botActing === true;
@@ -209,7 +212,7 @@ export function TcgMatchPage() {
 
   const { view } = data;
   const mySeat = data.seat ?? view.seat;
-  const foeSeat: v3.Seat = mySeat === 0 ? 1 : 0;
+  const foeSeat: v4.Seat = mySeat === 0 ? 1 : 0;
   const me = view.players[mySeat];
   const foe = view.players[foeSeat];
   const finished = view.status === "finished";
@@ -316,13 +319,13 @@ export function TcgMatchPage() {
         </button>
         <button
           type="button"
-          aria-label="ประวัติ"
+          aria-label="การ์ดทั้งหมด"
           onClick={() => {
-            setPopup("history");
+            setPopup("cards");
           }}
           className="am-sticker am-pressable h-11 w-11 !rounded-xl bg-am-deco-purple text-lg"
         >
-          📜
+          🗂️
         </button>
         <button
           type="button"
@@ -338,6 +341,10 @@ export function TcgMatchPage() {
 
       <div
         data-drop="field"
+        role="region"
+        aria-label="สนาม"
+        // Scrollable on small screens: keyboard users must be able to focus and scroll it (WCAG).
+        tabIndex={0}
         className={`flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto bg-am-field p-1.5 ${attackFx ? "am-fx-attack" : ""}`}
       >
         {finished && (
@@ -403,7 +410,7 @@ export function TcgMatchPage() {
             />
           ))}
           {Array.from(
-            { length: Math.max(0, v3.RULESET_V3.maxUnits - foe.units.length) },
+            { length: Math.max(0, v4.RULESET_V4.maxUnits - foe.units.length) },
             (_, i) => (
               <EmptySlot key={i} />
             ),
@@ -433,7 +440,7 @@ export function TcgMatchPage() {
               />
             </div>
           ))}
-          {Array.from({ length: Math.max(0, v3.RULESET_V3.maxUnits - me.units.length) }, (_, i) => (
+          {Array.from({ length: Math.max(0, v4.RULESET_V4.maxUnits - me.units.length) }, (_, i) => (
             <EmptySlot key={i} drop active={dragSummon !== undefined} />
           ))}
         </div>
@@ -500,7 +507,7 @@ export function TcgMatchPage() {
           >
             <span aria-hidden="true" className="h-1.5 w-11 rounded-full bg-am-lavender" />
             <span className="text-xs font-semibold">
-              การ์ดในมือ {view.myHand.length}/{v3.RULESET_V3.maxHand} ·{" "}
+              การ์ดในมือ {view.myHand.length}/{v4.RULESET_V4.maxHand} ·{" "}
               {handOpen ? "แตะเพื่อพับเก็บ" : "แตะเพื่อเปิด"}
             </span>
           </button>
@@ -660,6 +667,13 @@ export function TcgMatchPage() {
         >
           {muted ? "🔇 เปิดเสียง" : "🔊 ปิดเสียง"}
         </StickerButton>
+        <StickerButton
+          onClick={() => {
+            setPopup("history");
+          }}
+        >
+          📜 ประวัติการเล่น
+        </StickerButton>
         {!finished && (
           <StickerButton
             variant="danger"
@@ -671,6 +685,16 @@ export function TcgMatchPage() {
             ยอมแพ้
           </StickerButton>
         )}
+      </Popup>
+
+      <Popup
+        title="การ์ดทั้งหมด"
+        open={popup === "cards"}
+        onClose={() => {
+          setPopup(null);
+        }}
+      >
+        <CardGallery />
       </Popup>
 
       <Popup

@@ -72,7 +72,7 @@ test("pass & play 1v1: privacy handoff between turns, then forfeit ends the matc
         await page.keyboard.press("Escape");
     }
     if (!acted) {
-      const endTurn = page.getByRole("button", { name: "จบเทิร์น" });
+      const endTurn = page.getByRole("button", { name: "จบเทิร์น", exact: true });
       if (await endTurn.isVisible().catch(() => false)) {
         await endTurn.click();
         await expect(idle).toHaveCount(0);

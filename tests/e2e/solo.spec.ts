@@ -37,7 +37,7 @@ test("sign up → solo 1v1 vs paced bot → several turns → forfeit", async ({
         .catch(() => false)
     )
       sawBot = true;
-    const endTurn = page.getByRole("button", { name: "จบเทิร์น" });
+    const endTurn = page.getByRole("button", { name: "จบเทิร์น", exact: true });
     if (!(await endTurn.isVisible().catch(() => false))) {
       await page.waitForTimeout(500);
       continue;

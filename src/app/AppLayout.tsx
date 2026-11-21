@@ -1,4 +1,4 @@
-import { ENGINE_VERSION, v3 } from "@aummon/game-engine";
+import { ENGINE_VERSION, v4 } from "@aummon/game-engine";
 import { Link, Outlet } from "react-router";
 import { PreviewBanner } from "../components/PreviewBanner.tsx";
 import { AccountNav } from "../features/auth/AccountNav.tsx";
@@ -20,7 +20,7 @@ export function AppLayout() {
       </main>
       <footer className="px-4 py-4 text-center text-xs text-am-muted">
         <span className="rounded-full bg-am-round px-3 py-1 font-semibold text-am-ink">
-          Ruleset {v3.RULESET_V3.version} · 1v1
+          Ruleset {v4.RULESET_V4.version} · 1v1
         </span>{" "}
         · engine {ENGINE_VERSION} ·{" "}
         <Link to="/privacy" className="underline">

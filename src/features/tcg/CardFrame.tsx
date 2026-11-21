@@ -1,8 +1,15 @@
-import { v3 } from "@aummon/game-engine";
-import { CARD_ART, cardName, KEYWORD_HELP, KEYWORD_LABEL, KEYWORD_STYLE } from "./labels.ts";
+import { v4 } from "@aummon/game-engine";
+import {
+  CARD_ART,
+  cardName,
+  KEYWORD_HELP,
+  KEYWORD_LABEL,
+  KEYWORD_STYLE,
+  TRAIT_LABEL,
+} from "./labels.ts";
 
 /** Keyword badge: icon + Thai text + color stripe (never color alone). */
-export function KeywordBadge({ k }: { k: v3.Keyword }) {
+export function KeywordBadge({ k }: { k: v4.Keyword }) {
   const s = KEYWORD_STYLE[k];
   return (
     <abbr
@@ -16,23 +23,20 @@ export function KeywordBadge({ k }: { k: v3.Keyword }) {
   );
 }
 
-/** Ability line: 🔁 Passive (works by itself) / ✨ Active (tap to use, SPARK cost). */
+/** Ability line: 🔁 Passive (works by itself) / ✨ Active (tap to use, free). */
 function AbilityLine({
   kind,
   name,
   text,
-  cost,
 }: {
   kind: "passive" | "active";
   name: string;
   text: string;
-  cost?: number;
 }) {
   return (
     <span className="text-[11px] leading-tight text-am-text">
       <b>
         {kind === "passive" ? "🔁" : "✨"} {name}
-        {cost !== undefined && ` ⚡${String(cost)}`}
       </b>{" "}
       <span className="text-am-muted">{text}</span>
     </span>
@@ -63,8 +67,8 @@ const Stat = ({
 export interface CardFrameProps {
   cardId: string;
   /** On-board unit (effective stats, exhaustion) and its side (static Passives). */
-  unit?: v3.UnitInstance;
-  side?: readonly v3.UnitInstance[];
+  unit?: v4.UnitInstance;
+  side?: readonly v4.UnitInstance[];
   selected?: boolean;
   /** This unit can be attacked by the selected attacker. */
   validTarget?: boolean;
@@ -89,8 +93,8 @@ export function CardFrame({
   compact,
   onSelect,
 }: CardFrameProps) {
-  const def = v3.getCardDefinition(cardId);
-  const keywords = unit ? [...v3.unitKeywords(unit)] : def.keywords;
+  const def = v4.getCardDefinition(cardId);
+  const keywords = unit ? [...v4.unitKeywords(unit)] : def.keywords;
   const units = unit && !side.includes(unit) ? [...side, unit] : side;
   const ring =
     selected === true || marked === true
@@ -131,7 +135,7 @@ export function CardFrame({
           <Stat
             icon="⚔️"
             label="พลังโจมตี"
-            value={String(unit ? v3.unitAtk(units, unit) : def.atk)}
+            value={String(unit ? v4.unitAtk(units, unit) : def.atk)}
             color="var(--color-atk)"
           />
           <Stat
@@ -139,12 +143,17 @@ export function CardFrame({
             label="พลังชีวิต"
             value={
               unit
-                ? `${String(v3.unitHp(units, unit))}/${String(v3.unitMaxHp(units, unit))}`
+                ? `${String(v4.unitHp(units, unit))}/${String(v4.unitMaxHp(units, unit))}`
                 : String(def.hp)
             }
             color="var(--color-hp)"
           />
         </span>
+        {!compact && (
+          <span className="text-[10px] font-semibold text-am-muted">
+            {def.traits.map((t) => TRAIT_LABEL[t]).join(" · ")}
+          </span>
+        )}
         {keywords.length > 0 && (
           <span className="flex flex-wrap gap-1">
             {keywords.map((k) => (
@@ -160,21 +169,14 @@ export function CardFrame({
           ))}
         {def.active &&
           (compact ? (
-            <span className="text-[11px] font-semibold">
-              ✨ {def.active.name} ⚡{String(def.active.cost)}
-            </span>
+            <span className="text-[11px] font-semibold">✨ {def.active.name}</span>
           ) : (
-            <AbilityLine
-              kind="active"
-              name={def.active.name}
-              text={def.active.text}
-              cost={def.active.cost}
-            />
+            <AbilityLine kind="active" name={def.active.name} text={def.active.text} />
           ))}
         {marked && <span className="text-[11px] font-bold">↩︎ เปลี่ยน</span>}
         {unit?.exhausted && (
           <span className="mt-auto rounded-md bg-am-exhausted px-1 text-center text-[11px] font-semibold text-am-inverse">
-            💤 เหนื่อย
+            💤 หลับ
           </span>
         )}
       </span>

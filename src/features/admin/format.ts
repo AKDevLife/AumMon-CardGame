@@ -1,4 +1,4 @@
-import type { v3 } from "@aummon/game-engine";
+import type { v4 } from "@aummon/game-engine";
 import { cardName, describeEvent, KEYWORD_LABEL } from "../tcg/labels.ts";
 
 /** Human-readable Thai text for admin data (no database/program words on screen). */
@@ -74,7 +74,7 @@ export function keywords(v: unknown): string {
   if (!Array.isArray(v) || v.length === 0) return "—";
   return v
     .map((k) =>
-      typeof k === "string" && k in KEYWORD_LABEL ? KEYWORD_LABEL[k as v3.Keyword] : String(k),
+      typeof k === "string" && k in KEYWORD_LABEL ? KEYWORD_LABEL[k as v4.Keyword] : String(k),
     )
     .join(", ");
 }
@@ -84,12 +84,11 @@ export function abilities(v: unknown): string {
   if (typeof v !== "object" || v === null) return "—";
   const spec = v as {
     passive?: { name?: string } | null;
-    active?: { name?: string; cost?: number } | null;
+    active?: { name?: string } | null;
   };
   const parts: string[] = [];
   if (spec.passive?.name) parts.push(`🔁 ${spec.passive.name}`);
-  if (spec.active?.name)
-    parts.push(`✨ ${spec.active.name} (⚡${String(spec.active.cost ?? "?")})`);
+  if (spec.active?.name) parts.push(`✨ ${spec.active.name}`);
   return parts.length ? parts.join(" · ") : "—";
 }
 
@@ -98,7 +97,7 @@ export const card = (v: unknown): string => (typeof v === "string" ? cardName(v)
 /** Readable game event sentence from its public payload (seats shown as Player 1/2). */
 export function eventText(payload: unknown): string {
   if (typeof payload !== "object" || payload === null) return "—";
-  return describeEvent(payload as v3.GameEvent, ["ผู้เล่น 1", "ผู้เล่น 2"]) ?? "จบเทิร์น / จั่วการ์ด";
+  return describeEvent(payload as v4.GameEvent, ["ผู้เล่น 1", "ผู้เล่น 2"]) ?? "จบเทิร์น / จั่วการ์ด";
 }
 
 export function shortId(v: unknown): string {

@@ -1,4 +1,4 @@
-/** Ruleset 3 match state. Plain data only — safe to serialize. */
+/** Ruleset 4 match state. Plain data only — safe to serialize. */
 import type { Effect, Keyword, Trigger } from "./types.ts";
 
 export type Seat = 0 | 1;
@@ -21,6 +21,8 @@ export interface UnitInstance extends CardInstance {
   exhausted: boolean;
   /** Active ability used this turn (once per turn per Object). */
   activeUsed: boolean;
+  /** Falls asleep when this turn ends (Active with sleepAtEndOfTurn). */
+  sleepAtEnd: boolean;
   /** Permanent max HP bonus (e.g. Wrench). */
   hpBonus: number;
   mods: Modifier[];
@@ -44,7 +46,7 @@ export type TurnPhase = "main" | "battle";
 export type MatchResult = { readonly winner: Seat } | { readonly draw: true };
 
 export interface MatchState {
-  readonly rulesetVersion: "3";
+  readonly rulesetVersion: "4";
   status: MatchStatus;
   readonly firstSeat: Seat;
   activeSeat: Seat;
