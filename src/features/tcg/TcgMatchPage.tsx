@@ -307,6 +307,16 @@ export function TcgMatchPage() {
         </span>
         <button
           type="button"
+          aria-label="กติกา"
+          onClick={() => {
+            setPopup("rules");
+          }}
+          className="am-sticker am-pressable h-11 w-11 !rounded-xl bg-am-deco-purple text-lg"
+        >
+          📖
+        </button>
+        <button
+          type="button"
           aria-label="ประวัติ"
           onClick={() => {
             setPopup("history");
@@ -542,12 +552,21 @@ export function TcgMatchPage() {
               )}
             </div>
           ) : (
-            <div aria-hidden="true" className="flex h-16 justify-center overflow-hidden pt-2">
+            // Folded: the whole purple block (fan included) opens the hand; the header closes it again.
+            <button
+              type="button"
+              aria-label="เปิดการ์ดในมือ"
+              onClick={() => {
+                setHandOpen(true);
+              }}
+              className="flex h-16 w-full justify-center overflow-hidden pt-2"
+            >
               {fan.map((c, i) => {
                 const mid = (fan.length - 1) / 2;
                 return (
                   <span
                     key={c.instanceId}
+                    aria-hidden="true"
                     className="-ml-3 h-20 w-14 shrink-0 rounded-lg border-[3px] border-am-ink bg-am-card p-1 text-[10px] font-semibold leading-tight [word-break:keep-all] first:ml-0"
                     style={{
                       transform: `rotate(${String((i - mid) * 6)}deg) translateY(${String(Math.abs(i - mid) * 3)}px)`,
@@ -557,7 +576,7 @@ export function TcgMatchPage() {
                   </span>
                 );
               })}
-            </div>
+            </button>
           )}
         </div>
       )}
@@ -629,13 +648,6 @@ export function TcgMatchPage() {
           setPopup(null);
         }}
       >
-        <StickerButton
-          onClick={() => {
-            setPopup("rules");
-          }}
-        >
-          📖 กติกา
-        </StickerButton>
         <StickerButton
           onClick={() => {
             const next = !muted;

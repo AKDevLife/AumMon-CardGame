@@ -80,7 +80,7 @@ Legacy aliases (`--am-*`) still exist and point at these tokens, so older compon
 | Selection highlight    | `#FFC83D`                    | yellow ring                                       |
 | Valid target           | `#65D69A`                    | green ring on units the selected attacker can hit |
 | Invalid target         | `#ED4966`                    | reserved (invalid targets are simply not offered) |
-| Exhausted              | `#75658F`                    | "💤 เหนื่อย (โจมตีไม่ได้)" label with inverse text     |
+| Exhausted              | `#75658F`                    | "💤 เหนื่อย" label with inverse text                |
 
 ## 5. Card frame (`src/features/tcg/CardFrame.tsx`)
 
