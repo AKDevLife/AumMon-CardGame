@@ -180,7 +180,8 @@ async function respondTcg(
     deadline: rt.deadline === null ? null : new Date(rt.deadline).toISOString(),
     seat,
     actingSeat: acting,
-    botActing: acting !== null && locked.seats.find((s) => s.seat === acting + 1)?.player_type === "bot",
+    botActing:
+      acting !== null && locked.seats.find((s) => s.seat === acting + 1)?.player_type === "bot",
     names: [name(1), name(2)],
     view: safeView,
     legal: seat !== null && seat === acting ? v2.getLegalCommands(state, seat) : [],
