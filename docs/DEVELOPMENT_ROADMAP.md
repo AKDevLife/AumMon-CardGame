@@ -165,3 +165,16 @@ Owner request 2026-11-20 (dev tooling; production tasks 6.8/7.3/7.8 stay deferre
 - [x] **9.18** Tap sounds on the game screen: one shared tap sound for every button; separate sounds for card tap, hand open, hand close (admin-configurable) — deps: 9.17 — PR #74 (2026-11-21)
 
 **Acceptance:** admin logs in without Register · non-admins get 403 on every admin action · players cannot self-grant · MFA enforced server-side · audited mutations · no secret in the client bundle · per-environment bootstrap documented (`docs/ADMIN.md`)
+
+## Phase 10 — Everyday Objects Battle (`ruleset_version = "3"`)
+
+Owner-approved direction 2026-11-21 (R3 in `docs/rule-clarifications.md`, design `docs/design/object-ability-framework.md`).
+
+- [x] **10.1** Decisions D1–D11 recorded; Object/Ability framework + 24-card prototype set + Starter Deck v3 designed; Phase 10 plan — deps: 9.18 — PR #75 (2026-11-21)
+- [ ] **10.2** Engine ruleset 3 (pure TS): Object cards, 1 Passive + 1 Active, triggers, effects, durations, safety limits, card data validation, bot; simulation of the framework cards then the 24-card set — deps: 10.1
+- [ ] **10.3** Database + server: additive migration for ruleset 3 cards / starter deck, seed, Edge Functions run ruleset 3 for new matches (`activate` command) — deps: 10.2
+- [ ] **10.4** UI: Object card frame with Passive/Active text, activate flow with targets, rules popup, sounds, placeholder Living-Objects art — deps: 10.3
+- [ ] **10.5** Remove ruleset 2 (Evolution, Fusion, Equipment, Action, recipes tables, old cards, tests); Game Spec v4.0 + blueprint/domain rules updated — deps: 10.4
+- [ ] **10.6** Owner playtest on Dev; balance pass — deps: 10.5
+
+**Acceptance:** only ruleset 3 playable in all 3 modes · every handoff §10.2 case covered by engine tests · 1,000 simulated bot matches without errors · E2E + a11y pass · spec v4.0 is the single authoritative rule source
