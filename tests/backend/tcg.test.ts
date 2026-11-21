@@ -71,7 +71,7 @@ describe.runIf(run)("ruleset 2 matches via Edge Functions", () => {
     b = await newUser();
   });
 
-  it("solo: plays a whole match against the server bot", async () => {
+  it("solo: plays several turns against the paced server bot, then forfeits", async () => {
     const created = await a("tcg-create", { mode: "solo" });
     expect(created.status).toBe(200);
     const matchId = created.body["matchId"] as string;
@@ -101,7 +101,10 @@ describe.runIf(run)("ruleset 2 matches via Edge Functions", () => {
     expect((await send(a, v, { type: "end_turn" })).body["error"]).toBe("stale_version");
     v = first.body as unknown as Tcg;
 
-    for (let i = 0; i < 1500 && v.view.status !== "finished"; i++) {
+    // Full games vary a lot in length with a paced bot; play 3 of our turns
+    // (the bot must act in between), then forfeit to finish deterministically.
+    let ownTurns = 0;
+    for (let i = 0; i < 1500 && v.view.status !== "finished" && ownTurns < 3; i++) {
       const pick =
         v.legal.find((c) => c.type === "attack") ??
         v.legal.find((c) => c.type === "summon") ??
@@ -112,9 +115,13 @@ describe.runIf(run)("ruleset 2 matches via Edge Functions", () => {
         v = (await a("tcg-view", { matchId })).body as unknown as Tcg;
         continue;
       }
+      if (pick.type === "end_turn") ownTurns++;
       const res = await send(a, v, pick);
       expect(res.status).toBe(200);
       v = res.body as unknown as Tcg;
+    }
+    if (v.view.status !== "finished") {
+      v = (await send(a, v, { type: "forfeit" })).body as unknown as Tcg;
     }
     expect(v.view.status).toBe("finished");
     expect(v.view.result).not.toBeNull();
