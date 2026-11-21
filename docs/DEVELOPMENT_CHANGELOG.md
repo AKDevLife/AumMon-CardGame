@@ -2,6 +2,11 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-21 — 11.4 Rules update from the owner (ruleset 5)
+
+- Owner wrote the new rules; clarified with the owner: Active does not put the Object to sleep, Guard must be attacked first (awake or asleep), Guard and Flying never combine, bump to ruleset "5".
+- Engine `rules/v5` (engine 0.5.0): no Main → Battle lock (summon / activate after attacking), Active allowed while asleep and only once per turn, Guard forcing ignores sleep, Helmet cannot give Guard to a flying ally, validator rejects Guard + Flying cards. Migration `20261121000400_ruleset5.sql` (rows in place, `starter_v5`, unfinished ruleset 4 matches abandoned). Rules popup uses the owner's wording; spec v6.0; R4 recorded.
+
 ## 2026-11-21 — 11.3 Sort by SPARK cost (owner request)
 
 - Hand and "All cards" gallery ordered cheapest first (`sort.ts`; ties: playable first, then card id). Replaces the playable-first-only hand order.

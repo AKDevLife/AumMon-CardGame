@@ -1,6 +1,6 @@
 import type { RandomSource } from "../../rng/seeded-random.ts";
 import { getCardDefinition } from "./cards.ts";
-import { RULESET_V4 } from "./constants.ts";
+import { RULESET_V5 } from "./constants.ts";
 import { unitAtk, unitHp, unitKeywords } from "./stats.ts";
 import {
   cloneState,
@@ -123,8 +123,8 @@ function buildDeck(seat: Seat, list: Readonly<Record<string, number>>): CardInst
     getCardDefinition(cardId);
     for (let i = 0; i < copies; i++) cards.push({ instanceId: `p${seat}-${cards.length}`, cardId });
   }
-  if (cards.length !== RULESET_V4.deckSize)
-    throw new Error(`deck must have ${RULESET_V4.deckSize} cards`);
+  if (cards.length !== RULESET_V5.deckSize)
+    throw new Error(`deck must have ${RULESET_V5.deckSize} cards`);
   return cards;
 }
 
@@ -134,10 +134,10 @@ export function initializeMatch(input: MatchInput, rng: RandomSource): MatchStat
     const deck = shuffle(buildDeck(seat, input.decks[seat]), rng);
     return {
       playerId: input.playerIds[seat],
-      hp: RULESET_V4.playerHp,
+      hp: RULESET_V5.playerHp,
       spark: 0,
       maxSpark: 0,
-      hand: deck.splice(0, RULESET_V4.initialHand),
+      hand: deck.splice(0, RULESET_V5.initialHand),
       deck,
       units: [],
       discard: [],
@@ -147,7 +147,7 @@ export function initializeMatch(input: MatchInput, rng: RandomSource): MatchStat
   }) as [PlayerState, PlayerState];
   const firstSeat: Seat = rng.nextInt(2) === 0 ? 0 : 1;
   return {
-    rulesetVersion: "4",
+    rulesetVersion: "5",
     status: "mulligan",
     firstSeat,
     activeSeat: firstSeat,
@@ -178,7 +178,7 @@ const someoneDead = (s: MatchState) => s.players.some((p) => p.hp <= 0);
 
 function addToHand(ctx: Ctx, seat: Seat, card: CardInstance): boolean {
   const p = ctx.state.players[seat];
-  if (p.hand.length >= RULESET_V4.maxHand) {
+  if (p.hand.length >= RULESET_V5.maxHand) {
     p.discard.push(card);
     ctx.events.push({
       type: "card_burned",
@@ -294,7 +294,7 @@ function applyEffect(
   targets: readonly Target[],
 ): void {
   ctx.resolved += 1;
-  if (ctx.resolved > RULESET_V4.maxEffectsPerCommand)
+  if (ctx.resolved > RULESET_V5.maxEffectsPerCommand)
     throw new Error("effect limit exceeded (loop protection)");
   const { state, events } = ctx;
   const log = (target: EffectTarget, amount: number) => {
@@ -328,7 +328,7 @@ function applyEffect(
     if ("player" in t) {
       const p = state.players[t.player];
       if (effect.type === "damage") p.hp -= effect.amount;
-      else if (effect.type === "heal") p.hp = Math.min(RULESET_V4.playerHp, p.hp + effect.amount);
+      else if (effect.type === "heal") p.hp = Math.min(RULESET_V5.playerHp, p.hp + effect.amount);
       else continue;
       log({ player: t.player }, effect.amount);
       continue;
@@ -368,6 +368,16 @@ function applyEffect(
 
 // ---------------------------------------------------------------- Active targets
 
+/** No Object may have Guard and Flying at the same time (owner 2026-11-21). */
+function conflictsWith(u: UnitInstance, a: Active): boolean {
+  if (a.effect.type !== "keyword") return false;
+  const k = unitKeywords(u);
+  return (
+    (a.effect.keyword === "guard" && k.has("flying")) ||
+    (a.effect.keyword === "flying" && k.has("guard"))
+  );
+}
+
 const needsTarget = (e: Effect) => e.type !== "draw" && e.type !== "search";
 
 /** Instance ids / "player" the Active may pick, or null when its target is automatic. */
@@ -394,6 +404,7 @@ function pickOptions(
             !t.trait || (getCardDefinition(u.cardId).traits as readonly string[]).includes(t.trait),
         )
         .filter((u) => !t.exhaustedOnly || u.exhausted)
+        .filter((u) => !conflictsWith(u, a))
         .map((u) => u.instanceId);
     case "ally_or_own_player":
       return [...me.units.map((u) => u.instanceId), "player"];
@@ -411,7 +422,8 @@ function resolvePick(state: MatchState, seat: Seat, a: Active, choice: string): 
 
 function canActivate(u: UnitInstance): Active | null {
   const a = getCardDefinition(u.cardId).active;
-  if (!a || u.exhausted || u.activeUsed) return null;
+  // Ruleset 5: a sleeping Object may use its Active; once per turn (owner 2026-11-21).
+  if (!a || u.activeUsed) return null;
   return a;
 }
 
@@ -421,7 +433,6 @@ function activate(ctx: Ctx, seat: Seat, instanceId: string, choice: string | und
   const unit = findUnit(me.units, instanceId);
   const a = getCardDefinition(unit.cardId).active;
   if (!a) throw new CommandError("no_active");
-  if (unit.exhausted) throw new CommandError("unit_exhausted");
   if (unit.activeUsed) throw new CommandError("active_used");
   // Targets are validated before anything is paid (spec §5.3 step 4).
   const options = pickOptions(state, seat, unit, a);
@@ -433,9 +444,8 @@ function activate(ctx: Ctx, seat: Seat, instanceId: string, choice: string | und
     targets = autoTargets(state, seat, unit.instanceId, a.target as AutoTarget);
     if (needsTarget(a.effect) && targets.length === 0) throw new CommandError("invalid_target");
   }
-  // Actives are free (owner 2026-11-21, ruleset 4); the source sleeps now or at end of turn.
+  // Actives are free and do not put the source to sleep (ruleset 5), unless the card says so.
   if (a.sleepAtEndOfTurn) unit.sleepAtEnd = true;
-  else unit.exhausted = true;
   unit.activeUsed = true;
   ctx.events.push({
     type: "ability_activated",
@@ -464,7 +474,7 @@ function startTurn(ctx: Ctx, seat: Seat): void {
   expire(state, seat === 0 ? "start_of_0" : "start_of_1");
   const p = state.players[seat];
   for (const u of p.units) u.exhausted = false;
-  p.maxSpark = Math.min(RULESET_V4.maxSpark, p.maxSpark + 1);
+  p.maxSpark = Math.min(RULESET_V5.maxSpark, p.maxSpark + 1);
   p.spark = p.maxSpark;
   ctx.events.push({ type: "turn_started", seat, turn: state.turn, spark: p.spark });
   if (state.turn > 1) draw(ctx, seat);
@@ -494,7 +504,7 @@ function summon(ctx: Ctx, seat: Seat, instanceId: string): void {
   const card = me.hand.find((c) => c.instanceId === instanceId);
   if (!card) throw new CommandError("card_not_in_hand");
   const def = getCardDefinition(card.cardId);
-  if (me.units.length >= RULESET_V4.maxUnits) throw new CommandError("unit_zone_full");
+  if (me.units.length >= RULESET_V5.maxUnits) throw new CommandError("unit_zone_full");
   if (me.spark < def.cost) throw new CommandError("not_enough_spark");
   me.spark -= def.cost;
   me.hand = me.hand.filter((c) => c !== card);
@@ -553,11 +563,11 @@ export function applyCommand(state: MatchState, command: Command, rng: RandomSou
       break;
     }
     case "summon":
-      requireMain(next, seat);
+      requireTurn(next, seat);
       summon(ctx, seat, command.instanceId);
       break;
     case "activate":
-      requireMain(next, seat);
+      requireTurn(next, seat);
       activate(ctx, seat, command.instanceId, command.target);
       break;
     case "attack":
@@ -577,11 +587,6 @@ function requireTurn(state: MatchState, seat: Seat): void {
   if (seat !== state.activeSeat) throw new CommandError("not_your_turn");
 }
 
-function requireMain(state: MatchState, seat: Seat): void {
-  requireTurn(state, seat);
-  if (state.phase !== "main") throw new CommandError("wrong_phase");
-}
-
 function findUnit(units: readonly UnitInstance[], instanceId: string): UnitInstance {
   const unit = units.find((u) => u.instanceId === instanceId);
   if (!unit) throw new CommandError("unknown_unit");
@@ -590,13 +595,9 @@ function findUnit(units: readonly UnitInstance[], instanceId: string): UnitInsta
 
 // ---------------------------------------------------------------- combat
 
-/** Ready Guards the attacker must hit first (spec §5.1 GUARD; R2-4). */
-function forcingGuards(attacker: UnitInstance, defenders: readonly UnitInstance[]): UnitInstance[] {
-  const flies = unitKeywords(attacker).has("flying");
-  return defenders.filter((d) => {
-    const k = unitKeywords(d);
-    return k.has("guard") && !d.exhausted && (flies || !k.has("flying"));
-  });
+/** Guards the attacker must hit first — awake or asleep (ruleset 5, owner 2026-11-21). */
+function forcingGuards(defenders: readonly UnitInstance[]): UnitInstance[] {
+  return defenders.filter((d) => unitKeywords(d).has("guard"));
 }
 
 function canTarget(
@@ -604,7 +605,7 @@ function canTarget(
   defenders: readonly UnitInstance[],
   target: string,
 ): CommandErrorCode | null {
-  const guards = forcingGuards(attacker, defenders);
+  const guards = forcingGuards(defenders);
   if (target === "player") return guards.length > 0 ? "guard_blocks" : null;
   const def = defenders.find((d) => d.instanceId === target);
   if (!def) return "unknown_unit";
@@ -625,7 +626,6 @@ function resolveAttack(ctx: Ctx, seat: Seat, attackerId: string, target: string)
   const error = canTarget(attacker, foe.units, target);
   if (error) throw new CommandError(error);
 
-  state.phase = "battle";
   attacker.exhausted = true;
   enqueue(ctx, seat, attacker, "on_attack");
   resolveQueue(ctx);
@@ -679,8 +679,8 @@ export function getLegalCommands(state: MatchState, seat: Seat): LegalCommand[] 
   if (seat !== state.activeSeat) return [];
   const foe = state.players[other(seat)];
   const out: LegalCommand[] = [];
-  if (state.phase === "main") {
-    if (me.units.length < RULESET_V4.maxUnits)
+  {
+    if (me.units.length < RULESET_V5.maxUnits)
       for (const c of me.hand)
         if (getCardDefinition(c.cardId).cost <= me.spark)
           out.push({ type: "summon", instanceId: c.instanceId });

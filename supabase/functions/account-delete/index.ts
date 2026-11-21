@@ -1,6 +1,6 @@
 // POST { confirm: "DELETE" } → { ok }   Task 7.4: delete the caller's account.
 // Active matches are forfeited first; finished history stays anonymized (migration 20261120000100).
-import { v4 } from "@aummon/game-engine";
+import { v5 } from "@aummon/game-engine";
 import { requireUser } from "../_shared/auth.ts";
 import { db } from "../_shared/db.ts";
 import { handler, HttpError, readJson } from "../_shared/http.ts";
@@ -19,18 +19,18 @@ Deno.serve(
     const seats = await db()<{ match_id: string }[]>`
       select mp.match_id from public.match_players mp join public.matches m on m.id = mp.match_id
       join public.game_rooms r on r.id = m.room_id
-      where mp.user_id = ${userId} and m.status = 'active' and m.ruleset_version = '4' and r.mode <> 'pass_play'`;
+      where mp.user_id = ${userId} and m.status = 'active' and m.ruleset_version = '5' and r.mode <> 'pass_play'`;
     for (const { match_id } of seats) {
       await withTcg(userId, match_id, {
         act: (state, seat, rng) =>
-          v4.applyCommand(state, { type: "forfeit", playerId: state.players[seat].playerId }, rng),
+          v5.applyCommand(state, { type: "forfeit", playerId: state.players[seat].playerId }, rng),
       });
     }
-    // Retired ruleset 1–3 matches cannot be played any more.
+    // Retired ruleset 1–4 matches cannot be played any more.
     await db()`
       update public.matches m set status = 'abandoned', finished_at = now()
       from public.match_players mp
-      where mp.match_id = m.id and mp.user_id = ${userId} and m.status = 'active' and m.ruleset_version in ('1','2','3')`;
+      where mp.match_id = m.id and mp.user_id = ${userId} and m.status = 'active' and m.ruleset_version in ('1','2','3','4')`;
     // 2. Pass & Play matches the user hosted cannot continue without the device owner.
     await db()`
       update public.matches m set status = 'abandoned', finished_at = now()

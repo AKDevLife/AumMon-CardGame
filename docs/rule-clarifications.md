@@ -44,3 +44,7 @@ Owner approved every recommendation of the audit ("ทำตามคำแน�
 - **D9 Ruleset:** `"3"`; ruleset "2" retired after the switch (owner: delete old rules once the new ones work).
 - **D10 Art:** placeholder Living-Objects art by Claude until real art.
 - **D11 Rarity / launch set size / numeric power budget:** after playtest.
+
+## R4 — Flexible turn & Guard while asleep — ✅ Owner decided 2026-11-21 (ruleset "5")
+
+Supersedes R2-4 (Guard only when Ready) and R2-6 (Main → Battle one way), and D2's "source must be Ready / sleeps after use": actions in any order during your turn; Active usable while asleep, once per turn, does not put the Object to sleep (except "หลับตอนจบเทิร์น"); Guard works while asleep and must be attacked first (no attacking other Objects or the player); Guard and Flying never combine. Spec v6.0 §4.4, §5.1, §5.3.

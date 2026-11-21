@@ -1,4 +1,4 @@
-import type { v4 } from "@aummon/game-engine";
+import type { v5 } from "@aummon/game-engine";
 import { cardName, describeEvent, KEYWORD_LABEL } from "../tcg/labels.ts";
 
 /** Human-readable Thai text for admin data (no database/program words on screen). */
@@ -24,7 +24,7 @@ const MAPS: Record<string, Record<string, string>> = {
   roomStatus: { lobby: "รอผู้เล่น", playing: "กำลังเล่น", closed: "ปิดแล้ว" },
   matchStatus: { active: "กำลังเล่น", finished: "จบแล้ว", abandoned: "ถูกยุติ", created: "กำลังเริ่ม" },
   mode: { solo: "เล่นกับ Bot", pass_play: "เครื่องเดียวกัน", online: "ออนไลน์" },
-  phase: { mulligan: "เลือกเปลี่ยนการ์ด", main: "ช่วงลงการ์ด", battle: "ช่วงต่อสู้" },
+  phase: { mulligan: "เลือกเปลี่ยนการ์ด", main: "เทิร์นของผู้เล่น", battle: "ช่วงต่อสู้" },
   seatType: { human: "ผู้เล่น", bot: "Bot", local: "ผู้เล่นในเครื่อง" },
   cardType: {
     unit: "Unit (ตัวละคร)",
@@ -74,7 +74,7 @@ export function keywords(v: unknown): string {
   if (!Array.isArray(v) || v.length === 0) return "—";
   return v
     .map((k) =>
-      typeof k === "string" && k in KEYWORD_LABEL ? KEYWORD_LABEL[k as v4.Keyword] : String(k),
+      typeof k === "string" && k in KEYWORD_LABEL ? KEYWORD_LABEL[k as v5.Keyword] : String(k),
     )
     .join(", ");
 }
@@ -97,7 +97,7 @@ export const card = (v: unknown): string => (typeof v === "string" ? cardName(v)
 /** Readable game event sentence from its public payload (seats shown as Player 1/2). */
 export function eventText(payload: unknown): string {
   if (typeof payload !== "object" || payload === null) return "—";
-  return describeEvent(payload as v4.GameEvent, ["ผู้เล่น 1", "ผู้เล่น 2"]) ?? "จบเทิร์น / จั่วการ์ด";
+  return describeEvent(payload as v5.GameEvent, ["ผู้เล่น 1", "ผู้เล่น 2"]) ?? "จบเทิร์น / จั่วการ์ด";
 }
 
 export function shortId(v: unknown): string {

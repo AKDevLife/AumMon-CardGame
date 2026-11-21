@@ -46,7 +46,7 @@ export type TurnPhase = "main" | "battle";
 export type MatchResult = { readonly winner: Seat } | { readonly draw: true };
 
 export interface MatchState {
-  readonly rulesetVersion: "4";
+  readonly rulesetVersion: "5";
   status: MatchStatus;
   readonly firstSeat: Seat;
   activeSeat: Seat;

@@ -1,6 +1,6 @@
 // POST { matchId, expectedVersion, idempotencyKey, command: { type, ... } } → TcgResponse
 // Intent only: the server picks the acting seat and computes every result (spec §1.3).
-import { v4 } from "@aummon/game-engine";
+import { v5 } from "@aummon/game-engine";
 import { requireUser } from "../_shared/auth.ts";
 import { handler, HttpError, readJson } from "../_shared/http.ts";
 import { int, rejectServerFields, uuid } from "../_shared/input.ts";
@@ -72,9 +72,9 @@ Deno.serve(
       receipt: { key, hash },
       act: (state, seat, rng) =>
         // Shape validated above; the engine validates every rule and throws CommandError otherwise.
-        v4.applyCommand(
+        v5.applyCommand(
           state,
-          { ...intent, playerId: state.players[seat].playerId } as v4.Command,
+          { ...intent, playerId: state.players[seat].playerId } as v5.Command,
           rng,
         ),
     });

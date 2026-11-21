@@ -1,7 +1,7 @@
-import { v4 } from "@aummon/game-engine";
+import { v5 } from "@aummon/game-engine";
 
-/** Thai UI text for ruleset 4 (Everyday Objects Battle). */
-export const KEYWORD_LABEL: Record<v4.Keyword, string> = {
+/** Thai UI text for ruleset 5 (Everyday Objects Battle). */
+export const KEYWORD_LABEL: Record<v5.Keyword, string> = {
   haste: "โจมตีทันที",
   guard: "โล่กำบัง",
   flying: "บินได้",
@@ -9,21 +9,21 @@ export const KEYWORD_LABEL: Record<v4.Keyword, string> = {
 };
 
 /** Keyword badge style: icon + color token (never color alone). */
-export const KEYWORD_STYLE: Record<v4.Keyword, { icon: string; color: string }> = {
+export const KEYWORD_STYLE: Record<v5.Keyword, { icon: string; color: string }> = {
   haste: { icon: "💨", color: "var(--color-haste)" },
   guard: { icon: "🛡️", color: "var(--color-guard)" },
   flying: { icon: "🪽", color: "var(--color-flying)" },
   piercing: { icon: "🎯", color: "var(--color-piercing)" },
 };
 
-export const KEYWORD_HELP: Record<v4.Keyword, string> = {
+export const KEYWORD_HELP: Record<v5.Keyword, string> = {
   haste: "โจมตีได้ทันทีในเทิร์นที่ลง",
-  guard: "ต้องถูกโจมตีก่อน (เฉพาะตอนตื่น ไม่หลับ)",
+  guard: "ต้องถูกโจมตีก่อน ถึงจะโจมตีตัวอื่นหรือผู้เล่นโดยตรงได้ (ทำงานแม้หลับ · ตัวที่มีโล่จะบินไม่ได้)",
   flying: "ตัวที่ไม่บินโจมตีไม่ได้",
   piercing: "ดาเมจเกินทะลุเข้าผู้เล่น",
 };
 
-export const TRAIT_LABEL: Record<v4.Trait, string> = {
+export const TRAIT_LABEL: Record<v5.Trait, string> = {
   STATIONERY: "เครื่องเขียน",
   CONTAINER: "ที่เก็บของ",
   VEHICLE: "พาหนะ",
@@ -63,7 +63,7 @@ export const CARD_ART: Record<string, string> = {
 
 export const cardName = (cardId: string): string => {
   try {
-    return v4.getCardDefinition(cardId).name;
+    return v5.getCardDefinition(cardId).name;
   } catch {
     return cardId;
   }
@@ -71,15 +71,15 @@ export const cardName = (cardId: string): string => {
 
 const PHASE: Record<string, string> = {
   mulligan: "เลือกเปลี่ยนการ์ดในมือ",
-  main: "ช่วงลงการ์ด",
+  main: "เทิร์นของผู้เล่น",
   battle: "ช่วงต่อสู้",
 };
-export const phaseLabel = (view: v4.PlayerView): string =>
+export const phaseLabel = (view: v5.PlayerView): string =>
   view.status === "mulligan" ? (PHASE["mulligan"] ?? "") : (PHASE[view.phase] ?? view.phase);
 
 type Names = readonly [string, string];
 
-function unitNameIn(view: v4.PlayerView | null, id: string): string {
+function unitNameIn(view: v5.PlayerView | null, id: string): string {
   if (!view) return "ตัวละคร";
   for (const p of view.players) {
     const u = p.units.find((x) => x.instanceId === id);
@@ -89,8 +89,8 @@ function unitNameIn(view: v4.PlayerView | null, id: string): string {
 }
 
 /** One line per public event; never reveals hidden cards (draw events carry no card id). */
-export function describeEvent(e: v4.GameEvent, names: Names): string | null {
-  const who = (s: v4.Seat) => names[s];
+export function describeEvent(e: v5.GameEvent, names: Names): string | null {
+  const who = (s: v5.Seat) => names[s];
   switch (e.type) {
     case "turn_started":
       return `— เทิร์น ${String(e.turn)}: ${who(e.seat)} (พลังงาน ${String(e.spark)}) —`;
@@ -112,11 +112,11 @@ export function describeEvent(e: v4.GameEvent, names: Names): string | null {
     case "unit_destroyed":
       return `${cardName(e.cardId)} ของ ${who(e.seat)} ถูกทำลาย`;
     case "ability_activated": {
-      const a = v4.getCardDefinition(e.cardId).active;
+      const a = v5.getCardDefinition(e.cardId).active;
       return `${who(e.seat)}: ${cardName(e.cardId)} ใช้ "${a?.name ?? "ความสามารถ"}"`;
     }
     case "ability_triggered": {
-      const p = v4.getCardDefinition(e.cardId).passive;
+      const p = v5.getCardDefinition(e.cardId).passive;
       return `${cardName(e.cardId)} ทำงาน: "${p?.name ?? "ความสามารถ"}"`;
     }
     case "effect_applied":
@@ -131,7 +131,7 @@ export function describeEvent(e: v4.GameEvent, names: Names): string | null {
 }
 
 /** Button label for a legal command (target names resolved from the view). */
-export function commandLabel(c: v4.LegalCommand, view: v4.PlayerView): string {
+export function commandLabel(c: v5.LegalCommand, view: v5.PlayerView): string {
   switch (c.type) {
     case "mulligan":
       return "ยืนยันมือ";
@@ -141,7 +141,7 @@ export function commandLabel(c: v4.LegalCommand, view: v4.PlayerView): string {
       return c.target === "player" ? "⚔️ โจมตีผู้เล่น" : `⚔️ โจมตี ${unitNameIn(view, c.target)}`;
     case "activate": {
       const src = view.players.flatMap((p) => p.units).find((u) => u.instanceId === c.instanceId);
-      const a = src ? v4.getCardDefinition(src.cardId).active : null;
+      const a = src ? v5.getCardDefinition(src.cardId).active : null;
       const name = `✨ ${a?.name ?? "ใช้ความสามารถ"}`;
       if (c.target === undefined) return name;
       if (c.target === "player") {
@@ -156,7 +156,7 @@ export function commandLabel(c: v4.LegalCommand, view: v4.PlayerView): string {
 }
 
 /** Instances a legal command "belongs to" (what the player taps first). */
-export function commandSubjects(c: v4.LegalCommand): string[] {
+export function commandSubjects(c: v5.LegalCommand): string[] {
   switch (c.type) {
     case "summon":
     case "activate":
@@ -169,14 +169,14 @@ export function commandSubjects(c: v4.LegalCommand): string[] {
 }
 
 /** Unit ids a command points at (green "valid target" ring). */
-export function commandTarget(c: v4.LegalCommand): string | null {
+export function commandTarget(c: v5.LegalCommand): string | null {
   if ((c.type === "attack" || c.type === "activate") && c.target && c.target !== "player")
     return c.target;
   return null;
 }
 
 /** History grouped by turn, newest turn first; lines inside a turn stay in play order (owner request). */
-export function historyByTurn(events: readonly v4.GameEvent[], names: Names) {
+export function historyByTurn(events: readonly v5.GameEvent[], names: Names) {
   const groups: { key: string; title: string; lines: string[] }[] = [];
   for (const [i, e] of events.entries()) {
     if (e.type === "turn_started" || groups.length === 0) {

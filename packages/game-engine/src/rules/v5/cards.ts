@@ -35,7 +35,7 @@ function obj(
   };
 }
 
-export const CARD_DEFINITIONS_V4: readonly CardDefinition[] = [
+export const CARD_DEFINITIONS_V5: readonly CardDefinition[] = [
   // ---- Aggro
   obj(
     "O01",
@@ -298,7 +298,7 @@ export const CARD_DEFINITIONS_V4: readonly CardDefinition[] = [
     },
     {
       name: "ล็อกประตู",
-      text: "ทำให้ศัตรูที่พร้อม 1 ตัวหลับ",
+      text: "ทำให้ศัตรูที่ตื่นอยู่ 1 ตัวหลับ",
       target: { pick: "enemy_unit", readyOnly: true },
       effect: { type: "exhaust" },
     },
@@ -325,7 +325,7 @@ export const CARD_DEFINITIONS_V4: readonly CardDefinition[] = [
     },
     {
       name: "เลื่อนปลุก",
-      text: "ทำให้ศัตรูที่พร้อม 1 ตัวหลับ",
+      text: "ทำให้ศัตรูที่ตื่นอยู่ 1 ตัวหลับ",
       target: { pick: "enemy_unit", readyOnly: true },
       effect: { type: "exhaust" },
     },
@@ -574,7 +574,7 @@ export const CARD_DEFINITIONS_V4: readonly CardDefinition[] = [
   ),
 ];
 
-const BY_ID = new Map(CARD_DEFINITIONS_V4.map((c) => [c.cardId, c]));
+const BY_ID = new Map(CARD_DEFINITIONS_V5.map((c) => [c.cardId, c]));
 
 export function getCardDefinition(cardId: string): CardDefinition {
   const def = BY_ID.get(cardId);

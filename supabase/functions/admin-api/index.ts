@@ -1,7 +1,7 @@
 // POST { action, ...params } → admin data. Every call: session + super_admin role + MFA (aal2),
 // checked server-side in requireAdmin. Mutations are audited. Catalog data is read-only
 // (owner decision 2026-11-20: rule changes go through the spec + PR, not the dashboard).
-import { createSeededRandom, ENGINE_VERSION, RULESET_VERSION, v4 } from "@aummon/game-engine";
+import { createSeededRandom, ENGINE_VERSION, RULESET_VERSION, v5 } from "@aummon/game-engine";
 import { appEnv, audit, authAdmin, requireAdmin, type AdminContext } from "../_shared/admin.ts";
 import { db } from "../_shared/db.ts";
 import { handler, HttpError, readJson } from "../_shared/http.ts";
@@ -117,7 +117,7 @@ const actions: Record<string, Action> = {
   cards: async () => ({
     cards: await db()`
       select id, name, description, effect_spec, rarity, cost, atk, hp, traits, keywords, is_enabled
-      from public.card_definitions where ruleset_version = '4' order by id`,
+      from public.card_definitions where ruleset_version = '5' order by id`,
   }),
 
   decks: async () =>
@@ -125,7 +125,7 @@ const actions: Record<string, Action> = {
       select t.id, t.version, t.is_active, t.ruleset_version, c.card_definition_id, c.quantity
       from public.deck_templates t join public.deck_template_cards c
         on c.deck_template_id = t.id and c.deck_template_version = t.version
-      where t.ruleset_version = '4' order by t.id, c.card_definition_id`,
+      where t.ruleset_version = '5' order by t.id, c.card_definition_id`,
 
   /** Open rooms with a server-computed `stale_reason` (null = healthy). */
   rooms: async (_a, body) =>
@@ -204,20 +204,20 @@ const actions: Record<string, Action> = {
         seed[2] ?? 0,
         seed[3] ?? 0,
       ]);
-      let s = v4.initializeMatch(
-        { playerIds: ["a", "b"], decks: [v4.STARTER_DECK_V4, v4.STARTER_DECK_V4] },
+      let s = v5.initializeMatch(
+        { playerIds: ["a", "b"], decks: [v5.STARTER_DECK_V5, v5.STARTER_DECK_V5] },
         rng,
       );
       for (let n = 0; n < 3000 && s.status !== "finished"; n++) {
-        const seat: v4.Seat =
+        const seat: v5.Seat =
           s.status === "mulligan" ? (s.players[0].mulliganDone ? 1 : 0) : s.activeSeat;
-        const pick = v4.chooseBotCommand(
-          v4.getPlayerView(s, seat),
-          v4.getLegalCommands(s, seat),
+        const pick = v5.chooseBotCommand(
+          v5.getPlayerView(s, seat),
+          v5.getLegalCommands(s, seat),
           rng,
         );
         const playerId = s.players[seat].playerId;
-        s = v4.applyCommand(
+        s = v5.applyCommand(
           s,
           pick.type === "mulligan"
             ? { type: "mulligan", playerId, instanceIds: [] }
@@ -279,7 +279,7 @@ const actions: Record<string, Action> = {
       env: appEnv(),
       engineVersion: ENGINE_VERSION,
       rulesetVersion: RULESET_VERSION,
-      turnTimeoutMs: v4.RULESET_V4.turnTimeoutMs,
+      turnTimeoutMs: v5.RULESET_V5.turnTimeoutMs,
       devToolsEnabled: appEnv() === "development",
       mfaRequired: true,
     }),

@@ -3,7 +3,7 @@
 > เอกสารออกแบบระบบและคู่มือเริ่มพัฒนาจริงสำหรับ AumMon  
 > ใช้คู่กับ `aummon_game_spec.md` ซึ่งเป็นแหล่งอ้างอิงหลักของกติกาเกม  
 > เวอร์ชัน: 1.2 | อัปเดต: 2026-11-20 | สถานะ: Implementation Blueprint  
-> **2026-11-21:** เกมเป็น Everyday Objects Battle (Spec v5.0, `ruleset_version = "4"`: Object Cards + Passive/free Active; engine `packages/game-engine/src/rules/v4`, ตาราง recipe ถูกลบแล้ว). ก่อนหน้า 2026-11-20: เปลี่ยนเป็น TCG 1v1 (Spec v3.0, ruleset "2" — ยกเลิกแล้ว). Platform, Auth, Security, Stack และ Operations ยังใช้ได้ตามเดิม. หัวข้อที่อธิบายกติกาเก่า 2–4 คน (§3.4 ตาราง Game, §5.2, §5.5–5.7) เป็นของ `ruleset_version = "1"` และจะถูกแทนที่ระหว่าง Roadmap Phase 8 — กติกาที่ถูกต้องอยู่ใน `aummon_game_spec.md`
+> **2026-11-21:** เกมเป็น Everyday Objects Battle (Spec v6.0, `ruleset_version = "5"`: Object Cards + Passive/free Active; engine `packages/game-engine/src/rules/v5`, ตาราง recipe ถูกลบแล้ว). ก่อนหน้า 2026-11-20: เปลี่ยนเป็น TCG 1v1 (Spec v3.0, ruleset "2" — ยกเลิกแล้ว). Platform, Auth, Security, Stack และ Operations ยังใช้ได้ตามเดิม. หัวข้อที่อธิบายกติกาเก่า 2–4 คน (§3.4 ตาราง Game, §5.2, §5.5–5.7) เป็นของ `ruleset_version = "1"` และจะถูกแทนที่ระหว่าง Roadmap Phase 8 — กติกาที่ถูกต้องอยู่ใน `aummon_game_spec.md`
 
 ---
 
@@ -653,7 +653,7 @@ Policies ข้างต้นเป็นตัวอย่างขั้น�
 
 ### 5.2 TypeScript domain contracts
 
-> ⚠ Contracts ด้านล่างเป็นของ ruleset 1 (เลิกใช้). Ruleset 3 ใช้ Card Definitions / Card Instances / Match State / Match Events ตาม Spec v5.0 §3.3 และ Data Contract §6.4 — โค้ดจริงอยู่ที่ `packages/game-engine/src/rules/v4`
+> ⚠ Contracts ด้านล่างเป็นของ ruleset 1 (เลิกใช้). Ruleset 3 ใช้ Card Definitions / Card Instances / Match State / Match Events ตาม Spec v6.0 §3.3 และ Data Contract §6.4 — โค้ดจริงอยู่ที่ `packages/game-engine/src/rules/v5`
 
 ```ts
 export type PlayerId = string;
@@ -857,7 +857,7 @@ export interface BotStrategy {
 
 Bot ต้องไม่รับ Full GameState หรือ Hand คู่แข่ง ใช้ Difficulty Presets เช่น `easy`, `normal`, `hard` ผ่าน Weight/Heuristic ที่ปรับได้ ไม่ต้องใช้ LLM ในการตัดสินใจทุก Turn
 
-ตัวอย่าง Heuristic เริ่มต้น (ruleset 1; Bot ruleset 3 ให้คะแนนการลง Object / ใช้ความสามารถ / โจมตี — `rules/v4/bot.ts`):
+ตัวอย่าง Heuristic เริ่มต้น (ruleset 1; Bot ruleset 3 ให้คะแนนการลง Object / ใช้ความสามารถ / โจมตี — `rules/v5/bot.ts`):
 - HP ต่ำ: เพิ่มน้ำหนัก Defense/Heal
 - HP เต็ม: ลดน้ำหนัก Heal
 - เลือก Attack Target จาก HP, Threat และโอกาสชนะ

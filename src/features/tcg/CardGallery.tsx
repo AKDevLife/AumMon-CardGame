@@ -1,17 +1,17 @@
-import { v4 } from "@aummon/game-engine";
+import { v5 } from "@aummon/game-engine";
 import { useState } from "react";
 import { CardFrame } from "./CardFrame.tsx";
 import { TRAIT_LABEL } from "./labels.ts";
 import { sortByCost } from "./sort.ts";
 
-const TRAITS = Object.keys(TRAIT_LABEL) as v4.Trait[];
+const TRAITS = Object.keys(TRAIT_LABEL) as v5.Trait[];
 
 /** All Objects filtered by Thai category; tap a card to see its stats and abilities (owner request). */
 export function CardGallery() {
-  const [trait, setTrait] = useState<v4.Trait | null>(null);
+  const [trait, setTrait] = useState<v5.Trait | null>(null);
   const [open, setOpen] = useState<string | null>(null);
   const cards = sortByCost(
-    v4.CARD_DEFINITIONS_V4.filter((c) => trait === null || c.traits.includes(trait)),
+    v5.CARD_DEFINITIONS_V5.filter((c) => trait === null || c.traits.includes(trait)),
   );
 
   if (open)
@@ -30,7 +30,7 @@ export function CardGallery() {
       </div>
     );
 
-  const chip = (label: string, value: v4.Trait | null) => (
+  const chip = (label: string, value: v5.Trait | null) => (
     <button
       key={label}
       type="button"
