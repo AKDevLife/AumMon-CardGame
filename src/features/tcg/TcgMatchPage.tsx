@@ -341,6 +341,10 @@ export function TcgMatchPage() {
 
       <div
         data-drop="field"
+        role="region"
+        aria-label="สนาม"
+        // Scrollable on small screens: keyboard users must be able to focus and scroll it (WCAG).
+        tabIndex={0}
         className={`flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto bg-am-field p-1.5 ${attackFx ? "am-fx-attack" : ""}`}
       >
         {finished && (
