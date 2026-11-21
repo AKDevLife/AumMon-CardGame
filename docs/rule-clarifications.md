@@ -48,3 +48,7 @@ Owner approved every recommendation of the audit ("ทำตามคำแน�
 ## R4 — Flexible turn & Guard while asleep — ✅ Owner decided 2026-11-21 (ruleset "5")
 
 Supersedes R2-4 (Guard only when Ready) and R2-6 (Main → Battle one way), and D2's "source must be Ready / sleeps after use": actions in any order during your turn; Active usable while asleep, once per turn, does not put the Object to sleep (except "หลับตอนจบเทิร์น"); Guard works while asleep and must be attacked first (no attacking other Objects or the player); Guard and Flying never combine. Spec v6.0 §4.4, §5.1, §5.3.
+
+## R5 — First-player advantage — ⏳ Open (needs owner decision)
+
+Bot-vs-bot simulation (8,000 games, ruleset 5 after the 11.5 balance pass): the first player wins ~68%. Fixing it needs a core-rule change (e.g. the second player draws 1 extra card or starts with +1 SPARK on their first turn, or the first player cannot attack on turn 1). Not changed without owner approval.

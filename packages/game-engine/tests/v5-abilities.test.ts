@@ -134,13 +134,15 @@ describe("ruleset 3 — Active abilities (framework §3.1)", () => {
     expect(unitAtk(t.state.players[1].units, u(t.state, 1, "x"))).toBe(3);
   });
 
-  it("Power Strip readies another exhausted ELECTRONIC only", () => {
+  it("Power Strip gives another ELECTRONIC +2 ATK; Alarm Clock wakes a sleeping ally", () => {
     const s = board([obj("ps", "O20"), obj("c", "O13", true), obj("p", "O01", true)], []);
     expect(errorOf(() => play(s, { type: "activate", instanceId: "ps", target: "p" }))).toBe(
       "invalid_target",
     );
     const t = play(s, { type: "activate", instanceId: "ps", target: "c" });
-    expect(u(t.state, 0, "c").exhausted).toBe(false);
+    expect(unitAtk(t.state.players[0].units, u(t.state, 0, "c"))).toBe(3);
+    const w = play(t.state, { type: "activate", instanceId: "c", target: "p" });
+    expect(u(w.state, 0, "p").exhausted).toBe(false);
   });
 
   it("Rubber Band can hit the enemy player", () => {

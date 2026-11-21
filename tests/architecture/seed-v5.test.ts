@@ -6,7 +6,7 @@ import {
   STARTER_DECK_V5,
 } from "../../packages/game-engine/src/rules/v5/index.ts";
 
-const sql = readFileSync("supabase/migrations/20261121000400_ruleset5.sql", "utf8");
+const sql = readFileSync("supabase/migrations/20261121000500_balance_pass.sql", "utf8");
 const q = (s: string) => `'${s.replace(/'/g, "''")}'`;
 const arr = (a: readonly string[]) => `'{${a.join(",")}}'`;
 
