@@ -186,3 +186,21 @@ export function commandSubjects(c: v2.LegalCommand): string[] {
       return [];
   }
 }
+
+/** History grouped by turn, newest turn first; lines inside a turn stay in play order (owner request). */
+export function historyByTurn(events: readonly v2.GameEvent[], names: Names) {
+  const groups: { key: string; title: string; lines: string[] }[] = [];
+  for (const [i, e] of events.entries()) {
+    if (e.type === "turn_started" || groups.length === 0) {
+      groups.push({
+        key: `g${String(i)}`,
+        title: e.type === "turn_started" ? `เทิร์น ${String(e.turn)} · ${names[e.seat]}` : "ก่อนหน้า",
+        lines: [],
+      });
+      if (e.type === "turn_started") continue;
+    }
+    const line = describeEvent(e, names);
+    if (line) groups[groups.length - 1]?.lines.push(line);
+  }
+  return groups.filter((g) => g.lines.length > 0 || g.title !== "ก่อนหน้า").reverse();
+}

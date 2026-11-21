@@ -47,3 +47,27 @@ describe("ruleset 2 labels", () => {
     expect(commandSubjects({ type: "end_turn" })).toEqual([]);
   });
 });
+
+import { historyByTurn } from "./labels.ts";
+
+describe("history", () => {
+  it("groups by turn with the newest turn first", () => {
+    const g = historyByTurn(
+      [
+        { type: "turn_started", seat: 0, turn: 1, spark: 1 },
+        {
+          type: "unit_summoned",
+          seat: 0,
+          instanceId: "a",
+          cardId: "U001_RUBBER_DUCKLING",
+          exhausted: false,
+        },
+        { type: "turn_started", seat: 1, turn: 2, spark: 1 },
+        { type: "forfeit", seat: 1 },
+      ],
+      ["Aum", "Bot"],
+    );
+    expect(g.map((x) => x.title)).toEqual(["เทิร์น 2 · Bot", "เทิร์น 1 · Aum"]);
+    expect(g[1]?.lines).toEqual(["Aum ลง เป็ดยางจิ๋ว"]);
+  });
+});

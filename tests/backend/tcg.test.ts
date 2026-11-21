@@ -101,19 +101,24 @@ describe.runIf(run)("ruleset 2 matches via Edge Functions", () => {
     expect((await send(a, v, { type: "end_turn" })).body["error"]).toBe("stale_version");
     v = first.body as unknown as Tcg;
 
-    for (let i = 0; i < 400 && v.view.status !== "finished"; i++) {
+    for (let i = 0; i < 1500 && v.view.status !== "finished"; i++) {
       const pick =
         v.legal.find((c) => c.type === "attack") ??
         v.legal.find((c) => c.type === "summon") ??
         v.legal.find((c) => c.type === "end_turn");
-      if (!pick) throw new Error("no legal command");
+      if (!pick) {
+        // Bot turns are paced on the server: wait for its next step, then refresh.
+        await new Promise((r) => setTimeout(r, 750));
+        v = (await a("tcg-view", { matchId })).body as unknown as Tcg;
+        continue;
+      }
       const res = await send(a, v, pick);
       expect(res.status).toBe(200);
       v = res.body as unknown as Tcg;
     }
     expect(v.view.status).toBe("finished");
     expect(v.view.result).not.toBeNull();
-  }, 120_000);
+  }, 600_000);
 
   it("rejects illegal intents with engine error codes", async () => {
     const matchId = (await a("tcg-create", { mode: "solo" })).body["matchId"] as string;

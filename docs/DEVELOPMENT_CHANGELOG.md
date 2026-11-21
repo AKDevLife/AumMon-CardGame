@@ -2,6 +2,11 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-21 — 9.15 Paced bot, drag & drop, history order (owner request)
+
+- **Bot pacing (server):** `tcg-flow.ts` now runs one bot action per step, `BOT_STEP_MS = 700` apart (deadline holds the next step time; bot mulligan stays instant). `tcg-view` reports `botActing`; the client refreshes at each step and shows "🤖 Bot กำลังเล่น…". Flow/backend/load tests updated for paced turns. No rule change.
+- **UI:** history grouped by turn, newest turn on top (`historyByTurn` + test); hand sorts playable cards first; drag & drop via pointer events (`DraggableCard.tsx`, no dependency): drag up from the hand, unit → empty slot (green "วางที่นี่") summons, equipment → highlighted unit attaches, action → command popup; tapping still works and sideways swipes still scroll the hand.
+
 ## 2026-11-21 — 9.14 Game screen layout B (owner choice)
 
 - Mockups of 3 layouts shared; owner chose B with A's deck chips and the end-turn button left of the player's HP. `TcgMatchPage` is now a full-screen layer: sticky top bar (turn, phase, timer, history, settings), field that fits without page scroll (compact unit frames), hand drawer at the bottom (folded = card fan, open = swipeable cards; auto-opens on your turn and for mulligan). Deck shown as a deep-purple count chip (contrast 13.65:1). Popups, commands and game flow unchanged.

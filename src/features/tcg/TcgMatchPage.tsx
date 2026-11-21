@@ -6,11 +6,12 @@ import { StickerButton } from "../../components/StickerButton.tsx";
 import { ApiError, callFunction } from "../../lib/api.ts";
 import { useAuth } from "../auth/auth-context.ts";
 import { HandoffScreen } from "../passplay/HandoffScreen.tsx";
-import { cardName, commandLabel, commandSubjects, describeEvent, phaseLabel } from "./labels.ts";
+import { cardName, commandLabel, commandSubjects, historyByTurn, phaseLabel } from "./labels.ts";
 import { CardFrame, EmptySlot } from "./CardFrame.tsx";
 import { CardBack, DeckPile, HeartIcon, SparkIcon } from "./GameIcons.tsx";
 import { Popup } from "./Popup.tsx";
 import { RulesText } from "./RulesText.tsx";
+import { DraggableCard, type DropTarget } from "./DraggableCard.tsx";
 import {
   isMuted,
   normalizeSoundConfig,
@@ -50,10 +51,17 @@ export function TcgMatchPage() {
   const lastEvent = useRef<string | null>(null);
   const [attackFx, setAttackFx] = useState(false);
   const [handOpen, setHandOpen] = useState(true);
+  const [drag, setDrag] = useState<{
+    instanceId: string;
+    cardId: string;
+    x: number;
+    y: number;
+  } | null>(null);
   const [popup, setPopup] = useState<"history" | "settings" | "rules" | "forfeit" | null>(null);
   const idem = useRef<{ key: string; body: string } | null>(null);
   const passPlay = useRef(false);
-  const seconds = useCountdown(data?.deadline ?? null);
+  const botActing = data?.botActing === true;
+  const seconds = useCountdown(botActing ? null : (data?.deadline ?? null));
 
   const refresh = useCallback(
     async (reveal = false) => {
@@ -162,6 +170,17 @@ export function TcgMatchPage() {
     lastEvent.current = last;
   }, [data]);
 
+  // Server bot plays one action per step: fetch again right after each step time.
+  const botDeadline = botActing ? data.deadline : null;
+  useEffect(() => {
+    if (!botDeadline) return;
+    const wait = Math.max(50, Date.parse(botDeadline) - Date.now() + 60);
+    const id = setTimeout(() => void refresh(), wait);
+    return () => {
+      clearTimeout(id);
+    };
+  }, [botDeadline, refresh]);
+
   // Server applies the turn timeout when asked after the deadline.
   useEffect(() => {
     if (seconds !== 0) return;
@@ -203,6 +222,36 @@ export function TcgMatchPage() {
   const endTurn = data.legal.find((c) => c.type === "end_turn");
   const canMulligan = data.legal.some((c) => c.type === "mulligan");
   const playableIds = new Set(data.legal.flatMap(commandSubjects));
+  // Playable cards first so they are never hidden off-screen (owner request); stable sort.
+  const sortedHand = [...view.myHand].sort(
+    (a, b) => Number(playableIds.has(b.instanceId)) - Number(playableIds.has(a.instanceId)),
+  );
+  const draggedDef = drag ? v2.getCardDefinition(drag.cardId) : null;
+  const dragSummon = drag
+    ? data.legal.find((c) => c.type === "summon" && c.instanceId === drag.instanceId)
+    : undefined;
+
+  /** Drag & drop: unit → empty slot summons; equipment → one of your units attaches; others open the command popup. */
+  const onDrop = (instanceId: string, cardId: string, target: DropTarget) => {
+    if (!target) return;
+    const def = v2.getCardDefinition(cardId);
+    const mine = data.legal.filter((c) => commandSubjects(c).includes(instanceId));
+    if (def.cardType === "unit") {
+      const summon = mine.find((c) => c.type === "summon");
+      if (summon && (target.kind === "slot" || target.kind === "field")) void send(summon);
+      else if (!summon) setError("ยังลงตัวละครนี้ไม่ได้ (พลังงานไม่พอ / สนามเต็ม / ไม่ใช่ช่วงลงการ์ด)");
+      return;
+    }
+    if (def.cardType === "equipment" && target.kind === "unit") {
+      const attach = mine.find((c) => c.type === "attach" && c.unitId === target.unitId);
+      if (attach) {
+        void send(attach);
+        return;
+      }
+    }
+    if (mine.length > 0) setSelected(instanceId);
+    else setError("ยังใช้การ์ดนี้ไม่ได้ตอนนี้");
+  };
 
   const send = async (command: Record<string, unknown>) => {
     setPending(true);
@@ -230,10 +279,7 @@ export function TcgMatchPage() {
     }
   };
 
-  const log = data.events
-    .map((e) => describeEvent(e, data.names))
-    .filter((line): line is string => line !== null)
-    .slice(-40);
+  const log = historyByTurn(data.events, data.names);
 
   const winner = view.result && "winner" in view.result ? view.result.winner : null;
 
@@ -282,6 +328,7 @@ export function TcgMatchPage() {
       </div>
 
       <div
+        data-drop="field"
         className={`flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto bg-am-field p-1.5 ${attackFx ? "am-fx-attack" : ""}`}
       >
         {finished && (
@@ -356,22 +403,32 @@ export function TcgMatchPage() {
           className="grid shrink-0 grid-cols-3 gap-1.5 rounded-2xl bg-am-player/60 p-1.5"
         >
           {me.units.map((u) => (
-            <CardFrame
-              key={u.instanceId}
-              compact
-              cardId={u.cardId}
-              unit={u}
-              selected={selected === u.instanceId}
-              {...(!handoff &&
-                playableIds.has(u.instanceId) && {
-                  onSelect: () => {
-                    setSelected(u.instanceId);
-                  },
-                })}
-            />
+            <div key={u.instanceId} data-drop={`unit:${u.instanceId}`}>
+              <CardFrame
+                compact
+                cardId={u.cardId}
+                unit={u}
+                selected={selected === u.instanceId}
+                validTarget={
+                  drag !== null &&
+                  data.legal.some(
+                    (c) =>
+                      c.type === "attach" &&
+                      c.instanceId === drag.instanceId &&
+                      c.unitId === u.instanceId,
+                  )
+                }
+                {...(!handoff &&
+                  playableIds.has(u.instanceId) && {
+                    onSelect: () => {
+                      setSelected(u.instanceId);
+                    },
+                  })}
+              />
+            </div>
           ))}
           {Array.from({ length: Math.max(0, v2.RULESET_V2.maxUnits - me.units.length) }, (_, i) => (
-            <EmptySlot key={i} />
+            <EmptySlot key={i} drop active={dragSummon !== undefined} />
           ))}
         </div>
 
@@ -410,7 +467,9 @@ export function TcgMatchPage() {
           />
         )}
         {!handoff && !myTurn && !finished && (
-          <p className="text-center text-am-muted">รอฝ่ายตรงข้าม…</p>
+          <p className="text-center text-am-muted">
+            {botActing ? "🤖 Bot กำลังเล่น…" : "รอฝ่ายตรงข้าม…"}
+          </p>
         )}
         {error && (
           <p
@@ -441,8 +500,18 @@ export function TcgMatchPage() {
           {handOpen ? (
             <div className="flex flex-col gap-2 px-2 pt-2">
               <div role="group" aria-label="Hand" className="flex gap-2 overflow-x-auto pb-1">
-                {view.myHand.map((c) => (
-                  <div key={c.instanceId} className="w-28 shrink-0">
+                {sortedHand.map((c) => (
+                  <DraggableCard
+                    key={c.instanceId}
+                    className="w-28 shrink-0"
+                    enabled={!canMulligan && !pending && playableIds.has(c.instanceId)}
+                    onMove={(p) => {
+                      setDrag(p ? { instanceId: c.instanceId, cardId: c.cardId, ...p } : null);
+                    }}
+                    onDrop={(target) => {
+                      onDrop(c.instanceId, c.cardId, target);
+                    }}
+                  >
                     <CardFrame
                       cardId={c.cardId}
                       selected={selected === c.instanceId}
@@ -458,7 +527,7 @@ export function TcgMatchPage() {
                         } else setSelected(c.instanceId);
                       }}
                     />
-                  </div>
+                  </DraggableCard>
                 ))}
               </div>
               {canMulligan && (
@@ -493,6 +562,23 @@ export function TcgMatchPage() {
         </div>
       )}
 
+      {drag && draggedDef && (
+        <div
+          aria-hidden="true"
+          className="am-sticker pointer-events-none fixed z-30 w-24 -translate-x-1/2 -translate-y-full rotate-3 bg-am-card p-2 text-xs font-bold shadow-sticker"
+          style={{ left: drag.x, top: drag.y }}
+        >
+          {cardName(drag.cardId)}
+          <div className="mt-1 text-[10px] font-semibold text-am-muted">
+            {draggedDef.cardType === "unit"
+              ? "วางในช่องว่าง"
+              : draggedDef.cardType === "equipment"
+                ? "วางบนตัวละคร"
+                : "วางบนสนาม"}
+          </div>
+        </div>
+      )}
+
       <Popup
         title={selected ? `คำสั่ง: ${selectedName}` : "คำสั่ง"}
         open={!handoff && choices.length > 0}
@@ -519,9 +605,18 @@ export function TcgMatchPage() {
         {log.length === 0 ? (
           <p className="text-sm text-am-muted">ยังไม่มีเหตุการณ์</p>
         ) : (
-          <ol className="flex flex-col gap-1 text-sm" aria-label="Event log">
-            {log.map((line, i) => (
-              <li key={i}>{line}</li>
+          <ol className="flex flex-col gap-3 text-sm" aria-label="Event log">
+            {log.map((g) => (
+              <li key={g.key}>
+                <h3 className="mb-1 rounded-md bg-am-deco-purple px-2 py-0.5 font-display font-bold">
+                  {g.title}
+                </h3>
+                <ul className="flex flex-col gap-0.5 pl-2">
+                  {g.lines.map((line, i) => (
+                    <li key={i}>{line}</li>
+                  ))}
+                </ul>
+              </li>
             ))}
           </ol>
         )}

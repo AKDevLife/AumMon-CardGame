@@ -55,6 +55,7 @@ async function player(i) {
   for (let step = 0; step < 300 && r.view?.status !== "finished"; step++) {
     const pick = order.map((t) => r.legal?.find((c) => c.type === t)).find(Boolean);
     if (!pick) {
+      await new Promise((res) => setTimeout(res, 750)); // server bot is pacing its turn
       r = (await call("tcg-view", { matchId })).body;
       continue;
     }

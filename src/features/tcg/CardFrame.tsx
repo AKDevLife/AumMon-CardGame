@@ -169,12 +169,19 @@ export function CardFrame({
   );
 }
 
-/** Dashed placeholder for a free unit slot (max 3 per side). */
-export const EmptySlot = () => (
+/** Dashed placeholder for a free unit slot (max 3 per side); `drop` makes it a drag target. */
+export const EmptySlot = ({
+  drop = false,
+  active = false,
+}: {
+  drop?: boolean;
+  active?: boolean;
+}) => (
   <span
     aria-hidden="true"
-    className="grid min-h-[5.75rem] place-items-center rounded-[1.25rem] border-[3px] border-dashed border-am-lavender bg-am-slot text-xs text-am-muted"
+    {...(drop && { "data-drop": "slot" })}
+    className={`${active ? "ring-4 ring-am-green" : ""} grid min-h-[5.75rem] place-items-center rounded-[1.25rem] border-[3px] border-dashed border-am-lavender bg-am-slot text-xs text-am-muted`}
   >
-    ช่องว่าง
+    {active ? "วางที่นี่" : "ช่องว่าง"}
   </span>
 );
