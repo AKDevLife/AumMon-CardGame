@@ -1,4 +1,4 @@
-/** Ruleset 3 constants (core rules kept from spec v3.0 §4; framework doc §1, §3.3, §4). */
+/** Ruleset 3 constants (aummon_game_spec.md v4.0 §4, §5.5, §6). */
 export const RULESET_V3 = {
   version: "3",
   players: 2,

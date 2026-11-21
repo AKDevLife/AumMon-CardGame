@@ -1,6 +1,6 @@
 import type { Active, Archetype, CardDefinition, Keyword, Passive, Trait } from "./types.ts";
 
-/** Prototype set — 24 Objects (docs/design/object-ability-framework.md §5). Provisional until playtest. */
+/** Prototype set — 24 Objects (aummon_game_spec.md §6.2). Provisional until playtest. */
 const VERSION = "3.0.0";
 
 function obj(

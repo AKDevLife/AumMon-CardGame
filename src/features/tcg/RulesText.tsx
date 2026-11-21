@@ -1,6 +1,6 @@
 import { KEYWORD_HELP, KEYWORD_LABEL } from "./labels.ts";
 
-/** Short rule summary (ruleset 3 — docs/design/object-ability-framework.md) in plain Thai. */
+/** Short rule summary (ruleset 3 — aummon_game_spec.md v4.0) in plain Thai. */
 export function RulesText() {
   return (
     <div className="flex flex-col gap-2 text-sm">

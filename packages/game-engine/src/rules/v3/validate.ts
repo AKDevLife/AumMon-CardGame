@@ -1,7 +1,7 @@
 import type { CardDefinition } from "./types.ts";
 import { ABILITY_BUDGET_ALLOWANCE, POWER_BUDGET_V3, RULESET_V3 } from "./constants.ts";
 
-/** Hard errors make card data unusable; budget flags are review warnings (framework §4). */
+/** Hard errors make card data unusable; budget flags are review warnings (spec §6.1). */
 export interface DataReport {
   readonly errors: readonly string[];
   readonly budgetFlags: readonly string[];

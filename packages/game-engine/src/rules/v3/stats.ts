@@ -5,7 +5,7 @@ import type { Keyword, StaticPassive } from "./types.ts";
 /**
  * Effective Object stats: definition + static Passives of the same side + modifiers.
  * `side` is the owner's units (the unit itself included). Static effects stop as soon
- * as their source leaves the field (framework §3.2).
+ * as their source leaves the field (spec §5.2).
  */
 function staticBonus(side: readonly UnitInstance[], u: UnitInstance, stat: "atk" | "hp"): number {
   let total = 0;

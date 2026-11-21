@@ -1,4 +1,4 @@
-/** Ruleset 3 (Everyday Objects Battle — docs/design/object-ability-framework.md). */
+/** Ruleset 3 (Everyday Objects Battle — aummon_game_spec.md v4.0). */
 export type * from "./types.ts";
 export { CARD_DEFINITIONS_V3, getCardDefinition } from "./cards.ts";
 export {
