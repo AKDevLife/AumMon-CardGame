@@ -70,6 +70,8 @@ export interface CardFrameProps {
   disabled?: boolean;
   /** Not playable now (hand only): drawn lighter. */
   dimmed?: boolean;
+  /** Shorter frame for units on the board (no page scroll). */
+  compact?: boolean;
   onSelect?: () => void;
 }
 
@@ -81,6 +83,7 @@ export function CardFrame({
   marked,
   disabled,
   dimmed,
+  compact,
   onSelect,
 }: CardFrameProps) {
   const def = v2.getCardDefinition(cardId);
@@ -98,7 +101,7 @@ export function CardFrame({
       disabled={disabled ?? !onSelect}
       aria-pressed={selected === true || marked === true}
       onClick={onSelect}
-      className={`am-sticker am-pressable relative flex min-h-28 flex-col overflow-hidden bg-am-card text-left disabled:cursor-default ${dimmed ? "opacity-60" : ""} ${ring}`}
+      className={`am-sticker am-pressable relative flex ${compact ? "min-h-[5.75rem]" : "min-h-28"} flex-col overflow-hidden bg-am-card text-left disabled:cursor-default ${dimmed ? "opacity-60" : ""} ${ring}`}
       style={{
         borderTopColor: def.stage > 0 ? stageStripe(def.stage) : undefined,
         borderTopWidth: def.stage > 0 ? 6 : undefined,
@@ -170,7 +173,7 @@ export function CardFrame({
 export const EmptySlot = () => (
   <span
     aria-hidden="true"
-    className="grid min-h-28 place-items-center rounded-[1.25rem] border-[3px] border-dashed border-am-lavender bg-am-slot text-xs text-am-muted"
+    className="grid min-h-[5.75rem] place-items-center rounded-[1.25rem] border-[3px] border-dashed border-am-lavender bg-am-slot text-xs text-am-muted"
   >
     ช่องว่าง
   </span>

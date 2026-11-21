@@ -128,23 +128,13 @@ export const CardBack = ({ small = false }: { small?: boolean }) => (
   />
 );
 
-/** Deck pile: stacked backs with the remaining count on the top card. */
+/** Deck: compact purple chip with the cards left (layout A style, owner choice 2026-11-21). */
 export const DeckPile = ({ count }: { count: number }) => (
   <span
     role="img"
     aria-label={`กองการ์ดเหลือ ${String(count)} ใบ`}
-    className="relative inline-block h-14 w-10"
+    className={`inline-grid h-9 min-w-8 place-items-center rounded-md border-2 border-am-ink bg-am-brand px-1 font-display text-sm font-bold text-am-inverse`}
   >
-    {count > 1 && (
-      <span
-        aria-hidden="true"
-        className="am-sticker absolute left-1 top-1 h-14 w-10 !rounded-md bg-am-lavender"
-      />
-    )}
-    <span className={`am-sticker absolute inset-0 grid place-items-center !rounded-md ${BACK}`}>
-      <span className="rounded-full bg-am-card px-1.5 font-display text-sm font-bold text-am-text">
-        {count}
-      </span>
-    </span>
+    {count}
   </span>
 );

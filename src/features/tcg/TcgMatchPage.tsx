@@ -49,6 +49,7 @@ export function TcgMatchPage() {
   const [muted, setMutedState] = useState(isMuted);
   const lastEvent = useRef<string | null>(null);
   const [attackFx, setAttackFx] = useState(false);
+  const [handOpen, setHandOpen] = useState(true);
   const [popup, setPopup] = useState<"history" | "settings" | "rules" | "forfeit" | null>(null);
   const idem = useRef<{ key: string; body: string } | null>(null);
   const passPlay = useRef(false);
@@ -121,6 +122,18 @@ export function TcgMatchPage() {
         setSoundConfig(normalizeSoundConfig(row?.value));
       });
   }, [client]);
+
+  // Open the hand drawer automatically whenever it becomes this player's turn (or mulligan).
+  const actionable = (data?.legal.length ?? 0) > 0;
+  useEffect(() => {
+    if (!actionable) return;
+    const id = setTimeout(() => {
+      setHandOpen(true);
+    }, 0);
+    return () => {
+      clearTimeout(id);
+    };
+  }, [actionable]);
 
   // Sound effects for events that arrived since the last response (first load is silent).
   useEffect(() => {
@@ -224,70 +237,73 @@ export function TcgMatchPage() {
 
   const winner = view.result && "winner" in view.result ? view.result.winner : null;
 
+  const resultTone =
+    data.mode !== "pass_play" && winner !== null && winner !== mySeat
+      ? "bg-am-error-bg text-am-danger-text" /* defeat */
+      : "bg-am-title text-am-text"; /* victory / draw */
+
+  const fan = view.myHand.slice(0, 7);
+
+  // Full-screen game layer (no page scroll): sticky top bar, field in the middle,
+  // hand drawer at the bottom (layout B, owner choice 2026-11-21).
   return (
-    <section className="flex flex-col gap-4">
-      <div className="flex items-center justify-between gap-2">
-        <span className="rounded-full bg-am-round px-3 py-1 text-sm font-bold text-am-ink">
+    <section
+      aria-label="กระดานเกม"
+      className="fixed inset-0 z-20 flex flex-col bg-am-bg pt-[env(safe-area-inset-top)] text-am-text"
+    >
+      <div className="flex shrink-0 items-center gap-2 border-b-[3px] border-am-ink bg-am-card px-3 py-2">
+        <span className="rounded-full border-2 border-am-ink bg-am-round px-3 py-1 font-display text-sm font-bold">
           เทิร์น {view.turn}
         </span>
-        <span className="font-semibold">{phaseLabel(view)}</span>
-        {seconds !== null && (
-          <span className="font-display font-bold tabular-nums">⏱ {seconds}s</span>
-        )}
-        <span className="flex gap-2">
-          <button
-            type="button"
-            aria-label="ประวัติ"
-            onClick={() => {
-              setPopup("history");
-            }}
-            className="am-sticker am-pressable bg-am-card px-2.5 py-1.5 text-lg"
-          >
-            📜
-          </button>
-          <button
-            type="button"
-            aria-label="ตั้งค่า"
-            onClick={() => {
-              setPopup("settings");
-            }}
-            className="am-sticker am-pressable bg-am-card px-2.5 py-1.5 text-lg"
-          >
-            ⚙️
-          </button>
+        <span className="min-w-0 flex-1 truncate text-sm font-semibold">
+          {phaseLabel(view)}
+          {seconds !== null && <span className="ml-2 font-display tabular-nums">⏱ {seconds}s</span>}
         </span>
+        <button
+          type="button"
+          aria-label="ประวัติ"
+          onClick={() => {
+            setPopup("history");
+          }}
+          className="am-sticker am-pressable h-11 w-11 !rounded-xl bg-am-deco-purple text-lg"
+        >
+          📜
+        </button>
+        <button
+          type="button"
+          aria-label="ตั้งค่า"
+          onClick={() => {
+            setPopup("settings");
+          }}
+          className="am-sticker am-pressable h-11 w-11 !rounded-xl bg-am-deco-purple text-lg"
+        >
+          ⚙️
+        </button>
       </div>
 
-      {finished && (
-        <div
-          role="status"
-          className={`am-sticker p-4 text-center ${
-            data.mode !== "pass_play" && winner !== null && winner !== mySeat
-              ? "bg-am-error-bg text-am-danger-text" /* defeat */
-              : "border-b-am-pink bg-am-title text-am-text" /* victory / draw */
-          }`}
-        >
-          <h1 className="font-display text-3xl font-bold">
-            {winner === null
-              ? "เสมอ!"
-              : data.mode !== "pass_play" && winner === mySeat
-                ? "คุณชนะ! 🎉"
-                : `${data.names[winner]} ชนะ`}
-          </h1>
-          <Link to="/" className="mt-2 inline-block font-semibold text-am-accent underline">
-            กลับหน้าหลัก
-          </Link>
-        </div>
-      )}
-
       <div
-        className={`am-sticker flex flex-col gap-2 bg-am-field p-2 ${attackFx ? "am-fx-attack" : ""}`}
+        className={`flex min-h-0 flex-1 flex-col gap-1.5 overflow-y-auto bg-am-field p-1.5 ${attackFx ? "am-fx-attack" : ""}`}
       >
+        {finished && (
+          <div role="status" className={`am-sticker p-3 text-center ${resultTone}`}>
+            <h1 className="font-display text-2xl font-bold">
+              {winner === null
+                ? "เสมอ!"
+                : data.mode !== "pass_play" && winner === mySeat
+                  ? "คุณชนะ! 🎉"
+                  : `${data.names[winner]} ชนะ`}
+            </h1>
+            <Link to="/" className="mt-1 inline-block font-semibold text-am-accent underline">
+              กลับหน้าหลัก
+            </Link>
+          </div>
+        )}
+
         <div
           aria-label="Opponent"
-          className="am-sticker flex flex-wrap items-center justify-between gap-2 bg-am-opponent p-3"
+          className="am-sticker flex shrink-0 items-center gap-2 bg-am-opponent px-3 py-1.5"
         >
-          <span className="font-display font-bold">
+          <span className="min-w-0 flex-1 truncate font-display font-bold">
             {data.names[foeSeat]}
             {data.mode === "online" && (
               <span
@@ -296,29 +312,31 @@ export function TcgMatchPage() {
               />
             )}
           </span>
-          <span className="flex items-center gap-2">
-            <HeartIcon value={Math.max(0, foe.hp)} />
-            <SparkIcon value={foe.spark} max={foe.maxSpark} />
-            <DeckPile count={foe.deckCount} />
-          </span>
           <span
             role="img"
             aria-label={`การ์ดในมือคู่ต่อสู้ ${String(foe.handCount)} ใบ`}
-            className="flex w-full flex-wrap gap-1"
+            className="flex items-center"
           >
-            {Array.from({ length: foe.handCount }, (_, i) => (
-              <CardBack key={i} small />
+            {Array.from({ length: Math.min(foe.handCount, 6) }, (_, i) => (
+              <span key={i} className="-ml-2 first:ml-0">
+                <CardBack small />
+              </span>
             ))}
           </span>
+          <HeartIcon value={Math.max(0, foe.hp)} size={38} />
+          <SparkIcon value={foe.spark} max={foe.maxSpark} size={34} />
+          <DeckPile count={foe.deckCount} />
         </div>
+
         <div
           role="group"
           aria-label="Opponent units"
-          className="grid grid-cols-3 gap-2 rounded-2xl bg-am-opponent/50 p-2"
+          className="grid shrink-0 grid-cols-3 gap-1.5 rounded-2xl bg-am-opponent/50 p-1.5"
         >
           {foe.units.map((u) => (
             <CardFrame
               key={u.instanceId}
+              compact
               cardId={u.cardId}
               unit={u}
               validTarget={targetIds.has(u.instanceId)}
@@ -335,11 +353,12 @@ export function TcgMatchPage() {
         <div
           role="group"
           aria-label="Your units"
-          className="grid grid-cols-3 gap-2 rounded-2xl bg-am-player/60 p-2"
+          className="grid shrink-0 grid-cols-3 gap-1.5 rounded-2xl bg-am-player/60 p-1.5"
         >
           {me.units.map((u) => (
             <CardFrame
               key={u.instanceId}
+              compact
               cardId={u.cardId}
               unit={u}
               selected={selected === u.instanceId}
@@ -358,69 +377,120 @@ export function TcgMatchPage() {
 
         <div
           aria-label="You"
-          className="am-sticker flex flex-wrap items-center justify-between gap-2 bg-am-player p-3"
+          className="am-sticker flex shrink-0 items-center gap-2 bg-am-player px-3 py-1.5"
         >
-          <span className="font-display font-bold">
+          <span className="min-w-0 flex-1 truncate font-display font-bold">
             {data.mode === "pass_play" ? data.names[mySeat] : `${data.names[mySeat]} (คุณ)`}
           </span>
-          <span className="flex items-center gap-2">
-            <HeartIcon value={Math.max(0, me.hp)} />
-            <SparkIcon value={me.spark} max={me.maxSpark} />
-            <DeckPile count={me.deckCount} />
-          </span>
+          {!handoff && endTurn && (
+            <button
+              type="button"
+              disabled={pending}
+              onClick={() => void send({ type: "end_turn" })}
+              className="am-sticker am-pressable min-h-11 !rounded-full bg-am-green px-3 font-display text-sm font-bold text-am-success-text disabled:!bg-am-disabled disabled:!text-am-faint"
+            >
+              {pending ? "กำลังส่ง…" : "จบเทิร์น"}
+            </button>
+          )}
+          <HeartIcon value={Math.max(0, me.hp)} size={38} />
+          <SparkIcon value={me.spark} max={me.maxSpark} size={34} />
+          <DeckPile count={me.deckCount} />
         </div>
+
+        {handoff && data.actingSeat !== null && (
+          <HandoffScreen
+            name={data.names[data.actingSeat]}
+            pending={pending}
+            onReveal={() => {
+              setPending(true);
+              void refresh(true).finally(() => {
+                setPending(false);
+              });
+            }}
+          />
+        )}
+        {!handoff && !myTurn && !finished && (
+          <p className="text-center text-am-muted">รอฝ่ายตรงข้าม…</p>
+        )}
+        {error && (
+          <p
+            role="alert"
+            className="rounded-lg border-l-4 border-am-red bg-am-error-bg px-2 py-1 font-semibold text-am-danger-text"
+          >
+            {error}
+          </p>
+        )}
       </div>
 
-      {handoff && data.actingSeat !== null && (
-        <HandoffScreen
-          name={data.names[data.actingSeat]}
-          pending={pending}
-          onReveal={() => {
-            setPending(true);
-            void refresh(true).finally(() => {
-              setPending(false);
-            });
-          }}
-        />
-      )}
-
       {!handoff && (
-        <div>
-          <h2 className="mb-2 font-display text-lg font-semibold">
-            การ์ดในมือ ({view.myHand.length}/{v2.RULESET_V2.maxHand})
-          </h2>
-          <div role="group" aria-label="Hand" className="grid grid-cols-3 gap-2">
-            {view.myHand.map((c) => (
-              <CardFrame
-                key={c.instanceId}
-                cardId={c.cardId}
-                selected={selected === c.instanceId}
-                marked={mulligan.has(c.instanceId)}
-                disabled={pending || (!canMulligan && !playableIds.has(c.instanceId))}
-                dimmed={!canMulligan && !playableIds.has(c.instanceId)}
-                onSelect={() => {
-                  if (canMulligan) {
-                    const next = new Set(mulligan);
-                    if (next.has(c.instanceId)) next.delete(c.instanceId);
-                    else next.add(c.instanceId);
-                    setMulligan(next);
-                  } else setSelected(c.instanceId);
-                }}
-              />
-            ))}
-          </div>
+        <div className="shrink-0 rounded-t-3xl border-t-[3px] border-am-ink bg-am-brand pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+          <button
+            type="button"
+            aria-expanded={handOpen}
+            onClick={() => {
+              setHandOpen(!handOpen);
+            }}
+            className="flex w-full flex-col items-center gap-1 pt-2 text-am-inverse"
+          >
+            <span aria-hidden="true" className="h-1.5 w-11 rounded-full bg-am-lavender" />
+            <span className="text-xs font-semibold">
+              การ์ดในมือ {view.myHand.length}/{v2.RULESET_V2.maxHand} ·{" "}
+              {handOpen ? "แตะเพื่อพับเก็บ" : "แตะเพื่อเปิด"}
+            </span>
+          </button>
+          {handOpen ? (
+            <div className="flex flex-col gap-2 px-2 pt-2">
+              <div role="group" aria-label="Hand" className="flex gap-2 overflow-x-auto pb-1">
+                {view.myHand.map((c) => (
+                  <div key={c.instanceId} className="w-28 shrink-0">
+                    <CardFrame
+                      cardId={c.cardId}
+                      selected={selected === c.instanceId}
+                      marked={mulligan.has(c.instanceId)}
+                      disabled={pending || (!canMulligan && !playableIds.has(c.instanceId))}
+                      dimmed={!canMulligan && !playableIds.has(c.instanceId)}
+                      onSelect={() => {
+                        if (canMulligan) {
+                          const next = new Set(mulligan);
+                          if (next.has(c.instanceId)) next.delete(c.instanceId);
+                          else next.add(c.instanceId);
+                          setMulligan(next);
+                        } else setSelected(c.instanceId);
+                      }}
+                    />
+                  </div>
+                ))}
+              </div>
+              {canMulligan && (
+                <StickerButton
+                  variant="confirm"
+                  disabled={pending}
+                  onClick={() => void send({ type: "mulligan", instanceIds: [...mulligan] })}
+                  className="min-h-12"
+                >
+                  {mulligan.size === 0 ? "เก็บมือนี้" : `เปลี่ยน ${String(mulligan.size)} ใบ`}
+                </StickerButton>
+              )}
+            </div>
+          ) : (
+            <div aria-hidden="true" className="flex h-16 justify-center overflow-hidden pt-2">
+              {fan.map((c, i) => {
+                const mid = (fan.length - 1) / 2;
+                return (
+                  <span
+                    key={c.instanceId}
+                    className="-ml-3 h-20 w-14 shrink-0 rounded-lg border-[3px] border-am-ink bg-am-card p-1 text-[10px] font-semibold leading-tight [word-break:keep-all] first:ml-0"
+                    style={{
+                      transform: `rotate(${String((i - mid) * 6)}deg) translateY(${String(Math.abs(i - mid) * 3)}px)`,
+                    }}
+                  >
+                    {cardName(c.cardId)}
+                  </span>
+                );
+              })}
+            </div>
+          )}
         </div>
-      )}
-
-      {!handoff && canMulligan && (
-        <StickerButton
-          variant="confirm"
-          disabled={pending}
-          onClick={() => void send({ type: "mulligan", instanceIds: [...mulligan] })}
-          className="min-h-14"
-        >
-          {mulligan.size === 0 ? "เก็บมือนี้" : `เปลี่ยน ${mulligan.size} ใบ`}
-        </StickerButton>
       )}
 
       <Popup
@@ -438,29 +508,6 @@ export function TcgMatchPage() {
           ))}
         </div>
       </Popup>
-
-      {!handoff && endTurn && (
-        <StickerButton
-          variant="confirm"
-          disabled={pending}
-          onClick={() => void send({ type: "end_turn" })}
-          className="min-h-14"
-        >
-          {pending ? "กำลังส่ง…" : "จบเทิร์น"}
-        </StickerButton>
-      )}
-      {!handoff && !myTurn && !finished && (
-        <p className="text-center text-am-muted">รอฝ่ายตรงข้าม…</p>
-      )}
-
-      {error && (
-        <p
-          role="alert"
-          className="rounded-lg border-l-4 border-am-red bg-am-error-bg px-2 py-1 font-semibold text-am-danger-text"
-        >
-          {error}
-        </p>
-      )}
 
       <Popup
         title="ประวัติการเล่น"
