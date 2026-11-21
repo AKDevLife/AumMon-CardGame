@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { unitAtk, unitHp, unitKeywords, type MatchState } from "../src/rules/v3/index.ts";
-import { at, board, errorOf, giveCard, obj, play } from "./v3-fixtures.ts";
+import { unitAtk, unitHp, unitKeywords, type MatchState } from "../src/rules/v4/index.ts";
+import { at, board, errorOf, giveCard, obj, play } from "./v4-fixtures.ts";
 
 const u = (s: MatchState, seat: 0 | 1, id: string) => {
   const x = s.players[seat].units.find((v) => v.instanceId === id);
@@ -9,10 +9,11 @@ const u = (s: MatchState, seat: 0 | 1, id: string) => {
 };
 
 describe("ruleset 3 — Active abilities (framework §3.1)", () => {
-  it("pays SPARK, exhausts the source, applies the effect", () => {
+  it("is free (no SPARK), exhausts the source, applies the effect", () => {
     const s = board([obj("a", "O05")], [obj("x", "O09")]);
+    s.players[0].spark = 0;
     const t = play(s, { type: "activate", instanceId: "a", target: "x" });
-    expect(t.state.players[0].spark).toBe(6);
+    expect(t.state.players[0].spark).toBe(0);
     expect(u(t.state, 0, "a").exhausted).toBe(true);
     expect(u(t.state, 1, "x").damage).toBe(2);
     expect(t.events.some((e) => e.type === "ability_activated")).toBe(true);
@@ -25,15 +26,7 @@ describe("ruleset 3 — Active abilities (framework §3.1)", () => {
     );
   });
 
-  it("requires enough SPARK", () => {
-    const s = board([obj("a", "O14")], [obj("x", "O09")]);
-    s.players[0].spark = 2;
-    expect(errorOf(() => play(s, { type: "activate", instanceId: "a", target: "x" }))).toBe(
-      "not_enough_spark",
-    );
-  });
-
-  it("is once per turn per Object, even with no exhaust", () => {
+  it("Turbo: stays Ready to attack, once per turn, then sleeps at end of turn", () => {
     const s = board([obj("car", "O02")], []);
     const t = play(s, { type: "activate", instanceId: "car" });
     expect(u(t.state, 0, "car").exhausted).toBe(false);
@@ -41,6 +34,10 @@ describe("ruleset 3 — Active abilities (framework §3.1)", () => {
     expect(errorOf(() => play(t.state, { type: "activate", instanceId: "car" }))).toBe(
       "active_used",
     );
+    const after = play(t.state, { type: "end_turn" });
+    expect(u(after.state, 0, "car").exhausted).toBe(true);
+    const back = play(after.state, { type: "end_turn" }, "foe");
+    expect(u(back.state, 0, "car").exhausted).toBe(false);
   });
 
   it("validates the target before paying", () => {
@@ -48,7 +45,7 @@ describe("ruleset 3 — Active abilities (framework §3.1)", () => {
     expect(errorOf(() => play(s, { type: "activate", instanceId: "a", target: "ghost" }))).toBe(
       "invalid_target",
     );
-    expect(s.players[0].spark).toBe(8);
+    expect(s.players[0].units[0]?.exhausted).toBe(false);
     const clock = board([obj("c", "O13")], [obj("x", "O09", true)]);
     expect(errorOf(() => play(clock, { type: "activate", instanceId: "c", target: "x" }))).toBe(
       "invalid_target",

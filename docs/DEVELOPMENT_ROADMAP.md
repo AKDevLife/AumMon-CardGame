@@ -177,4 +177,6 @@ Owner-approved direction 2026-11-21 (R3 in `docs/rule-clarifications.md`, rules 
 - [x] **10.5** Remove ruleset 2 (Evolution, Fusion, Equipment, Action, recipes tables, old cards, tests); Game Spec v4.0 + blueprint/domain rules updated — deps: 10.4 — PR #78 (2026-11-21)
 - [ ] **10.6** Owner playtest on Dev; balance pass — deps: 10.5
 
+- [x] **11.1** Owner changes: free Active abilities (ruleset "4", spec v5.0) with higher summon costs for strong cards and Turbo "sleeps at end of turn"; "เหนื่อย" → "หลับ"; Thai category names; "All cards" gallery (home + in game, filter by category, tap for details); history button moved into settings — deps: 10.5 — PR #79 (2026-11-21)
+
 **Acceptance:** only ruleset 3 playable in all 3 modes · every handoff §10.2 case covered by engine tests · 1,000 simulated bot matches without errors · E2E + a11y pass · spec v4.0 is the single authoritative rule source

@@ -1,6 +1,6 @@
 import type { RandomSource } from "../../rng/seeded-random.ts";
 import { getCardDefinition } from "./cards.ts";
-import { RULESET_V3 } from "./constants.ts";
+import { RULESET_V4 } from "./constants.ts";
 import { unitAtk, unitHp, unitKeywords } from "./stats.ts";
 import {
   cloneState,
@@ -17,7 +17,7 @@ import {
 import type { Active, AutoTarget, Duration, Effect, Trigger, TriggeredPassive } from "./types.ts";
 
 /**
- * Ruleset 3 flow: core rules of spec v4.0 §4 (1v1, SPARK, Ready/Exhausted, combat,
+ * Ruleset 4 flow: core rules of spec v5.0 §4 (1v1, SPARK, Ready/Exhausted, combat,
  * Guard/Flying/Piercing/Haste) + Object abilities (aummon_game_spec.md §5).
  */
 export type CommandErrorCode =
@@ -123,8 +123,8 @@ function buildDeck(seat: Seat, list: Readonly<Record<string, number>>): CardInst
     getCardDefinition(cardId);
     for (let i = 0; i < copies; i++) cards.push({ instanceId: `p${seat}-${cards.length}`, cardId });
   }
-  if (cards.length !== RULESET_V3.deckSize)
-    throw new Error(`deck must have ${RULESET_V3.deckSize} cards`);
+  if (cards.length !== RULESET_V4.deckSize)
+    throw new Error(`deck must have ${RULESET_V4.deckSize} cards`);
   return cards;
 }
 
@@ -134,10 +134,10 @@ export function initializeMatch(input: MatchInput, rng: RandomSource): MatchStat
     const deck = shuffle(buildDeck(seat, input.decks[seat]), rng);
     return {
       playerId: input.playerIds[seat],
-      hp: RULESET_V3.playerHp,
+      hp: RULESET_V4.playerHp,
       spark: 0,
       maxSpark: 0,
-      hand: deck.splice(0, RULESET_V3.initialHand),
+      hand: deck.splice(0, RULESET_V4.initialHand),
       deck,
       units: [],
       discard: [],
@@ -147,7 +147,7 @@ export function initializeMatch(input: MatchInput, rng: RandomSource): MatchStat
   }) as [PlayerState, PlayerState];
   const firstSeat: Seat = rng.nextInt(2) === 0 ? 0 : 1;
   return {
-    rulesetVersion: "3",
+    rulesetVersion: "4",
     status: "mulligan",
     firstSeat,
     activeSeat: firstSeat,
@@ -178,7 +178,7 @@ const someoneDead = (s: MatchState) => s.players.some((p) => p.hp <= 0);
 
 function addToHand(ctx: Ctx, seat: Seat, card: CardInstance): boolean {
   const p = ctx.state.players[seat];
-  if (p.hand.length >= RULESET_V3.maxHand) {
+  if (p.hand.length >= RULESET_V4.maxHand) {
     p.discard.push(card);
     ctx.events.push({
       type: "card_burned",
@@ -294,7 +294,7 @@ function applyEffect(
   targets: readonly Target[],
 ): void {
   ctx.resolved += 1;
-  if (ctx.resolved > RULESET_V3.maxEffectsPerCommand)
+  if (ctx.resolved > RULESET_V4.maxEffectsPerCommand)
     throw new Error("effect limit exceeded (loop protection)");
   const { state, events } = ctx;
   const log = (target: EffectTarget, amount: number) => {
@@ -328,7 +328,7 @@ function applyEffect(
     if ("player" in t) {
       const p = state.players[t.player];
       if (effect.type === "damage") p.hp -= effect.amount;
-      else if (effect.type === "heal") p.hp = Math.min(RULESET_V3.playerHp, p.hp + effect.amount);
+      else if (effect.type === "heal") p.hp = Math.min(RULESET_V4.playerHp, p.hp + effect.amount);
       else continue;
       log({ player: t.player }, effect.amount);
       continue;
@@ -409,9 +409,9 @@ function resolvePick(state: MatchState, seat: Seat, a: Active, choice: string): 
   return { unit, seat: side };
 }
 
-function canActivate(state: MatchState, seat: Seat, u: UnitInstance): Active | null {
+function canActivate(u: UnitInstance): Active | null {
   const a = getCardDefinition(u.cardId).active;
-  if (!a || u.exhausted || u.activeUsed || state.players[seat].spark < a.cost) return null;
+  if (!a || u.exhausted || u.activeUsed) return null;
   return a;
 }
 
@@ -423,7 +423,6 @@ function activate(ctx: Ctx, seat: Seat, instanceId: string, choice: string | und
   if (!a) throw new CommandError("no_active");
   if (unit.exhausted) throw new CommandError("unit_exhausted");
   if (unit.activeUsed) throw new CommandError("active_used");
-  if (me.spark < a.cost) throw new CommandError("not_enough_spark");
   // Targets are validated before anything is paid (spec §5.3 step 4).
   const options = pickOptions(state, seat, unit, a);
   let targets: Target[];
@@ -434,8 +433,9 @@ function activate(ctx: Ctx, seat: Seat, instanceId: string, choice: string | und
     targets = autoTargets(state, seat, unit.instanceId, a.target as AutoTarget);
     if (needsTarget(a.effect) && targets.length === 0) throw new CommandError("invalid_target");
   }
-  me.spark -= a.cost;
-  if (!a.noExhaust) unit.exhausted = true;
+  // Actives are free (owner 2026-11-21, ruleset 4); the source sleeps now or at end of turn.
+  if (a.sleepAtEndOfTurn) unit.sleepAtEnd = true;
+  else unit.exhausted = true;
   unit.activeUsed = true;
   ctx.events.push({
     type: "ability_activated",
@@ -464,7 +464,7 @@ function startTurn(ctx: Ctx, seat: Seat): void {
   expire(state, seat === 0 ? "start_of_0" : "start_of_1");
   const p = state.players[seat];
   for (const u of p.units) u.exhausted = false;
-  p.maxSpark = Math.min(RULESET_V3.maxSpark, p.maxSpark + 1);
+  p.maxSpark = Math.min(RULESET_V4.maxSpark, p.maxSpark + 1);
   p.spark = p.maxSpark;
   ctx.events.push({ type: "turn_started", seat, turn: state.turn, spark: p.spark });
   if (state.turn > 1) draw(ctx, seat);
@@ -479,7 +479,11 @@ function endTurn(ctx: Ctx, seat: Seat): void {
   resolveQueue(ctx);
   if (state.status === "finished") return;
   expire(state, "end_of_turn");
-  for (const u of me.units) u.activeUsed = false;
+  for (const u of me.units) {
+    u.activeUsed = false;
+    if (u.sleepAtEnd) u.exhausted = true;
+    u.sleepAtEnd = false;
+  }
   settleDeaths(ctx);
   ctx.events.push({ type: "turn_ended", seat });
   startTurn(ctx, other(seat));
@@ -490,7 +494,7 @@ function summon(ctx: Ctx, seat: Seat, instanceId: string): void {
   const card = me.hand.find((c) => c.instanceId === instanceId);
   if (!card) throw new CommandError("card_not_in_hand");
   const def = getCardDefinition(card.cardId);
-  if (me.units.length >= RULESET_V3.maxUnits) throw new CommandError("unit_zone_full");
+  if (me.units.length >= RULESET_V4.maxUnits) throw new CommandError("unit_zone_full");
   if (me.spark < def.cost) throw new CommandError("not_enough_spark");
   me.spark -= def.cost;
   me.hand = me.hand.filter((c) => c !== card);
@@ -500,6 +504,7 @@ function summon(ctx: Ctx, seat: Seat, instanceId: string): void {
     damage: 0,
     exhausted,
     activeUsed: false,
+    sleepAtEnd: false,
     hpBonus: 0,
     mods: [],
   };
@@ -675,12 +680,12 @@ export function getLegalCommands(state: MatchState, seat: Seat): LegalCommand[] 
   const foe = state.players[other(seat)];
   const out: LegalCommand[] = [];
   if (state.phase === "main") {
-    if (me.units.length < RULESET_V3.maxUnits)
+    if (me.units.length < RULESET_V4.maxUnits)
       for (const c of me.hand)
         if (getCardDefinition(c.cardId).cost <= me.spark)
           out.push({ type: "summon", instanceId: c.instanceId });
     for (const u of me.units) {
-      const a = canActivate(state, seat, u);
+      const a = canActivate(u);
       if (!a) continue;
       const options = pickOptions(state, seat, u, a);
       if (options)

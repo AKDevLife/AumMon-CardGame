@@ -1,4 +1,4 @@
-import { createSeededRandom, v3 } from "@aummon/game-engine";
+import { createSeededRandom, v4 } from "@aummon/game-engine";
 import { describe, expect, it } from "vitest";
 import {
   actingSeat,
@@ -8,12 +8,12 @@ import {
   type TcgRuntime,
 } from "../../supabase/functions/_shared/tcg-flow.ts";
 
-const T = v3.RULESET_V3.turnTimeoutMs;
+const T = v4.RULESET_V4.turnTimeoutMs;
 
 function runtime(): TcgRuntime {
   const rng = createSeededRandom([3, 1, 4, 1]);
-  const state = v3.initializeMatch(
-    { playerIds: ["h", "b"], decks: [v3.STARTER_DECK_V3, v3.STARTER_DECK_V3] },
+  const state = v4.initializeMatch(
+    { playerIds: ["h", "b"], decks: [v4.STARTER_DECK_V4, v4.STARTER_DECK_V4] },
     rng,
   );
   return { state, rng: rng.getState(), deadline: null };
@@ -52,7 +52,7 @@ describe("ruleset 2 server flow", () => {
     rt = advanceTcg(
       {
         ...rt,
-        state: v3.applyCommand(
+        state: v4.applyCommand(
           rt.state,
           { type: "mulligan", playerId: human, instanceIds: [] },
           rng,
@@ -62,16 +62,17 @@ describe("ruleset 2 server flow", () => {
       "solo",
       10,
     );
-    if (actingSeat(rt.state) === 0)
+    // Human ends turns until the bot is mid-turn (a bot may end its own turn in one step).
+    for (let i = 0; i < 6 && actingSeat(rt.state) === 0; i++)
       rt = advanceTcg(
         {
           ...rt,
-          state: v3.applyCommand(rt.state, { type: "end_turn", playerId: human }, rng).state,
+          state: v4.applyCommand(rt.state, { type: "end_turn", playerId: human }, rng).state,
           deadline: null,
         },
         kinds,
         "solo",
-        20,
+        20 + i,
       );
     // The bot is acting now: nothing happens before its next step time.
     expect(actingSeat(rt.state)).toBe(1);

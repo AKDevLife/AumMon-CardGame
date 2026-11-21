@@ -1,10 +1,10 @@
-# AumMon — Game Spec v4.0 (Everyday Objects Battle · 1v1 TCG)
+# AumMon — Game Spec v5.0 (Everyday Objects Battle · 1v1 TCG)
 
 > แหล่งอ้างอิงหลักเพียงไฟล์เดียวของ **กติกาเกม การ์ด และข้อกำหนดผลิตภัณฑ์ AumMon**
 > Architecture, Database, Security, เครื่องมือ และแผนพัฒนาอยู่ใน `aummon_project_blueprint.md`
-> เวอร์ชัน: 4.0 (2026-11-21) — ทิศทางใหม่ "Everyday Objects Battle" ที่เจ้าของอนุมัติ (การตัดสินใจ D1–D11 ใน `docs/rule-clarifications.md` §R3; brief ต้นฉบับ `docs/design/AumMon_New_Game_Direction_Handoff.zip`)
+> เวอร์ชัน: 5.0 (2026-11-21; v4.0 วันเดียวกัน) — ทิศทางใหม่ "Everyday Objects Battle" ที่เจ้าของอนุมัติ (การตัดสินใจ D1–D11 ใน `docs/rule-clarifications.md` §R3; brief ต้นฉบับ `docs/design/AumMon_New_Game_Direction_Handoff.zip`)
 > สถานะ: Design Baseline — **Provisional จนกว่าจะผ่าน Playtest / Balance**
-> Ruleset: `ruleset_version = "3"`. Ruleset `"1"` (2–4 คน) และ `"2"` (Evolution / Fusion / Equipment, Spec v3.0) **ยกเลิกแล้ว** — ดูได้จาก Git history เท่านั้น
+> Ruleset: `ruleset_version = "4"` (Active ใช้ฟรี). Ruleset `"1"` (2–4 คน), `"2"` (Evolution / Fusion / Equipment) และ `"3"` (Active จ่าย SPARK) **ยกเลิกแล้ว** — ดูได้จาก Git history เท่านั้น
 
 ---
 
@@ -26,6 +26,7 @@
 - Browser ส่งเฉพาะเจตนา (card instance, target, idempotency key) ห้ามส่งผลลัพธ์
 
 ## 1.4 UI
+- สถานะ Exhausted แสดงในเกมว่า **"หลับ 💤"**; หมวดหมู่ (Traits) แสดงเป็นภาษาไทย; มีหน้า "การ์ดทั้งหมด" ทั้งในหน้าหลักและในเกม
 - Playful Cartoon Game UI; สีและ token ตาม `docs/color_design_system.md` (Theme A); Layout B (เต็มจอ, ลิ้นชักการ์ดในมือ)
 - ข้อความในเกมเป็นภาษาไทยทั้งหมด (ชื่อการ์ด, ความสามารถ, Keyword)
 - Art Direction: **Living Objects** — สิ่งของมีหน้า แขน ขา และบุคลิก; ระหว่างยังไม่มีภาพจริงใช้ภาพแทน (placeholder) (D10)
@@ -54,7 +55,7 @@
 
 ## 3.2 Progression: Match-Based — LOCKED
 - ทุก Match เริ่มจาก Card Definition / Deck ต้นแบบ; ไม่มี Stat Progression ข้าม Match
-- การเปลี่ยนแปลงใน Match (ดาเมจ, buff, เหนื่อย) เป็นสถานะเฉพาะ Match
+- การเปลี่ยนแปลงใน Match (ดาเมจ, buff, หลับ) เป็นสถานะเฉพาะ Match
 
 ## 3.3 Data Model — LOCKED
 แยก Card Definitions (ข้อมูลต้นแบบ ไม่เปลี่ยนตามการเล่น), Card Instances, Match States และ Match Events
@@ -72,23 +73,23 @@
 
 ## 4.2 SPARK
 - เทิร์นแรกของแต่ละคนมี 1; ทุก Start Phase ของตัวเอง Max SPARK +1 (สูงสุด **8**) แล้วเติมเต็ม; ไม่สะสมข้ามเทิร์น
-- ใช้จ่ายค่าลงการ์ดและค่า Active Ability; Cost ต่ำสุด 1
+- ใช้จ่ายค่าลงการ์ดเท่านั้น (Active Ability ใช้ฟรี); Cost ต่ำสุด 1
 
 ## 4.3 Zones
 Deck · Hand · Object Zone (3 ช่อง) · Discard
 
 ## 4.4 Turn Structure
-1. **Start Phase:** หมดอายุผล "จนถึงเทิร์นถัดไปของเรา", Objects ของเราพร้อม (หายเหนื่อย), +1 Max SPARK และเติม, จั่ว 1 (ยกเว้นเทิร์นแรกของเกม), จากนั้น Passive "เริ่มเทิร์นเรา" ทำงาน
+1. **Start Phase:** หมดอายุผล "จนถึงเทิร์นถัดไปของเรา", Objects ของเราตื่น (หายหลับ), +1 Max SPARK และเติม, จั่ว 1 (ยกเว้นเทิร์นแรกของเกม), จากนั้น Passive "เริ่มเทิร์นเรา" ทำงาน
 2. **Main Phase:** ลง Object, ใช้ Active Ability
 3. **Battle & End:** สั่ง Object ที่พร้อมโจมตี — การโจมตีครั้งแรกเข้าสู่ Battle Phase (ทางเดียว: หลังจากนั้นลงการ์ด/ใช้ Active ไม่ได้), จบเทิร์น → Passive "จบเทิร์นเรา" ทำงาน, ผล "เทิร์นนี้" หมดอายุ, ส่งเทิร์น
 
 ## 4.5 Summoning
-- ต้องมีช่องว่างและ SPARK พอ; Object ใหม่เข้าสนามแบบ **เหนื่อย (Exhausted)** ยกเว้นมี Haste
+- ต้องมีช่องว่างและ SPARK พอ; Object ใหม่เข้าสนามแบบ **หลับ (Exhausted)** ยกเว้นมี Haste
 - Passive "เมื่อลงสนาม" ทำงานทันทีหลังลง
 
 ## 4.6 Combat
-- โจมตีได้เฉพาะ Object ที่ **พร้อม**; ผู้โจมตีกลายเป็นเหนื่อยจนถึง Start Phase ถัดไปของเจ้าของ
-- ลำดับ: ประกาศโจมตี → ตรวจ Haste / เหนื่อย / Flying / Guard → Passive "เมื่อโจมตี" → ดาเมจ
+- โจมตีได้เฉพาะ Object ที่ **พร้อม**; ผู้โจมตีหลับจนถึง Start Phase ถัดไปของเจ้าของ
+- ลำดับ: ประกาศโจมตี → ตรวจ Haste / หลับ / Flying / Guard → Passive "เมื่อโจมตี" → ดาเมจ
 - **Object vs Object:** ทั้งคู่ทำดาเมจ = ATK ของตัวเองใส่กัน **พร้อมกัน**
 - **Direct Attack:** ตีผู้เล่นได้เมื่อฝ่ายป้องกันไม่มี Guard ที่พร้อม (R2-4)
 - **Piercing:** `Excess = max(0, ATK − HP ที่เหลือของเป้าหมายก่อนรับดาเมจ)` เข้า Player HP
@@ -103,8 +104,8 @@ Deck · Hand · Object Zone (3 ช่อง) · Discard
 # 5. Keywords & Abilities
 
 ## 5.1 Keywords (4 คำ — LOCKED, D6)
-- **HASTE — โจมตีทันที:** เข้าสนามแบบพร้อม โจมตีได้ 1 ครั้งในเทิร์นที่ลง แล้วเหนื่อยตามปกติ
-- **GUARD — โล่กำบัง:** ถ้าฝ่ายป้องกันมี Guard ที่ **พร้อม** ผู้โจมตีต้องเลือกตีตัวที่มี Guard (ตัวไหนก็ได้ถ้ามีหลายตัว); Guard ที่เหนื่อยไม่บังคับและไม่กันการตีผู้เล่น; Guard ที่บินได้บังคับเฉพาะผู้โจมตีที่บินได้ (เจ้าของยืนยัน 2026-11-21)
+- **HASTE — โจมตีทันที:** เข้าสนามแบบพร้อม โจมตีได้ 1 ครั้งในเทิร์นที่ลง แล้วหลับตามปกติ
+- **GUARD — โล่กำบัง:** ถ้าฝ่ายป้องกันมี Guard ที่ **พร้อม** ผู้โจมตีต้องเลือกตีตัวที่มี Guard (ตัวไหนก็ได้ถ้ามีหลายตัว); Guard ที่หลับไม่บังคับและไม่กันการตีผู้เล่น; Guard ที่บินได้บังคับเฉพาะผู้โจมตีที่บินได้ (เจ้าของยืนยัน 2026-11-21)
 - **FLYING — บินได้:** ตัวที่ไม่บินโจมตีตัวที่บินไม่ได้; ตัวที่บินโจมตีได้ทุกเป้าหมาย
 - **PIERCING — เจาะทะลุ:** ดาเมจส่วนเกินจากการต่อสู้เข้า Player HP (§4.6)
 
@@ -115,17 +116,17 @@ Keyword ไม่ใช้กับเป้าหมายของ Ability (Ab
 - **Triggered:** ทำงานเมื่อเกิดเหตุการณ์ของตัวเอง: **เมื่อลงสนาม · เมื่อโจมตี · เมื่อถูกทำลาย · เริ่มเทิร์นเรา · จบเทิร์นเรา**
 - Triggered Passive ใช้เป้าหมายอัตโนมัติเท่านั้น (ตัวเอง, ฝ่ายเราทุกตัว/ตัวอื่น, ศัตรูทุกตัว, ผู้เล่น) — ไม่มีการเลือกระหว่าง Resolution
 
-## 5.3 Active Ability (✨ กดใช้เอง) — D2
+## 5.3 Active Ability (✨ กดใช้เอง) — D2 (ปรับ 2026-11-21: ใช้ฟรี)
 1. ใช้ได้เฉพาะเจ้าของ ใน **Main Phase** ของตัวเอง
 2. Object ต้นทางต้อง **พร้อม**
 3. ใช้ได้ **1 ครั้งต่อเทิร์นต่อ Object**
 4. ตรวจเป้าหมายและเงื่อนไข **ก่อนจ่าย**; ไม่มีเป้าหมายที่ถูกต้อง = ใช้ไม่ได้
-5. จ่าย SPARK ตาม Cost (ทุก Active ≥ 1)
-6. Object ต้นทาง **เหนื่อย** — ยกเว้นการ์ดเขียนว่า **"ไม่ทำให้เหนื่อย"**
+5. **ไม่ต้องจ่าย SPARK** (เจ้าของ 2026-11-21) — การ์ดที่ความสามารถแรงจะมีค่าลงสนามสูงขึ้นแทน
+6. Object ต้นทาง **หลับ** ทันที — ยกเว้นการ์ดเขียนว่า **"หลับตอนจบเทิร์น"** (ยังโจมตีได้ในเทิร์นนี้ แล้วหลับเมื่อจบเทิร์น เหมือนบูสต์แล้วแบตหมด)
 7. Resolve ผล → ทำลาย Object ที่ HP ≤ 0 → Passive ที่ถูกกระตุ้น → ตรวจผลแพ้ชนะ
 
 ## 5.4 Effects
-ปรับ ATK (±) · เพิ่ม HP สูงสุดถาวร · ดาเมจ · ฟื้น HP (ไม่เกินค่าสูงสุด; ผู้เล่นไม่เกิน 20) · จั่ว · ทำให้เหนื่อย · ทำให้พร้อม · ให้ Keyword · ค้นหา (การ์ดที่มี Trait ตามที่ระบุจาก Deck ขึ้นมือ เปิดเผย แล้วสับ Deck; ไม่มีการ์ดตรง = ไม่เกิดผล)
+ปรับ ATK (±) · เพิ่ม HP สูงสุดถาวร · ดาเมจ · ฟื้น HP (ไม่เกินค่าสูงสุด; ผู้เล่นไม่เกิน 20) · จั่ว · ทำให้หลับ · ทำให้ตื่น · ให้ Keyword · ค้นหา (การ์ดที่มี Trait ตามที่ระบุจาก Deck ขึ้นมือ เปิดเผย แล้วสับ Deck; ไม่มีการ์ดตรง = ไม่เกิดผล)
 
 ระยะเวลา: **เทิร์นนี้** (หมดตอนจบเทิร์น) · **จนถึงเทิร์นถัดไปของเรา** (หมดตอนเริ่มเทิร์นถัดไปของเจ้าของความสามารถ) · **ถาวร** (ขณะอยู่บนสนาม). Stat bonus จากต่างแหล่ง Stack ได้; Keyword ซ้ำไม่ซ้อน
 
@@ -149,43 +150,43 @@ STATIONERY เครื่องเขียน · CONTAINER ภาชนะ · 
 ## 6.2 Prototype Set — 24 Objects (Provisional)
 8 Passive-only · 8 Active-only · 8 Dual; Archetype ละ 6 ใบ (Aggro / Defensive / Control / Synergy). "ศัตรู" = Object ฝ่ายตรงข้าม
 
-| ID | ชื่อ (Object) | Arch | Cost | ATK/HP | KW | Traits | 🔁 Passive | ✨ Active (SPARK) |
+| ID | ชื่อ (Object) | Arch | Cost | ATK/HP | KW | Traits | 🔁 Passive | ✨ Active (ฟรี) |
 |---|---|---|---:|---:|---|---|---|---|
-| O01 | ดินสอไม้ (Pencil) | Aggro | 1 | 2/2 | – | STATIONERY | ไส้หัก: เมื่อถูกทำลาย ดาเมจ 1 ผู้เล่นฝ่ายตรงข้าม | – |
-| O02 | รถแข่งจิ๋ว (Toy Racer) | Aggro | 2 | 2/2 | Haste | VEHICLE | เร่งเครื่อง: เมื่อโจมตี +1 ATK เทิร์นนี้ | เทอร์โบ (1): +2 ATK เทิร์นนี้ · ไม่ทำให้เหนื่อย |
-| O03 | หนังยาง (Rubber Band) | Aggro | 1 | 1/2 | – | STATIONERY | – | ดีด (1): ดาเมจ 1 ใส่ศัตรูหรือผู้เล่นฝ่ายตรงข้าม |
-| O04 | จักรยาน (Bicycle) | Aggro | 3 | 3/4 | Haste | VEHICLE | ปั่นเป็นขบวน: +1 ATK ถ้ามี VEHICLE อื่นฝ่ายเรา | – |
-| O05 | กรรไกร (Scissors) | Aggro | 2 | 3/2 | Piercing | STATIONERY, TOOL | – | ตัดฉับ (2): ดาเมจ 2 ใส่ศัตรู |
-| O06 | จรวดขวดน้ำ (Bottle Rocket) | Aggro | 3 | 3/3 | Flying | VEHICLE | จุดชนวน: เมื่อลงสนาม ดาเมจ 1 ผู้เล่นฝ่ายตรงข้าม | พุ่งชน (2): ดาเมจ 2 ผู้เล่นฝ่ายตรงข้าม |
-| O07 | กระเป๋าเป้ (Backpack) | Defensive | 2 | 1/5 | Guard | CONTAINER | ช่องกันกระแทก: Object อื่นฝ่ายเรา +1 HP | ช่องฉุกเฉิน (1): ฟื้น 2 HP ให้ Object ฝ่ายเรา |
-| O08 | กล่องกระดาษ (Cardboard Box) | Defensive | 1 | 0/5 | Guard | CONTAINER | ของในกล่อง: เมื่อถูกทำลาย จั่ว 1 | – |
-| O09 | ร่ม (Umbrella) | Defensive | 2 | 2/4 | Guard | HOUSEHOLD | กางรับฝน: เริ่มเทิร์นเรา ฟื้น 2 HP ให้ตัวเอง | – |
-| O10 | กระติกน้ำแข็ง (Cooler) | Defensive | 3 | 2/6 | Guard | CONTAINER | – | ประคบเย็น (1): ฟื้น 3 HP ให้ Object ฝ่ายเราหรือผู้เล่นเรา |
-| O11 | หมวกกันน็อก (Helmet) | Defensive | 2 | 2/4 | – | HOUSEHOLD | – | สวมกันกระแทก (1): Object อื่นฝ่ายเราได้ Guard จนถึงเทิร์นถัดไปของเรา |
-| O12 | ประตูไม้ (Wooden Door) | Defensive | 4 | 2/8 | Guard | HOUSEHOLD | ปิดบ้าน: เมื่อลงสนาม ฟื้น 3 HP ผู้เล่นเรา | ล็อกประตู (2): ทำให้ศัตรูที่พร้อม 1 ตัวเหนื่อย |
-| O13 | นาฬิกาปลุก (Alarm Clock) | Control | 2 | 2/3 | – | ELECTRONIC | ปลุกเช้า: เมื่อลงสนาม จั่ว 1 | เลื่อนปลุก (1): ทำให้ศัตรูที่พร้อม 1 ตัวเหนื่อย |
-| O14 | ยางลบ (Eraser) | Control | 2 | 1/3 | – | STATIONERY | – | ลบทิ้ง (3): ดาเมจ 3 ใส่ศัตรู |
-| O15 | ไฟฉาย (Flashlight) | Control | 3 | 2/3 | – | ELECTRONIC | แสงจ้า: เมื่อลงสนาม ดาเมจ 1 ใส่ศัตรูทุกตัว | – |
-| O16 | กาวน้ำ (Glue) | Control | 2 | 1/4 | – | STATIONERY | – | ติดหนึบ (1): ศัตรู 1 ตัว −2 ATK จนถึงเทิร์นถัดไปของเรา |
-| O17 | เครื่องดูดฝุ่น (Vacuum) | Control | 5 | 4/6 | – | ELECTRONIC, HOUSEHOLD | ดูดพลัง: เมื่อลงสนาม ศัตรูทุกตัว −1 ATK จนถึงเทิร์นถัดไปของเรา | ดูดแรง (2): ดาเมจ 2 ใส่ศัตรู |
-| O18 | วิทยุ (Radio) | Control | 3 | 1/4 | – | ELECTRONIC | ข่าวต้นชั่วโมง: เริ่มเทิร์นเรา จั่ว 1 | – |
-| O19 | กล่องดินสอ (Pencil Case) | Synergy | 2 | 1/4 | – | CONTAINER, STATIONERY | เก็บครบชุด: STATIONERY อื่นฝ่ายเรา +1 ATK | – |
-| O20 | ปลั๊กพ่วง (Power Strip) | Synergy | 2 | 1/4 | – | ELECTRONIC | – | จ่ายไฟ (1): ELECTRONIC อื่นฝ่ายเราที่เหนื่อย กลับมาพร้อม |
-| O21 | ประแจ (Wrench) | Synergy | 2 | 2/3 | – | TOOL | หยิบเครื่องมือ: เมื่อลงสนาม ค้นหา TOOL 1 ใบจากเด็คขึ้นมือ | ขันแน่น (1): Object ฝ่ายเรา +2 HP ถาวร |
-| O22 | ค้อน (Hammer) | Synergy | 3 | 3/4 | – | TOOL | ทีมช่าง: +1 ATK ต่อ TOOL อื่นฝ่ายเรา | – |
-| O23 | ไขควง (Screwdriver) | Synergy | 1 | 2/2 | – | TOOL | – | ไขทะลุ (1): TOOL อื่นฝ่ายเราได้ Piercing เทิร์นนี้ |
-| O24 | รถบรรทุกของเล่น (Toy Truck) | Synergy | 4 | 3/6 | – | VEHICLE | ขนของ: เมื่อลงสนาม ค้นหา VEHICLE 1 ใบจากเด็คขึ้นมือ | ส่งของ (2): ฟื้น 2 HP ให้ Object ฝ่ายเราทุกตัว |
+| O01 | ดินสอไม้ (Pencil) | Aggro | 1 | 2/2 | – | STATIONERY | ไส้หัก: เมื่อถูกทำลาย: ดาเมจ 1 ใส่ผู้เล่นฝ่ายตรงข้าม | – |
+| O02 | รถแข่งจิ๋ว (Toy Racer) | Aggro | 3 | 2/3 | Haste | VEHICLE | เร่งเครื่อง: เมื่อโจมตี: +1 ATK เทิร์นนี้ | เทอร์โบ: +2 ATK เทิร์นนี้ ยังโจมตีได้ แล้วหลับตอนจบเทิร์น (แบตหมด) |
+| O03 | หนังยาง (Rubber Band) | Aggro | 2 | 1/2 | – | STATIONERY | – | ดีด: ดาเมจ 1 ใส่ศัตรูหรือผู้เล่นฝ่ายตรงข้าม |
+| O04 | จักรยาน (Bicycle) | Aggro | 3 | 3/4 | Haste | VEHICLE | ปั่นเป็นขบวน: +1 ATK ถ้ามีพาหนะตัวอื่นฝ่ายเรา | – |
+| O05 | กรรไกร (Scissors) | Aggro | 3 | 3/2 | Piercing | STATIONERY, TOOL | – | ตัดฉับ: ดาเมจ 2 ใส่ศัตรู 1 ตัว |
+| O06 | จรวดขวดน้ำ (Bottle Rocket) | Aggro | 4 | 3/5 | Flying | VEHICLE | จุดชนวน: เมื่อลงสนาม: ดาเมจ 1 ใส่ผู้เล่นฝ่ายตรงข้าม | พุ่งชน: ดาเมจ 2 ใส่ผู้เล่นฝ่ายตรงข้าม |
+| O07 | กระเป๋าเป้ (Backpack) | Defensive | 2 | 1/5 | Guard | CONTAINER | ช่องกันกระแทก: Object อื่นฝ่ายเรา +1 HP | ช่องฉุกเฉิน: ฟื้น 2 HP ให้ Object ฝ่ายเรา 1 ตัว |
+| O08 | กล่องกระดาษ (Cardboard Box) | Defensive | 1 | 0/5 | Guard | CONTAINER | ของในกล่อง: เมื่อถูกทำลาย: จั่ว 1 ใบ | – |
+| O09 | ร่ม (Umbrella) | Defensive | 2 | 2/4 | Guard | HOUSEHOLD | กางรับฝน: เริ่มเทิร์นเรา: ฟื้น 2 HP ให้ตัวเอง | – |
+| O10 | กระติกน้ำแข็ง (Cooler) | Defensive | 3 | 2/6 | Guard | CONTAINER | – | ประคบเย็น: ฟื้น 3 HP ให้ Object ฝ่ายเราหรือผู้เล่นเรา |
+| O11 | หมวกกันน็อก (Helmet) | Defensive | 2 | 2/4 | – | HOUSEHOLD | – | สวมกันกระแทก: Object อื่นฝ่ายเราได้ โล่กำบัง จนถึงเทิร์นถัดไปของเรา |
+| O12 | ประตูไม้ (Wooden Door) | Defensive | 5 | 2/8 | Guard | HOUSEHOLD | ปิดบ้าน: เมื่อลงสนาม: ฟื้น 3 HP ให้ผู้เล่นเรา | ล็อกประตู: ทำให้ศัตรูที่พร้อม 1 ตัวหลับ |
+| O13 | นาฬิกาปลุก (Alarm Clock) | Control | 3 | 2/3 | – | ELECTRONIC | ปลุกเช้า: เมื่อลงสนาม: จั่ว 1 ใบ | เลื่อนปลุก: ทำให้ศัตรูที่พร้อม 1 ตัวหลับ |
+| O14 | ยางลบ (Eraser) | Control | 4 | 2/6 | – | STATIONERY | – | ลบทิ้ง: ดาเมจ 3 ใส่ศัตรู 1 ตัว |
+| O15 | ไฟฉาย (Flashlight) | Control | 3 | 2/3 | – | ELECTRONIC | แสงจ้า: เมื่อลงสนาม: ดาเมจ 1 ใส่ศัตรูทุกตัว | – |
+| O16 | กาวน้ำ (Glue) | Control | 2 | 1/4 | – | STATIONERY | – | ติดหนึบ: ศัตรู 1 ตัว −2 ATK จนถึงเทิร์นถัดไปของเรา |
+| O17 | เครื่องดูดฝุ่น (Vacuum) | Control | 6 | 5/7 | – | ELECTRONIC, HOUSEHOLD | ดูดพลัง: เมื่อลงสนาม: ศัตรูทุกตัว −1 ATK จนถึงเทิร์นถัดไปของเรา | ดูดแรง: ดาเมจ 2 ใส่ศัตรู 1 ตัว |
+| O18 | วิทยุ (Radio) | Control | 3 | 1/4 | – | ELECTRONIC | ข่าวต้นชั่วโมง: เริ่มเทิร์นเรา: จั่ว 1 ใบ | – |
+| O19 | กล่องดินสอ (Pencil Case) | Synergy | 2 | 1/4 | – | CONTAINER, STATIONERY | เก็บครบชุด: เครื่องเขียนตัวอื่นฝ่ายเรา +1 ATK | – |
+| O20 | ปลั๊กพ่วง (Power Strip) | Synergy | 3 | 1/4 | – | ELECTRONIC | – | จ่ายไฟ: เครื่องไฟฟ้าตัวอื่นฝ่ายเราที่หลับ ตื่นกลับมาพร้อม |
+| O21 | ประแจ (Wrench) | Synergy | 3 | 2/3 | – | TOOL | หยิบเครื่องมือ: เมื่อลงสนาม: ค้นหาเครื่องมือ 1 ใบจากเด็คขึ้นมือ | ขันแน่น: Object ฝ่ายเรา 1 ตัว +2 HP ถาวร |
+| O22 | ค้อน (Hammer) | Synergy | 3 | 3/4 | – | TOOL | ทีมช่าง: +1 ATK ต่อเครื่องมือตัวอื่นฝ่ายเรา | – |
+| O23 | ไขควง (Screwdriver) | Synergy | 1 | 2/2 | – | TOOL | – | ไขทะลุ: เครื่องมือตัวอื่นฝ่ายเราได้ เจาะทะลุ เทิร์นนี้ |
+| O24 | รถบรรทุกของเล่น (Toy Truck) | Synergy | 5 | 3/7 | – | VEHICLE | ขนของ: เมื่อลงสนาม: ค้นหาพาหนะ 1 ใบจากเด็คขึ้นมือ | ส่งของ: ฟื้น 2 HP ให้ Object ฝ่ายเราทุกตัว |
 
-ข้อมูลเดียวกันอยู่ในโค้ดที่ `packages/game-engine/src/rules/v3/cards.ts` และ migration ruleset 3 (มี drift test)
+ข้อมูลเดียวกันอยู่ในโค้ดที่ `packages/game-engine/src/rules/v4/cards.ts` และ migration ruleset 4 (มี drift test)
 
-## 6.3 Starter Deck v3 (30, Provisional)
+## 6.3 Starter Deck v4 (30, Provisional)
 ทุกใบ O01–O24 อย่างละ 1 + ใบที่สองของ O01, O03, O08, O13, O19, O23
 
 ## 6.4 Card Data Contract
 `card_id`, `name` (ไทย), `name_en`, `archetype`, `rarity`, `cost`, `atk`, `hp`, `keywords`, `traits`, `passive`, `active`, `flavor`, `definition_version`
 
 ## 6.5 Scenario Tests (ต้องผ่านแบบอัตโนมัติ)
-Active: ต้นทางพร้อม/เหนื่อย · SPARK พอ/ไม่พอ · ใช้ซ้ำในเทิร์นเดียว · เป้าหมายผิด/หายไปก่อน Resolve (ไม่เสีย SPARK) · ไม่ทำให้เหนื่อย. Passive: หลาย Trigger พร้อมกัน (ลำดับ) · Trigger ต่อเนื่อง + Loop limit · ทำลายที่ HP 0 · ต้นทางออกจากสนามระหว่าง Resolution · Static หยุดแล้ว HP ลดจนถูกทำลาย · Guard ที่ได้ "จนถึงเทิร์นถัดไป" หมดอายุถูกเวลา · คำขอซ้ำ (idempotency)
+Active: ต้นทางตื่น/หลับ · ใช้ฟรีแม้ SPARK เป็น 0 · ใช้ซ้ำในเทิร์นเดียว · เป้าหมายผิด/หายไปก่อน Resolve (ต้นทางไม่หลับ) · หลับตอนจบเทิร์น. Passive: หลาย Trigger พร้อมกัน (ลำดับ) · Trigger ต่อเนื่อง + Loop limit · ทำลายที่ HP 0 · ต้นทางออกจากสนามระหว่าง Resolution · Static หยุดแล้ว HP ลดจนถูกทำลาย · Guard ที่ได้ "จนถึงเทิร์นถัดไป" หมดอายุถูกเวลา · คำขอซ้ำ (idempotency)
 
 ---
 
@@ -212,6 +213,12 @@ Active: ต้นทางพร้อม/เหนื่อย · SPARK พอ/
 ---
 
 # Appendix — Change Log
+
+## 2026-11-21 — v5.0 Free Actives (ruleset "4")
+- เจ้าของปรับ: Active Ability ใช้ฟรี ไม่ต้องจ่าย SPARK (กฎอื่นคงเดิม: Main Phase, ต้องตื่น, ใช้แล้วหลับ, ตัวละ 1 ครั้ง/เทิร์น)
+- การ์ดที่ Active แรงขึ้นค่าลงสนาม: O02, O03, O05, O06, O12, O13, O14, O17, O20, O21, O24 (ปรับ ATK/HP ให้อยู่ใน Power Budget)
+- รถแข่งจิ๋ว "เทอร์โบ": ใช้แล้วยังโจมตีได้ แล้วหลับตอนจบเทิร์น (แบตหมด)
+- ในเกมเรียกสถานะ Exhausted ว่า "หลับ"; ข้อความการ์ดใช้ชื่อหมวดหมู่ภาษาไทย
 
 ## 2026-11-21 — v4.0 Everyday Objects Battle (ruleset "3")
 - เจ้าของอนุมัติทิศทางใหม่และคำแนะนำทั้งหมด (D1–D11): Object Cards เท่านั้น, Passive + Active, ATK/HP, Keywords 4 คำ, Traits สำหรับ Synergy

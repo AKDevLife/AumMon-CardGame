@@ -1,6 +1,6 @@
 /**
- * Ruleset 3 card data contract — Object cards with Passive + Active abilities
- * (aummon_game_spec.md v4.0, owner decisions R3 D1–D11).
+ * Ruleset 4 card data contract — Object cards with Passive + free Active abilities
+ * (aummon_game_spec.md v5.0, owner decisions R3 D1–D11).
  */
 export type Keyword = "haste" | "guard" | "flying" | "piercing";
 export type Trait = "STATIONERY" | "CONTAINER" | "VEHICLE" | "ELECTRONIC" | "TOOL" | "HOUSEHOLD";
@@ -69,12 +69,13 @@ export interface TriggeredPassive extends Named {
 export type Passive = StaticPassive | TriggeredPassive;
 
 export interface Active extends Named {
-  /** SPARK cost (≥ 1, decision D2). */
-  readonly cost: number;
   readonly target: AutoTarget | PickTarget;
   readonly effect: Effect;
-  /** Card says "ไม่ทำให้เหนื่อย": the source stays Ready. */
-  readonly noExhaust?: boolean;
+  /**
+   * Card says "หลับตอนจบเทิร์น": the source stays Ready now (it may still attack) and
+   * falls asleep at the end of this turn — "boost then the battery runs out" (owner 2026-11-21).
+   */
+  readonly sleepAtEndOfTurn?: boolean;
 }
 
 export interface CardDefinition {

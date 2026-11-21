@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router";
 import { StickerButton } from "../components/StickerButton.tsx";
 import { useAuth } from "../features/auth/auth-context.ts";
+import { CardGallery } from "../features/tcg/CardGallery.tsx";
 import { Popup } from "../features/tcg/Popup.tsx";
 import { RulesText } from "../features/tcg/RulesText.tsx";
 
@@ -15,6 +16,7 @@ export function HomePage() {
   const auth = useAuth();
   const signedIn = auth.mode === "live" && auth.session !== null;
   const [rules, setRules] = useState(false);
+  const [cards, setCards] = useState(false);
   return (
     <div className="flex flex-1 flex-col justify-center gap-8">
       <section className="am-sticker relative overflow-hidden bg-am-brand px-6 py-6 text-center text-am-inverse">
@@ -65,15 +67,36 @@ export function HomePage() {
       </nav>
 
       {/* Secondary action: visually lighter than the play modes, always available (even signed out). */}
-      <button
-        type="button"
-        onClick={() => {
-          setRules(true);
+      <div className="flex flex-wrap justify-center gap-3">
+        <button
+          type="button"
+          onClick={() => {
+            setRules(true);
+          }}
+          className="am-pressable flex min-h-11 items-center gap-2 rounded-full border-[3px] border-am-ink bg-am-deco-purple px-5 py-2 font-display font-semibold"
+        >
+          <span aria-hidden="true">📖</span> วิธีเล่น &amp; กติกา
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setCards(true);
+          }}
+          className="am-pressable flex min-h-11 items-center gap-2 rounded-full border-[3px] border-am-ink bg-am-deco-purple px-5 py-2 font-display font-semibold"
+        >
+          <span aria-hidden="true">🗂️</span> การ์ดทั้งหมด
+        </button>
+      </div>
+
+      <Popup
+        title="การ์ดทั้งหมด"
+        open={cards}
+        onClose={() => {
+          setCards(false);
         }}
-        className="am-pressable mx-auto flex min-h-11 items-center gap-2 rounded-full border-[3px] border-am-ink bg-am-deco-purple px-5 py-2 font-display font-semibold"
       >
-        <span aria-hidden="true">📖</span> วิธีเล่น &amp; กติกา
-      </button>
+        <CardGallery />
+      </Popup>
 
       <Popup
         title="วิธีเล่น & กติกา"

@@ -1,4 +1,4 @@
-// POST { roomId } → { matchId }   (online ruleset 3 room, owner only)
+// POST { roomId } → { matchId }   (online ruleset 4 room, owner only)
 import { requireUser } from "../_shared/auth.ts";
 import { handler, readJson } from "../_shared/http.ts";
 import { uuid } from "../_shared/input.ts";

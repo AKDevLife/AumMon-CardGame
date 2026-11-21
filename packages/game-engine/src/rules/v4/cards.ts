@@ -35,7 +35,7 @@ function obj(
   };
 }
 
-export const CARD_DEFINITIONS_V3: readonly CardDefinition[] = [
+export const CARD_DEFINITIONS_V4: readonly CardDefinition[] = [
   // ---- Aggro
   obj(
     "O01",
@@ -63,9 +63,9 @@ export const CARD_DEFINITIONS_V3: readonly CardDefinition[] = [
     "รถแข่งจิ๋ว",
     "Toy Racer",
     "aggro",
+    3,
     2,
-    2,
-    2,
+    3,
     ["haste"],
     ["VEHICLE"],
     {
@@ -78,11 +78,10 @@ export const CARD_DEFINITIONS_V3: readonly CardDefinition[] = [
     },
     {
       name: "เทอร์โบ",
-      text: "+2 ATK เทิร์นนี้ (ไม่ทำให้เหนื่อย)",
-      cost: 1,
+      text: "+2 ATK เทิร์นนี้ ยังโจมตีได้ แล้วหลับตอนจบเทิร์น (แบตหมด)",
       target: "self",
       effect: { type: "atk", amount: 2, duration: "turn" },
-      noExhaust: true,
+      sleepAtEndOfTurn: true,
     },
     "บรื้น ๆ ไม่มีเบรก",
   ),
@@ -91,7 +90,7 @@ export const CARD_DEFINITIONS_V3: readonly CardDefinition[] = [
     "หนังยาง",
     "Rubber Band",
     "aggro",
-    1,
+    2,
     1,
     2,
     [],
@@ -100,7 +99,6 @@ export const CARD_DEFINITIONS_V3: readonly CardDefinition[] = [
     {
       name: "ดีด",
       text: "ดาเมจ 1 ใส่ศัตรูหรือผู้เล่นฝ่ายตรงข้าม",
-      cost: 1,
       target: { pick: "enemy_unit_or_player" },
       effect: { type: "damage", amount: 1 },
     },
@@ -119,7 +117,7 @@ export const CARD_DEFINITIONS_V3: readonly CardDefinition[] = [
     {
       kind: "static",
       name: "ปั่นเป็นขบวน",
-      text: "+1 ATK ถ้ามี VEHICLE อื่นฝ่ายเรา",
+      text: "+1 ATK ถ้ามีพาหนะตัวอื่นฝ่ายเรา",
       stat: "atk",
       amount: 1,
       to: "self",
@@ -133,7 +131,7 @@ export const CARD_DEFINITIONS_V3: readonly CardDefinition[] = [
     "กรรไกร",
     "Scissors",
     "aggro",
-    2,
+    3,
     3,
     2,
     ["piercing"],
@@ -142,7 +140,6 @@ export const CARD_DEFINITIONS_V3: readonly CardDefinition[] = [
     {
       name: "ตัดฉับ",
       text: "ดาเมจ 2 ใส่ศัตรู 1 ตัว",
-      cost: 2,
       target: { pick: "enemy_unit" },
       effect: { type: "damage", amount: 2 },
     },
@@ -153,9 +150,9 @@ export const CARD_DEFINITIONS_V3: readonly CardDefinition[] = [
     "จรวดขวดน้ำ",
     "Bottle Rocket",
     "aggro",
+    4,
     3,
-    3,
-    3,
+    5,
     ["flying"],
     ["VEHICLE"],
     {
@@ -169,7 +166,6 @@ export const CARD_DEFINITIONS_V3: readonly CardDefinition[] = [
     {
       name: "พุ่งชน",
       text: "ดาเมจ 2 ใส่ผู้เล่นฝ่ายตรงข้าม",
-      cost: 2,
       target: "enemy_player",
       effect: { type: "damage", amount: 2 },
     },
@@ -197,7 +193,6 @@ export const CARD_DEFINITIONS_V3: readonly CardDefinition[] = [
     {
       name: "ช่องฉุกเฉิน",
       text: "ฟื้น 2 HP ให้ Object ฝ่ายเรา 1 ตัว",
-      cost: 1,
       target: { pick: "ally" },
       effect: { type: "heal", amount: 2 },
     },
@@ -259,7 +254,6 @@ export const CARD_DEFINITIONS_V3: readonly CardDefinition[] = [
     {
       name: "ประคบเย็น",
       text: "ฟื้น 3 HP ให้ Object ฝ่ายเราหรือผู้เล่นเรา",
-      cost: 1,
       target: { pick: "ally_or_own_player" },
       effect: { type: "heal", amount: 3 },
     },
@@ -279,7 +273,6 @@ export const CARD_DEFINITIONS_V3: readonly CardDefinition[] = [
     {
       name: "สวมกันกระแทก",
       text: "Object อื่นฝ่ายเราได้ โล่กำบัง จนถึงเทิร์นถัดไปของเรา",
-      cost: 1,
       target: { pick: "ally", other: true },
       effect: { type: "keyword", keyword: "guard", duration: "until_next_turn" },
     },
@@ -290,7 +283,7 @@ export const CARD_DEFINITIONS_V3: readonly CardDefinition[] = [
     "ประตูไม้",
     "Wooden Door",
     "defensive",
-    4,
+    5,
     2,
     8,
     ["guard"],
@@ -305,8 +298,7 @@ export const CARD_DEFINITIONS_V3: readonly CardDefinition[] = [
     },
     {
       name: "ล็อกประตู",
-      text: "ทำให้ศัตรูที่พร้อม 1 ตัวเหนื่อย",
-      cost: 2,
+      text: "ทำให้ศัตรูที่พร้อม 1 ตัวหลับ",
       target: { pick: "enemy_unit", readyOnly: true },
       effect: { type: "exhaust" },
     },
@@ -318,7 +310,7 @@ export const CARD_DEFINITIONS_V3: readonly CardDefinition[] = [
     "นาฬิกาปลุก",
     "Alarm Clock",
     "control",
-    2,
+    3,
     2,
     3,
     [],
@@ -333,8 +325,7 @@ export const CARD_DEFINITIONS_V3: readonly CardDefinition[] = [
     },
     {
       name: "เลื่อนปลุก",
-      text: "ทำให้ศัตรูที่พร้อม 1 ตัวเหนื่อย",
-      cost: 1,
+      text: "ทำให้ศัตรูที่พร้อม 1 ตัวหลับ",
       target: { pick: "enemy_unit", readyOnly: true },
       effect: { type: "exhaust" },
     },
@@ -345,16 +336,15 @@ export const CARD_DEFINITIONS_V3: readonly CardDefinition[] = [
     "ยางลบ",
     "Eraser",
     "control",
+    4,
     2,
-    1,
-    3,
+    6,
     [],
     ["STATIONERY"],
     null,
     {
       name: "ลบทิ้ง",
       text: "ดาเมจ 3 ใส่ศัตรู 1 ตัว",
-      cost: 3,
       target: { pick: "enemy_unit" },
       effect: { type: "damage", amount: 3 },
     },
@@ -395,7 +385,6 @@ export const CARD_DEFINITIONS_V3: readonly CardDefinition[] = [
     {
       name: "ติดหนึบ",
       text: "ศัตรู 1 ตัว −2 ATK จนถึงเทิร์นถัดไปของเรา",
-      cost: 1,
       target: { pick: "enemy_unit" },
       effect: { type: "atk", amount: -2, duration: "until_next_turn" },
     },
@@ -406,9 +395,9 @@ export const CARD_DEFINITIONS_V3: readonly CardDefinition[] = [
     "เครื่องดูดฝุ่น",
     "Vacuum",
     "control",
-    5,
-    4,
     6,
+    5,
+    7,
     [],
     ["ELECTRONIC", "HOUSEHOLD"],
     {
@@ -422,7 +411,6 @@ export const CARD_DEFINITIONS_V3: readonly CardDefinition[] = [
     {
       name: "ดูดแรง",
       text: "ดาเมจ 2 ใส่ศัตรู 1 ตัว",
-      cost: 2,
       target: { pick: "enemy_unit" },
       effect: { type: "damage", amount: 2 },
     },
@@ -463,7 +451,7 @@ export const CARD_DEFINITIONS_V3: readonly CardDefinition[] = [
     {
       kind: "static",
       name: "เก็บครบชุด",
-      text: "STATIONERY อื่นฝ่ายเรา +1 ATK",
+      text: "เครื่องเขียนตัวอื่นฝ่ายเรา +1 ATK",
       stat: "atk",
       amount: 1,
       to: "other_allies",
@@ -477,7 +465,7 @@ export const CARD_DEFINITIONS_V3: readonly CardDefinition[] = [
     "ปลั๊กพ่วง",
     "Power Strip",
     "synergy",
-    2,
+    3,
     1,
     4,
     [],
@@ -485,8 +473,7 @@ export const CARD_DEFINITIONS_V3: readonly CardDefinition[] = [
     null,
     {
       name: "จ่ายไฟ",
-      text: "ELECTRONIC อื่นฝ่ายเราที่เหนื่อย กลับมาพร้อม",
-      cost: 1,
+      text: "เครื่องไฟฟ้าตัวอื่นฝ่ายเราที่หลับ ตื่นกลับมาพร้อม",
       target: { pick: "ally", other: true, trait: "ELECTRONIC", exhaustedOnly: true },
       effect: { type: "ready" },
     },
@@ -497,7 +484,7 @@ export const CARD_DEFINITIONS_V3: readonly CardDefinition[] = [
     "ประแจ",
     "Wrench",
     "synergy",
-    2,
+    3,
     2,
     3,
     [],
@@ -505,7 +492,7 @@ export const CARD_DEFINITIONS_V3: readonly CardDefinition[] = [
     {
       kind: "triggered",
       name: "หยิบเครื่องมือ",
-      text: "เมื่อลงสนาม: ค้นหา TOOL 1 ใบจากเด็คขึ้นมือ",
+      text: "เมื่อลงสนาม: ค้นหาเครื่องมือ 1 ใบจากเด็คขึ้นมือ",
       on: "on_summon",
       target: "none",
       effect: { type: "search", trait: "TOOL" },
@@ -513,7 +500,6 @@ export const CARD_DEFINITIONS_V3: readonly CardDefinition[] = [
     {
       name: "ขันแน่น",
       text: "Object ฝ่ายเรา 1 ตัว +2 HP ถาวร",
-      cost: 1,
       target: { pick: "ally" },
       effect: { type: "max_hp", amount: 2 },
     },
@@ -532,7 +518,7 @@ export const CARD_DEFINITIONS_V3: readonly CardDefinition[] = [
     {
       kind: "static",
       name: "ทีมช่าง",
-      text: "+1 ATK ต่อ TOOL อื่นฝ่ายเรา",
+      text: "+1 ATK ต่อเครื่องมือตัวอื่นฝ่ายเรา",
       stat: "atk",
       amount: 1,
       to: "self",
@@ -554,8 +540,7 @@ export const CARD_DEFINITIONS_V3: readonly CardDefinition[] = [
     null,
     {
       name: "ไขทะลุ",
-      text: "TOOL อื่นฝ่ายเราได้ เจาะทะลุ เทิร์นนี้",
-      cost: 1,
+      text: "เครื่องมือตัวอื่นฝ่ายเราได้ เจาะทะลุ เทิร์นนี้",
       target: { pick: "ally", other: true, trait: "TOOL" },
       effect: { type: "keyword", keyword: "piercing", duration: "turn" },
     },
@@ -566,15 +551,15 @@ export const CARD_DEFINITIONS_V3: readonly CardDefinition[] = [
     "รถบรรทุกของเล่น",
     "Toy Truck",
     "synergy",
-    4,
+    5,
     3,
-    6,
+    7,
     [],
     ["VEHICLE"],
     {
       kind: "triggered",
       name: "ขนของ",
-      text: "เมื่อลงสนาม: ค้นหา VEHICLE 1 ใบจากเด็คขึ้นมือ",
+      text: "เมื่อลงสนาม: ค้นหาพาหนะ 1 ใบจากเด็คขึ้นมือ",
       on: "on_summon",
       target: "none",
       effect: { type: "search", trait: "VEHICLE" },
@@ -582,7 +567,6 @@ export const CARD_DEFINITIONS_V3: readonly CardDefinition[] = [
     {
       name: "ส่งของ",
       text: "ฟื้น 2 HP ให้ Object ฝ่ายเราทุกตัว",
-      cost: 2,
       target: "all_allies",
       effect: { type: "heal", amount: 2 },
     },
@@ -590,7 +574,7 @@ export const CARD_DEFINITIONS_V3: readonly CardDefinition[] = [
   ),
 ];
 
-const BY_ID = new Map(CARD_DEFINITIONS_V3.map((c) => [c.cardId, c]));
+const BY_ID = new Map(CARD_DEFINITIONS_V4.map((c) => [c.cardId, c]));
 
 export function getCardDefinition(cardId: string): CardDefinition {
   const def = BY_ID.get(cardId);

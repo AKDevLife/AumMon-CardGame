@@ -1,18 +1,18 @@
-/** Ruleset 3 match flow (no I/O): server bots + 90 s turn timer. `now` is injected. */
-import { createSeededRandom, v3, type RngState } from "@aummon/game-engine";
+/** Ruleset 4 match flow (no I/O): server bots + 90 s turn timer. `now` is injected. */
+import { createSeededRandom, v4, type RngState } from "@aummon/game-engine";
 
-type Seat = v3.Seat;
+type Seat = v4.Seat;
 export type Kind = "human" | "bot" | "local";
 export type Mode = "solo" | "pass_play" | "online";
 
 export interface TcgRuntime {
-  state: v3.MatchState;
+  state: v4.MatchState;
   rng: RngState;
   deadline: number | null;
 }
 
 /** Seat that must act now: active seat, or during mulligan the first seat not done. */
-export function actingSeat(state: v3.MatchState): Seat | null {
+export function actingSeat(state: v4.MatchState): Seat | null {
   if (state.status === "finished") return null;
   if (state.status === "mulligan") {
     const i = state.players.findIndex((p) => !p.mulliganDone);
@@ -30,11 +30,11 @@ export function advanceTcg(
   kinds: readonly [Kind, Kind],
   mode: Mode,
   now: number,
-): TcgRuntime & { events: v3.GameEvent[] } {
+): TcgRuntime & { events: v4.GameEvent[] } {
   const rng = createSeededRandom(input.rng);
   let { state, deadline } = input;
-  const events: v3.GameEvent[] = [];
-  const key = (s: v3.MatchState) => `${s.status}:${s.turn}`;
+  const events: v4.GameEvent[] = [];
+  const key = (s: v4.MatchState) => `${s.status}:${s.turn}`;
   let lastKey = key(state);
 
   for (let guard = 0; guard < 300 && state.status !== "finished"; guard++) {
@@ -46,12 +46,12 @@ export function advanceTcg(
       state.status === "mulligan" && botMulligan !== undefined ? botMulligan : actingSeat(state);
     if (seat === null) break;
     const playerId = state.players[seat].playerId;
-    let command: v3.Command | null = null;
+    let command: v4.Command | null = null;
     if (kinds[seat] === "bot") {
       // Bot turns are paced: one action per step; `deadline` holds the next step time.
       if (state.status === "active" && deadline !== null && now < deadline) break;
-      const legal = v3.getLegalCommands(state, seat);
-      const pick = v3.chooseBotCommand(v3.getPlayerView(state, seat), legal, rng);
+      const legal = v4.getLegalCommands(state, seat);
+      const pick = v4.chooseBotCommand(v4.getPlayerView(state, seat), legal, rng);
       command =
         pick.type === "mulligan"
           ? { type: "mulligan", playerId, instanceIds: [] }
@@ -63,7 +63,7 @@ export function advanceTcg(
           : { type: "end_turn", playerId };
     }
     if (!command) break;
-    const t = v3.applyCommand(state, command, rng);
+    const t = v4.applyCommand(state, command, rng);
     state = t.state;
     events.push(...t.events);
     if (key(state) !== lastKey) {
@@ -78,7 +78,7 @@ export function advanceTcg(
   }
   if (deadline === null && mode !== "pass_play" && state.status !== "finished") {
     const seat = actingSeat(state);
-    if (seat !== null && kinds[seat] === "human") deadline = now + v3.RULESET_V3.turnTimeoutMs;
+    if (seat !== null && kinds[seat] === "human") deadline = now + v4.RULESET_V4.turnTimeoutMs;
   }
   return { state, rng: rng.getState(), deadline, events };
 }

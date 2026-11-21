@@ -2,6 +2,11 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-21 — 11.1 Free Actives (ruleset 4) + card gallery (owner request)
+
+- Owner decisions: Active abilities cost no SPARK (other Active rules unchanged); strong cards cost more to summon (O02, O03, O05, O06, O12, O13, O14, O17, O20, O21, O24 with stats kept inside the power budget); Toy Racer's Turbo keeps the car ready to attack and puts it to sleep at end of turn; `ruleset_version` 3 → 4 (engine folder `rules/v4`, migration `20261121000200_ruleset4.sql`, unfinished ruleset 3 matches abandoned); Game Spec v5.0.
+- UI: "เหนื่อย" → "หลับ 💤" everywhere (cards, rules, card texts); category names in Thai (card frame + texts); 🗂️ "การ์ดทั้งหมด" gallery with category filter and card details — on the home page and in the game top bar (where 📜 was); 📜 history moved into ⚙️ settings.
+
 ## 2026-11-21 — 10.5 Ruleset 2 removed · Game Spec v4.0
 
 - `aummon_game_spec.md` v4.0 is the single rule source (Object Cards, Passive/Active rules, 4 keywords, 24 cards, Starter Deck v3); the temporary framework doc merged into it and deleted.

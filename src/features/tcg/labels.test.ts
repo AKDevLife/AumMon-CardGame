@@ -1,4 +1,4 @@
-import type { v3 } from "@aummon/game-engine";
+import type { v4 } from "@aummon/game-engine";
 import { describe, expect, it } from "vitest";
 import {
   CARD_ART,
@@ -11,7 +11,7 @@ import {
 
 const names = ["Aum", "Bot"] as const;
 
-describe("ruleset 3 labels", () => {
+describe("ruleset 4 labels", () => {
   it("describes public events without hidden cards", () => {
     expect(describeEvent({ type: "card_drawn", seat: 0, instanceId: "p0-1" }, names)).toBeNull();
     expect(
@@ -37,12 +37,12 @@ describe("ruleset 3 labels", () => {
         { units: [{ instanceId: "s", cardId: "O05" }] },
         { units: [{ instanceId: "t", cardId: "O09" }] },
       ],
-    } as unknown as v3.PlayerView;
+    } as unknown as v4.PlayerView;
     expect(commandLabel({ type: "attack", attackerId: "s", target: "player" }, view)).toBe(
       "⚔️ โจมตีผู้เล่น",
     );
     expect(commandLabel({ type: "activate", instanceId: "s", target: "t" }, view)).toBe(
-      "✨ ตัดฉับ (⚡2) → ร่ม",
+      "✨ ตัดฉับ → ร่ม",
     );
     expect(commandSubjects({ type: "activate", instanceId: "s" })).toEqual(["s"]);
     expect(commandTarget({ type: "activate", instanceId: "s", target: "t" })).toBe("t");
