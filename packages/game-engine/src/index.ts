@@ -13,3 +13,4 @@ export {
   type SeededRandom,
 } from "./rng/seeded-random.ts";
 export * as v2 from "./rules/v2/index.ts";
+export * as v3 from "./rules/v3/index.ts";

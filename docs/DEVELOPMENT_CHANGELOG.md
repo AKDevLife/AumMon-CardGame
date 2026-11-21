@@ -2,6 +2,11 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-21 — 10.2 Engine ruleset 3 (Everyday Objects)
+
+- `packages/game-engine/src/rules/v3` (exported as `v3`, engine 0.3.0): 24 Object cards, Starter Deck v3, Passive (static auras / triggered on_summon, on_attack, on_destroyed, on_turn_start, on_turn_end) + Active (`activate` command: Main Phase, Ready, SPARK, exhaust unless no-exhaust, once per turn, targets validated before paying), 9 effect types, 3 durations, trigger queue (active player first, by slot), destroy-until-stable state checks, 100-effects-per-command loop guard, card data validator, normal bot.
+- Tests: every handoff §10.2 case, card set distribution + budget, 1,000 random matches, 200 bot-vs-bot, bot beats random ≥ 80 %, determinism, hidden information. Ruleset 2 untouched (server still uses it until 10.3).
+
 ## 2026-11-21 — 10.1 New direction: Everyday Objects Battle (owner approved)
 
 - Audit of the new direction brief vs repository; owner approved all recommendations (D1–D11, `docs/rule-clarifications.md` R3): Object cards only (no Action/Equipment/Field/Evolution/Fusion), ATK/HP, 1 Passive + 1 Active (Active: Main Phase, Ready, SPARK ≥1, exhausts unless "no exhaust", once per turn), keywords Haste/Guard/Flying/Piercing, traits for synergy, `ruleset_version "3"`, ruleset 2 deleted after the switch.

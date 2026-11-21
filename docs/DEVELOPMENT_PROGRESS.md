@@ -6,8 +6,8 @@
 
 - **Status:** 🚧 Phase 10 — new direction "Everyday Objects Battle" (owner approved 2026-11-21).
 - **Phase:** 10 — ruleset 3 (Object cards, Passive + Active abilities).
-- **Current task:** 10.2 engine ruleset 3
-- **Next:** 10.3 DB + server → 10.4 UI → 10.5 remove ruleset 2 + spec v4.0 → 10.6 owner playtest.
+- **Current task:** 10.3 database + server for ruleset 3
+- **Next:** 10.4 UI → 10.5 remove ruleset 2 + spec v4.0 → 10.6 owner playtest.
 - **Playtest URL (latest `main`):** https://aum-mon-card-game-git-playtest-aum-mon.vercel.app
 - **Dev backend:** Supabase `AumMon-Dev` (ref `yaxtzdhryctfjaspxvix`, ap-northeast-1), email confirmation OFF for playtesting.
 
