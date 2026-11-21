@@ -11,7 +11,7 @@ async function signUp(page: Page) {
   await expect(page.getByRole("link", { name: "โปรไฟล์" })).toBeVisible();
 }
 
-test("sign up → solo 1v1 vs bot → play until the match ends", async ({ page }) => {
+test("sign up → solo 1v1 vs paced bot → several turns → forfeit", async ({ page }) => {
   test.setTimeout(240_000);
   await signUp(page);
   await page.getByRole("link", { name: "Solo vs Bot" }).click();
@@ -23,8 +23,20 @@ test("sign up → solo 1v1 vs bot → play until the match ends", async ({ page 
   const result = page.getByRole("heading", { name: /ชนะ|เสมอ/ });
   const idle = page.getByRole("button", { name: "กำลังส่ง…" });
   let summoned = 0;
-  for (let step = 0; step < 400; step++) {
+  let myTurns = 0;
+  let sawBot = false;
+  const turnLabel = page.getByText(/^เทิร์น \d+$/);
+  let lastTurn = "";
+  // A full match is long now that the bot plays one action per step; play 3 of my turns.
+  for (let step = 0; step < 300 && myTurns < 3; step++) {
     if (await result.isVisible()) break;
+    if (
+      await page
+        .getByText("🤖 Bot กำลังเล่น…")
+        .isVisible()
+        .catch(() => false)
+    )
+      sawBot = true;
     const endTurn = page.getByRole("button", { name: "จบเทิร์น" });
     if (!(await endTurn.isVisible().catch(() => false))) {
       await page.waitForTimeout(500);
@@ -67,11 +79,23 @@ test("sign up → solo 1v1 vs bot → play until the match ends", async ({ page 
         await page.keyboard.press("Escape");
     }
     if (!acted) {
+      const t = (await turnLabel.textContent()) ?? "";
+      if (t !== lastTurn) {
+        lastTurn = t;
+        myTurns++;
+      }
       await endTurn.click();
       await expect(idle).toHaveCount(0);
     }
   }
-  await expect(result).toBeVisible();
+  expect(myTurns).toBe(3);
+  expect(sawBot).toBe(true);
   expect(summoned).toBeGreaterThan(0);
+  if (!(await result.isVisible())) {
+    await page.getByRole("button", { name: "ตั้งค่า" }).click();
+    await page.getByRole("button", { name: "ยอมแพ้" }).click();
+    await page.getByRole("button", { name: "ยืนยันยอมแพ้" }).click();
+  }
+  await expect(result).toBeVisible();
   await expect(page.getByRole("alert")).toHaveCount(0);
 });
