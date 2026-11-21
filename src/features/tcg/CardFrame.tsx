@@ -170,7 +170,7 @@ export function CardFrame({
 export const EmptySlot = () => (
   <span
     aria-hidden="true"
-    className="grid min-h-28 place-items-center rounded-[1.25rem] border-[3px] border-dashed border-am-lavender bg-am-slot text-xs text-am-faint"
+    className="grid min-h-28 place-items-center rounded-[1.25rem] border-[3px] border-dashed border-am-lavender bg-am-slot text-xs text-am-muted"
   >
     ช่องว่าง
   </span>
