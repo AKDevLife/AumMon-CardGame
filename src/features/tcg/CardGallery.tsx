@@ -2,6 +2,7 @@ import { v4 } from "@aummon/game-engine";
 import { useState } from "react";
 import { CardFrame } from "./CardFrame.tsx";
 import { TRAIT_LABEL } from "./labels.ts";
+import { sortByCost } from "./sort.ts";
 
 const TRAITS = Object.keys(TRAIT_LABEL) as v4.Trait[];
 
@@ -9,7 +10,9 @@ const TRAITS = Object.keys(TRAIT_LABEL) as v4.Trait[];
 export function CardGallery() {
   const [trait, setTrait] = useState<v4.Trait | null>(null);
   const [open, setOpen] = useState<string | null>(null);
-  const cards = v4.CARD_DEFINITIONS_V4.filter((c) => trait === null || c.traits.includes(trait));
+  const cards = sortByCost(
+    v4.CARD_DEFINITIONS_V4.filter((c) => trait === null || c.traits.includes(trait)),
+  );
 
   if (open)
     return (

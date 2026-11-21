@@ -16,6 +16,7 @@ import {
 } from "./labels.ts";
 import { CardFrame, EmptySlot } from "./CardFrame.tsx";
 import { CardGallery } from "./CardGallery.tsx";
+import { sortByCost } from "./sort.ts";
 import { CardBack, DeckPile, HeartIcon, SparkIcon } from "./GameIcons.tsx";
 import { Popup } from "./Popup.tsx";
 import { RulesText } from "./RulesText.tsx";
@@ -239,10 +240,8 @@ export function TcgMatchPage() {
   const endTurn = data.legal.find((c) => c.type === "end_turn");
   const canMulligan = data.legal.some((c) => c.type === "mulligan");
   const playableIds = new Set(data.legal.flatMap(commandSubjects));
-  // Playable cards first so they are never hidden off-screen (owner request); stable sort.
-  const sortedHand = [...view.myHand].sort(
-    (a, b) => Number(playableIds.has(b.instanceId)) - Number(playableIds.has(a.instanceId)),
-  );
+  // Hand sorted by SPARK cost, cheapest first (owner request); same cost → playable first.
+  const sortedHand = sortByCost(view.myHand, (c) => Number(!playableIds.has(c.instanceId)));
   const dragSummon = drag
     ? data.legal.find((c) => c.type === "summon" && c.instanceId === drag.instanceId)
     : undefined;
