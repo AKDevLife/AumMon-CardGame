@@ -2,6 +2,10 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-21 — 11.6 Save Actions minutes
+
+- GitHub warned 90 % of the 2,000 free Actions minutes were used (resets 2026-12-01). CI now runs once per PR (the duplicate run on `main` after each squash merge is gone) and skips docs-only changes. Owner asked to set the Actions budget to $0 so nothing is ever charged.
+
 ## 2026-11-21 — 11.5 Balance pass (owner request)
 
 - Measured with 8,000 bot-vs-bot games (win rate when the card was drawn); range 38–56 % → 47–54 %. Exhaust-enemy actives were useless under ruleset 5 (enemies wake at their own turn start) and were redesigned (Door heals the player, Alarm Clock wakes a sleeping ally, Power Strip +2 ATK to another electronic). Strong cards toned down (Bottle Rocket, Vacuum, Cooler, Wooden Door), weak ones made cheaper / sturdier. Card data only (owner precedent for in-playtest card changes: ruleset stays "5"); migration `20261121000500_balance_pass.sql`; spec v6.1. Bot now uses self-targeted max-HP actives.

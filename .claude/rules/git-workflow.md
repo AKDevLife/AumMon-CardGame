@@ -16,5 +16,5 @@ Merge your own PR only when ALL hold:
 5. No existing functionality broken (existing tests still pass).
 
 If any condition fails, fix it first. Never merge broken or unverified code.
-GitHub does not enforce the `main` ruleset on this private Free-plan repo, so these conditions are enforced by this process only: always confirm the PR's CI run concluded `success` before merging.
+GitHub does not enforce the `main` ruleset on this private Free-plan repo, so these conditions are enforced by this process only: always confirm the PR's CI run concluded `success` before merging. CI runs only on pull requests and skips docs-only changes (`**.md`, `docs/**`) to save Actions minutes (2,000/month); for a docs-only PR, `pnpm check` passing locally is the gate.
 After merging, sync local `main` and start the next task on a new branch.
