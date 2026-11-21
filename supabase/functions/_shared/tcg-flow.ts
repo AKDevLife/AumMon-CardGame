@@ -22,6 +22,9 @@ export function actingSeat(state: v2.MatchState): Seat | null {
 }
 
 /** Runs server bots and the turn timer until a human must act (spec §1.3: timeout → end turn). */
+/** Pause between server-bot actions so players can follow each move (owner: ≤ 1 s). */
+export const BOT_STEP_MS = 700;
+
 export function advanceTcg(
   input: TcgRuntime,
   kinds: readonly [Kind, Kind],
@@ -45,6 +48,8 @@ export function advanceTcg(
     const playerId = state.players[seat].playerId;
     let command: v2.Command | null = null;
     if (kinds[seat] === "bot") {
+      // Bot turns are paced: one action per step; `deadline` holds the next step time.
+      if (state.status === "active" && deadline !== null && now < deadline) break;
       const legal = v2.getLegalCommands(state, seat);
       const pick = v2.chooseBotCommand(v2.getPlayerView(state, seat), legal, rng);
       command =
@@ -64,6 +69,11 @@ export function advanceTcg(
     if (key(state) !== lastKey) {
       lastKey = key(state);
       deadline = null;
+    }
+    const next = actingSeat(state);
+    if (state.status === "active" && next !== null && kinds[next] === "bot") {
+      deadline = now + BOT_STEP_MS;
+      break;
     }
   }
   if (deadline === null && mode !== "pass_play" && state.status !== "finished") {

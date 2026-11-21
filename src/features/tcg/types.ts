@@ -9,6 +9,7 @@ export interface TcgResponse {
   deadline: string | null;
   seat: v2.Seat | null;
   actingSeat: v2.Seat | null;
+  botActing?: boolean;
   names: [string, string];
   view: v2.PlayerView;
   legal: v2.LegalCommand[];

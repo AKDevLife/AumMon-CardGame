@@ -147,6 +147,8 @@ export interface TcgResponse {
   /** Seat whose private view is shown; null = no hand visible (Pass & Play before reveal). */
   seat: Seat | null;
   actingSeat: Seat | null;
+  /** A server bot is mid-turn; `deadline` is its next step time (client refreshes then). */
+  botActing: boolean;
   names: [string, string];
   view: v2.PlayerView;
   legal: v2.LegalCommand[];
@@ -178,6 +180,7 @@ async function respondTcg(
     deadline: rt.deadline === null ? null : new Date(rt.deadline).toISOString(),
     seat,
     actingSeat: acting,
+    botActing: acting !== null && locked.seats.find((s) => s.seat === acting + 1)?.player_type === "bot",
     names: [name(1), name(2)],
     view: safeView,
     legal: seat !== null && seat === acting ? v2.getLegalCommands(state, seat) : [],
