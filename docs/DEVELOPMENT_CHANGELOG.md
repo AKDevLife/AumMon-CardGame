@@ -2,6 +2,10 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-21 — 11.3 Sort by SPARK cost (owner request)
+
+- Hand and "All cards" gallery ordered cheapest first (`sort.ts`; ties: playable first, then card id). Replaces the playable-first-only hand order.
+
 ## 2026-11-21 — 11.2 Category rework (owner request)
 
 - CONTAINER label "ที่เก็บของ"; HOUSEHOLD replaced by FREE "อิสระ" (Objects in no other category: Umbrella, Helmet, Wooden Door, Bottle Rocket); Bottle Rocket no longer VEHICLE (affects Bicycle bonus / Toy Truck search); Vacuum ELECTRONIC only. Owner chose to keep `ruleset_version` "4" for this playtest-stage change. Migration `20261121000300_trait_rework.sql` updates the card rows; spec v5.1.
