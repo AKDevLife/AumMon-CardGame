@@ -13,7 +13,7 @@ export type AbilityId =
   | "peek" // แว่นขยาย: secretly see 2 random cards of a chosen player
   | "ruler" // ไม้บรรทัด: next player must play exactly this value or draw & pass
   | "tape" // เทปกาว: also play 2 cards of equal points
-  | "trash" // ถังขยะ: remove 1 own card from the game, draw 1
+  | "trash" // ถังขยะ: remove 1 own card from the game (ruleset 9: no redraw)
   | "flashlight" // ไฟฉาย: reveal all hands, a chosen player draws 1
   | "skip" // กุญแจ: skip the next player
   | "fan" // พัดลม: the player with the fewest cards (not you) draws 1
@@ -103,7 +103,7 @@ export const DISCARD_CARDS: readonly DiscardCard[] = [
     "ผู้เล่นคนถัดไปต้องลงไพ่แต้ม 5 เท่านั้น ไม่งั้นจั่ว 1 ใบและผ่าน",
   ),
   c("D10", "เทปกาว", "Tape", 6, "tape", "แปะคู่", "ลงไพ่ 2 ใบที่แต้มเท่ากันเพิ่มได้ทันที"),
-  c("D11", "ถังขยะ", "Trash Can", 1, "trash", "ทิ้งกาก", "ทิ้งไพ่ในมือ 1 ใบออกจากเกม แล้วจั่วใหม่ 1 ใบ"),
+  c("D11", "ถังขยะ", "Trash Can", 1, "trash", "ทิ้งกาก", "ทิ้งไพ่ในมือ 1 ใบออกจากเกม (ไม่ต้องจั่วคืน)"),
   c(
     "D12",
     "ไฟฉาย",
@@ -111,10 +111,10 @@ export const DISCARD_CARDS: readonly DiscardCard[] = [
     6,
     "flashlight",
     "ส่องสว่าง",
-    "เปิดไพ่ในมือทุกคนให้ทุกคนเห็น แล้วเลือกผู้เล่น 1 คนจั่วเพิ่ม 1 ใบ",
+    "เปิดไพ่ในมือทุกคนให้ทุกคนเห็น 3 วินาที แล้วเลือกผู้เล่น 1 คนจั่วเพิ่ม 1 ใบ",
     true,
   ),
-  c("D13", "กุญแจ", "Key", 7, "skip", "ล็อก", "ข้ามเทิร์นของผู้เล่นคนถัดไป 1 เทิร์น"),
+  c("D13", "กุญแจ", "Key", 6, "skip", "ล็อก", "ข้ามเทิร์นของผู้เล่นคนถัดไป 1 เทิร์น"),
   c("D14", "พัดลม", "Fan", 4, "fan", "เป่า", "ผู้เล่นที่มีไพ่น้อยที่สุด (ไม่นับเรา) จั่วเพิ่ม 1 ใบ"),
   c(
     "D15",
@@ -129,7 +129,7 @@ export const DISCARD_CARDS: readonly DiscardCard[] = [
     "D16",
     "ร่ม",
     "Umbrella",
-    8,
+    7,
     "umbrella",
     "กางกัน",
     "ลงสวนนอกเทิร์นได้ เมื่อถูกบังคับจั่วหรือข้ามเทิร์น ยกเลิกผลนั้นกับเรา",
@@ -137,7 +137,7 @@ export const DISCARD_CARDS: readonly DiscardCard[] = [
 ];
 
 export const DISCARD_RULES = {
-  version: "8",
+  version: "9",
   minPlayers: 2,
   maxPlayers: 8,
   copies: 4,

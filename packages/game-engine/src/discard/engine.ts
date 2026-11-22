@@ -25,7 +25,7 @@ export interface PendingHit {
 }
 
 export interface GameState {
-  readonly rulesetVersion: "8";
+  readonly rulesetVersion: "9";
   status: "active" | "finished";
   players: PlayerState[];
   drawPile: CardInstance[];
@@ -158,7 +158,7 @@ export function startGame(
   if (!start) throw new Error("empty deck");
   const firstSeat = rng.nextInt(n);
   const state: GameState = {
-    rulesetVersion: "8",
+    rulesetVersion: "9",
     status: "active",
     players,
     drawPile: deck,
@@ -351,7 +351,7 @@ function resolveAbility(
       const gone = take(s, me, choice.card);
       s.removed.push(gone);
       ev.push({ type: "removed", seat: me, cardId: gone.cardId });
-      draw(s, me, 1, rng, ev);
+      // Ruleset 9 (Q1): no redraw.
       break;
     }
     case "flashlight":

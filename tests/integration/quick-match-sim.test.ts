@@ -27,49 +27,35 @@ export interface Config {
   readonly noAbility?: discard.AbilityId;
   /** PROPOSAL emulation: card points override (restored after each game). */
   readonly points?: Readonly<Record<string, number>>;
-  /** PROPOSAL emulation: Trash Can removes 1 card without drawing a new one. */
-  readonly trashNoDraw?: boolean;
+  /** PROPOSAL B4B emulation: after Magnifier, play 1 more legal card (no ability). */
+  readonly magnifierExtra?: boolean;
+  /** PROPOSAL B6B emulation: Box = put your lowest card on the pile (no ability). */
+  readonly boxShed?: boolean;
 }
 
 const quick = (n: number) => (n <= 4 ? 5 : 4);
 const small = (n: number) => (n <= 4 ? 4 : 3);
 export const CONFIGS: readonly Config[] = [
-  { name: "R8 shipped", hand: quick, drawThenPlay: true, turnTimer: 20, reactionTimer: 5 },
-  { name: "R8 without DTP", hand: quick, drawThenPlay: false, turnTimer: 20, reactionTimer: 5 },
-  { name: "R8 4/3 cards", hand: small, drawThenPlay: true, turnTimer: 20, reactionTimer: 5 },
-  { name: "R8 45 s timer", hand: quick, drawThenPlay: true, turnTimer: 45, reactionTimer: 8 },
+  { name: "R9 shipped", hand: quick, drawThenPlay: true, turnTimer: 20, reactionTimer: 5 },
+  { name: "R9 without DTP", hand: quick, drawThenPlay: false, turnTimer: 20, reactionTimer: 5 },
+  { name: "R9 4/3 cards", hand: small, drawThenPlay: true, turnTimer: 20, reactionTimer: 5 },
+  { name: "R9 45 s timer", hand: quick, drawThenPlay: true, turnTimer: 45, reactionTimer: 8 },
   {
-    name: "R8 + Key 6 pts (proposal)",
+    name: "R9 + Magnifier peek & play 1 more (proposal B4B)",
     hand: quick,
     drawThenPlay: true,
     turnTimer: 20,
     reactionTimer: 5,
-    points: { D13: 6 },
+    magnifierExtra: true,
   },
   {
-    name: "R8 + Umbrella 7 pts (proposal)",
+    name: "R9 + Box put 1 card on the pile (proposal B6B)",
     hand: quick,
     drawThenPlay: true,
     turnTimer: 20,
     reactionTimer: 5,
-    points: { D16: 7 },
-  },
-  {
-    name: "R8 + Trash no redraw (proposal)",
-    hand: quick,
-    drawThenPlay: true,
-    turnTimer: 20,
-    reactionTimer: 5,
-    trashNoDraw: true,
-  },
-  {
-    name: "R8 + balance pack (Key 6, Umbrella 7, Trash no redraw)",
-    hand: quick,
-    drawThenPlay: true,
-    turnTimer: 20,
-    reactionTimer: 5,
-    points: { D13: 6, D16: 7 },
-    trashNoDraw: true,
+    boxShed: true,
+    noAbility: "box",
   },
 ];
 
@@ -131,6 +117,34 @@ function randomChoice(
     ...(rest.length > 0 && { card: rest[rng.nextInt(rest.length)]?.id ?? "" }),
     ...(x && y && { pair: [x, y] as const }),
   };
+}
+
+/**
+ * Proposal emulation: put one more card from `me`'s hand on the pile (no ability).
+ * `any` = lowest card regardless of points (Box B6B); otherwise the lowest legal card (Magnifier B4B).
+ */
+function extraShed(t: discard.Transition, me: number, any: boolean): discard.Transition {
+  const st = t.state;
+  if (st.status !== "active") return t;
+  const hand = st.players[me]?.hand ?? [];
+  const top = st.pile[st.pile.length - 1];
+  const topPts = top ? pts(top) : 0;
+  const pick = [...hand]
+    .filter((c) => any || pts(c) >= topPts || discard.getDiscardCard(c.cardId).ability === "eraser")
+    .sort((a, b) => pts(a) - pts(b))[0];
+  if (!pick) return t;
+  hand.splice(hand.indexOf(pick), 1);
+  st.pile.push(pick);
+  const events: discard.GameEvent[] = [
+    ...t.events,
+    { type: "played", seat: me, cardIds: [pick.cardId], ability: false },
+  ];
+  if (hand.length === 0) {
+    st.status = "finished";
+    st.winner = me;
+    st.reactions = [];
+  }
+  return { state: st, events };
 }
 
 /** Tries `cmd` and falls back to playing without the ability when the choice is invalid. */
@@ -301,18 +315,14 @@ function playOne(players: number, seed: number, cfg: Config): GameResult {
         t = safePlay(state, cmd, rng);
       }
     }
-    if (cfg.trashNoDraw && t.events.some((e) => e.type === "ability" && e.ability === "trash")) {
-      // Emulation: undo Trash's redraw (the card goes back on top of the draw pile).
-      const st = t.state;
-      const drew = t.events.find((e) => e.type === "drew" && e.seat === me && e.count > 0);
-      const back = drew ? st.players[me]?.hand.pop() : undefined;
-      if (back) st.drawPile.unshift(back);
-      if (st.status === "active" && (st.players[me]?.hand.length ?? 1) === 0) {
-        st.status = "finished";
-        st.winner = me;
-      }
-      t = { state: st, events: t.events.filter((e) => e !== drew) };
-    }
+    const usedAbility = (id: discard.AbilityId) =>
+      t.events.some((e) => e.type === "ability" && e.seat === me && e.ability === id);
+    if (
+      (cfg.magnifierExtra && usedAbility("peek")) ||
+      (cfg.boxShed &&
+        t.events.some((e) => e.type === "played" && e.seat === me && e.cardIds.includes("D05")))
+    )
+      t = extraShed(t, me, cfg.boxShed === true);
     for (const e of t.events) {
       if (e.type === "ability") {
         r.abilities++;

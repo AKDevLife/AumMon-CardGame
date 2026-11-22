@@ -246,3 +246,22 @@ See `AumMon_Card_Balance_Review.md` §1.
 | R8 + balance pack (Key 6, Umbrella 7, Trash no redraw) |       8 |         41 | 4.8 / 12.7            |     83 % | 0.67–1.56                 | 1.18 | 1.44 |  0.85 |   1.56 |             2.1 % |
 
 Emulation: points changes patch the card data for the run only; "Trash no redraw" returns the redrawn card to the top of the draw pile. Reproduce one group with `AUMMON_SIM_ONLY="(proposal)"` or `AUMMON_SIM_ONLY="balance pack"`.
+
+## 7. Ruleset "9" and Q2 proposals (task 12.14)
+
+| Config                                           | Players | Mean turns | Est. min median / p90 | ≤ 10 min | Win index range | แว่นขยาย | กล่องกระดาษ | First player wins |
+| ------------------------------------------------ | ------: | ---------: | --------------------- | -------: | --------------- | ------: | ---------: | ----------------: |
+| R9 shipped                                       |       2 |         12 | 1.7 / 3.2             |    100 % | 0.85–1.15       |    0.85 |       0.85 |              56 % |
+| R9 shipped                                       |       4 |         31 | 3.9 / 8.6             |     94 % | 0.75–1.38       |    0.75 |       0.85 |              26 % |
+| R9 shipped                                       |       6 |         36 | 3.9 / 11.6            |     87 % | 0.65–1.53       |    0.68 |       0.77 |              21 % |
+| R9 shipped                                       |       8 |         41 | 4.8 / 12.6            |     84 % | 0.67–1.57       |    0.71 |       0.82 |              16 % |
+| R9 + Magnifier peek & play 1 more (proposal B4B) |       2 |         11 | 1.6 / 2.9             |    100 % | 0.86–1.13       |    0.95 |       0.86 |              56 % |
+| R9 + Magnifier peek & play 1 more (proposal B4B) |       4 |         29 | 3.6 / 7.9             |     95 % | 0.79–1.35       |    0.89 |       0.87 |              27 % |
+| R9 + Magnifier peek & play 1 more (proposal B4B) |       6 |         34 | 3.8 / 10.4            |     89 % | 0.71–1.55       |    0.85 |       0.81 |              19 % |
+| R9 + Magnifier peek & play 1 more (proposal B4B) |       8 |         39 | 4.6 / 11.9            |     86 % | 0.63–1.55       |    0.88 |       0.84 |              17 % |
+| R9 + Box put 1 card on the pile (proposal B6B)   |       2 |         11 | 1.5 / 2.9             |    100 % | 0.82–1.14       |    0.82 |       0.99 |              58 % |
+| R9 + Box put 1 card on the pile (proposal B6B)   |       4 |         27 | 3.4 / 7.3             |     97 % | 0.75–1.38       |    0.75 |       1.11 |              27 % |
+| R9 + Box put 1 card on the pile (proposal B6B)   |       6 |         31 | 3.5 / 9.6             |     91 % | 0.66–1.54       |    0.67 |       1.15 |              22 % |
+| R9 + Box put 1 card on the pile (proposal B6B)   |       8 |         35 | 4.2 / 10.5            |     89 % | 0.62–1.65       |    0.62 |       1.28 |              17 % |
+
+"R9 shipped" reproduces the simulated balance pack (8 players: mean 41 turns). B4B / B6B: see `AumMon_Game_Design_Upgrade.md` §4.

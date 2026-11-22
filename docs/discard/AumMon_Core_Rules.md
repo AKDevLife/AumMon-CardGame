@@ -1,6 +1,6 @@
 # AumMon — Everyday Objects Battle · Casual Discard Edition — Core Rules
 
-> Status: **Approved — ruleset "8" Quick Match (owner 2026-11-22, DC1–DC9)** · provisional until playtest. Quick Match details (timers, timeouts, rematch): `AumMon_Quick_Match_Rules.md`. Proposed simplifications (not approved): `AumMon_Rule_Simplification.md`. Decisions and reasoning: `AumMon_Rule_Clarification.md`. Cards: `AumMon_Card_Library.md`.
+> Status: **Approved — ruleset "9" (Quick Match + balance pack; owner 2026-11-22, DC1–DC10)** · provisional until playtest. Quick Match details (timers, timeouts, rematch): `AumMon_Quick_Match_Rules.md`. Proposed simplifications (not approved): `AumMon_Rule_Simplification.md`. Decisions and reasoning: `AumMon_Rule_Clarification.md`. Cards: `AumMon_Card_Library.md`.
 > Rulings marked _(proposed)_ are small clarifications by Claude — the owner may change them at any time.
 
 ## 1. Goal
@@ -34,7 +34,7 @@ If **every other player** draws & passes in a row after your card, the pile **re
 
 ## 6. Reactions — Umbrella (DC3)
 
-When an effect would make **you** draw or skip your turn, you may immediately play **Umbrella** from your hand (any points, out of turn). The effect is cancelled for you, Umbrella goes on top of the pile, and play continues from where it was. Umbrella can also be played on your own turn as a normal 8.
+When an effect would make **you** draw or skip your turn, you may immediately play **Umbrella** from your hand (any points, out of turn). The effect is cancelled for you, Umbrella goes on top of the pile, and play continues from where it was. Umbrella can also be played on your own turn as a normal 7.
 
 ## 7. Effect order
 

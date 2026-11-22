@@ -39,7 +39,7 @@ const ABILITY_LINE: Partial<Record<discard.AbilityId, string>> = {
   peek: "แอบดูไพ่",
   ruler: "บังคับคนถัดไปลงแต้ม 5",
   tape: "ลงไพ่คู่เพิ่ม",
-  trash: "ทิ้งไพ่ 1 ใบแล้วจั่วใหม่",
+  trash: "ทิ้งไพ่ 1 ใบออกจากเกม",
   flashlight: "เปิดไพ่ทุกคน",
   skip: "ข้ามเทิร์นคนถัดไป",
   fan: "คนไพ่น้อยสุดจั่ว 1",
