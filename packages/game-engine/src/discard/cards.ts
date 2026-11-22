@@ -169,13 +169,13 @@ export const DISCARD_CARDS: readonly DiscardCard[] = [
 ];
 
 export const DISCARD_RULES = {
-  version: "10",
+  version: "11",
   minPlayers: 2,
   maxPlayers: 8,
   copies: 4,
-  handSmall: 5, // 2–4 players (Quick Match, QM1)
-  handLarge: 4, // 5–8 players
-  turnTimeoutMs: 20_000, // QM3
+  handSmall: 7, // 2–4 players (ruleset 11, owner 2026-11-22)
+  handLarge: 5, // 5–8 players
+  turnTimeoutMs: 60_000, // ruleset 11 (owner): 60 s per turn
   reactionTimeoutMs: 5_000,
   /** Draw Then Play: the decision on a drawn card gets at least this much time. */
   drawnDecisionMinMs: 5_000,

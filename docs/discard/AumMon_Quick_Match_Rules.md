@@ -1,6 +1,6 @@
 # AumMon — Quick Match Rules (ruleset "8")
 
-> Status: **APPROVED by the owner 2026-11-22 (QM1–QM6) and implemented in task 12.12.** Core Rules and the Card Library are updated to ruleset "8". Best-of-3 for 2–3 players is not built (owner choice pending). Still valid in ruleset "9" (task 12.14 only changed card values: Key 6, Umbrella 7, Trash no redraw, Flashlight 3 s).
+> Status: **APPROVED by the owner 2026-11-22 (QM1–QM6) and implemented in task 12.12.** Core Rules and the Card Library are updated to ruleset "8". Best-of-3 for 2–3 players is not built (owner choice pending). Ruleset "11" (DC12) changes two values here: starting hands 7 / 5 and a 60 s turn timer. Otherwise still valid in ruleset "9" (task 12.14 only changed card values: Key 6, Umbrella 7, Trash no redraw, Flashlight 3 s).
 > Every section says whether it is **unchanged** from Core Rules or **changed (proposal)**. Evidence: `AumMon_Game_Simulation_Report.md` (configuration E).
 
 ## 1. Goal — unchanged

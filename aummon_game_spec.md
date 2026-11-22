@@ -1,6 +1,6 @@
 # AumMon — Game Spec (Casual Discard Edition)
 
-> Version 11.0 · `ruleset_version = "10"` (Quick Match QM1–QM6 + balance pack Q1/Q4 + Magnifier / Box upgrade DC11, 2026-11-22) · approved by owner 2026-11-22 (DC1–DC7). Replaces the retired 1v1 TCG (rulesets 1–6).
+> Version 12.0 · `ruleset_version = "11"` (Quick Match + balance pack + Magnifier / Box + 7 / 5 cards and 60 s turns DC12, 2026-11-22) · approved by owner 2026-11-22 (DC1–DC7). Replaces the retired 1v1 TCG (rulesets 1–6).
 > Architecture, database and security: `aummon_project_blueprint.md`.
 
 ## 1. Platform decisions (LOCKED)

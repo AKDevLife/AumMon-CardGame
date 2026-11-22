@@ -25,7 +25,7 @@ export interface PendingHit {
 }
 
 export interface GameState {
-  readonly rulesetVersion: "10";
+  readonly rulesetVersion: "11";
   status: "active" | "finished";
   players: PlayerState[];
   drawPile: CardInstance[];
@@ -158,7 +158,7 @@ export function startGame(
   if (!start) throw new Error("empty deck");
   const firstSeat = rng.nextInt(n);
   const state: GameState = {
-    rulesetVersion: "10",
+    rulesetVersion: "11",
     status: "active",
     players,
     drawPile: deck,
