@@ -14,7 +14,7 @@ export const CARD_ART: Record<string, string> = {
   D10: "🩹",
   D11: "🗑️",
   D12: "🔦",
-  D13: "🔑",
+  D13: "🔒",
   D14: "🌀",
   D15: "⏳",
   D16: "☂️",
@@ -75,9 +75,11 @@ export function describeEvent(e: discard.GameEvent, names: Names): string | null
     case "removed":
       return `${cardName(e.cardId)} ถูกนำออกจากเกม`;
     case "reveal_all":
-      return "ไฟฉายเปิดไพ่ทุกคน 🔦";
+      return "ไฟฉายเปิดไพ่ (กติกาเก่า) 🔦";
     case "peek":
-      return `${who(e.seat)} แอบดูไพ่ของ ${who(e.target)} 🔍`;
+      return e.target === null
+        ? `${who(e.seat)} แอบดูไพ่ 2 ใบบนกองจั่ว 🔍`
+        : `${who(e.seat)} ดูไพ่ทั้งมือของ ${who(e.target)} 🔦`;
     case "game_over":
       return `จบเกม: ${who(e.winner)} ชนะ! 🏆`;
     case "timeout":

@@ -2,6 +2,7 @@ import { discard } from "@aummon/game-engine";
 import { REALTIME_SUBSCRIBE_STATES } from "@supabase/supabase-js";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router";
+import { Spinner } from "../../components/Spinner.tsx";
 import { StickerButton } from "../../components/StickerButton.tsx";
 import { ApiError, callFunction } from "../../lib/api.ts";
 import { useAuth } from "../auth/auth-context.ts";
@@ -24,8 +25,7 @@ function needOf(ability: discard.AbilityId, underTop: string | null): Need {
     case "glue":
     case "flashlight":
       return "target";
-    case "peek":
-      return "targetOptional";
+
     case "magnet":
     case "trash":
       return "card";
@@ -72,6 +72,8 @@ export function GamePage() {
   const [data, setData] = useState<GameResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  /** Which command is running (spinner on its button). */
+  const [busy, setBusy] = useState<string | null>(null);
   const [plan, setPlan] = useState<Plan | null>(null);
   const [popup, setPopup] = useState<"rules" | "cards" | "settings" | "history" | "leave" | null>(
     null,
@@ -81,8 +83,7 @@ export function GamePage() {
   const [banner, setBanner] = useState<{ text: string; key: number } | null>(null);
   const [dealt, setDealt] = useState<Set<string>>(() => new Set());
   const known = useRef<Set<string> | null>(null);
-  const [peek, setPeek] = useState<{ target: number; cards: string[] } | null>(null);
-  const [reveal, setReveal] = useState<string[][] | null>(null);
+  const [peek, setPeek] = useState<{ target: number | null; cards: string[] } | null>(null);
   const [zoom, setZoom] = useState<string | null>(null);
   const lastEvent = useRef<string | null>(null);
   const idem = useRef<{ key: string; body: string } | null>(null);
@@ -166,11 +167,9 @@ export function GamePage() {
           playSound(n);
         }, i * 180);
       });
-      const shown = [...fresh].reverse().find((e) => e.type === "reveal_all");
       const became = data.view.acting === data.seat && data.seat !== null;
       const text = bannerFor(fresh, data.seat, data.names, became);
       setTimeout(() => {
-        if (shown?.type === "reveal_all") setReveal(shown.hands);
         if (fresh.some((e) => e.type === "played" || e.type === "pile_reset"))
           setLandKey((k) => k + 1);
         if (text) setBanner({ text, key: Date.now() });
@@ -211,8 +210,6 @@ export function GamePage() {
       setDealt(new Set(fresh));
     }, 0);
   }, [handIds]);
-
-  // Flashlight: the reveal stays open until the player closes it (owner 2026-11-22).
 
   // Bots act one step at a time; timeouts are applied when asked after the deadline.
   const botDeadline = data?.botActing ? data.deadline : null;
@@ -299,6 +296,7 @@ export function GamePage() {
 
   const send = async (command: Record<string, unknown>) => {
     setPending(true);
+    setBusy(typeof command["type"] === "string" ? command["type"] : null);
     const body = JSON.stringify(command);
     if (idem.current?.body !== body) idem.current = { key: crypto.randomUUID(), body };
     try {
@@ -473,6 +471,7 @@ export function GamePage() {
                 onClick={() => void send(drawnCard ? { type: "keep" } : { type: "draw" })}
                 className="am-sticker am-pressable min-h-10 shrink-0 !rounded-full bg-am-card px-3 font-display text-sm font-bold text-am-text disabled:opacity-60"
               >
+                {pending && (busy === "draw" || busy === "keep") && <Spinner className="mr-1" />}
                 {drawnCard ? "เก็บไว้ จบเทิร์น" : "จั่วไพ่"}
               </button>
             )}
@@ -512,6 +511,7 @@ export function GamePage() {
                 }}
                 className="am-sticker am-pressable am-active min-h-12 w-full !rounded-full bg-am-green font-display text-lg font-bold text-am-success-text disabled:opacity-60"
               >
+                {pending && busy === "draw" && <Spinner className="mr-2" />}
                 {drawnCard ? `ลงใบที่จั่ว (${cardName(drawnCard.cardId)})` : "จั่วไพ่"}
               </button>
             </div>
@@ -702,50 +702,33 @@ export function GamePage() {
       </Popup>
 
       <Popup
-        title={peek ? `🔍 ไพ่ของ ${name(peek.target)}` : "แอบดู"}
+        title={
+          peek
+            ? peek.target === null
+              ? "🔍 ไพ่ 2 ใบบนกองจั่ว"
+              : `🔦 ไพ่ทั้งมือของ ${name(peek.target)}`
+            : "แอบดู"
+        }
         open={peek !== null}
         onClose={() => {
           setPeek(null);
-        }}
-      >
-        <div className="flex gap-2">
-          {peek?.cards.map((c, i) => (
-            <CardView key={i} cardId={c} compact />
-          ))}
-        </div>
-      </Popup>
-
-      <Popup
-        title="🔦 ไฟฉาย: ไพ่ของทุกคน"
-        open={reveal !== null}
-        onClose={() => {
-          setReveal(null);
           setZoom(null);
         }}
       >
-        <ul aria-label="ไพ่ของทุกคน" className="flex flex-col gap-3 text-sm">
-          {reveal?.map((hand, i) => (
-            <li key={i}>
-              <b>
-                {name(i)} ({hand.length} ใบ)
-              </b>
-              <div className="am-no-scrollbar mt-1 flex gap-2 overflow-x-auto pb-1">
-                {hand.length === 0
-                  ? "—"
-                  : hand.map((c, k) => (
-                      <CardView
-                        key={k}
-                        cardId={c}
-                        selected={zoom === c}
-                        onSelect={() => {
-                          setZoom(zoom === c ? null : c);
-                        }}
-                      />
-                    ))}
-              </div>
-            </li>
+        <p className="text-xs text-am-muted">เห็นคนเดียว · แตะการ์ดเพื่ออ่านความสามารถเต็ม</p>
+        <div className="am-no-scrollbar flex gap-2 overflow-x-auto pb-1 pt-3">
+          {peek?.cards.length === 0 && <p>ไม่มีไพ่</p>}
+          {peek?.cards.map((c, i) => (
+            <CardView
+              key={i}
+              cardId={c}
+              selected={zoom === c}
+              onSelect={() => {
+                setZoom(zoom === c ? null : c);
+              }}
+            />
           ))}
-        </ul>
+        </div>
         {zoom && (
           <div className="flex justify-center">
             <CardView cardId={zoom} size="lg" />

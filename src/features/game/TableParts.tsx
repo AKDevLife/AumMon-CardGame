@@ -1,6 +1,7 @@
 import { discard } from "@aummon/game-engine";
 import type { ReactNode } from "react";
 import { Link } from "react-router";
+import { Spinner } from "../../components/Spinner.tsx";
 import { CardView } from "./CardView.tsx";
 import { CardBack } from "./GameIcons.tsx";
 
@@ -295,6 +296,7 @@ export function WinOverlay({
                 onClick={onRematch}
                 className="am-sticker am-pressable bg-am-green px-5 py-2 font-display font-bold text-am-success-text disabled:opacity-60"
               >
+                {pending && <Spinner className="mr-2" />}
                 เล่นอีกรอบ
               </button>
             )}

@@ -111,7 +111,7 @@ jobs:
           pnpm sync:engine
           nohup pnpm exec supabase functions serve --no-verify-jwt --env-file supabase/functions/ci-dev.env > /tmp/functions.log 2>&1 &
           for i in $(seq 1 30); do
-            if curl -sf http://127.0.0.1:54321/functions/v1/engine-health | grep -q '"rulesetVersion":"11"'; then exit 0; fi
+            if curl -sf http://127.0.0.1:54321/functions/v1/engine-health | grep -q '"rulesetVersion":"12"'; then exit 0; fi
             sleep 3
           done
           cat /tmp/functions.log; exit 1
