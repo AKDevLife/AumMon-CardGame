@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { act, leave } from "./game-helpers.ts";
+import { act, closePopups, leave } from "./game-helpers.ts";
 
 test.skip(!process.env["VITE_SUPABASE_URL"], "Supabase backend not configured");
 
@@ -20,6 +20,7 @@ test("pass & play with 3 players: privacy handoff between turns, then leave", as
   let handoffs = 0;
   for (let step = 0; step < 120 && handoffs < 4; step++) {
     if (await page.getByRole("heading", { name: /ชนะ/ }).isVisible()) break;
+    if (await closePopups(page)) continue;
     const reveal = page.getByRole("button", { name: /แสดงการ์ด/ });
     if ((await reveal.isVisible()) && (await reveal.isEnabled())) {
       await expect(page.getByRole("group", { name: "Hand" })).toHaveCount(0); // nothing private before handoff

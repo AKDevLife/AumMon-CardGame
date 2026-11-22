@@ -367,7 +367,7 @@ export function GamePage() {
         <div className="flex flex-1 items-center justify-center gap-4">
           <div className="flex flex-col items-center gap-1">
             <DeckPile count={view.drawCount} />
-            <span className="text-xs text-am-muted">กองจั่ว</span>
+            <span className="text-xs font-bold">กองจั่ว</span>
           </div>
           <div className="flex flex-col items-center gap-1">
             {top ? <CardView cardId={top} compact /> : <span className="text-am-muted">ว่าง</span>}

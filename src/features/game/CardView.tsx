@@ -22,7 +22,6 @@ export function CardView({
       data-sound="card_tap"
       disabled={!onSelect}
       aria-pressed={selected}
-      aria-label={`${c.name} แต้ม ${String(c.points)}`}
       onClick={onSelect}
       className={`am-sticker am-pressable relative flex shrink-0 flex-col overflow-hidden bg-am-card text-left disabled:cursor-default ${compact ? "w-20" : "w-28"} ${selected ? "ring-4 ring-am-title" : ""} ${dimmed ? "opacity-50" : ""}`}
     >
