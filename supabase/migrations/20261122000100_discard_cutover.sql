@@ -12,6 +12,7 @@ drop table if exists private.match_cards;
 
 alter table public.matches drop column deck_template_id, drop column deck_template_version;
 alter table public.matches drop constraint matches_phase_check;
+alter table public.matches alter column phase set default 'play';
 alter table public.matches add constraint matches_phase_check check (phase in ('play', 'reaction', 'finished'));
 alter table public.matches add constraint matches_ruleset_check check (ruleset_version = '7');
 

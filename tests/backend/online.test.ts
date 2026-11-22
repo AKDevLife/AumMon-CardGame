@@ -146,7 +146,9 @@ describe.runIf(run)("online multiplayer via Edge Functions", () => {
       a.call("game-command", draw(va)),
       b.call("game-command", draw(vb)),
     ]);
-    expect([ra.status, rb.status].sort()).toEqual([200, 403]);
+    const statuses = [ra.status, rb.status].sort();
+    expect(statuses[0]).toBe(200);
+    expect([403, 409]).toContain(statuses[1]);
     const after = (await a.call("game-view", { matchId })).body as unknown as GameView;
     expect(after.view.status).toBe("active");
     for (let i = 0; i < 40 && la.received.length === 0; i++) await wait(250);

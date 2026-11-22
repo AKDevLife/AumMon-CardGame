@@ -202,7 +202,8 @@ describe.runIf(run)("admin RBAC via Edge Functions", () => {
       .eq("key", "sounds")
       .single();
     expect(
-      (read.data as { value: Record<string, { preset: string }> }).value["attack"]?.preset,
+      (read.data as { value: Record<string, { preset: string }> }).value[SOUND_EVENT_IDS[0]]
+        ?.preset,
     ).toBe("pop");
     const sim = await admin.call({ action: "bots.simulate", games: 3 });
     expect(sim.body["games"]).toBe(3);
