@@ -188,3 +188,18 @@ Owner-approved direction 2026-11-21 (R3 in `docs/rule-clarifications.md`, rules 
 - [x] **11.9** Fix: in-app links (home play-mode buttons) had no tap sound (router preventDefault); background music volume doubled — deps: 11.8 — PR #87 (2026-11-22)
 
 **Acceptance:** only ruleset 3 playable in all 3 modes · every handoff §10.2 case covered by engine tests · 1,000 simulated bot matches without errors · E2E + a11y pass · spec v4.0 is the single authoritative rule source
+
+## Phase 12 — Casual Discard Edition (new game, owner 2026-11-22)
+
+Owner brief: shedding-type card game for 2–8 players with the 16 Everyday Objects. Docs in `docs/discard/`; decisions DC1–DC7 in `docs/discard/AumMon_Rule_Clarification.md`. Login, profiles, UI kit, sounds and admin stay.
+
+- [x] **12.1** Phase 1 audit (simulation: base rule stalls — 0.1–5 % of games finish; pile reset → ~100 %) + owner decisions DC1–DC7 + Core Rules + Card Library — deps: 11.9 — PR #88 (2026-11-22)
+- [ ] **12.2** Engine prototype (pure TS, data-driven cards, reactions) + simulation 2–8 players, balance report `AumMon_Card_Balance.md` — deps: 12.1
+- [ ] **12.3** Architecture, database schema and test plan docs for 2–8 player rooms — deps: 12.2
+- [ ] **12.4** Backend: N-player rooms (2–8), turn direction, reactions, private reveals, bots, timers — deps: 12.3
+- [ ] **12.5** UI: table for 2–8 players, discard pile, hand, reactions, reveals, rules + card gallery, sounds — deps: 12.4
+- [ ] **12.6** Remove the 1v1 TCG (ruleset 6) and switch all modes to the new game — deps: 12.5
+- [ ] **12.7** VIP + cosmetic gacha design doc (no payments until legal check + owner approval) — deps: 12.1
+- [ ] **12.8** Owner playtest on Dev; balance pass — deps: 12.6
+
+**Acceptance:** all 3 modes play the Discard Edition with 2–8 seats · games always finish in simulation · server-authoritative hidden hands · no pay-to-win
