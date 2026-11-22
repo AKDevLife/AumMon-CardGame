@@ -1,11 +1,18 @@
 import { ENGINE_VERSION, v6 } from "@aummon/game-engine";
+import { useEffect } from "react";
 import { Link, Outlet } from "react-router";
 import { PreviewBanner } from "../components/PreviewBanner.tsx";
 import { AccountNav } from "../features/auth/AccountNav.tsx";
 import { useAuth } from "../features/auth/auth-context.ts";
+import { installMusic } from "../features/tcg/music.ts";
+import { installAudioUnlock, installTapSounds } from "../features/tcg/sound.ts";
 
 export function AppLayout() {
   const auth = useAuth();
+  // Every button in the app makes a tap sound; background music starts on the first tap.
+  useEffect(() => installAudioUnlock(), []);
+  useEffect(() => installTapSounds(), []);
+  useEffect(() => installMusic(), []);
   return (
     <div className="flex min-h-dvh flex-col pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
       {auth.mode === "preview" && <PreviewBanner />}

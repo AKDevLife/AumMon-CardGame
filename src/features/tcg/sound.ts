@@ -206,6 +206,9 @@ function wake(): AudioContext | null {
   return ctx;
 }
 
+/** Shared audio context (created / resumed lazily; null where Web Audio is unavailable). */
+export const audioContext = (): AudioContext | null => wake();
+
 export function installAudioUnlock(): () => void {
   if (typeof window === "undefined") return () => undefined;
   const unlock = (): void => {

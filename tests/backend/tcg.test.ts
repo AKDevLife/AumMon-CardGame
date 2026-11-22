@@ -21,6 +21,7 @@ interface Tcg {
   view: {
     status: string;
     myHand: { instanceId: string; cardId: string }[];
+    firstSeat: number;
     players: { hp: number; handCount: number }[];
     result: unknown;
   };
@@ -77,7 +78,7 @@ describe.runIf(run)("ruleset 2 matches via Edge Functions", () => {
     const matchId = created.body["matchId"] as string;
     let v = (await a("tcg-view", { matchId })).body as unknown as Tcg;
     expect(v.seat).toBe(0);
-    expect(v.view.myHand).toHaveLength(5);
+    expect(v.view.myHand).toHaveLength(v.view.firstSeat === 0 ? 5 : 6); // second player opens with 6
     expect(v.deadline).not.toBeNull();
     expect(JSON.stringify(v)).not.toContain('"deck"');
 
@@ -157,7 +158,7 @@ describe.runIf(run)("ruleset 2 matches via Edge Functions", () => {
     expect(hidden.deadline).toBeNull();
     const shown = (await a("tcg-view", { matchId, reveal: true })).body as unknown as Tcg;
     expect(shown.seat).toBe(0);
-    expect(shown.view.myHand).toHaveLength(5);
+    expect(shown.view.myHand).toHaveLength(shown.view.firstSeat === 0 ? 5 : 6);
     const next = (await send(a, shown, { type: "mulligan", instanceIds: [] }))
       .body as unknown as Tcg;
     expect(next.actingSeat).toBe(1);

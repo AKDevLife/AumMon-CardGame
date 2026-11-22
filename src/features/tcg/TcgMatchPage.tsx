@@ -15,22 +15,14 @@ import {
   phaseLabel,
 } from "./labels.ts";
 import { CardFrame, EmptySlot } from "./CardFrame.tsx";
+import { AudioSettings } from "./AudioSettings.tsx";
 import { CardGallery } from "./CardGallery.tsx";
 import { sortByCost } from "./sort.ts";
 import { CardBack, DeckPile, HeartIcon, SparkIcon } from "./GameIcons.tsx";
 import { Popup } from "./Popup.tsx";
 import { RulesText } from "./RulesText.tsx";
 import { DraggableCard, type DropTarget } from "./DraggableCard.tsx";
-import {
-  installAudioUnlock,
-  installTapSounds,
-  isMuted,
-  normalizeSoundConfig,
-  playSound,
-  setMuted,
-  setSoundConfig,
-  soundFor,
-} from "./sound.ts";
+import { normalizeSoundConfig, playSound, setSoundConfig, soundFor } from "./sound.ts";
 import type { TcgResponse } from "./types.ts";
 
 const POLL_MS = 2000;
@@ -60,7 +52,6 @@ export function TcgMatchPage() {
   /** Card shown in the read-only info popup (tap any Object to read its abilities). */
   const [info, setInfo] = useState<string | null>(null);
   const [mulligan, setMulligan] = useState<Set<string>>(new Set());
-  const [muted, setMutedState] = useState(isMuted);
   const lastEvent = useRef<string | null>(null);
   const [attackFx, setAttackFx] = useState(false);
   const [handOpen, setHandOpen] = useState(true);
@@ -132,9 +123,6 @@ export function TcgMatchPage() {
       void client.removeChannel(channel);
     };
   }, [client, mode, presenceKey, matchId, refresh]);
-
-  useEffect(() => installAudioUnlock(), []);
-  useEffect(() => installTapSounds(), []);
 
   // Admin-chosen sound settings (public.game_settings 'sounds'); defaults if missing.
   useEffect(() => {
@@ -657,15 +645,7 @@ export function TcgMatchPage() {
           setPopup(null);
         }}
       >
-        <StickerButton
-          onClick={() => {
-            const next = !muted;
-            setMutedState(next);
-            setMuted(next);
-          }}
-        >
-          {muted ? "🔇 เปิดเสียง" : "🔊 ปิดเสียง"}
-        </StickerButton>
+        <AudioSettings />
         <StickerButton
           onClick={() => {
             setPopup("history");

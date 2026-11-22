@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router";
 import { StickerButton } from "../components/StickerButton.tsx";
 import { useAuth } from "../features/auth/auth-context.ts";
+import { AudioSettings } from "../features/tcg/AudioSettings.tsx";
 import { CardGallery } from "../features/tcg/CardGallery.tsx";
 import { Popup } from "../features/tcg/Popup.tsx";
 import { RulesText } from "../features/tcg/RulesText.tsx";
@@ -17,6 +18,7 @@ export function HomePage() {
   const signedIn = auth.mode === "live" && auth.session !== null;
   const [rules, setRules] = useState(false);
   const [cards, setCards] = useState(false);
+  const [settings, setSettings] = useState(false);
   return (
     <div className="flex flex-1 flex-col justify-center gap-8">
       <section className="am-sticker relative overflow-hidden bg-am-brand px-6 py-6 text-center text-am-inverse">
@@ -86,7 +88,26 @@ export function HomePage() {
         >
           <span aria-hidden="true">🗂️</span> การ์ดทั้งหมด
         </button>
+        <button
+          type="button"
+          onClick={() => {
+            setSettings(true);
+          }}
+          className="am-pressable flex min-h-11 items-center gap-2 rounded-full border-[3px] border-am-ink bg-am-deco-purple px-5 py-2 font-display font-semibold"
+        >
+          <span aria-hidden="true">⚙️</span> ตั้งค่า
+        </button>
       </div>
+
+      <Popup
+        title="ตั้งค่า"
+        open={settings}
+        onClose={() => {
+          setSettings(false);
+        }}
+      >
+        <AudioSettings />
+      </Popup>
 
       <Popup
         title="การ์ดทั้งหมด"
