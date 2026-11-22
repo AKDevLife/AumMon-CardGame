@@ -2,6 +2,12 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-22 — 12.19 Online playtest fixes (owner)
+
+- **Bug:** after a player's command the server kept the old deadline when the turn passed to another human, so the next player got only the remaining time. Now `deadlineAfterAct` starts a fresh 60 s timer for every new turn / reaction (kept only while the same player decides on a drawn card). Integration test added.
+- Flashlight reveal: no auto-close; each player's cards are shown as cards with their ability (tap to enlarge); close with ✕.
+- Online next round: when a round ends the room goes back to the lobby; non-owners become "not ready"; the lobby shows "ผู้เล่นในห้อง x/y" and why the owner cannot start yet; the result screen offers "กลับห้อง (เล่นอีกรอบ)" and "ออกจากห้อง" (frees the seat). `game-rematch` stays for Solo only. DC13.
+
 ## 2026-11-22 — 12.18 Ruleset "11": 60 s turns, 7 / 5 starting cards (owner)
 
 - Owner: turn timer 20 s → 60 s; more starting cards because rounds ended too fast. Simulation compared 5/4, 6/4, 6/5 and 7/5 with 60 s; chose **7 (2–4 players) / 5 (5–8)** (4 players est. median 3.4 → 5.0 min, 8 players 4.2 → 5.8 min; 83–93 % of rounds still ≤ 10 min).

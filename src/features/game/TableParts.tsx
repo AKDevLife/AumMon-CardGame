@@ -259,10 +259,16 @@ export function WinOverlay({
   title,
   pending = false,
   onRematch,
+  onLobby,
+  onHome,
 }: {
   title: string;
   pending?: boolean;
   onRematch?: () => void;
+  /** Online: back to the room — everyone presses ready again for the next round. */
+  onLobby?: () => void;
+  /** Online: leave the room and go home (instead of the plain link). */
+  onHome?: () => void;
 }) {
   const colors = ["bg-am-title", "bg-am-pink", "bg-am-blue", "bg-am-green", "bg-am-orange"];
   return (
@@ -292,12 +298,31 @@ export function WinOverlay({
                 เล่นอีกรอบ
               </button>
             )}
-            <Link
-              to="/"
-              className="am-sticker am-pressable inline-block bg-am-card px-5 py-2 font-display font-bold"
-            >
-              กลับหน้าหลัก
-            </Link>
+            {onLobby && (
+              <button
+                type="button"
+                onClick={onLobby}
+                className="am-sticker am-pressable bg-am-green px-5 py-2 font-display font-bold text-am-success-text"
+              >
+                กลับห้อง (เล่นอีกรอบ)
+              </button>
+            )}
+            {onHome ? (
+              <button
+                type="button"
+                onClick={onHome}
+                className="am-sticker am-pressable bg-am-card px-5 py-2 font-display font-bold"
+              >
+                ออกจากห้อง
+              </button>
+            ) : (
+              <Link
+                to="/"
+                className="am-sticker am-pressable inline-block bg-am-card px-5 py-2 font-display font-bold"
+              >
+                กลับหน้าหลัก
+              </Link>
+            )}
           </div>
         </div>
       </div>
