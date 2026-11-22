@@ -1,9 +1,23 @@
 # AumMon — Casual Discard Edition · Phase 1 Game Design Audit & Rule Clarification
 
-> Status: **PROPOSED — waiting for owner decisions** (nothing here is an approved rule yet).
+> Status: **Owner decisions recorded 2026-11-22 (§0)**; remaining small rulings marked PROPOSED.
 > Source: owner brief "AumMon — Everyday Objects Battle · Master Game Design & Development Handoff" (2026-11-22).
 > The current 1v1 TCG (ruleset "6") stays live until the owner approves the new rules; login, sign-up, profile, UI/UX, sounds, admin and other non-rule systems are kept as they are.
 > Labels: **[BRIEF]** = owner's text · **[FOUND]** = verified by analysis / simulation · **[PROPOSED]** = my recommendation · **[OPEN]** = owner must decide.
+
+## 0. Owner decisions (2026-11-22) — APPROVED
+
+| ID  | Decision                                                                                                                                                                         |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| DC1 | **Pile reset:** when every other player draws & passes in a row, the last player who played starts again and may play any card (R1).                                             |
+| DC2 | **Deck:** 16 cards × 4 copies = **64 cards** for every room size (R2).                                                                                                           |
+| DC3 | **Umbrella is a reaction:** may be played out of turn when a draw / skip effect targets you (any points).                                                                        |
+| DC4 | **Magnet and Hourglass redesigned** as proposed in §3.                                                                                                                           |
+| DC5 | **Eraser may be played on any card.**                                                                                                                                            |
+| DC6 | The 1v1 TCG is removed once the new game works; the new game keeps **Solo vs Bots (1–7 bots), Pass & Play and Online**.                                                          |
+| DC7 | **VIP + gacha:** designed now, built later — after the core game, a legal check of payments / loot boxes and owner approval. 5–8 player rooms are free to test on Dev meanwhile. |
+
+Rules text: `AumMon_Core_Rules.md`; cards: `AumMon_Card_Library.md`.
 
 ## 1. Summary of findings
 
