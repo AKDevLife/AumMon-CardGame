@@ -1,12 +1,9 @@
 /**
- * Task 12.11 — Quick Match simulation (analysis only; production rules are unchanged).
- * Uses the real engine (`discard.startGame` / `applyCommand` / `canPlay`) and the real card data.
- * Variants are applied by this harness only:
- *  - starting hand size: extra dealt cards go back into the draw pile, which is reshuffled;
- *  - Draw Then Play: if the top of the draw pile is playable, the harness moves it into the hand
- *    and plays it with a normal `play` command (only that card); otherwise the normal `draw`
- *    command draws that same card and passes — so the drawn card is identical in both branches.
- * Human time is a MODEL (see `thinkSeconds`), not measured play.
+ * Quick Match simulation on the real engine (ruleset "8": 5 / 4 cards, Draw Then Play, Alarm
+ * next-only). The task 12.11 comparison with ruleset 7 (configs A–E, X1–X3) was run on the
+ * ruleset 7 engine at commit 07ebd61 — see docs/discard/AumMon_Game_Simulation_Report.md.
+ * Harness-only variants (for tuning): starting hand size, Draw Then Play off (drawn card kept),
+ * timers. Human time is a MODEL (`lognormal` medians per profile), not measured play.
  *
  * Quick smoke run in CI; full report (JSON):
  *   `AUMMON_SIM=2000 AUMMON_SIM_OUT=/tmp/sim.json pnpm vitest run tests/integration/quick-match-sim.test.ts --testTimeout=1200000`
@@ -28,42 +25,15 @@ export interface Config {
   readonly reactionTimer: number;
   /** Abilities that are never used (ablation study). */
   readonly noAbility?: discard.AbilityId;
-  /** PROPOSAL emulation: Alarm Clock = reverse + only the new next player draws 1. */
-  readonly alarmNextOnly?: boolean;
 }
 
-const current = (n: number) => (n <= 4 ? 7 : 5);
 const quick = (n: number) => (n <= 4 ? 5 : 4);
 const small = (n: number) => (n <= 4 ? 4 : 3);
 export const CONFIGS: readonly Config[] = [
-  { name: "A current", hand: current, drawThenPlay: false, turnTimer: 45, reactionTimer: 8 },
-  { name: "B hand 5/4", hand: quick, drawThenPlay: false, turnTimer: 45, reactionTimer: 8 },
-  { name: "C 5/4 + DTP", hand: quick, drawThenPlay: true, turnTimer: 45, reactionTimer: 8 },
-  { name: "D 5/4 + DTP + 20s", hand: quick, drawThenPlay: true, turnTimer: 20, reactionTimer: 8 },
-  {
-    name: "E 5/4 + DTP + 20s + Alarm next-only",
-    hand: quick,
-    drawThenPlay: true,
-    turnTimer: 20,
-    reactionTimer: 5,
-    alarmNextOnly: true,
-  },
-  {
-    name: "X1 5/4 + 20s (no DTP)",
-    hand: quick,
-    drawThenPlay: false,
-    turnTimer: 20,
-    reactionTimer: 5,
-  },
-  { name: "X2 4/3 + DTP + 20s", hand: small, drawThenPlay: true, turnTimer: 20, reactionTimer: 5 },
-  {
-    name: "X3 4/3 + DTP + 20s + Alarm next-only",
-    hand: small,
-    drawThenPlay: true,
-    turnTimer: 20,
-    reactionTimer: 5,
-    alarmNextOnly: true,
-  },
+  { name: "R8 shipped", hand: quick, drawThenPlay: true, turnTimer: 20, reactionTimer: 5 },
+  { name: "R8 without DTP", hand: quick, drawThenPlay: false, turnTimer: 20, reactionTimer: 5 },
+  { name: "R8 4/3 cards", hand: small, drawThenPlay: true, turnTimer: 20, reactionTimer: 5 },
+  { name: "R8 45 s timer", hand: quick, drawThenPlay: true, turnTimer: 45, reactionTimer: 8 },
 ];
 
 interface GameResult {
@@ -120,27 +90,7 @@ function safePlay(
   s: discard.GameState,
   cmd: discard.Command,
   rng: RandomSource,
-  cfg?: Config,
 ): discard.Transition {
-  if (cfg?.alarmNextOnly && cmd.type === "play" && cmd.useAbility) {
-    const id = cmd.card;
-    const card = s.players.flatMap((p) => p.hand).find((c) => c.id === id);
-    if (card && discard.getDiscardCard(card.cardId).ability === "alarm") {
-      // Emulated proposal: reverse, then the next player (new direction) draws 1.
-      const me = discard.actingSeat(s) ?? 0;
-      const t = discard.applyCommand(s, { ...cmd, useAbility: false, choice: {} }, rng);
-      if (t.state.status === "finished") return t;
-      const st = t.state;
-      st.direction = st.direction === 1 ? -1 : 1;
-      st.current = discard.nextSeat(st, me);
-      const drawn = st.drawPile.shift();
-      if (drawn) st.players[st.current]?.hand.push(drawn);
-      return {
-        state: st,
-        events: [...t.events, { type: "drew", seat: st.current, count: drawn ? 1 : 0 }],
-      };
-    }
-  }
   try {
     return discard.applyCommand(s, cmd, rng);
   } catch (e) {
@@ -190,9 +140,15 @@ export function playGame(players: number, seed: number, cfg: Config): GameResult
   const rng = createSeededRandom([seed, players * 7919, 17, 4242]);
   const ids = Array.from({ length: players }, (_, i) => `p${String(i)}`);
   let { state } = discard.startGame(ids, rng);
-  // Starting hand variant: surplus back to the draw pile, then reshuffle.
+  // Starting hand variant: surplus back to the draw pile (or extra cards dealt), then reshuffle.
   const size = cfg.hand(players);
-  for (const p of state.players) state.drawPile.push(...p.hand.splice(size));
+  for (const p of state.players) {
+    state.drawPile.push(...p.hand.splice(size));
+    while (p.hand.length < size && state.drawPile.length > 0) {
+      const extra = state.drawPile.shift();
+      if (extra) p.hand.push(extra);
+    }
+  }
   for (let i = state.drawPile.length - 1; i > 0; i--) {
     const j = rng.nextInt(i + 1);
     const a = state.drawPile[i];
@@ -230,48 +186,46 @@ export function playGame(players: number, seed: number, cfg: Config): GameResult
       r.seconds += think + ANIMATION_S;
       const use = profile !== "casual" || unit(rng) < 0.8;
       t = discard.applyCommand(state, { type: "react", playerId, useUmbrella: use }, rng);
+    } else if (state.drawn?.seat === me) {
+      // Draw Then Play decision on the drawn card (engine rule).
+      const drawn = state.players[me]?.hand.find((c) => c.id === state.drawn?.id);
+      const umbrella = drawn && discard.getDiscardCard(drawn.cardId).ability === "umbrella";
+      if (cfg.drawThenPlay && drawn && !(umbrella && profile === "careful")) {
+        const use = profile !== "casual" || unit(rng) < 0.75;
+        r.dtpPlays++;
+        r.seconds += 2.5 + ANIMATION_S;
+        t = safePlay(
+          state,
+          {
+            type: "play",
+            playerId,
+            card: drawn.id,
+            useAbility: use,
+            choice: use ? randomChoice(state, me, drawn, rng) : {},
+          },
+          rng,
+        );
+      } else t = discard.applyCommand(state, { type: "keep", playerId }, rng);
     } else {
       r.turns++;
       r.maxWaitSeconds = Math.max(r.maxWaitSeconds, r.seconds - (lastTurnAt[me] ?? 0));
       lastTurnAt[me] = r.seconds;
-      let cmd = decide(state, me, profile, rng, cfg);
+      const cmd = decide(state, me, profile, rng, cfg);
       const needsChoice = cmd.type === "play" && cmd.useAbility;
       let think = lognormal(rng, MEDIAN_THINK[profile]) * (needsChoice ? 1.3 : 0.8);
       if (think > cfg.turnTimer) {
-        // Server timeout: draw 1 and pass (never plays the drawn card).
+        // Server timeout: draw 1 and pass (a playable drawn card is kept).
         think = cfg.turnTimer;
-        cmd = { type: "draw", playerId };
         r.timeouts++;
         r.seconds += think + ANIMATION_S;
-        t = discard.applyCommand(state, cmd, rng);
-      } else if (cmd.type === "draw" && cfg.drawThenPlay) {
-        const top = state.drawPile[0];
-        const keep = top && discard.getDiscardCard(top.cardId).ability === "umbrella";
-        if (top && discard.canPlay(state, me, top) && !(keep && profile === "careful")) {
-          // Draw Then Play: only the drawn card may be played.
-          const s = { ...state, drawPile: state.drawPile.slice(1) };
-          s.players = state.players.map((p, i) =>
-            i === me ? { ...p, hand: [...p.hand, top] } : p,
-          );
-          const use = profile !== "casual" || unit(rng) < 0.75;
-          const play: discard.Command = {
-            type: "play",
-            playerId,
-            card: top.id,
-            useAbility: use,
-            choice: use ? randomChoice(s, me, top, rng) : {},
-          };
-          r.cardsDrawn++;
-          r.dtpPlays++;
-          r.seconds += think + 2.5 + 2 * ANIMATION_S; // see the card, decide, play
-          t = safePlay(s, play, rng, cfg);
-        } else {
-          r.seconds += think + ANIMATION_S;
-          t = discard.applyCommand(state, cmd, rng);
+        t = discard.applyCommand(state, { type: "draw", playerId }, rng);
+        if (t.state.drawn) {
+          const k = discard.applyCommand(t.state, { type: "keep", playerId }, rng);
+          t = { state: k.state, events: [...t.events, ...k.events] };
         }
       } else {
         r.seconds += think + ANIMATION_S;
-        t = safePlay(state, cmd, rng, cfg);
+        t = safePlay(state, cmd, rng);
       }
     }
     for (const e of t.events) {
@@ -361,7 +315,7 @@ describe("quick match simulation (task 12.11)", () => {
     const rows = [];
     for (const cfg of CONFIGS) for (let n = 2; n <= 8; n++) rows.push(summarize(cfg, n, full));
     const ablation = [];
-    const base = CONFIGS[3];
+    const base = CONFIGS[0];
     if (base)
       for (const n of [4, 8]) {
         const ref = summarize(base, n, full / 2);

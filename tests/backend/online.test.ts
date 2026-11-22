@@ -94,7 +94,7 @@ describe.runIf(run)("online multiplayer via Edge Functions", () => {
       .single();
     const room = data as { join_code_hash: string; max_players: number; ruleset_version: string };
     expect(room.join_code_hash).not.toContain(code);
-    expect([room.max_players, room.ruleset_version]).toEqual([2, "7"]);
+    expect([room.max_players, room.ruleset_version]).toEqual([2, "8"]);
   });
 
   it("joining validates code and capacity", async () => {
@@ -147,7 +147,7 @@ describe.runIf(run)("online multiplayer via Edge Functions", () => {
       b.call("game-command", draw(vb)),
     ]);
     const statuses = [ra.status, rb.status].sort();
-    expect(statuses[0]).toBe(200);
+    expect(statuses[0], JSON.stringify([ra.body["error"], rb.body["error"]])).toBe(200);
     expect([403, 409]).toContain(statuses[1]);
     const after = (await a.call("game-view", { matchId })).body as unknown as GameView;
     expect(after.view.status).toBe("active");

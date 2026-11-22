@@ -1,6 +1,6 @@
-# AumMon — Quick Match Rules (PROPOSED ruleset "8")
+# AumMon — Quick Match Rules (ruleset "8")
 
-> Status: **PROPOSAL — waiting for owner approval. Not in production.** The approved rules remain `AumMon_Core_Rules.md` (ruleset "7").
+> Status: **APPROVED by the owner 2026-11-22 (QM1–QM6) and implemented in task 12.12.** Core Rules and the Card Library are updated to ruleset "8". Best-of-3 for 2–3 players is not built (owner choice pending).
 > Every section says whether it is **unchanged** from Core Rules or **changed (proposal)**. Evidence: `AumMon_Game_Simulation_Report.md` (configuration E).
 
 ## 1. Goal — unchanged

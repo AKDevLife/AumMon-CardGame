@@ -71,16 +71,16 @@ Legacy aliases (`--am-*`) still exist and point at these tokens, so older compon
 
 Layout top → bottom (full `100dvh`, safe areas respected): header · opponents · table (scrolls only if a very small screen overflows) · hand dock (thumb zone).
 
-| Element      | Style                                                                                                                           | Rule                                                                             |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| Header       | `am-brand` bar; turn pill `am-card`, **`am-title` when it is your turn**; timer chip turns `am-red` ≤ 10 s; icon buttons 40 px  | rules / all cards / settings only                                                |
-| Opponents    | sticker chips, 1 row (≤ 4) or 2 rows of 4 (5–7); avatar shown only for ≤ 3                                                      | active seat: `am-title` + `am-active` glow; bot thinking dots; 🧴 glue, 📏 ruler |
-| Table        | lavender dashed felt; draw pile (2 stacked backs + count badge), discard (top card with `am-title` ring, 2 recent cards fanned) | top card lands with `am-land`                                                    |
-| Status chips | `am-card` rule chip (≥ points), `am-green` new pile, `am-title` ruler, `am-deco-purple` glue, `am-blue` umbrella                | only the ones in effect                                                          |
-| Last action  | cream pill above the piles                                                                                                      | hidden on short screens with 5+ opponents                                        |
-| Banner       | `am-title` sticker over the table, 1.8 s                                                                                        | skip / forced effect on you / your turn / new pile / winner                      |
-| Hand dock    | `am-brand` rounded sheet; hand count badge (glows on your turn) + one-line hint + small "จั่วแล้วผ่าน"                              | no playable card → full-width green `am-active` "จั่วแล้วผ่าน"                       |
-| Win          | confetti + `am-title` card with "กลับหน้าหลัก"                                                                                     |                                                                                  |
+| Element      | Style                                                                                                                                                | Rule                                                                             |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| Header       | `am-brand` bar; turn pill `am-card`, **`am-title` when it is your turn**; timer chip turns `am-red` ≤ 5 s (warning sound at 5 s); icon buttons 40 px | rules / all cards / settings only                                                |
+| Opponents    | sticker chips, 1 row (≤ 4) or 2 rows of 4 (5–7); avatar shown only for ≤ 3                                                                           | active seat: `am-title` + `am-active` glow; bot thinking dots; 🧴 glue, 📏 ruler |
+| Table        | lavender dashed felt; draw pile (2 stacked backs + count badge), discard (top card with `am-title` ring, 2 recent cards fanned)                      | top card lands with `am-land`                                                    |
+| Status chips | `am-card` rule chip (≥ points), `am-green` new pile, `am-title` ruler, `am-deco-purple` glue, `am-blue` umbrella                                     | only the ones in effect                                                          |
+| Last action  | cream pill above the piles                                                                                                                           | hidden on short screens with 5+ opponents                                        |
+| Banner       | `am-title` sticker over the table, 1.8 s                                                                                                             | skip / forced effect on you / your turn / new pile / winner                      |
+| Hand dock    | `am-brand` rounded sheet; hand count badge (glows on your turn) + one-line hint + small "จั่วไพ่"                                                       | no playable card → full-width green `am-active` "จั่วไพ่"                           |
+| Win          | confetti + `am-title` card with "กลับหน้าหลัก"                                                                                                          |                                                                                  |
 
 ### Gameplay tokens (`src/styles/index.css`)
 

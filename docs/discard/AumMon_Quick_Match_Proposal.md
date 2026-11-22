@@ -1,6 +1,6 @@
 # AumMon — Quick Match Proposal (final recommendation)
 
-> Task 12.11 · Status: **PROPOSAL — owner approval required before any production rule changes.**
+> Task 12.11 · Status: **APPROVED by the owner on 2026-11-22 ("อนุมัติทั้งหมด") — implemented in task 12.12 (ruleset "8").** Best-of-3 (QM6 option) not built yet.
 > Approved by the owner: Quick Match First, 5–10 min per round, 20 s per turn, mobile first, keep card abilities fun, no separate Standard mode.
 > Not yet approved: everything marked **Proposal** below.
 
@@ -28,7 +28,7 @@
 | QM5 | Alarm Clock → reverse + next player draws 1 (P1)              | Approve                             |
 | QM6 | "เล่นอีกรอบ" rematch button; 2–3 players best of 3 (optional)   | Rematch yes; best of 3 owner choice |
 
-## If approved — implementation plan (not started)
+## Implementation plan (done in 12.12)
 
 1. New `ruleset_version` "8" in the engine (hand sizes, Draw Then Play command, Alarm text) + tests; ruleset 7 stays readable for finished matches.
 2. Server: 20 s / 5 s deadlines, grace window, auto-play after 2 timeouts, `serverNow` in responses.

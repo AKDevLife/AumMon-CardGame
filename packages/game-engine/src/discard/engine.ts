@@ -25,7 +25,7 @@ export interface PendingHit {
 }
 
 export interface GameState {
-  readonly rulesetVersion: "7";
+  readonly rulesetVersion: "8";
   status: "active" | "finished";
   players: PlayerState[];
   drawPile: CardInstance[];
@@ -47,6 +47,8 @@ export interface GameState {
   /** Umbrella decisions still awaited, in order. */
   reactions: PendingHit[];
   winner: Seat | null;
+  /** Draw Then Play: the card the current player just drew and may still play (only that card). */
+  drawn?: { readonly seat: Seat; readonly id: string } | null;
 }
 
 export type GameEvent =
@@ -65,7 +67,9 @@ export type GameEvent =
   | { type: "reveal_all"; hands: string[][] }
   /** Magnifier: PRIVATE — only `seat` may see `cards` (the server must filter it). */
   | { type: "peek"; seat: Seat; target: Seat; cards: string[]; private: true }
-  | { type: "game_over"; winner: Seat };
+  | { type: "game_over"; winner: Seat }
+  /** Server-only: the turn or reaction timer ran out for `seat` (never emitted by the engine). */
+  | { type: "timeout"; seat: Seat };
 
 export type CommandErrorCode =
   | "game_over"
@@ -106,6 +110,8 @@ export type Command =
       readonly choice?: AbilityChoice;
     }
   | { readonly type: "draw"; readonly playerId: string }
+  /** Draw Then Play: keep the drawn card and end the turn. */
+  | { readonly type: "keep"; readonly playerId: string }
   | { readonly type: "react"; readonly playerId: string; readonly useUmbrella: boolean };
 
 export interface Transition {
@@ -152,7 +158,7 @@ export function startGame(
   if (!start) throw new Error("empty deck");
   const firstSeat = rng.nextInt(n);
   const state: GameState = {
-    rulesetVersion: "7",
+    rulesetVersion: "8",
     status: "active",
     players,
     drawPile: deck,
@@ -170,6 +176,7 @@ export function startGame(
     skip: null,
     reactions: [],
     winner: null,
+    drawn: null,
   };
   return { state, events: [{ type: "game_started", firstSeat, top: start.cardId }] };
 }
@@ -300,10 +307,11 @@ function resolveAbility(
       break;
     }
     case "alarm":
+      // Ruleset 8 (QM5): reverse, then only the next player in the new direction draws 1.
       s.direction = s.direction === 1 ? -1 : 1;
       ev.push({ type: "direction", direction: s.direction });
-      for (let seat = 0; seat < n(s); seat++)
-        if (seat !== me) hits.push({ kind: "draw", target: seat, amount: 1 });
+      target = nextSeat(s, me);
+      hits.push({ kind: "draw", target, amount: 1 });
       break;
     case "magnet": {
       target = fewest(s, me);
@@ -420,6 +428,17 @@ function advance(s: GameState, ev: GameEvent[]): void {
   s.turnNumber++;
 }
 
+/** End the turn without playing (after drawing): Ruler / Glue on this player end. */
+function pass(s: GameState, me: Seat, ev: GameEvent[]): void {
+  const forced = s.ruler?.seat === me;
+  if (s.ruler?.seat === me) s.ruler = null;
+  if (s.glue === me) s.glue = null;
+  s.drawn = null;
+  ev.push({ type: "passed", seat: me, forced });
+  s.passStreak++;
+  advance(s, ev);
+}
+
 // ---------------------------------------------------------------- commands
 
 export function applyCommand(state: GameState, command: Command, rng: RandomSource): Transition {
@@ -448,17 +467,30 @@ export function applyCommand(state: GameState, command: Command, rng: RandomSour
   if (s.reactions.length > 0) throw new CommandError("awaiting_reaction");
   if (me !== s.current) throw new CommandError("not_your_turn");
 
+  const pending = s.drawn?.seat === me ? s.drawn : null;
+
   if (command.type === "draw") {
-    const forced = s.ruler?.seat === me;
-    if (s.ruler?.seat === me) s.ruler = null;
-    if (s.glue === me) s.glue = null;
+    if (pending) throw new CommandError("cannot_play");
+    const before = s.players[me]?.hand.length ?? 0;
     draw(s, me, 1, rng, ev);
-    ev.push({ type: "passed", seat: me, forced });
-    s.passStreak++;
-    advance(s, ev);
+    const got = s.players[me]?.hand[before];
+    // Draw Then Play (QM2): a legal drawn card may be played now — only that card.
+    if (got && canPlay(s, me, got)) {
+      s.drawn = { seat: me, id: got.id };
+      return { state: s, events: ev };
+    }
+    pass(s, me, ev);
     return { state: s, events: ev };
   }
 
+  if (command.type === "keep") {
+    if (!pending) throw new CommandError("cannot_play");
+    pass(s, me, ev);
+    return { state: s, events: ev };
+  }
+
+  if (pending && command.card !== pending.id) throw new CommandError("cannot_play");
+  s.drawn = null;
   const card = s.players[me]?.hand.find((x) => x.id === command.card);
   if (!card) throw new CommandError("card_not_in_hand");
   if (!canPlay(s, me, card)) throw new CommandError("cannot_play");

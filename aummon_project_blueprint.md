@@ -17,7 +17,7 @@ Browser (React)  ──intent──▶  Edge Functions (Deno)  ──▶  Postgr
 
 - **Engine** (`packages/game-engine/src/discard`): `startGame(players, rng)`, `applyCommand(state, seat, command)`, `getView(state, seat)`, `chooseBotCommand`. Deterministic: seeded RNG stored server-side; no I/O, clock or `Math.random`.
 - **Server-authoritative:** clients send `play {card, useAbility, choice}`, `draw` or `react {useUmbrella}` plus an idempotency key. The server validates seat, turn and phase, runs the engine, stores the state and events.
-- **Flow** (`supabase/functions/_shared/game-flow.ts`): after each command the server runs bots one step at a time (`BOT_STEP_MS` 700) and applies timeouts — turn 45 s → auto-draw, reaction 8 s → decline.
+- **Flow** (`supabase/functions/_shared/game-flow.ts`): after each command the server runs bots one step at a time (`BOT_STEP_MS` 700) and applies timeouts — turn 20 s → auto-draw (a playable drawn card is kept), reaction 5 s → decline; commands received ≤ 0.5 s after the deadline still count; Online seats with 2 timeouts in a row are auto-played until the player returns; `serverNow` lets clients correct their countdown; `game-rematch` starts a new match in the same room.
 - **Privacy:** `game-view` returns only the caller's hand, counts for others, and peek cards only to the peeking seat. Stored and broadcast events never contain private cards.
 - **Modes:** Solo (1 human + 1–7 bots), Online (room code, 2–8 seats, ready → `game-start`; leaving online seats become bots).
 

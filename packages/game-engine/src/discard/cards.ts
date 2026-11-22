@@ -8,7 +8,7 @@ export type AbilityId =
   | "eraser" // ยางลบ: wild; clears the pile conditions
   | "scissors" // กรรไกร: remove the card under, play 1 more card
   | "box" // กล่องกระดาษ: card under → hand, place another hand card on top
-  | "alarm" // นาฬิกาปลุก: reverse + all others draw 1
+  | "alarm" // นาฬิกาปลุก: reverse + the next player (new direction) draws 1
   | "magnet" // แม่เหล็ก: give 1 own card to the player with the fewest cards
   | "peek" // แว่นขยาย: secretly see 2 random cards of a chosen player
   | "ruler" // ไม้บรรทัด: next player must play exactly this value or draw & pass
@@ -89,7 +89,7 @@ export const DISCARD_CARDS: readonly DiscardCard[] = [
     5,
     "alarm",
     "ปลุก",
-    "สลับทิศทางการเล่น และผู้เล่นคนอื่นทุกคนจั่วเพิ่มคนละ 1 ใบ",
+    "สลับทิศทางการเล่น แล้วผู้เล่นคนถัดไป (ตามทิศใหม่) จั่วเพิ่ม 1 ใบ",
   ),
   c("D07", "แม่เหล็ก", "Magnet", 4, "magnet", "ดูดติด", "ส่งไพ่ 1 ใบจากมือเราไปติดผู้เล่นที่มีไพ่น้อยที่สุด"),
   c("D08", "แว่นขยาย", "Magnifier", 2, "peek", "ส่อง", "เลือกผู้เล่น 1 คน ดูไพ่ในมือเขาแบบลับ 2 ใบ", true),
@@ -137,14 +137,18 @@ export const DISCARD_CARDS: readonly DiscardCard[] = [
 ];
 
 export const DISCARD_RULES = {
-  version: "7",
+  version: "8",
   minPlayers: 2,
   maxPlayers: 8,
   copies: 4,
-  handSmall: 7, // 2–4 players
-  handLarge: 5, // 5–8 players
-  turnTimeoutMs: 45_000,
-  reactionTimeoutMs: 8_000,
+  handSmall: 5, // 2–4 players (Quick Match, QM1)
+  handLarge: 4, // 5–8 players
+  turnTimeoutMs: 20_000, // QM3
+  reactionTimeoutMs: 5_000,
+  /** Draw Then Play: the decision on a drawn card gets at least this much time. */
+  drawnDecisionMinMs: 5_000,
+  /** Online: consecutive timeouts before the seat is auto-played (QM4). */
+  afkTimeouts: 2,
 } as const;
 
 const BY_ID = new Map(DISCARD_CARDS.map((x) => [x.cardId, x]));

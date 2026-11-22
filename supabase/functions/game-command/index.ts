@@ -44,6 +44,7 @@ function parseChoice(raw: unknown): discard.AbilityChoice {
 type Intent =
   | { type: "play"; card: string; useAbility: boolean; choice: discard.AbilityChoice }
   | { type: "draw" }
+  | { type: "keep" }
   | { type: "react"; useUmbrella: boolean };
 
 function parseCommand(raw: unknown): Intent {
@@ -60,6 +61,8 @@ function parseCommand(raw: unknown): Intent {
       };
     case "draw":
       return { type: "draw" };
+    case "keep":
+      return { type: "keep" };
     case "react":
       return { type: "react", useUmbrella: c["useUmbrella"] === true };
     default:

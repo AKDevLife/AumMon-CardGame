@@ -40,7 +40,8 @@ function needOf(ability: discard.AbilityId, underTop: string | null): Need {
   }
 }
 
-function useCountdown(deadline: string | null): number | null {
+/** Display-only countdown from the server deadline, corrected by the server clock offset. */
+function useCountdown(deadline: string | null, offset: number): number | null {
   const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
     if (!deadline) return;
@@ -51,7 +52,7 @@ function useCountdown(deadline: string | null): number | null {
       clearInterval(id);
     };
   }, [deadline]);
-  return deadline ? Math.max(0, Math.ceil((Date.parse(deadline) - now) / 1000)) : null;
+  return deadline ? Math.max(0, Math.ceil((Date.parse(deadline) - now - offset) / 1000)) : null;
 }
 
 interface Plan {
@@ -83,20 +84,26 @@ export function GamePage() {
   const [reveal, setReveal] = useState<string[][] | null>(null);
   const lastEvent = useRef<string | null>(null);
   const idem = useRef<{ key: string; body: string } | null>(null);
-  const seconds = useCountdown(data?.botActing ? null : (data?.deadline ?? null));
+  const [offset, setOffset] = useState(0);
+  const seconds = useCountdown(data?.botActing ? null : (data?.deadline ?? null), offset);
 
-  const refresh = useCallback(async () => {
-    if (!client) return;
-    try {
-      const next = await callFunction<GameResponse>(client, "game-view", {
-        matchId,
-      });
-      setData(next);
-      setError(null);
-    } catch (e) {
-      setError(e instanceof ApiError ? e.message : "โหลดเกมไม่สำเร็จ");
-    }
-  }, [client, matchId]);
+  const refresh = useCallback(
+    async (resume = false) => {
+      if (!client) return;
+      try {
+        const next = await callFunction<GameResponse>(client, "game-view", {
+          matchId,
+          ...(resume && { resume: true }),
+        });
+        setOffset(next.serverNow - Date.now());
+        setData(next);
+        setError(null);
+      } catch (e) {
+        setError(e instanceof ApiError ? e.message : "โหลดเกมไม่สำเร็จ");
+      }
+    },
+    [client, matchId],
+  );
 
   useEffect(() => {
     const first = setTimeout(() => void refresh(), 0);
@@ -226,6 +233,40 @@ export function GamePage() {
       clearTimeout(id);
     };
   }, [botDeadline, refresh]);
+  // 5-second warning on your own turn (display + sound only; the server owns the clock).
+  const canAct = data !== null && (data.view.canDraw || data.view.canKeep);
+  useEffect(() => {
+    if (seconds === 5 && canAct) playSound("warning");
+  }, [seconds, canAct]);
+  // Your turn ended (timeout or server result): close the play dialog.
+  useEffect(() => {
+    if (canAct) return;
+    const id = setTimeout(() => {
+      setPlan(null);
+    }, 0);
+    return () => {
+      clearTimeout(id);
+    };
+  }, [canAct]);
+  // Rematch started by anyone at the table: follow it.
+  const nextMatchId = data?.nextMatchId ?? null;
+  useEffect(() => {
+    if (nextMatchId) void navigate(`/game/${nextMatchId}`, { replace: true });
+  }, [nextMatchId, navigate]);
+  // New match id (rematch): start from a clean screen.
+  useEffect(() => {
+    lastEvent.current = null;
+    known.current = null;
+    const id = setTimeout(() => {
+      setData(null);
+      setPlan(null);
+      setInspect(null);
+    }, 0);
+    return () => {
+      clearTimeout(id);
+    };
+  }, [matchId]);
+
   useEffect(() => {
     if (seconds !== 0) return;
     const id = setTimeout(() => void refresh(), 300);
@@ -240,7 +281,19 @@ export function GamePage() {
   const { view } = data;
   const name = (s: number) => data.names[s] ?? `ผู้เล่น ${String(s + 1)}`;
   const finished = view.status === "finished";
-  const myTurn = view.canDraw;
+  const myTurn = view.canDraw || view.canKeep;
+  const drawnCard = view.drawn ? (view.myHand.find((c) => c.id === view.drawn) ?? null) : null;
+  const rematch = async () => {
+    setPending(true);
+    try {
+      const out = await callFunction<{ matchId: string }>(client, "game-rematch", { matchId });
+      void navigate(`/game/${out.matchId}`, { replace: true });
+    } catch (e) {
+      setError(e instanceof ApiError ? e.message : "เริ่มรอบใหม่ไม่สำเร็จ");
+    } finally {
+      setPending(false);
+    }
+  };
 
   const send = async (command: Record<string, unknown>) => {
     setPending(true);
@@ -309,6 +362,7 @@ export function GamePage() {
   };
 
   const me = data.seat;
+  const auto = me !== null && data.autoSeats.includes(me);
   const isBot = (i: number) => /^bot\b|^🤖/i.test(name(i));
   const seats = view.players.map((_, i) => i).filter((i) => i !== me);
   const turnLabel = finished
@@ -341,9 +395,11 @@ export function GamePage() {
       ? view.canReact
         ? "☂️ เลือกว่าจะใช้ร่มไหม"
         : `รอ ${name(view.acting ?? view.current)}…`
-      : playableCount > 0
-        ? `ตาคุณ! แตะไพ่ขอบเขียวเพื่อลง (ลงได้ ${String(playableCount)} ใบ)`
-        : "ไม่มีไพ่ที่ลงได้ — จั่ว 1 ใบแล้วผ่านเทิร์น";
+      : drawnCard
+        ? `จั่วได้ ${cardName(drawnCard.cardId)} — ลงใบนี้ได้เลย หรือเก็บไว้`
+        : playableCount > 0
+          ? `ตาคุณ! แตะไพ่ขอบเขียวเพื่อลง (ลงได้ ${String(playableCount)} ใบ)`
+          : "ไม่มีไพ่ที่ลงได้ — จั่ว 1 ใบแล้วผ่านเทิร์น";
 
   return (
     <section
@@ -403,14 +459,14 @@ export function GamePage() {
             <span className="min-w-0 flex-1 text-[13px] font-semibold leading-tight">
               {hint ?? `ไพ่ในมือ ${String(view.myHand.length)} ใบ`}
             </span>
-            {myTurn && playableCount > 0 && (
+            {myTurn && (drawnCard !== null || playableCount > 0) && (
               <button
                 type="button"
                 disabled={pending}
-                onClick={() => void send({ type: "draw" })}
+                onClick={() => void send(drawnCard ? { type: "keep" } : { type: "draw" })}
                 className="am-sticker am-pressable min-h-10 shrink-0 !rounded-full bg-am-card px-3 font-display text-sm font-bold text-am-text disabled:opacity-60"
               >
-                จั่วแล้วผ่าน
+                {drawnCard ? "เก็บไว้ จบเทิร์น" : "จั่วไพ่"}
               </button>
             )}
           </div>
@@ -438,15 +494,32 @@ export function GamePage() {
               );
             })}
           </div>
-          {myTurn && playableCount === 0 && (
+          {myTurn && (drawnCard !== null || playableCount === 0) && (
             <div className="px-3 pt-1">
               <button
                 type="button"
                 disabled={pending}
-                onClick={() => void send({ type: "draw" })}
+                onClick={() => {
+                  if (drawnCard) setPlan({ card: drawnCard, useAbility: true, pair: [] });
+                  else void send({ type: "draw" });
+                }}
                 className="am-sticker am-pressable am-active min-h-12 w-full !rounded-full bg-am-green font-display text-lg font-bold text-am-success-text disabled:opacity-60"
               >
-                จั่วแล้วผ่าน
+                {drawnCard ? `ลงใบที่จั่ว (${cardName(drawnCard.cardId)})` : "จั่วไพ่"}
+              </button>
+            </div>
+          )}
+          {auto && (
+            <div className="mx-3 mt-1 flex items-center gap-2 rounded-xl bg-am-card px-3 py-2 text-am-text">
+              <span className="min-w-0 flex-1 text-[13px] font-semibold">
+                🤖 หมดเวลา 2 ครั้ง — ระบบกำลังเล่นแทนคุณ
+              </span>
+              <button
+                type="button"
+                onClick={() => void refresh(true)}
+                className="am-sticker am-pressable min-h-10 shrink-0 !rounded-full bg-am-green px-3 font-display text-sm font-bold text-am-success-text"
+              >
+                กลับมาเล่นเอง
               </button>
             </div>
           )}
@@ -454,7 +527,11 @@ export function GamePage() {
       </>
 
       {finished && (
-        <WinOverlay title={view.winner === me ? "คุณชนะ! 🎉" : `${name(view.winner ?? 0)} ชนะ 🏆`} />
+        <WinOverlay
+          title={view.winner === me ? "คุณชนะ! 🎉" : `${name(view.winner ?? 0)} ชนะ 🏆`}
+          pending={pending}
+          {...(me !== null && { onRematch: () => void rematch() })}
+        />
       )}
 
       <Popup

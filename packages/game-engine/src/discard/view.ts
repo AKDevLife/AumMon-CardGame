@@ -23,6 +23,9 @@ export interface SeatView {
   /** Actions for this seat right now. */
   readonly playable: readonly string[];
   readonly canDraw: boolean;
+  /** Draw Then Play: the drawn card (instance id) waiting for play / keep. */
+  readonly drawn: string | null;
+  readonly canKeep: boolean;
   readonly canReact: boolean;
 }
 
@@ -31,6 +34,8 @@ export function getView(s: GameState, seat: Seat | null): SeatView {
   const me = seat === null ? null : s.players[seat];
   const myTurn = seat !== null && acting === seat && s.reactions.length === 0;
   const pending = s.reactions[0];
+  const drawn = seat !== null && s.drawn?.seat === seat ? s.drawn.id : null;
+  const drawnCard = drawn === null ? undefined : me?.hand.find((c) => c.id === drawn);
   return {
     seat,
     status: s.status,
@@ -49,8 +54,17 @@ export function getView(s: GameState, seat: Seat | null): SeatView {
     ruler: s.ruler ? { ...s.ruler } : null,
     reaction: pending ? { target: pending.target, kind: pending.kind } : null,
     winner: s.winner,
-    playable: myTurn && me ? me.hand.filter((c) => canPlay(s, seat, c)).map((c) => c.id) : [],
-    canDraw: myTurn,
+    playable:
+      !myTurn || !me
+        ? []
+        : drawnCard
+          ? canPlay(s, seat, drawnCard)
+            ? [drawnCard.id]
+            : []
+          : me.hand.filter((c) => canPlay(s, seat, c)).map((c) => c.id),
+    canDraw: myTurn && drawn === null,
+    drawn,
+    canKeep: myTurn && drawn !== null,
     canReact: seat !== null && pending?.target === seat,
   };
 }

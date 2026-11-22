@@ -1,4 +1,4 @@
-// POST { matchId } → GameResponse   (also applies due bots / timeouts)
+// POST { matchId, resume? } → GameResponse   (also applies due bots / timeouts)
 import { requireUser } from "../_shared/auth.ts";
 import { withGame } from "../_shared/game.ts";
 import { handler, readJson } from "../_shared/http.ts";
@@ -8,6 +8,6 @@ Deno.serve(
   handler(async (request) => {
     const userId = await requireUser(request);
     const body = await readJson(request);
-    return withGame(userId, uuid(body, "matchId"), {});
+    return withGame(userId, uuid(body, "matchId"), { resume: body["resume"] === true });
   }),
 );

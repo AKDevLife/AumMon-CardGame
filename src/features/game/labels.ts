@@ -34,7 +34,7 @@ const ABILITY_LINE: Partial<Record<discard.AbilityId, string>> = {
   eraser: "ล้างกองกลาง",
   scissors: "ตัดไพ่ใบใต้",
   box: "เก็บไพ่ใบใต้ขึ้นมือ",
-  alarm: "สลับทิศ ทุกคนจั่ว 1",
+  alarm: "สลับทิศ คนถัดไปจั่ว 1",
   magnet: "ส่งไพ่ไปติดคนที่ไพ่น้อยสุด",
   peek: "แอบดูไพ่",
   ruler: "บังคับคนถัดไปลงแต้ม 5",
@@ -80,6 +80,8 @@ export function describeEvent(e: discard.GameEvent, names: Names): string | null
       return `${who(e.seat)} แอบดูไพ่ของ ${who(e.target)} 🔍`;
     case "game_over":
       return `จบเกม: ${who(e.winner)} ชนะ! 🏆`;
+    case "timeout":
+      return `⏱ ${who(e.seat)} หมดเวลา — ระบบเล่นแทน`;
   }
 }
 
@@ -103,6 +105,7 @@ export function bannerFor(
   for (const e of [...fresh].reverse()) {
     if (e.type === "game_over") return `🏆 ${who(e.winner)} ชนะ!`;
     if (me === null) continue;
+    if (e.type === "timeout" && e.seat === me) return "⏱ หมดเวลา — จั่วให้อัตโนมัติ";
     if (e.type === "skipped" && e.seat === me) return "🔒 คุณถูกข้ามเทิร์น";
     if (e.type === "umbrella" && e.seat === me) return "☂️ กางร่มกันสำเร็จ!";
     if (e.type === "card_given" && e.to === me) return `🧲 ${who(e.from)} ส่งไพ่มาติดคุณ`;

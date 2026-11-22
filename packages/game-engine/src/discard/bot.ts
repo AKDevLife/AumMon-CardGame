@@ -70,8 +70,17 @@ export function chooseBotCommand(s: GameState, me: Seat, rng: RandomSource): Com
   const playerId = s.players[me]?.playerId ?? "";
   if (s.reactions[0]?.target === me) return { type: "react", playerId, useUmbrella: true };
   const hand = s.players[me]?.hand ?? [];
-  const playable = hand.filter((c) => canPlay(s, me, c));
-  if (playable.length === 0) return { type: "draw", playerId };
+  const drawnId = s.drawn?.seat === me ? s.drawn.id : null;
+  // Draw Then Play: only the drawn card may follow; keep an Umbrella unless it is the last card.
+  const playable = hand.filter(
+    (c) =>
+      canPlay(s, me, c) &&
+      (drawnId === null ||
+        (c.id === drawnId &&
+          (getDiscardCard(c.cardId).ability !== "umbrella" || hand.length === 1))),
+  );
+  if (playable.length === 0)
+    return drawnId === null ? { type: "draw", playerId } : { type: "keep", playerId };
   // Shed low cards first, keep Umbrella / Eraser for answers; last card always goes.
   const score = (c: CardInstance) => {
     const a = getDiscardCard(c.cardId).ability;
@@ -81,7 +90,7 @@ export function chooseBotCommand(s: GameState, me: Seat, rng: RandomSource): Com
   const best = sorted[0];
   const tie = best ? sorted.filter((c) => score(c) === score(best)) : [];
   const card = tie[rng.nextInt(tie.length)];
-  if (!card) return { type: "draw", playerId };
+  if (!card) return drawnId === null ? { type: "draw", playerId } : { type: "keep", playerId };
   const choice = choiceFor(s, me, getDiscardCard(card.cardId).ability, card);
   const withAbility: Command = {
     type: "play",
