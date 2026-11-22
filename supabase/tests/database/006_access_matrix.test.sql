@@ -1,7 +1,7 @@
 -- Task 2.6 — access matrix (blueprint §4.4): User A, User B, non-member, anonymous, service_role.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(17);
+select plan(18);
 
 insert into auth.users (id, email) values
   ('00000000-0000-0000-0000-00000000a001', 'a@test.local'),
@@ -33,7 +33,7 @@ select ok(not public.is_room_member('10000000-0000-0000-0000-00000000b001'), 'A 
 select is((select count(*)::int from public.game_rooms where id = '10000000-0000-0000-0000-00000000b001'), 0, 'A cannot read B lobby');
 -- private schema: every table denied, even for own hand
 select throws_ok(format('select * from private.%I', t), '42501', null, 'A cannot read private.' || t)
-  from unnest(array['match_runtime','command_receipts']) t;
+  from unnest(array['match_runtime','command_receipts','round_stats']) t;
 select throws_ok($$insert into public.match_events (match_id, event_seq, round_number, event_type)
   values ('20000000-0000-0000-0000-00000000a001', 99, 1, 'fake')$$, '42501', null, 'A cannot forge events');
 select throws_ok($$update public.matches set phase = 'finished'$$, '42501', null, 'A cannot change match phase');

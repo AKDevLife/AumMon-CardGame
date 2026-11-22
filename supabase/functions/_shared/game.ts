@@ -3,7 +3,13 @@
  * timers) → command → advance → save, and per-seat views. Clients send intent only;
  * hands stay private (Magnifier peeks reach only the peeking seat).
  */
-import { createSeededRandom, discard, ENGINE_VERSION, type RngState } from "@aummon/game-engine";
+import {
+  createSeededRandom,
+  discard,
+  ENGINE_VERSION,
+  RULESET_VERSION,
+  type RngState,
+} from "@aummon/game-engine";
 import { db } from "./db.ts";
 import { HttpError } from "./http.ts";
 import { rateLimit } from "./ratelimit.ts";
@@ -137,6 +143,7 @@ async function saveGame(
     }));
     await tx`insert into public.match_events ${tx(rows as never)}`;
   }
+  await recordStats(tx, locked, state, events);
   if (finished) {
     const [room] = await tx<
       { room_id: string }[]
@@ -144,6 +151,37 @@ async function saveGame(
     if (room) await tx`update public.game_rooms set status = 'closed' where id = ${room.room_id}`;
   }
   return version;
+}
+
+// ---------------------------------------------------------------- telemetry (private, aggregate only)
+
+/** Adds this save's events to private.round_stats (task 12.16). */
+async function recordStats(
+  tx: Tx,
+  locked: Locked,
+  state: discard.GameState,
+  events: readonly discard.GameEvent[],
+): Promise<void> {
+  const abilities: Record<string, number> = {};
+  for (const e of events)
+    if (e.type === "ability") abilities[e.ability] = (abilities[e.ability] ?? 0) + 1;
+  const timeouts = events.filter((e) => e.type === "timeout").length;
+  const finished = state.status === "finished";
+  const winnerKind =
+    state.winner === null
+      ? null
+      : (locked.seats.find((x) => toEngine(x.seat) === state.winner)?.player_type ?? null);
+  await tx`
+    update private.round_stats set
+      turns = ${state.turnNumber},
+      timeouts = timeouts + ${timeouts},
+      abilities = abilities || coalesce((
+        select jsonb_object_agg(n.key, n.value::int + coalesce((round_stats.abilities ->> n.key)::int, 0))
+        from jsonb_each_text(${tx.json(abilities)}::jsonb) n), '{}'::jsonb),
+      finished_at = ${finished ? tx`now()` : null},
+      winner_seat = ${state.winner},
+      winner_kind = ${winnerKind}
+    where match_id = ${locked.matchId}`;
 }
 
 // ---------------------------------------------------------------- views
@@ -279,6 +317,17 @@ export async function withGame(
         throw e;
       }
       events.push(...t.events);
+      // Telemetry: decision time of this human action (from the start of the turn timer).
+      const startedAt =
+        rt.deadline === null ? null : rt.deadline - discard.DISCARD_RULES.turnTimeoutMs;
+      const drawnPlay =
+        rt.state.drawn?.seat === seat &&
+        t.events.some((e) => e.type === "played" && e.seat === seat);
+      await tx`
+        update private.round_stats set decisions = decisions + 1,
+          decision_ms = decision_ms + ${startedAt === null ? 0 : Math.max(0, Math.min(now - startedAt, 60_000))},
+          drawn_plays = drawn_plays + ${drawnPlay ? 1 : 0}
+        where match_id = ${locked.matchId}`;
       // Acting resets this seat's timeout streak (and ends auto-play).
       const timeouts = rt.timeouts.map((x, i) => (i === seat ? 0 : x));
       const after = advanceGame(
@@ -317,6 +366,7 @@ export async function rematch(userId: string, matchId: string): Promise<{ matchI
     const [existing] = await tx<{ id: string }[]>`
       select id from public.matches where room_id = ${locked.roomId} and status = 'active' limit 1`;
     if (existing) return { matchId: existing.id };
+    await tx`update private.round_stats set rematch = true where match_id = ${matchId}`;
     return { matchId: await startMatch(tx, locked.roomId) };
   });
 }
@@ -326,12 +376,14 @@ export async function leaveGame(userId: string, matchId: string): Promise<{ ok: 
   return db().begin(async (tx) => {
     const locked = await lockGame(tx, matchId, userId);
     if (locked.mode !== "online") {
+      await tx`update private.round_stats set left_early = left_early + 1 where match_id = ${matchId}`;
       await tx`update public.matches set status = 'abandoned', finished_at = now() where id = ${matchId} and status = 'active'`;
       await tx`update public.game_rooms set status = 'closed' where id = (select room_id from public.matches where id = ${matchId})`;
       return { ok: true };
     }
     const own = locked.seats.find((s) => s.user_id === userId);
     if (!own) throw new HttpError(404, "not_found", "Match not found");
+    await tx`update private.round_stats set left_early = left_early + 1 where match_id = ${matchId}`;
     await tx`update public.match_players set player_type = 'bot', status = 'left', user_id = null where id = ${own.id}`;
     if (own.room_player_id)
       await tx`update public.room_players set status = 'left' where id = ${own.room_player_id}`;
@@ -378,6 +430,14 @@ async function startMatch(tx: Tx, roomId: string): Promise<string> {
     public_payload: e,
   }));
   if (rows.length > 0) await tx`insert into public.match_events ${tx(rows as never)}`;
+  const [room] = await tx<
+    { mode: Mode }[]
+  >`select mode from public.game_rooms where id = ${roomId}`;
+  await tx`
+    insert into private.round_stats (match_id, ruleset_version, mode, players, humans, opening)
+    values (${match.id}, ${RULESET_VERSION}, ${room?.mode ?? "solo"}, ${seats.length},
+            ${seats.filter((x) => x.player_type === "human").length},
+            ${tx.json(state.players.map((p) => p.hand.map((c) => c.cardId)))})`;
   await tx`update public.game_rooms set status = 'playing' where id = ${roomId}`;
   return match.id;
 }

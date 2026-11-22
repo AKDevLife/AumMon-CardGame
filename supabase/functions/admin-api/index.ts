@@ -114,6 +114,83 @@ const actions: Record<string, Action> = {
     return { ok: true };
   },
 
+  /**
+   * Playtest stats (task 12.16, Playtest Protocol §4–§5): aggregates of private.round_stats for the
+   * current ruleset — no names, no user ids, no hands are returned.
+   */
+  stats: async () => {
+    const rows = await db()<
+      {
+        players: number;
+        humans: number;
+        seconds: number;
+        turns: number;
+        timeouts: number;
+        decisions: number;
+        decision_ms: string;
+        drawn_plays: number;
+        rematch: boolean;
+        left_early: number;
+        winner_seat: number | null;
+        opening: string[][];
+      }[]
+    >`
+      select players, humans, extract(epoch from (finished_at - started_at))::int as seconds,
+             turns, timeouts, decisions, decision_ms, drawn_plays, rematch, left_early,
+             winner_seat, opening
+      from private.round_stats
+      where ruleset_version = ${RULESET_VERSION} and finished_at is not null
+      order by started_at desc limit 2000`;
+    const median = (xs: number[]) => {
+      const s = [...xs].sort((a, b) => a - b);
+      return s.length === 0 ? null : (s[Math.floor(s.length / 2)] ?? null);
+    };
+    const byPlayers = [2, 3, 4, 5, 6, 7, 8].map((n) => {
+      const rs = rows.filter((r) => r.players === n);
+      const humanRounds = rs.reduce((a, r) => a + r.humans, 0);
+      return {
+        players: n,
+        rounds: rs.length,
+        medianMinutes: rs.length ? (median(rs.map((r) => r.seconds)) ?? 0) / 60 : null,
+        over15Pct: rs.length ? (rs.filter((r) => r.seconds > 900).length / rs.length) * 100 : null,
+        timeoutsPerHumanRound: humanRounds
+          ? rs.reduce((a, r) => a + r.timeouts, 0) / humanRounds
+          : null,
+        rematchPct: rs.length ? (rs.filter((r) => r.rematch).length / rs.length) * 100 : null,
+      };
+    });
+    const decisions = rows.reduce((a, r) => a + r.decisions, 0);
+    const cards = discard.DISCARD_CARDS.map((c) => {
+      let had = 0;
+      let won = 0;
+      let fair = 0;
+      for (const r of rows)
+        r.opening.forEach((hand, seat) => {
+          if (hand.includes(c.cardId)) {
+            had++;
+            fair += 1 / r.players;
+            if (r.winner_seat === seat) won++;
+          }
+        });
+      return { name: c.name, winIndex: fair > 0 ? won / fair : null, rounds: had };
+    });
+    return {
+      rulesetVersion: RULESET_VERSION,
+      rounds: rows.length,
+      byPlayers,
+      avgDecisionSeconds: decisions
+        ? rows.reduce((a, r) => a + Number(r.decision_ms), 0) / decisions / 1000
+        : null,
+      drawnPlaysPerRound: rows.length
+        ? rows.reduce((a, r) => a + r.drawn_plays, 0) / rows.length
+        : null,
+      leftEarlyPct: rows.length
+        ? (rows.filter((r) => r.left_early > 0).length / rows.length) * 100
+        : null,
+      cards,
+    };
+  },
+
   /** Card list from the engine data (cards are no longer stored in the database). */
   cards: () =>
     Promise.resolve({ cards: discard.DISCARD_CARDS, copies: discard.DISCARD_RULES.copies }),

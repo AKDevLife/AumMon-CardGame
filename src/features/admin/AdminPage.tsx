@@ -99,6 +99,7 @@ const ACTION: Record<SectionId, string> = {
   matches: "matches",
   bots: "settings",
   sounds: "sounds.get",
+  stats: "stats",
   logs: "logs.security",
   health: "health",
   settings: "settings",
@@ -326,6 +327,44 @@ export function AdminPage() {
             />
           </>
         );
+      case "stats": {
+        const num = (v: unknown, digits = 1) =>
+          typeof v === "number"
+            ? v.toLocaleString("th-TH", { maximumFractionDigits: digits })
+            : "—";
+        return (
+          <>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              <Stat title="รอบที่จบ (กติกาชุดนี้)" value={text(field(data, "rounds"))} />
+              <Stat title="เวลาคิดเฉลี่ย (วินาที)" value={num(field(data, "avgDecisionSeconds"))} />
+              <Stat title="ลงใบที่จั่ว / รอบ" value={num(field(data, "drawnPlaysPerRound"))} />
+              <Stat title="รอบที่มีคนออกกลางคัน" value={`${num(field(data, "leftEarlyPct"), 0)}%`} />
+            </div>
+            <Section title="ตามจำนวนผู้เล่น (เป้า: 5–10 นาที, เกิน 15 นาที ≤ 10%)">
+              <RowList
+                rows={asRows(field(data, "byPlayers"))}
+                title={(r) => `${text(r["players"])} คน · ${text(r["rounds"])} รอบ`}
+                columns={[
+                  { label: "เวลากลาง (นาที)", value: (r) => num(r["medianMinutes"]) },
+                  { label: "เกิน 15 นาที", value: (r) => `${num(r["over15Pct"], 0)}%` },
+                  { label: "หมดเวลา/คน/รอบ", value: (r) => num(r["timeoutsPerHumanRound"], 2) },
+                  { label: "เล่นอีกรอบ", value: (r) => `${num(r["rematchPct"], 0)}%` },
+                ]}
+              />
+            </Section>
+            <Section title="ความแรงของการ์ด (1.00 = ยุติธรรม; เกิน 1.35 หรือต่ำกว่า 0.75 ควรดู)">
+              <RowList
+                rows={asRows(field(data, "cards"))}
+                title={(r) => text(r["name"])}
+                columns={[
+                  { label: "ดัชนีชนะ", value: (r) => num(r["winIndex"], 2) },
+                  { label: "จำนวนครั้งในมือเริ่ม", value: (r) => text(r["rounds"]) },
+                ]}
+              />
+            </Section>
+          </>
+        );
+      }
       case "cards":
         return (
           <>
@@ -566,7 +605,7 @@ export function AdminPage() {
               title="สภาพแวดล้อม"
               value={<span className="text-xl">{label("env", field(data, "env"))}</span>}
             />
-            <Stat title="กติกาชุดที่" value={text(field(data, "rulesetVersion"))} note="1v1 TCG" />
+            <Stat title="กติกาชุดที่" value={text(field(data, "rulesetVersion"))} note="Quick Match" />
             <Stat
               title="เวอร์ชันระบบเกม"
               value={<span className="text-xl">{text(field(data, "engineVersion"))}</span>}

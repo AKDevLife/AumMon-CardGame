@@ -40,7 +40,7 @@ Browser (React)  ──intent──▶  Edge Functions (Deno)  ──▶  Postgr
 | Schema | Tables |
 | --- | --- |
 | `public` (RLS on every table) | `profiles`, `game_rooms` (max_players 2–8), `room_players` (seats 1–8), `matches` (phase `play`/`reaction`/`finished`, ruleset `7`), `match_players` (seat, player_type, `hand_count`, status `playing`/`won`/`left`), `match_events`, `game_settings` |
-| `private` (never exposed by the API) | `match_runtime` (engine state, RNG, deadlines, resolve lease), `command_receipts` (idempotency), `rate_limits`, `function_metrics`, `admin_roles`, `admin_audit_log` |
+| `private` (never exposed by the API) | `match_runtime` (engine state, RNG, deadlines, resolve lease), `command_receipts` (idempotency), `round_stats` (playtest telemetry, aggregates only), `rate_limits`, `function_metrics`, `admin_roles`, `admin_audit_log` |
 
 - Migrations are append-only (`supabase/migrations/`); `20261122000100_discard_cutover.sql` removed the TCG tables and data.
 - Members read their own room and match rows only; all writes go through Edge Functions with the service role.
