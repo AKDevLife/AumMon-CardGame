@@ -21,6 +21,7 @@ interface Tcg {
   view: {
     status: string;
     myHand: { instanceId: string; cardId: string }[];
+    firstSeat: number;
     players: { hp: number; handCount: number }[];
     result: unknown;
   };
