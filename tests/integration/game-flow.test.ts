@@ -23,7 +23,7 @@ describe("discard server flow", () => {
     let rt = runtime(4);
     let now = 0;
     for (let i = 0; i < 200 && rt.state.status === "active"; i++) {
-      const out = advanceGame(rt, kinds, "solo", now);
+      const out = advanceGame(rt, kinds, now);
       const seat = actingSeat(out.state);
       if (seat !== null && kinds[seat] === "bot") expect(out.deadline).toBe(now + BOT_STEP_MS);
       if (seat === 0 && out.state.reactions.length === 0)
@@ -36,13 +36,8 @@ describe("discard server flow", () => {
 
   it("nothing happens before a bot's step time", () => {
     const kinds: Kind[] = ["bot", "bot"];
-    const first = advanceGame(runtime(2), kinds, "solo", 0);
+    const first = advanceGame(runtime(2), kinds, 0);
     if (first.state.status === "active" && first.deadline !== null)
-      expect(advanceGame(first, kinds, "solo", first.deadline - 1).events).toEqual([]);
-  });
-
-  it("pass & play has no timer", () => {
-    const out = advanceGame(runtime(3), ["local", "local", "local"], "pass_play", 0);
-    expect(out.deadline).toBeNull();
+      expect(advanceGame(first, kinds, first.deadline - 1).events).toEqual([]);
   });
 });

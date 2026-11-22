@@ -19,13 +19,13 @@ Browser (React)  ──intent──▶  Edge Functions (Deno)  ──▶  Postgr
 - **Server-authoritative:** clients send `play {card, useAbility, choice}`, `draw` or `react {useUmbrella}` plus an idempotency key. The server validates seat, turn and phase, runs the engine, stores the state and events.
 - **Flow** (`supabase/functions/_shared/game-flow.ts`): after each command the server runs bots one step at a time (`BOT_STEP_MS` 700) and applies timeouts — turn 45 s → auto-draw, reaction 8 s → decline.
 - **Privacy:** `game-view` returns only the caller's hand, counts for others, and peek cards only to the peeking seat. Stored and broadcast events never contain private cards.
-- **Modes:** Solo (1 human + 1–7 bots), Pass & Play (2–8 local seats; privacy by hand-off screen on one device), Online (room code, 2–8 seats, ready → `game-start`; leaving online seats become bots).
+- **Modes:** Solo (1 human + 1–7 bots), Online (room code, 2–8 seats, ready → `game-start`; leaving online seats become bots).
 
 ## 3. Edge Functions
 
 | Function | Purpose |
 | --- | --- |
-| `game-create` | Solo / Pass & Play match |
+| `game-create` | Solo match (1–7 bots) |
 | `game-start` | Start an online room's match (owner, all ready) |
 | `game-view` | Per-seat view (+ advance due bots/timeouts) |
 | `game-command` | Play / draw / react intent |
@@ -61,6 +61,6 @@ Browser (React)  ──intent──▶  Edge Functions (Deno)  ──▶  Postgr
 | Architecture | `tests/architecture` | engine isolation |
 | Integration / backend | `tests/integration`, `tests/backend` | game flow, timeouts, bots, privacy of views, online rooms, admin, account deletion |
 | Database | `supabase/tests/database` (pgTAP) | schema, constraints, RLS, access matrix, account deletion |
-| UI / E2E | `tests/e2e` (Playwright) | Solo, Pass & Play, Online flows; accessibility |
+| UI / E2E | `tests/e2e` (Playwright) | Solo, Online flows; accessibility |
 
 Gate: `pnpm check` locally + CI on the pull request (CI also runs pgTAP and E2E).

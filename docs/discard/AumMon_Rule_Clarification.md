@@ -15,6 +15,7 @@
 | DC4 | **Magnet and Hourglass redesigned** as proposed in §3.                                                                                                                           |
 | DC5 | **Eraser may be played on any card.**                                                                                                                                            |
 | DC6 | The 1v1 TCG is removed once the new game works; the new game keeps **Solo vs Bots (1–7 bots), Pass & Play and Online**.                                                          |
+| DC8 | **Pass & Play removed** (owner 2026-11-22): Online already covers playing with friends. Modes: Solo vs Bots and Online.                                                          |
 | DC7 | **VIP + gacha:** designed now, built later — after the core game, a legal check of payments / loot boxes and owner approval. 5–8 player rooms are free to test on Dev meanwhile. |
 
 Rules text: `AumMon_Core_Rules.md`; cards: `AumMon_Card_Library.md`.

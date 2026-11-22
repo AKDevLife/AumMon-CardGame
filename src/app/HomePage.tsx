@@ -9,7 +9,6 @@ import { RulesText } from "../features/game/RulesText.tsx";
 
 const MODES = [
   { id: "solo", label: "Solo vs Bot" },
-  { id: "pass_play", label: "Pass & Play" },
   { id: "online", label: "Online" },
 ] as const;
 
@@ -33,7 +32,7 @@ export function HomePage() {
         <h1 className="relative font-display text-5xl font-bold tracking-wide text-am-title">
           AumMon
         </h1>
-        <p className="relative mt-2">การ์ดเกมดวล 1 ต่อ 1 · สิ่งของรอบตัวมีชีวิต</p>
+        <p className="relative mt-2">เกมไพ่ทิ้งให้หมดมือ 2–8 คน · สิ่งของรอบตัวมีชีวิต</p>
       </section>
 
       <nav aria-label="Game modes" className="flex flex-col gap-4">
@@ -41,13 +40,7 @@ export function HomePage() {
           signedIn ? (
             <Link
               key={mode.id}
-              to={
-                mode.id === "solo"
-                  ? "/play/solo"
-                  : mode.id === "pass_play"
-                    ? "/play/pass"
-                    : "/play/online"
-              }
+              to={mode.id === "solo" ? "/play/solo" : "/play/online"}
               className="am-sticker am-pressable flex min-h-14 items-center justify-center bg-am-title px-6 py-3 font-display text-lg font-semibold text-am-text hover:bg-am-hover"
             >
               {mode.label}

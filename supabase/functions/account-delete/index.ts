@@ -20,11 +20,11 @@ Deno.serve(
       join public.game_rooms r on r.id = m.room_id
       where mp.user_id = ${userId} and m.status = 'active' and r.mode = 'online'`;
     for (const { match_id } of seats) await leaveGame(userId, match_id);
-    // 2. Pass & Play matches the user hosted cannot continue without the device owner.
+    // 2. Solo matches the user hosted end with them.
     await db()`
       update public.matches m set status = 'abandoned', finished_at = now()
       from public.game_rooms r
-      where r.id = m.room_id and r.owner_id = ${userId} and r.mode = 'pass_play' and m.status = 'active'`;
+      where r.id = m.room_id and r.owner_id = ${userId} and r.mode <> 'online' and m.status = 'active'`;
     await db()`update public.game_rooms set status = 'closed' where owner_id = ${userId} and status <> 'closed'`;
 
     // 3. Delete the auth user (service role, server only). Cascades/anonymizes via FKs + trigger.

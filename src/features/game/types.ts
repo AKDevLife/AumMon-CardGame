@@ -4,7 +4,7 @@ import type { discard } from "@aummon/game-engine";
 export interface GameResponse {
   matchId: string;
   rulesetVersion: "7";
-  mode: "solo" | "pass_play" | "online";
+  mode: "solo" | "online";
   version: number;
   deadline: string | null;
   seat: number | null;

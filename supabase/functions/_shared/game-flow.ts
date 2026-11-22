@@ -1,8 +1,8 @@
 /** Discard Edition match flow (no I/O): paced server bots + turn / reaction timers. `now` is injected. */
 import { createSeededRandom, discard, type RngState } from "@aummon/game-engine";
 
-export type Kind = "human" | "bot" | "local";
-export type Mode = "solo" | "pass_play" | "online";
+export type Kind = "human" | "bot";
+export type Mode = "solo" | "online";
 
 export interface GameRuntime {
   state: discard.GameState;
@@ -19,7 +19,6 @@ export const actingSeat = (s: discard.GameState): number | null => discard.actin
 export function advanceGame(
   input: GameRuntime,
   kinds: readonly Kind[],
-  mode: Mode,
   now: number,
 ): GameRuntime & { events: discard.GameEvent[] } {
   const rng = createSeededRandom(input.rng);
@@ -57,7 +56,7 @@ export function advanceGame(
       break;
     }
   }
-  if (deadline === null && mode !== "pass_play" && state.status === "active") {
+  if (deadline === null && state.status === "active") {
     const seat = actingSeat(state);
     if (seat !== null && kinds[seat] === "human")
       deadline =

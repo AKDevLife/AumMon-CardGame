@@ -7,27 +7,27 @@ insert into auth.users (id, email) values
   ('00000000-0000-0000-0000-00000000a001', 'a@test.local'),
   ('00000000-0000-0000-0000-00000000b001', 'b@test.local'),
   ('00000000-0000-0000-0000-00000000c001', 'c@test.local');
--- A: pass & play room with local seats + match. B: online lobby (no match yet) that A has not joined.
+-- A: solo room (A + bot) + match. B: online lobby (no match yet) that A has not joined.
 insert into public.game_rooms (id, owner_id, mode) values
-  ('10000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-00000000a001', 'pass_play'),
+  ('10000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-00000000a001', 'solo'),
   ('10000000-0000-0000-0000-00000000b001', '00000000-0000-0000-0000-00000000b001', 'online');
 insert into public.room_players (room_id, user_id, seat, player_type, display_name_snapshot) values
-  ('10000000-0000-0000-0000-00000000a001', null, 1, 'local', 'P1'),
-  ('10000000-0000-0000-0000-00000000a001', null, 2, 'local', 'P2'),
+  ('10000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-00000000a001', 1, 'human', 'A'),
+  ('10000000-0000-0000-0000-00000000a001', null, 2, 'bot', 'Bot 1'),
   ('10000000-0000-0000-0000-00000000b001', '00000000-0000-0000-0000-00000000b001', 1, 'human', 'B');
 insert into public.matches (id, room_id, engine_version, ruleset_version) values
   ('20000000-0000-0000-0000-00000000a001', '10000000-0000-0000-0000-00000000a001', '1.0.0', '7');
-insert into public.match_players (id, match_id, seat, player_type, hand_count) values
-  ('30000000-0000-0000-0000-00000000a001', '20000000-0000-0000-0000-00000000a001', 1, 'local', 7),
-  ('30000000-0000-0000-0000-00000000a002', '20000000-0000-0000-0000-00000000a001', 2, 'local', 7);
+insert into public.match_players (id, match_id, user_id, seat, player_type, hand_count) values
+  ('30000000-0000-0000-0000-00000000a001', '20000000-0000-0000-0000-00000000a001', '00000000-0000-0000-0000-00000000a001', 1, 'human', 7),
+  ('30000000-0000-0000-0000-00000000a002', '20000000-0000-0000-0000-00000000a001', null, 2, 'bot', 7);
 insert into private.match_runtime (match_id, rng_state) values ('20000000-0000-0000-0000-00000000a001', '\x00');
 
--- ---------- User A (pass & play owner)
+-- ---------- User A (solo owner)
 set local role authenticated;
 select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-00000000a001","role":"authenticated"}', true),
        set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-00000000a001', true);
-select is((select count(*)::int from public.matches), 1, 'owner sees pass & play match');
-select is((select count(*)::int from public.match_players), 2, 'owner sees local seats in match');
+select is((select count(*)::int from public.matches), 1, 'owner sees solo match');
+select is((select count(*)::int from public.match_players), 2, 'owner sees all seats in match');
 select is((select count(*)::int from public.room_players), 2, 'owner sees own room seats only');
 select ok(not public.is_room_member('10000000-0000-0000-0000-00000000b001'), 'A is not a member of B lobby');
 select is((select count(*)::int from public.game_rooms where id = '10000000-0000-0000-0000-00000000b001'), 0, 'A cannot read B lobby');
@@ -45,7 +45,7 @@ select set_config('request.jwt.claims', '{"sub":"00000000-0000-0000-0000-0000000
        set_config('request.jwt.claim.sub', '00000000-0000-0000-0000-00000000b001', true);
 select is((select count(*)::int from public.game_rooms), 1, 'B reads own lobby');
 select is((select count(*)::int from public.room_players), 1, 'B reads own lobby seats only');
-select is((select count(*)::int from public.matches), 0, 'B cannot read A pass & play match');
+select is((select count(*)::int from public.matches), 0, 'B cannot read A solo match');
 select ok(not public.is_match_member('20000000-0000-0000-0000-00000000a001'), 'B is not a member of A match');
 reset role;
 

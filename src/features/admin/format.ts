@@ -23,7 +23,7 @@ export function ago(v: unknown): string {
 const MAPS: Record<string, Record<string, string>> = {
   roomStatus: { lobby: "รอผู้เล่น", playing: "กำลังเล่น", closed: "ปิดแล้ว" },
   matchStatus: { active: "กำลังเล่น", finished: "จบแล้ว", abandoned: "ถูกยุติ", created: "กำลังเริ่ม" },
-  mode: { solo: "เล่นกับ Bot", pass_play: "เครื่องเดียวกัน", online: "ออนไลน์" },
+  mode: { solo: "เล่นกับ Bot", online: "ออนไลน์" },
   phase: { mulligan: "เลือกเปลี่ยนการ์ด", main: "เทิร์นของผู้เล่น", battle: "ช่วงต่อสู้" },
   seatType: { human: "ผู้เล่น", bot: "Bot", local: "ผู้เล่นในเครื่อง" },
   cardType: {

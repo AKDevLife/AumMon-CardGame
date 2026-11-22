@@ -6,7 +6,7 @@
 ## 1. Platform decisions (LOCKED)
 
 - Web game (mobile first), Thai UI, theme "Everyday Objects".
-- Modes: **Solo** vs 1–7 server bots · **Pass & Play** (2–8 names on one device) · **Online** rooms (2–8 seats; a leaving player is replaced by a bot).
+- Modes (Pass & Play removed by the owner 2026-11-22, DC8): **Solo** vs 1–7 server bots · **Online** rooms (2–8 seats; a leaving player is replaced by a bot).
 - Server-authoritative; clients send intent only. Hands and peeks are private to their seat.
 - Accounts, profiles, admin, sound and music settings are shared platform features.
 - VIP and cosmetic gacha: designed later; nothing paid is built before a legal check and owner approval (DC7).

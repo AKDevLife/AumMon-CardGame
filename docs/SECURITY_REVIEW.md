@@ -24,6 +24,6 @@ Date: 2026-11-20 · Scope: Dev (`AumMon-Dev`) + Vercel Preview · Reviewer: Clau
 
 1. **Email confirmation** is OFF on `AumMon-Dev` for playtesting (owner-approved); production must keep it ON with a real SMTP provider.
 2. **Vercel Authentication** is OFF for previews (owner choice); production URL decision pending.
-3. **Pass & Play** privacy is UI-only on a shared device (documented, shown to users).
+3. ~~Pass & Play privacy on a shared device~~ — mode removed 2026-11-22 (task 12.10).
 4. **Timeouts are lazy** (applied on the next request); a fully idle online match pauses until someone reconnects — acceptable, not a security issue.
 5. Production project, secrets rotation and backups are covered by 6.8 / 7.3.

@@ -1,4 +1,4 @@
-// POST { matchId } → { ok }   Online: a bot takes your seat. Solo / Pass & Play: the match ends.
+// POST { matchId } → { ok }   Online: a bot takes your seat. Solo: the match ends.
 import { requireUser } from "../_shared/auth.ts";
 import { leaveGame } from "../_shared/game.ts";
 import { handler, readJson } from "../_shared/http.ts";
