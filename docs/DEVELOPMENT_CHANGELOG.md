@@ -2,6 +2,12 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-22 — 12.11 Quick Match analysis (proposal, no rule change)
+
+- `tests/integration/quick-match-sim.test.ts`: simulation harness on the real engine with 4 player profiles, hand-size / Draw Then Play / timer / Alarm variants and a time model; CI smoke, full run by env. 112,000 games (8 configs × 2–8 players × 2,000) + 32,000-game ability ablation.
+- Docs in `docs/discard/`: Game Duration Analysis, Simulation Report, Game Balance Impact, Quick Match Rules (proposed ruleset "8"), Quick Match Proposal (QM1–QM6), Game Test Plan; links from spec, Core Rules, Card Library, Card Balance, Master Handoff.
+- Recommendation E: 5 / 4 cards, Draw Then Play, 20 s turn, 5 s Umbrella, Alarm Clock next-only. Estimated (model) median 1.8–5.8 min, p90 3.4–16.6 min at 2–8 players; needs owner approval + playtest.
+
 ## 2026-11-22 — 12.9 Gameplay screen redesign (mobile)
 
 - `GamePage.tsx` + new `TableParts.tsx` (header, opponents, center table, win overlay), `CardView.tsx` (points colors, sizes sm/md/lg, playable/selected/disabled states), `labels.ts` `bannerFor`, `index.css` gameplay tokens + animations (reduced-motion safe). Opponents fit 1–7 in max 2 rows; table shows rule/effect chips and last action; tapping any card opens an enlarged preview (play controls only when playable, otherwise the reason); draw button moves to the thumb zone and becomes the main action when nothing is playable; banners for skips / effects on you / your turn; landing, deal, turn-glow and win animations. UI only — no rule, engine or backend change.

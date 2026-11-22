@@ -1,6 +1,6 @@
 # AumMon — Everyday Objects Battle · Casual Discard Edition — Core Rules
 
-> Status: **Approved direction (owner 2026-11-22, DC1–DC7)** · provisional until playtest. Decisions and reasoning: `AumMon_Rule_Clarification.md`. Cards: `AumMon_Card_Library.md`.
+> Status: **Approved direction (owner 2026-11-22, DC1–DC8)** · provisional until playtest. Quick Match changes (ruleset "8") are a **proposal** in `AumMon_Quick_Match_Rules.md` until the owner approves them. Decisions and reasoning: `AumMon_Rule_Clarification.md`. Cards: `AumMon_Card_Library.md`.
 > Rulings marked _(proposed)_ are small clarifications by Claude — the owner may change them at any time.
 
 ## 1. Goal
