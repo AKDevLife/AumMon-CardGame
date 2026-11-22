@@ -194,7 +194,7 @@ Owner-approved direction 2026-11-21 (R3 in `docs/rule-clarifications.md`, rules 
 Owner brief: shedding-type card game for 2–8 players with the 16 Everyday Objects. Docs in `docs/discard/`; decisions DC1–DC7 in `docs/discard/AumMon_Rule_Clarification.md`. Login, profiles, UI kit, sounds and admin stay.
 
 - [x] **12.1** Phase 1 audit (simulation: base rule stalls — 0.1–5 % of games finish; pile reset → ~100 %) + owner decisions DC1–DC7 + Core Rules + Card Library — deps: 11.9 — PR #88 (2026-11-22)
-- [ ] **12.2** Engine prototype (pure TS, data-driven cards, reactions) + simulation 2–8 players, balance report `AumMon_Card_Balance.md` — deps: 12.1
+- [x] **12.2** Engine prototype (pure TS, data-driven cards, reactions) + simulation 2–8 players, balance report `AumMon_Card_Balance.md` — deps: 12.1 — PR #89 (2026-11-22)
 - [ ] **12.3** Architecture, database schema and test plan docs for 2–8 player rooms — deps: 12.2
 - [ ] **12.4** Backend: N-player rooms (2–8), turn direction, reactions, private reveals, bots, timers — deps: 12.3
 - [ ] **12.5** UI: table for 2–8 players, discard pile, hand, reactions, reveals, rules + card gallery, sounds — deps: 12.4

@@ -1,0 +1,200 @@
+import { describe, expect, it } from "vitest";
+import { createSeededRandom } from "../src/rng/seeded-random.ts";
+import {
+  actingSeat,
+  applyCommand,
+  chooseBotCommand,
+  CommandError,
+  DISCARD_CARDS,
+  getView,
+  startGame,
+  type Command,
+  type GameState,
+} from "../src/discard/index.ts";
+
+const rng = () => createSeededRandom([3, 1, 4, 1]);
+let uid = 0;
+const card = (cardId: string) => ({ id: `t${String(uid++)}`, cardId });
+
+/** 3 players, p0 to act, top card `top`; hands given as card ids. */
+function table(top: string, hands: string[][]): GameState {
+  const { state } = startGame(["p0", "p1", "p2"], rng());
+  state.players.forEach((p, i) => (p.hand = (hands[i] ?? []).map(card)));
+  state.pile = [card(top)];
+  state.drawPile = Array.from({ length: 20 }, () => card("D01"));
+  state.current = 0;
+  state.open = false;
+  return state;
+}
+const id = (s: GameState, seat: number, cardId: string) =>
+  s.players[seat]?.hand.find((c) => c.cardId === cardId)?.id ?? "";
+const run = (s: GameState, c: Command) => applyCommand(s, c, rng());
+const err = (f: () => unknown) => {
+  try {
+    f();
+  } catch (e) {
+    if (e instanceof CommandError) return e.code;
+    throw e;
+  }
+  return "none";
+};
+const play = (s: GameState, seat: number, cardId: string, useAbility = false, choice = {}) =>
+  run(s, {
+    type: "play",
+    playerId: `p${String(seat)}`,
+    card: id(s, seat, cardId),
+    useAbility,
+    choice,
+  });
+
+describe("discard edition — core rules", () => {
+  it("deals 7 (2–4 players) / 5 (5–8), 64-card deck, starts on a normal card", () => {
+    const four = startGame(["a", "b", "c", "d"], rng()).state;
+    expect(four.players.every((p) => p.hand.length === 7)).toBe(true);
+    const eight = startGame(["a", "b", "c", "d", "e", "f", "g", "h"], rng()).state;
+    expect(eight.players.every((p) => p.hand.length === 5)).toBe(true);
+    expect(eight.drawPile.length + eight.pile.length + 40).toBe(64);
+    expect(DISCARD_CARDS).toHaveLength(16);
+  });
+
+  it("plays only cards with points ≥ the top; Eraser is wild", () => {
+    const s = table("D09", [["D01", "D13", "D03"], ["D02"], ["D02"]]);
+    expect(err(() => play(s, 0, "D01"))).toBe("cannot_play");
+    expect(play(s, 0, "D13").state.current).toBe(1);
+    expect(play(s, 0, "D03").state.pile.at(-1)?.cardId).toBe("D03");
+  });
+
+  it("pile resets after everyone else passes (DC1)", () => {
+    let s = table("D01", [["D16", "D01"], ["D02"], ["D02"]]);
+    s = play(s, 0, "D16").state; // 8 on top
+    s = run(s, { type: "draw", playerId: "p1" }).state;
+    const t = run(s, { type: "draw", playerId: "p2" });
+    expect(t.events.some((e) => e.type === "pile_reset")).toBe(true);
+    expect(t.state.current).toBe(0);
+    expect(play(t.state, 0, "D01").state.players[0]?.hand).toHaveLength(0);
+  });
+
+  it("first empty hand wins", () => {
+    const s = table("D01", [["D02"], ["D02"], ["D02"]]);
+    const t = play(s, 0, "D02");
+    expect(t.state.status).toBe("finished");
+    expect(t.state.winner).toBe(0);
+  });
+});
+
+describe("discard edition — abilities", () => {
+  it("Rubber Band makes the next player draw; Umbrella can cancel it (DC3)", () => {
+    const s = table("D01", [["D01", "D02"], ["D04"], ["D04"]]);
+    const t = play(s, 0, "D01", true);
+    expect(t.state.players[1]?.hand).toHaveLength(2);
+    const u = table("D01", [["D01", "D02"], ["D16", "D04"], ["D04"]]);
+    const w = play(u, 0, "D01", true);
+    expect(actingSeat(w.state)).toBe(1);
+    expect(getView(w.state, 1).canReact).toBe(true);
+    const r = run(w.state, { type: "react", playerId: "p1", useUmbrella: true });
+    expect(r.state.players[1]?.hand).toHaveLength(1);
+    expect(r.state.pile.at(-1)?.cardId).toBe("D16");
+  });
+
+  it("Key skips the next player; Alarm reverses and makes everyone else draw", () => {
+    const s = table("D01", [["D13", "D02"], ["D04"], ["D04"]]);
+    expect(play(s, 0, "D13", true).state.current).toBe(2);
+    const a = play(table("D01", [["D06", "D02"], ["D04"], ["D04"]]), 0, "D06", true).state;
+    expect(a.direction).toBe(-1);
+    expect(a.players[1]?.hand).toHaveLength(2);
+    expect(a.current).toBe(2);
+  });
+
+  it("Glue and Ruler restrict the next play; Eraser answers them", () => {
+    const g = play(table("D01", [["D02", "D01"], ["D02", "D05"], ["D04"]]), 0, "D02", true, {
+      target: 1,
+    }).state;
+    expect(err(() => play(g, 1, "D02"))).toBe("cannot_play");
+    const r = play(table("D01", [["D09", "D01"], ["D13", "D03"], ["D04"]]), 0, "D09", true).state;
+    expect(err(() => play(r, 1, "D13"))).toBe("cannot_play");
+    expect(play(r, 1, "D03").state.current).toBe(2);
+  });
+
+  it("Tape sheds a pair; Scissors removes the card under and plays one more", () => {
+    const s = table("D01", [["D10", "D02", "D02", "D01"], ["D04"], ["D04"]]);
+    const hand = s.players[0]?.hand ?? [];
+    const twos = hand.filter((c) => c.cardId === "D02").map((c) => c.id);
+    const tape = run(s, {
+      type: "play",
+      playerId: "p0",
+      card: id(s, 0, "D10"),
+      useAbility: true,
+      choice: { pair: [twos[0] ?? "", twos[1] ?? ""] },
+    }).state;
+    expect(tape.players[0]?.hand).toHaveLength(1);
+    const sc = table("D02", [["D04", "D06", "D01"], ["D04"], ["D04"]]);
+    const cut = play(sc, 0, "D04", true, { card: id(sc, 0, "D06") }).state;
+    expect(cut.removed.map((c) => c.cardId)).toEqual(["D02"]);
+    expect(cut.players[0]?.hand).toHaveLength(1);
+  });
+
+  it("Box, Magnet and Trash move cards; Magnifier reveals privately", () => {
+    const b = table("D02", [["D05", "D01", "D13"], ["D04", "D04"], ["D04"]]);
+    const box = play(b, 0, "D05", true, { card: id(b, 0, "D01") }).state;
+    expect(box.pile.at(-1)?.cardId).toBe("D01");
+    expect(box.players[0]?.hand.map((c) => c.cardId).sort()).toEqual(["D02", "D13"]);
+    const m = table("D01", [["D07", "D01", "D13"], ["D04", "D04"], ["D04"]]);
+    const mag = play(m, 0, "D07", true, { card: id(m, 0, "D01") }).state;
+    expect(mag.players[2]?.hand).toHaveLength(2);
+    const tr = table("D11", [["D11", "D02"], ["D04"], ["D04"]]);
+    expect(
+      play(tr, 0, "D11", true, { card: id(tr, 0, "D02") }).state.players[0]?.hand,
+    ).toHaveLength(1);
+    const pk = play(table("D01", [["D08", "D01"], ["D04", "D13"], ["D04"]]), 0, "D08", true, {
+      target: 1,
+    });
+    const peek = pk.events.find((e) => e.type === "peek");
+    expect(peek && "private" in peek && peek.cards.length).toBe(2);
+  });
+
+  it("Hourglass repeats the ability of the card under it", () => {
+    let s = table("D01", [
+      ["D01", "D15", "D02"],
+      ["D04", "D04"],
+      ["D04", "D04"],
+    ]);
+    s = play(s, 0, "D01").state;
+    s = run(s, { type: "draw", playerId: "p1" }).state;
+    s = run(s, { type: "draw", playerId: "p2" }).state; // reset → p0 again
+    const t = play(s, 0, "D15", true);
+    expect(t.events.flatMap((e) => (e.type === "ability" ? [e.ability] : []))).toContain(
+      "next_draw",
+    );
+  });
+});
+
+describe("discard edition — simulation", () => {
+  it("bot games always finish for 2–8 players and keep 64 cards", () => {
+    for (const n of [2, 3, 4, 5, 6, 7, 8])
+      for (let g = 1; g <= 40; g++) {
+        const r = createSeededRandom([g, n, 5, 9]);
+        let { state: s } = startGame(
+          Array.from({ length: n }, (_, i) => `p${String(i)}`),
+          r,
+        );
+        for (let k = 0; s.status === "active"; k++) {
+          if (k > 3000) throw new Error("did not finish");
+          const seat = actingSeat(s) ?? 0;
+          s = applyCommand(s, chooseBotCommand(s, seat, r), r).state;
+          const total =
+            s.players.reduce((a, p) => a + p.hand.length, 0) +
+            s.drawPile.length +
+            s.pile.length +
+            s.removed.length;
+          expect(total).toBe(64);
+        }
+        expect(s.winner).not.toBeNull();
+      }
+  });
+
+  it("views never contain other players' hands", () => {
+    const { state } = startGame(["a", "b", "c"], rng());
+    const json = JSON.stringify(getView(state, 0));
+    for (const c of state.players[1]?.hand ?? []) expect(json).not.toContain(`"${c.id}"`);
+  });
+});
