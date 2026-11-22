@@ -2,6 +2,11 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-22 — 12.14 Ruleset "9" balance pack (owner approved Q1–Q4)
+
+- Engine 3.0.0 / ruleset "9": กุญแจ 6 points, ร่ม 7 points, ถังขยะ removes 1 card without redraw (can win), ไฟฉาย reveal 3 s (UI). Migration `20261122000400_ruleset9_balance.sql` (rulesets 7–9, default 9; active ruleset 8 matches ended). Docs: Card Library, Core Rules, DC10, spec v10.0.
+- Q2 simulation: Magnifier "peek + play 1 more" → Magnifier 0.75 → 0.89 win index (recommend); Box "put 1 card on the pile" overshoots at 6–8 players (1.28) — owner decision in 12.17.
+
 ## 2026-11-22 — 12.13 Quality 9–10 audit (proposals, no rule change)
 
 - Simulation harness: new metrics (cards played, forced draws, skips, hits on one player, "hopeless" losers, win by turn position, ability use and win index per card) and proposal emulation (card points, Trash without redraw). 14,000 baseline rounds + 32,000 ablation + 4 × 14,000 proposal rounds.

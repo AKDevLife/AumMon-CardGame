@@ -1,6 +1,6 @@
 # AumMon — Casual Discard Edition · Card Library (16 Objects × 4 copies)
 
-> Status: approved — ruleset "8" (owner 2026-11-22: DC3 Umbrella reaction, DC4 Magnet/Hourglass redesign, DC5 Eraser wild, QM5 Alarm next-only). Balance numbers come in Phase 3 (`AumMon_Card_Balance.md`). Abilities are optional after playing (Core Rules §4).
+> Status: approved — ruleset "9" (balance pack Q1: Key 6, Umbrella 7, Trash no redraw; Q4 Flashlight 3 s) — earlier: ruleset "8" (owner 2026-11-22: DC3 Umbrella reaction, DC4 Magnet/Hourglass redesign, DC5 Eraser wild, QM5 Alarm next-only). Balance numbers come in Phase 3 (`AumMon_Card_Balance.md`). Abilities are optional after playing (Core Rules §4).
 
 | ID  | Card       | Pts | Ability (Thai text)                                                                 | Target                 | Duration        | Rule notes                                        | Last card? |
 | --- | ---------- | --: | ----------------------------------------------------------------------------------- | ---------------------- | --------------- | ------------------------------------------------- | ---------- |
@@ -14,12 +14,12 @@
 | D08 | แว่นขยาย    |   2 | **ส่อง:** เลือกผู้เล่น 1 คน ดูไพ่ในมือเขาแบบลับ 2 ใบ (สุ่ม)                                    | chosen player          | instant         | Only you see them                                 | yes        |
 | D09 | ไม้บรรทัด    |   5 | **ตีเส้น:** ผู้เล่นคนถัดไปต้องลงไพ่แต้ม 5 เท่านั้น ไม่งั้นจั่ว 1 ใบและผ่าน                            | next player            | their next turn | Eraser / Umbrella answer it                       | yes        |
 | D10 | เทปกาว     |   6 | **แปะคู่:** หลังลงเทปกาว ลงไพ่ 2 ใบที่แต้มเท่ากันเพิ่มได้ทันที (ไม่ต้องสูงกว่ากอง)                    | own hand               | instant         | Pair's abilities not used _(proposed)_            | yes        |
-| D11 | ถังขยะ      |   1 | **ทิ้งกาก:** ทิ้งไพ่ในมือ 1 ใบออกจากเกม แล้วจั่วใหม่ 1 ใบ                                     | own hand               | instant         | —                                                 | yes        |
-| D12 | ไฟฉาย      |   6 | **ส่องสว่าง:** เปิดไพ่ในมือทุกคนให้ทุกคนเห็น 5 วินาที แล้วเลือกผู้เล่น 1 คนจั่วเพิ่ม 1 ใบ               | all + chosen           | instant         | Draw can be Umbrella'd                            | yes        |
-| D13 | กุญแจ       |   7 | **ล็อก:** ข้ามเทิร์นของผู้เล่นคนถัดไป 1 เทิร์น                                                | next player            | instant         | Umbrella can block                                | yes        |
+| D11 | ถังขยะ      |   1 | **ทิ้งกาก:** ทิ้งไพ่ในมือ 1 ใบออกจากเกม (ไม่ต้องจั่วคืน)                                       | own hand               | instant         | Ruleset 9 (Q1): no redraw; can win                | yes        |
+| D12 | ไฟฉาย      |   6 | **ส่องสว่าง:** เปิดไพ่ในมือทุกคนให้ทุกคนเห็น 3 วินาที แล้วเลือกผู้เล่น 1 คนจั่วเพิ่ม 1 ใบ               | all + chosen           | instant         | Draw can be Umbrella'd                            | yes        |
+| D13 | กุญแจ       |   6 | **ล็อก:** ข้ามเทิร์นของผู้เล่นคนถัดไป 1 เทิร์น                                                | next player            | instant         | Umbrella can block                                | yes        |
 | D14 | พัดลม       |   4 | **เป่า:** ผู้เล่นที่มีไพ่น้อยที่สุด (ไม่นับเรา) จั่วเพิ่ม 1 ใบ                                        | fewest cards           | instant         | Tie: next in turn order                           | yes        |
 | D15 | นาฬิกาทราย  |   3 | **ย้อนเวลา:** ใช้ความสามารถของไพ่ใบก่อนหน้า (ใบใต้นาฬิกาทราย) ซ้ำอีกครั้ง                      | pile                   | instant         | Redesigned (DC4); no effect if that card has none | yes        |
-| D16 | ร่ม         |   8 | **กางกัน:** ลงสวนนอกเทิร์นได้ เมื่อถูกบังคับจั่วหรือข้ามเทิร์น ยกเลิกผลนั้นกับเรา                      | self                   | instant         | Reaction (DC3); normal 8 on your turn             | yes        |
+| D16 | ร่ม         |   7 | **กางกัน:** ลงสวนนอกเทิร์นได้ เมื่อถูกบังคับจั่วหรือข้ามเทิร์น ยกเลิกผลนั้นกับเรา                      | self                   | instant         | Reaction (DC3); normal 7 on your turn             | yes        |
 
 Alarm Clock changed in ruleset "8" (QM5) — evidence: `AumMon_Game_Balance_Impact.md`.
 

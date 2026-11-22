@@ -210,12 +210,12 @@ export function GamePage() {
     }, 0);
   }, [handIds]);
 
-  // Flashlight shows every hand for 5 seconds.
+  // Flashlight shows every hand for 3 seconds (ruleset 9, Q4).
   useEffect(() => {
     if (!reveal) return;
     const id = setTimeout(() => {
       setReveal(null);
-    }, 5000);
+    }, 3000);
     return () => {
       clearTimeout(id);
     };

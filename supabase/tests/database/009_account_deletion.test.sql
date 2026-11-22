@@ -9,7 +9,7 @@ insert into public.game_rooms (id, owner_id, mode, status) values
 insert into public.room_players (room_id, user_id, seat, player_type, display_name_snapshot)
   values ('10000000-0000-0000-0000-00000000d001', '00000000-0000-0000-0000-00000000d001', 1, 'human', 'Deleter');
 insert into public.matches (id, room_id, engine_version, ruleset_version, status)
-  values ('20000000-0000-0000-0000-00000000d001', '10000000-0000-0000-0000-00000000d001', '2.0.0', '8', 'finished');
+  values ('20000000-0000-0000-0000-00000000d001', '10000000-0000-0000-0000-00000000d001', '3.0.0', '9', 'finished');
 insert into public.match_players (match_id, user_id, seat, player_type)
   values ('20000000-0000-0000-0000-00000000d001', '00000000-0000-0000-0000-00000000d001', 1, 'human');
 

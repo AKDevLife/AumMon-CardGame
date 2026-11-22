@@ -148,10 +148,12 @@ describe("discard edition — abilities", () => {
     const m = table("D01", [["D07", "D01", "D13"], ["D04", "D04"], ["D04"]]);
     const mag = play(m, 0, "D07", true, { card: id(m, 0, "D01") }).state;
     expect(mag.players[2]?.hand).toHaveLength(2);
-    const tr = table("D11", [["D11", "D02"], ["D04"], ["D04"]]);
-    expect(
-      play(tr, 0, "D11", true, { card: id(tr, 0, "D02") }).state.players[0]?.hand,
-    ).toHaveLength(1);
+    const tr = table("D11", [["D11", "D02", "D04"], ["D04"], ["D04"]]);
+    const trashed = play(tr, 0, "D11", true, { card: id(tr, 0, "D02") }).state;
+    expect(trashed.players[0]?.hand).toHaveLength(1); // ruleset 9: no redraw
+    expect(trashed.drawPile).toHaveLength(tr.drawPile.length);
+    const last = table("D11", [["D11", "D02"], ["D04"], ["D04"]]);
+    expect(play(last, 0, "D11", true, { card: id(last, 0, "D02") }).state.winner).toBe(0);
     const pk = play(table("D01", [["D08", "D01"], ["D04", "D13"], ["D04"]]), 0, "D08", true, {
       target: 1,
     });
