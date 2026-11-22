@@ -1,6 +1,6 @@
 # AumMon — Tutorial Design (Phase 5)
 
-> Task 12.13 · Status: **design proposal** (UI work, no rule change). Goal: a new player can play alone in under 2 minutes.
+> Task 12.13 · Status: **built in task 12.15** (`src/features/tutorial/TutorialPage.tsx`, route `/tutorial`, E2E `tests/e2e/tutorial.spec.ts`; UI only, no rule change). First-time banners (§3) and tutorial metrics (§4) come with telemetry (12.16). Goal: a new player can play alone in under 2 minutes.
 
 ## 1. Format
 

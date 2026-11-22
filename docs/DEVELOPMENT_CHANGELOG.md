@@ -2,6 +2,11 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-22 — 12.15 Quality UI (owner Q3)
+
+- Interactive tutorial `/tutorial` (`src/features/tutorial/TutorialPage.tsx`): 7 scripted situations on the real engine run locally (play, draw, Draw Then Play, ability, target, pile reset, win); home "ฝึกเล่น (1 นาที)" glows until finished once. E2E `tests/e2e/tutorial.spec.ts` + a11y.
+- Cards: one-line `short` text in engine card data (display only) on hand cards, full text in the preview; Glue text "ห้ามลงแต้ม 1–3"; Hourglass dialog shows the ability it will repeat; "เหลือ 1 ใบ!" badge on players; 4-line rules summary on top of the rules popup.
+
 ## 2026-11-22 — 12.14 Ruleset "9" balance pack (owner approved Q1–Q4)
 
 - Engine 3.0.0 / ruleset "9": กุญแจ 6 points, ร่ม 7 points, ถังขยะ removes 1 card without redraw (can win), ไฟฉาย reveal 3 s (UI). Migration `20261122000400_ruleset9_balance.sql` (rulesets 7–9, default 9; active ruleset 8 matches ended). Docs: Card Library, Core Rules, DC10, spec v10.0.

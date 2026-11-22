@@ -93,10 +93,10 @@ export function CardView({
       </span>
       {!small && (
         <span
-          className={`px-1.5 pb-1.5 leading-snug ${size === "lg" ? "text-sm" : "min-h-0 flex-1 overflow-hidden text-[11.5px] [mask-image:linear-gradient(to_bottom,black_72%,transparent)]"}`}
+          className={`px-1.5 pb-1.5 leading-snug ${size === "lg" ? "text-sm" : "min-h-0 flex-1 overflow-hidden text-[12.5px]"}`}
         >
           <b className="text-am-accent">✨ {c.abilityName}</b>{" "}
-          <span className="text-am-text">{c.text}</span>
+          <span className="text-am-text">{size === "lg" ? c.text : c.short}</span>
         </span>
       )}
     </button>

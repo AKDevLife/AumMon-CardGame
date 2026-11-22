@@ -12,6 +12,15 @@ const MODES = [
   { id: "online", label: "Online" },
 ] as const;
 
+/** The tutorial is highlighted until it was finished once on this device. */
+function tutorialDone(): boolean {
+  try {
+    return localStorage.getItem("aummon.tutorialDone") === "1";
+  } catch {
+    return false;
+  }
+}
+
 export function HomePage() {
   const auth = useAuth();
   const signedIn = auth.mode === "live" && auth.session !== null;
@@ -63,6 +72,12 @@ export function HomePage() {
 
       {/* Secondary action: visually lighter than the play modes, always available (even signed out). */}
       <div className="flex flex-wrap justify-center gap-3">
+        <Link
+          to="/tutorial"
+          className={`am-pressable flex min-h-11 items-center gap-2 rounded-full border-[3px] border-am-ink px-5 py-2 font-display font-semibold ${tutorialDone() ? "bg-am-deco-purple" : "am-active bg-am-green text-am-success-text"}`}
+        >
+          <span aria-hidden="true">🎓</span> ฝึกเล่น (1 นาที)
+        </Link>
         <button
           type="button"
           onClick={() => {

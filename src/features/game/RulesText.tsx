@@ -2,6 +2,15 @@
 export function RulesText() {
   return (
     <div className="flex flex-col gap-2 text-sm">
+      <ol
+        aria-label="สรุปกติกา 4 ข้อ"
+        className="am-sticker list-decimal !rounded-xl bg-am-deco-yellow py-2 pl-7 pr-3 font-semibold"
+      >
+        <li>ลงไพ่แต้มเท่ากันหรือสูงกว่าใบบนกอง แล้วใช้พลังของไพ่ได้</li>
+        <li>ลงไม่ได้หรือไม่อยากลง → จั่ว 1 ใบ ถ้าใบนั้นลงได้ ลงทันทีได้เลย</li>
+        <li>ทุกคนผ่านจนวนกลับมา → กองใหม่ คนลงล่าสุดเริ่มด้วยแต้มไหนก็ได้</li>
+        <li>หมดมือก่อนชนะ · เทิร์นละ 20 วินาที</li>
+      </ol>
       <p>
         <b>เป้าหมาย:</b> ทิ้งไพ่ในมือให้หมดก่อนคนอื่น คนแรกที่หมดมือชนะทันที
       </p>

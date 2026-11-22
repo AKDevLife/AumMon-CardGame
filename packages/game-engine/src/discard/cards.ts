@@ -28,6 +28,8 @@ export interface DiscardCard {
   readonly ability: AbilityId;
   readonly abilityName: string;
   readonly text: string;
+  /** One-line text shown on small cards (same meaning as `text`). */
+  readonly short: string;
   /** Needs a chosen opponent seat when the ability is used. */
   readonly needsTarget: boolean;
 }
@@ -41,20 +43,41 @@ const c = (
   abilityName: string,
   text: string,
   needsTarget = false,
-): DiscardCard => ({ cardId, name, nameEn, points, ability, abilityName, text, needsTarget });
+): DiscardCard => ({
+  cardId,
+  name,
+  nameEn,
+  points,
+  ability,
+  abilityName,
+  text,
+  short: SHORT[ability],
+  needsTarget,
+});
+
+/** One-line card texts (Rule Simplification S2; same meaning as the full text). */
+const SHORT: Record<AbilityId, string> = {
+  next_draw: "คนถัดไปจั่ว 1",
+  glue: "เลือก 1 คน ห้ามลงแต้ม 1–3 เทิร์นหน้า",
+  eraser: "ลงทับได้ทุกใบ ล้างกอง",
+  scissors: "ตัดใบใต้ทิ้ง ลงเพิ่มได้ 1",
+  box: "ใบใต้ขึ้นมือ วางใบอื่นแทน",
+  alarm: "สลับทิศ คนถัดไปจั่ว 1",
+  magnet: "ส่ง 1 ใบให้คนไพ่น้อยสุด",
+  peek: "แอบดูไพ่ 2 ใบของ 1 คน",
+  ruler: "คนถัดไปต้องลงแต้ม 5",
+  tape: "ลงคู่แต้มเท่ากันเพิ่ม 2 ใบ",
+  trash: "ทิ้ง 1 ใบออกจากเกม",
+  flashlight: "เปิดไพ่ทุกคน เลือก 1 คนจั่ว",
+  skip: "ข้ามคนถัดไป 1 เทิร์น",
+  fan: "คนไพ่น้อยสุดจั่ว 1",
+  hourglass: "ใช้พลังใบใต้ซ้ำ",
+  umbrella: "กันจั่ว/โดนข้าม นอกเทิร์นได้",
+};
 
 export const DISCARD_CARDS: readonly DiscardCard[] = [
   c("D01", "หนังยาง", "Rubber Band", 2, "next_draw", "ดีด", "ผู้เล่นคนถัดไปจั่วเพิ่ม 1 ใบ"),
-  c(
-    "D02",
-    "กาวน้ำ",
-    "Glue",
-    3,
-    "glue",
-    "ติดหนึบ",
-    "เลือกผู้เล่น 1 คน เทิร์นถัดไปของเขาลงไพ่แต้มต่ำกว่า 4 ไม่ได้",
-    true,
-  ),
+  c("D02", "กาวน้ำ", "Glue", 3, "glue", "ติดหนึบ", "เลือกผู้เล่น 1 คน เทิร์นถัดไปของเขาห้ามลงไพ่แต้ม 1–3", true),
   c(
     "D03",
     "ยางลบ",
