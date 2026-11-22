@@ -2,6 +2,11 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-22 — 12.17 Ruleset "10": Magnifier and Box (decision delegated by the owner)
+
+- Engine 4.0.0 / ruleset "10": แว่นขยาย = peek 2 cards, then optionally play 1 more card (points rule); กล่องกระดาษ = optionally put 1 card of 1–3 points on the pile (no ability). Bot choices and play dialog (target + optional card, Box shows only 1–3 point cards). Migration `20261122000600_ruleset10_magnifier_box.sql`. DC11, Card Library, spec v11.0.
+- Simulation (2,000 rounds per size): Magnifier 0.84–0.92 and Box 0.88–0.96 win index (both were the weakest cards); 8 players mean 38 turns, 86 % of rounds ≤ 10 min (model).
+
 ## 2026-11-22 — 12.16 Playtest telemetry (owner Q3)
 
 - Migration `20261122000500_round_stats.sql`: `private.round_stats` (one row per match; never exposed; card ids only, no names / user ids). Server writes it at match start, on each human action (decision time, drawn-card plays), on every save (turns, timeouts, abilities, winner), on rematch and on leaving.

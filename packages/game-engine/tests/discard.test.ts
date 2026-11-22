@@ -141,10 +141,13 @@ describe("discard edition — abilities", () => {
   });
 
   it("Box, Magnet and Trash move cards; Magnifier reveals privately", () => {
+    // Ruleset 10: Box puts one extra card of 1–3 points on the pile.
     const b = table("D02", [["D05", "D01", "D13"], ["D04", "D04"], ["D04"]]);
     const box = play(b, 0, "D05", true, { card: id(b, 0, "D01") }).state;
     expect(box.pile.at(-1)?.cardId).toBe("D01");
-    expect(box.players[0]?.hand.map((c) => c.cardId).sort()).toEqual(["D02", "D13"]);
+    expect(box.players[0]?.hand.map((c) => c.cardId)).toEqual(["D13"]);
+    expect(err(() => play(b, 0, "D05", true, { card: id(b, 0, "D13") }))).toBe("invalid_choice");
+    expect(play(b, 0, "D05", true, {}).state.players[0]?.hand).toHaveLength(2);
     const m = table("D01", [["D07", "D01", "D13"], ["D04", "D04"], ["D04"]]);
     const mag = play(m, 0, "D07", true, { card: id(m, 0, "D01") }).state;
     expect(mag.players[2]?.hand).toHaveLength(2);
@@ -159,6 +162,14 @@ describe("discard edition — abilities", () => {
     });
     const peek = pk.events.find((e) => e.type === "peek");
     expect(peek && "private" in peek && peek.cards.length).toBe(2);
+    // Ruleset 10: Magnifier may play 1 more card (points rule).
+    const pt = table("D01", [["D08", "D06", "D11"], ["D04"], ["D04"]]);
+    const more = play(pt, 0, "D08", true, { target: 1, card: id(pt, 0, "D06") }).state;
+    expect(more.pile.at(-1)?.cardId).toBe("D06");
+    expect(more.players[0]?.hand).toHaveLength(1);
+    expect(err(() => play(pt, 0, "D08", true, { target: 1, card: id(pt, 0, "D11") }))).toBe(
+      "invalid_choice",
+    );
   });
 
   it("Hourglass repeats the ability of the card under it", () => {

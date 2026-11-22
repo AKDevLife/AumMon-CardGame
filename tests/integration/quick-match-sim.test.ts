@@ -31,32 +31,17 @@ export interface Config {
   readonly magnifierExtra?: boolean;
   /** PROPOSAL B6B emulation: Box = put your lowest card on the pile (no ability). */
   readonly boxShed?: boolean;
+  /** With boxShed: only a card with at most this many points may be placed. */
+  readonly boxShedMax?: number;
 }
 
 const quick = (n: number) => (n <= 4 ? 5 : 4);
 const small = (n: number) => (n <= 4 ? 4 : 3);
 export const CONFIGS: readonly Config[] = [
-  { name: "R9 shipped", hand: quick, drawThenPlay: true, turnTimer: 20, reactionTimer: 5 },
-  { name: "R9 without DTP", hand: quick, drawThenPlay: false, turnTimer: 20, reactionTimer: 5 },
-  { name: "R9 4/3 cards", hand: small, drawThenPlay: true, turnTimer: 20, reactionTimer: 5 },
-  { name: "R9 45 s timer", hand: quick, drawThenPlay: true, turnTimer: 45, reactionTimer: 8 },
-  {
-    name: "R9 + Magnifier peek & play 1 more (proposal B4B)",
-    hand: quick,
-    drawThenPlay: true,
-    turnTimer: 20,
-    reactionTimer: 5,
-    magnifierExtra: true,
-  },
-  {
-    name: "R9 + Box put 1 card on the pile (proposal B6B)",
-    hand: quick,
-    drawThenPlay: true,
-    turnTimer: 20,
-    reactionTimer: 5,
-    boxShed: true,
-    noAbility: "box",
-  },
+  { name: "R10 shipped", hand: quick, drawThenPlay: true, turnTimer: 20, reactionTimer: 5 },
+  { name: "R10 without DTP", hand: quick, drawThenPlay: false, turnTimer: 20, reactionTimer: 5 },
+  { name: "R10 4/3 cards", hand: small, drawThenPlay: true, turnTimer: 20, reactionTimer: 5 },
+  { name: "R10 45 s timer", hand: quick, drawThenPlay: true, turnTimer: 45, reactionTimer: 8 },
 ];
 
 interface GameResult {
@@ -123,14 +108,18 @@ function randomChoice(
  * Proposal emulation: put one more card from `me`'s hand on the pile (no ability).
  * `any` = lowest card regardless of points (Box B6B); otherwise the lowest legal card (Magnifier B4B).
  */
-function extraShed(t: discard.Transition, me: number, any: boolean): discard.Transition {
+function extraShed(t: discard.Transition, me: number, any: boolean, max = 99): discard.Transition {
   const st = t.state;
   if (st.status !== "active") return t;
   const hand = st.players[me]?.hand ?? [];
   const top = st.pile[st.pile.length - 1];
   const topPts = top ? pts(top) : 0;
   const pick = [...hand]
-    .filter((c) => any || pts(c) >= topPts || discard.getDiscardCard(c.cardId).ability === "eraser")
+    .filter((c) =>
+      any
+        ? pts(c) <= max
+        : pts(c) >= topPts || discard.getDiscardCard(c.cardId).ability === "eraser",
+    )
     .sort((a, b) => pts(a) - pts(b))[0];
   if (!pick) return t;
   hand.splice(hand.indexOf(pick), 1);
@@ -317,12 +306,12 @@ function playOne(players: number, seed: number, cfg: Config): GameResult {
     }
     const usedAbility = (id: discard.AbilityId) =>
       t.events.some((e) => e.type === "ability" && e.seat === me && e.ability === id);
+    if (cfg.magnifierExtra && usedAbility("peek")) t = extraShed(t, me, false);
     if (
-      (cfg.magnifierExtra && usedAbility("peek")) ||
-      (cfg.boxShed &&
-        t.events.some((e) => e.type === "played" && e.seat === me && e.cardIds.includes("D05")))
+      cfg.boxShed &&
+      t.events.some((e) => e.type === "played" && e.seat === me && e.cardIds.includes("D05"))
     )
-      t = extraShed(t, me, cfg.boxShed === true);
+      t = extraShed(t, me, true, cfg.boxShedMax);
     for (const e of t.events) {
       if (e.type === "ability") {
         r.abilities++;

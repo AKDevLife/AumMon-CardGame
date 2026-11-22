@@ -94,7 +94,7 @@ describe.runIf(run)("online multiplayer via Edge Functions", () => {
       .single();
     const room = data as { join_code_hash: string; max_players: number; ruleset_version: string };
     expect(room.join_code_hash).not.toContain(code);
-    expect([room.max_players, room.ruleset_version]).toEqual([2, "9"]);
+    expect([room.max_players, room.ruleset_version]).toEqual([2, "10"]);
   });
 
   it("joining validates code and capacity", async () => {
