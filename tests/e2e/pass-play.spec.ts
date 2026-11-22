@@ -35,7 +35,7 @@ test("pass & play with 3 players: privacy handoff between turns, then leave", as
   if (!(await page.getByRole("heading", { name: /ชนะ/ }).isVisible())) {
     await page
       .getByRole("button", { name: /แสดงการ์ด/ })
-      .click()
+      .click({ timeout: 5000 })
       .catch(() => undefined);
     await leave(page);
     await expect(page).toHaveURL(/\/$/);

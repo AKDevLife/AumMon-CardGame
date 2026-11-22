@@ -37,7 +37,12 @@ export async function act(page: Page): Promise<boolean> {
 }
 
 export async function leave(page: Page) {
+  while (await closePopups(page)) await page.waitForTimeout(200);
   await page.getByRole("button", { name: "ตั้งค่า" }).click();
-  await page.getByRole("button", { name: "ออกจากเกม" }).click();
+  await page
+    .getByRole("dialog")
+    .getByRole("button", { name: "ออกจากเกม", exact: true })
+    .first()
+    .click();
   await page.getByRole("button", { name: "ยืนยันออกจากเกม" }).click();
 }
