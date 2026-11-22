@@ -4,7 +4,7 @@
  */
 export type AbilityId =
   | "next_draw" // หนังยาง: next player draws 1
-  | "glue" // กาวน้ำ: chosen player cannot play < 4 on their next turn
+  | "glue" // กาวน้ำ (ruleset 13): give 1 own card to a chosen player
   | "eraser" // ยางลบ: wild; clears the pile conditions
   | "scissors" // กรรไกร: remove the card under, play 1 more card
   | "box" // กล่องกระดาษ: also put 1 card of 1–3 points on the pile (ruleset 10)
@@ -58,7 +58,7 @@ const c = (
 /** One-line card texts (Rule Simplification S2; same meaning as the full text). */
 const SHORT: Record<AbilityId, string> = {
   next_draw: "คนถัดไปจั่ว 1",
-  glue: "เลือก 1 คน ห้ามลงแต้ม 1–3 เทิร์นหน้า",
+  glue: "ส่งไพ่ 1 ใบไปติดคนที่เลือก",
   eraser: "ลงทับได้ทุกใบ ล้างกอง",
   scissors: "ตัดใบใต้ทิ้ง ลงเพิ่มได้ 1",
   box: "วางไพ่แต้ม 1–3 เพิ่มได้ 1 ใบ",
@@ -77,7 +77,7 @@ const SHORT: Record<AbilityId, string> = {
 
 export const DISCARD_CARDS: readonly DiscardCard[] = [
   c("D01", "หนังยาง", "Rubber Band", 2, "next_draw", "ดีด", "ผู้เล่นคนถัดไปจั่วเพิ่ม 1 ใบ"),
-  c("D02", "กาวน้ำ", "Glue", 3, "glue", "ติดหนึบ", "เลือกผู้เล่น 1 คน เทิร์นถัดไปของเขาห้ามลงไพ่แต้ม 1–3", true),
+  c("D02", "กาวน้ำ", "Glue", 3, "glue", "ติดหนึบ", "ส่งไพ่ 1 ใบจากมือเราไปติดผู้เล่นที่เลือก", true),
   c(
     "D03",
     "ยางลบ",
@@ -152,7 +152,7 @@ export const DISCARD_CARDS: readonly DiscardCard[] = [
 ];
 
 export const DISCARD_RULES = {
-  version: "12",
+  version: "13",
   minPlayers: 2,
   maxPlayers: 8,
   copies: 4,

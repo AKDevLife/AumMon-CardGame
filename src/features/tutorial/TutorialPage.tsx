@@ -68,7 +68,7 @@ const STEPS: Step[] = [
   },
   {
     title: "เลือกเป้าหมาย",
-    hint: "ลง 'กาวน้ำ' แล้วเลือก Bot เป็นเป้าหมาย — เทิร์นหน้าเขาห้ามลงแต้ม 1–3",
+    hint: "ลง 'กาวน้ำ' แล้วส่งไพ่ 1 ใบไปติด Bot — ไพ่คุณลด ของเขาเพิ่ม",
     build: () => table("D01", ["D02", "D06"], ["D04", "D04"]),
     done: (ev) => ev.some((e) => e.type === "ability" && e.ability === "glue" && e.target === 1),
     ability: true,
@@ -154,6 +154,16 @@ export function TutorialPage() {
     );
 
   const sel = view.myHand.find((c) => c.id === selected) ?? null;
+  // Glue gives your lowest other card (the tutorial picks it for you).
+  const give =
+    sel && discard.getDiscardCard(sel.cardId).ability === "glue"
+      ? [...view.myHand]
+          .filter((c) => c.id !== sel.id)
+          .sort(
+            (a, b) =>
+              discard.getDiscardCard(a.cardId).points - discard.getDiscardCard(b.cardId).points,
+          )[0]?.id
+      : undefined;
   const selDef = sel ? discard.getDiscardCard(sel.cardId) : null;
   const top = view.top;
 
@@ -236,7 +246,10 @@ export function TutorialPage() {
                     playerId: "you",
                     card: sel.id,
                     useAbility,
-                    choice: selDef.needsTarget && useAbility ? { target: 1 } : {},
+                    choice:
+                      selDef.needsTarget && useAbility
+                        ? { target: 1, ...(give !== undefined && { card: give }) }
+                        : {},
                   });
                 }}
               >

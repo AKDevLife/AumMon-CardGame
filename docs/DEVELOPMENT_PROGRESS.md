@@ -23,9 +23,9 @@
 | 6 Online Multiplayer    |       7 |       8 |     88% |
 | 7 Public Launch & Scale |       6 |       8 |     75% |
 | 9 Developer Admin       |      17 |      17 |    100% |
-| 12 Discard Edition      |      18 |      21 |     86% |
+| 12 Discard Edition      |      19 |      21 |     90% |
 | 13 AI Art Production    |       1 |       9 |     11% |
-| **Overall**             | **105** | **119** | **88%** |
+| **Overall**             | **106** | **119** | **89%** |
 
 ## Completed (summary)
 

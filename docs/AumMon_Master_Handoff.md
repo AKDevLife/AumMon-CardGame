@@ -4,7 +4,7 @@
 
 ## Product
 
-Casual Discard Edition — 2–8 player shed-your-hand card game with 16 Everyday Objects (`aummon_game_spec.md`, rules in `docs/discard/`). Modes: Solo vs bots, Online. Ruleset `12` (7 / 5 cards, 60 s turns, card changes DC14), engine `6.0.0`.
+Casual Discard Edition — 2–8 player shed-your-hand card game with 16 Everyday Objects (`aummon_game_spec.md`, rules in `docs/discard/`). Modes: Solo vs bots, Online. Ruleset `13` (7 / 5 cards, 60 s turns, card changes DC14–DC15), engine `7.0.0`.
 
 ## Status
 

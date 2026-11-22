@@ -2,6 +2,11 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-22 — 12.21 Ruleset "13": Glue G2 (owner)
+
+- Engine 7.0.0 / ruleset "13": กาวน้ำ gives 1 card from your hand to a chosen player (`card_given` event); play dialog asks for the player and the card; the bot gives its lowest card to the opponent with the fewest cards; the tutorial step uses it. Migration `20261122000900_ruleset13_glue.sql`. DC15.
+- Simulation on the shipped engine: Glue 0.90–1.02 win index (was 0.77–0.81); 8 players 90 % of rounds ≤ 10 min.
+
 ## 2026-11-22 — 12.20 Ruleset "12": card changes + loading spinners (owner)
 
 - Engine 6.0.0 / ruleset "12": ไฟฉาย = see one opponent's whole hand (private `peek`, no draw); แว่นขยาย = see the top 2 draw-pile cards (private, `target: null`); พัดลม = reverse only; นาฬิกาปลุก = fewest-cards player draws 1; the Flashlight "reveal all" popup is removed; private views show cards with ability text (tap to enlarge). กุญแจ art 🔑 → 🔒. Migration `20261122000800_ruleset12_cards.sql`. DC14.

@@ -1,7 +1,7 @@
 # AumMon
 
 เกมไพ่ทิ้งให้หมดมือ 2–8 คน ธีมสิ่งของในชีวิตประจำวัน (Casual Discard Edition) — Solo vs Bot และ Online
-Server-authoritative · `ruleset_version = "12"` (Quick Match) · engine 6.0.0
+Server-authoritative · `ruleset_version = "13"` (Quick Match) · engine 7.0.0
 
 ## เอกสารหลัก
 

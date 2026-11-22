@@ -25,7 +25,7 @@ export interface PendingHit {
 }
 
 export interface GameState {
-  readonly rulesetVersion: "12";
+  readonly rulesetVersion: "13";
   status: "active" | "finished";
   players: PlayerState[];
   drawPile: CardInstance[];
@@ -159,7 +159,7 @@ export function startGame(
   if (!start) throw new Error("empty deck");
   const firstSeat = rng.nextInt(n);
   const state: GameState = {
-    rulesetVersion: "12",
+    rulesetVersion: "13",
     status: "active",
     players,
     drawPile: deck,
@@ -276,10 +276,15 @@ function resolveAbility(
       target = nextSeat(s, me);
       hits.push({ kind: "draw", target, amount: 1 });
       break;
-    case "glue":
+    case "glue": {
+      // Ruleset 13 (G2): stick 1 card from your hand on the chosen player.
       target = opponent(s, me, choice.target);
-      s.glue = target;
+      if (choice.card === undefined || !hand.some((x) => x.id === choice.card))
+        throw new CommandError("invalid_choice");
+      s.players[target]?.hand.push(take(s, me, choice.card));
+      ev.push({ type: "card_given", from: me, to: target });
       break;
+    }
     case "eraser":
       s.open = true;
       s.glue = null;

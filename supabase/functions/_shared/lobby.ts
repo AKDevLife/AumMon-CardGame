@@ -30,7 +30,7 @@ export async function createOnlineRoom(userId: string, maxPlayers = 4) {
     const code = newCode();
     const [room] = await tx<{ id: string }[]>`
       insert into public.game_rooms (owner_id, join_code_hash, mode, status, max_players, ruleset_version, expires_at)
-      values (${userId}, ${await hashRequest(code)}, 'online', 'lobby', ${maxPlayers}, '12', now() + ${`${LOBBY_TTL_MINUTES} minutes`}::interval)
+      values (${userId}, ${await hashRequest(code)}, 'online', 'lobby', ${maxPlayers}, '13', now() + ${`${LOBBY_TTL_MINUTES} minutes`}::interval)
       returning id`;
     if (!room) throw new Error("room insert failed");
     await tx`
@@ -49,7 +49,7 @@ export async function joinRoom(userId: string, rawCode: string) {
       throw new HttpError(404, "room_not_found", "Room not found or expired");
     const [room] = await tx<{ id: string; max_players: number }[]>`
       select id, max_players from public.game_rooms
-      where join_code_hash = ${await hashRequest(code)} and mode = 'online' and ruleset_version = '12'
+      where join_code_hash = ${await hashRequest(code)} and mode = 'online' and ruleset_version = '13'
         and status = 'lobby' and expires_at > now()
       for update`;
     if (!room) throw new HttpError(404, "room_not_found", "Room not found or expired");

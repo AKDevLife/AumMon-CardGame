@@ -3,7 +3,7 @@ import type { discard } from "@aummon/game-engine";
 /** Response of the game-* Edge Functions (supabase/functions/_shared/game.ts). */
 export interface GameResponse {
   matchId: string;
-  rulesetVersion: "12";
+  rulesetVersion: "13";
   mode: "solo" | "online";
   version: number;
   deadline: string | null;

@@ -115,11 +115,12 @@ describe("discard edition — abilities", () => {
     expect(a.players[2]?.hand).toHaveLength(2); // fewest cards → draws 1
   });
 
-  it("Glue and Ruler restrict the next play; Eraser answers them", () => {
-    const g = play(table("D01", [["D02", "D01"], ["D02", "D05"], ["D04"]]), 0, "D02", true, {
-      target: 1,
-    }).state;
-    expect(err(() => play(g, 1, "D02"))).toBe("cannot_play");
+  it("Glue sticks a card on the chosen player; Ruler restricts; Eraser answers it", () => {
+    const gt = table("D01", [["D02", "D01", "D13"], ["D02", "D05"], ["D04"]]);
+    const g = play(gt, 0, "D02", true, { target: 2, card: id(gt, 0, "D01") }).state;
+    expect(g.players[0]?.hand.map((c) => c.cardId)).toEqual(["D13"]);
+    expect(g.players[2]?.hand.map((c) => c.cardId)).toEqual(["D04", "D01"]);
+    expect(err(() => play(gt, 0, "D02", true, { target: 1 }))).toBe("invalid_choice");
     const r = play(table("D01", [["D09", "D01"], ["D13", "D03"], ["D04"]]), 0, "D09", true).state;
     expect(err(() => play(r, 1, "D13"))).toBe("cannot_play");
     expect(play(r, 1, "D03").state.current).toBe(2);
