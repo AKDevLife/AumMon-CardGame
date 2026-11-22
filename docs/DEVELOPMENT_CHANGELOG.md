@@ -2,6 +2,11 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-22 — 12.18 Ruleset "11": 60 s turns, 7 / 5 starting cards (owner)
+
+- Owner: turn timer 20 s → 60 s; more starting cards because rounds ended too fast. Simulation compared 5/4, 6/4, 6/5 and 7/5 with 60 s; chose **7 (2–4 players) / 5 (5–8)** (4 players est. median 3.4 → 5.0 min, 8 players 4.2 → 5.8 min; 83–93 % of rounds still ≤ 10 min).
+- Engine 5.0.0 / ruleset "11"; migration `20261122000700_ruleset11_hands_timer.sql`; rules text, Core Rules, DC12, spec v12.0.
+
 ## 2026-11-22 — 12.17 Ruleset "10": Magnifier and Box (decision delegated by the owner)
 
 - Engine 4.0.0 / ruleset "10": แว่นขยาย = peek 2 cards, then optionally play 1 more card (points rule); กล่องกระดาษ = optionally put 1 card of 1–3 points on the pile (no ability). Bot choices and play dialog (target + optional card, Box shows only 1–3 point cards). Migration `20261122000600_ruleset10_magnifier_box.sql`. DC11, Card Library, spec v11.0.

@@ -292,3 +292,28 @@ Emulation: points changes patch the card data for the run only; "Trash no redraw
 | R10 shipped                                         |       8 |         38 | 4.5 / 11.4            |     86 % | 0.67–1.56       |    0.84 |       0.96 |
 
 "R10 shipped" = the real engine 4.0.0. The R9 + B4B / B6C rows are harness emulations used for the decision. The emulated B6C also kept the old Box effect, which is why its Box index is a little higher than in the shipped ruleset.
+
+## 9. Ruleset "11": starting hand options with a 60 s timer (task 12.18)
+
+1,500 rounds per row (model minutes).
+
+| Starting hand (2–4 / 5–8), 60 s | Players | Mean turns | Est. min median / p90 | 5–10 min | ≤ 10 min | Longest wait p90 | Win index range |
+| ------------------------------- | ------: | ---------: | --------------------- | -------: | -------: | ---------------: | --------------- |
+| 5/4                             |       2 |         10 | 1.5 / 2.6             |      0 % |    100 % |             46 s | 0.84–1.15       |
+| 5/4                             |       4 |         25 | 3.4 / 6.7             |     22 % |     98 % |             94 s | 0.76–1.37       |
+| 5/4                             |       6 |         28 | 3.4 / 8.6             |     23 % |     94 % |            142 s | 0.67–1.53       |
+| 5/4                             |       8 |         33 | 4.2 / 9.8             |     30 % |     91 % |            195 s | 0.67–1.57       |
+| 6/4                             |       2 |         12 | 1.8 / 3.0             |      0 % |    100 % |             50 s | 0.85–1.16       |
+| 6/4                             |       4 |         30 | 4.2 / 7.7             |     34 % |     97 % |            102 s | 0.76–1.27       |
+| 6/4                             |       6 |         28 | 3.4 / 8.6             |     23 % |     94 % |            142 s | 0.67–1.53       |
+| 6/4                             |       8 |         33 | 4.2 / 9.8             |     30 % |     91 % |            195 s | 0.67–1.57       |
+| 6/5                             |       2 |         12 | 1.8 / 3.0             |      0 % |    100 % |             50 s | 0.85–1.16       |
+| 6/5                             |       4 |         30 | 4.2 / 7.7             |     34 % |     97 % |            102 s | 0.76–1.27       |
+| 6/5                             |       6 |         36 | 4.7 / 10.2            |     35 % |     89 % |            154 s | 0.73–1.50       |
+| 6/5                             |       8 |         44 | 5.8 / 12.2            |     44 % |     83 % |            210 s | 0.70–1.45       |
+| 7/5                             |       2 |         14 | 2.2 / 3.5             |      1 % |    100 % |             51 s | 0.86–1.14       |
+| 7/5                             |       4 |         36 | 5.0 / 9.2             |     43 % |     93 % |            105 s | 0.84–1.27       |
+| 7/5                             |       6 |         36 | 4.7 / 10.2            |     35 % |     89 % |            154 s | 0.73–1.50       |
+| 7/5                             |       8 |         44 | 5.8 / 12.2            |     44 % |     83 % |            210 s | 0.70–1.45       |
+
+Chosen: **7 / 5**. It gives the longest rounds (4 players median 5.0 min, 8 players 5.8 min), the most rounds in the 5–10 min band, a narrower win-index range at 2–4 players, and still 83–93 % of rounds within 10 min.

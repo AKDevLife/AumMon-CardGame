@@ -78,7 +78,7 @@ describe.runIf(run)("discard matches via Edge Functions", () => {
     let v = (await a("game-view", { matchId })).body as unknown as Game;
     expect(v.seat).toBe(0);
     expect(v.view.players).toHaveLength(4);
-    expect(v.view.myHand).toHaveLength(5);
+    expect(v.view.myHand).toHaveLength(7);
     expect(JSON.stringify(v)).not.toContain('"drawPile"');
     expect((await b("game-view", { matchId })).status).toBe(404);
 

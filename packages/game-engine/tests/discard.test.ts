@@ -54,12 +54,12 @@ const drawPass = (s: GameState, seat: number) => {
 };
 
 describe("discard edition — core rules", () => {
-  it("deals 5 (2–4 players) / 4 (5–8), 64-card deck, starts on a normal card", () => {
+  it("deals 7 (2–4 players) / 5 (5–8), 64-card deck, starts on a normal card", () => {
     const four = startGame(["a", "b", "c", "d"], rng()).state;
-    expect(four.players.every((p) => p.hand.length === 5)).toBe(true);
+    expect(four.players.every((p) => p.hand.length === 7)).toBe(true);
     const eight = startGame(["a", "b", "c", "d", "e", "f", "g", "h"], rng()).state;
-    expect(eight.players.every((p) => p.hand.length === 4)).toBe(true);
-    expect(eight.drawPile.length + eight.pile.length + 32).toBe(64);
+    expect(eight.players.every((p) => p.hand.length === 5)).toBe(true);
+    expect(eight.drawPile.length + eight.pile.length + 40).toBe(64);
     expect(DISCARD_CARDS).toHaveLength(16);
   });
 
