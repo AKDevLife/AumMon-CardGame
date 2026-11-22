@@ -4,7 +4,7 @@ import { card, eventText, label, seats, shortId, yesNo } from "./format.ts";
 describe("admin readable formatting", () => {
   it("translates codes into Thai", () => {
     expect(label("roomStatus", "lobby")).toBe("รอผู้เล่น");
-    expect(label("mode", "pass_play")).toBe("เครื่องเดียวกัน");
+    expect(label("mode", "online")).toBe("ออนไลน์");
     expect(label("action", "player.disabled")).toBe("ระงับบัญชีผู้เล่น");
     expect(label("httpStatus", 429)).toBe("ส่งคำขอถี่เกินไป");
     expect(label("mode", "unknown")).toBe("unknown");

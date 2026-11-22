@@ -6,7 +6,6 @@ import { PrivacyPage, TermsPage } from "../features/legal/LegalPages.tsx";
 import { ProfilePage } from "../features/profile/ProfilePage.tsx";
 import { LobbyPage } from "../features/online/LobbyPage.tsx";
 import { OnlinePage } from "../features/online/OnlinePage.tsx";
-import { PassPlaySetupPage } from "../features/passplay/PassPlaySetupPage.tsx";
 import { SoloSetupPage } from "../features/solo/SoloSetupPage.tsx";
 import { GamePage } from "../features/game/GamePage.tsx";
 import { AppLayout } from "./AppLayout.tsx";
@@ -24,7 +23,6 @@ export const routes: RouteObject[] = [
       { path: "privacy", element: <PrivacyPage /> },
       { path: "terms", element: <TermsPage /> },
       { path: "play/solo", element: <SoloSetupPage /> },
-      { path: "play/pass", element: <PassPlaySetupPage /> },
       { path: "play/online", element: <OnlinePage /> },
       { path: "lobby/:roomId", element: <LobbyPage /> },
       { path: "game/:matchId", element: <GamePage /> },

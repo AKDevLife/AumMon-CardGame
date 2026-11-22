@@ -14,7 +14,7 @@ Be the first player to **empty your hand**. In multi-round play the rest keep pl
 | Normal           | 2–4     | Free                                                         |
 | Large (VIP host) | 5–8     | VIP host only (free to test on Dev until VIP is built — DC7) |
 
-Modes: **Solo vs Bots** (1–7 bots), **Pass & Play** (one device), **Online** (join code / link).
+Modes: **Solo vs Bots** (1–7 bots), **Online** (join code / link). Pass & Play was removed (DC8).
 
 ## 3. Setup
 

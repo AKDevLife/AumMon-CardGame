@@ -130,10 +130,8 @@ async function saveGame(
 
 // ---------------------------------------------------------------- views
 
-/** Seat the caller controls now (own seat; Pass & Play owner → the acting local seat). */
-function actorSeat(locked: Locked, state: discard.GameState): number | null {
-  if (locked.mode === "pass_play")
-    return locked.ownerId === locked.userId ? actingSeat(state) : null;
+/** Seat the caller controls (own seat). */
+function actorSeat(locked: Locked): number | null {
   const own = locked.seats.find((s) => s.user_id === locked.userId);
   return own ? toEngine(own.seat) : null;
 }
@@ -144,7 +142,7 @@ export interface GameResponse {
   mode: Mode;
   version: number;
   deadline: string | null;
-  /** Seat whose private view is shown; null = no hand visible (Pass & Play before reveal). */
+  /** Caller's seat; null = spectator / not seated. */
   seat: number | null;
   acting: number | null;
   botActing: boolean;
@@ -160,13 +158,11 @@ async function respondGame(
   locked: Locked,
   rt: GameRuntime,
   version: number,
-  reveal: boolean,
   fresh: readonly discard.GameEvent[],
 ): Promise<GameResponse> {
   const { state } = rt;
   const acting = actingSeat(state);
-  const own = actorSeat(locked, state);
-  const seat = locked.mode === "pass_play" ? (reveal ? own : null) : own;
+  const seat = actorSeat(locked);
   const events = await tx<{ public_payload: unknown }[]>`
     select public_payload from public.match_events where match_id = ${locked.matchId}
     order by event_seq desc limit 60`;
@@ -199,7 +195,6 @@ export async function withGame(
   userId: string,
   matchId: string,
   options: {
-    reveal?: boolean;
     act?: (
       state: discard.GameState,
       seat: number,
@@ -224,13 +219,12 @@ export async function withGame(
     }
     const now = Date.now();
     const kinds = kindsOf(locked);
-    let rt = advanceGame(locked, kinds, locked.mode, now);
+    let rt = advanceGame(locked, kinds, now);
     const events = [...rt.events];
-    const actingBefore = actingSeat(rt.state);
     if (options.act) {
       if (options.expectedVersion !== undefined && options.expectedVersion !== locked.version)
         throw new HttpError(409, "stale_version", "State changed; refresh and retry");
-      const seat = actorSeat(locked, rt.state);
+      const seat = actorSeat(locked);
       if (seat === null) throw new HttpError(403, "not_your_turn", "You cannot act now");
       const rng = createSeededRandom(rt.rng);
       let t: discard.Transition;
@@ -244,7 +238,6 @@ export async function withGame(
       const after = advanceGame(
         { state: t.state, rng: rng.getState(), deadline: rt.deadline },
         kinds,
-        locked.mode,
         now,
       );
       events.push(...after.events);
@@ -252,16 +245,7 @@ export async function withGame(
     }
     const changed = events.length > 0 || rt.deadline !== locked.deadline;
     const version = changed ? await saveGame(tx, locked, rt, events) : locked.version;
-    // Pass & Play: the hand stays visible while the same seat keeps acting.
-    const keepRevealed = options.act !== undefined && actingSeat(rt.state) === actingBefore;
-    const response = await respondGame(
-      tx,
-      locked,
-      rt,
-      version,
-      (options.reveal ?? false) || keepRevealed,
-      events,
-    );
+    const response = await respondGame(tx, locked, rt, version, events);
     if (options.receipt)
       await storeReceipt(tx, matchId, userId, options.receipt.key, options.receipt.hash, {
         status: "accepted",
@@ -271,7 +255,7 @@ export async function withGame(
   });
 }
 
-/** A player leaves an online match: a bot takes the seat. Solo / Pass & Play: the match ends. */
+/** A player leaves an online match: a bot takes the seat. Solo: the match ends. */
 export async function leaveGame(userId: string, matchId: string): Promise<{ ok: true }> {
   return db().begin(async (tx) => {
     const locked = await lockGame(tx, matchId, userId);
@@ -339,30 +323,20 @@ async function displayName(tx: Tx, userId: string): Promise<string> {
   return p?.display_name ?? "Player";
 }
 
-/** Solo (you + 1–7 server bots) or Pass & Play (2–8 local names): room + match in one step. */
-export async function createGame(
-  userId: string,
-  mode: "solo" | "pass_play",
-  options: { bots?: number; names?: readonly string[] },
-): Promise<string> {
+/** Solo: you + 1–7 server bots; room + match in one step. */
+export async function createGame(userId: string, bots: number): Promise<string> {
   await rateLimit(userId, "room.create", 20, 60);
   return db().begin(async (tx) => {
-    const size = mode === "solo" ? (options.bots ?? 1) + 1 : (options.names?.length ?? 0);
+    const size = bots + 1;
     const [room] = await tx<{ id: string }[]>`
       insert into public.game_rooms (owner_id, mode, status, max_players)
-      values (${userId}, ${mode}, 'lobby', ${size}) returning id`;
+      values (${userId}, 'solo', 'lobby', ${size}) returning id`;
     if (!room) throw new Error("room insert failed");
-    if (mode === "solo") {
-      await tx`insert into public.room_players (room_id, user_id, seat, player_type, display_name_snapshot, status)
+    await tx`insert into public.room_players (room_id, user_id, seat, player_type, display_name_snapshot, status)
         values (${room.id}, ${userId}, 1, 'human', ${await displayName(tx, userId)}, 'ready')`;
-      for (let i = 2; i <= size; i++)
-        await tx`insert into public.room_players (room_id, seat, player_type, display_name_snapshot, status)
+    for (let i = 2; i <= size; i++)
+      await tx`insert into public.room_players (room_id, seat, player_type, display_name_snapshot, status)
           values (${room.id}, ${i}, 'bot', ${`Bot ${String(i - 1)}`}, 'ready')`;
-    } else {
-      for (const [i, name] of (options.names ?? []).entries())
-        await tx`insert into public.room_players (room_id, seat, player_type, display_name_snapshot, status)
-          values (${room.id}, ${i + 1}, 'local', ${name}, 'ready')`;
-    }
     return startMatch(tx, room.id);
   });
 }

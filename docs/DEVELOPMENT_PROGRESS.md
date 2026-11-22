@@ -19,13 +19,13 @@
 | 2 Auth & Database       |     10 |      10 |    100% |
 | 3 Pure Game Engine      |     13 |      13 |    100% |
 | 4 Solo Vertical Slice   |     12 |      12 |    100% |
-| 5 Pass & Play           |      5 |       5 |    100% |
+| 5 Pass & Play (removed) |      5 |       5 |    100% |
 | 6 Online Multiplayer    |      7 |       8 |     88% |
 | 7 Public Launch & Scale |      6 |       8 |     75% |
 | 9 Developer Admin       |     17 |      17 |    100% |
-| 12 Discard Edition      |      6 |       8 |     75% |
+| 12 Discard Edition      |      8 |      10 |     80% |
 | 13 AI Art Production    |      1 |       9 |     11% |
-| **Overall**             | **94** | **107** | **88%** |
+| **Overall**             | **95** | **108** | **88%** |
 
 ## Completed (summary)
 
@@ -33,7 +33,7 @@
 - **Phase 2:** migrations, RLS, least-privilege grants, triggers, auth + profile UI.
 - **Phase 3:** pure deterministic engine package + seeded RNG + isolation guards.
 - **Phase 4:** solo backend (Edge Functions, row-locked transactions, idempotency, timeouts) + UI.
-- **Phase 5:** Pass & Play with server-chosen seat and privacy handoff.
+- **Phase 5:** Pass & Play — built, then removed by the owner (12.10, DC8).
 - **Phase 6:** online lobby, join codes, rate limits, Realtime + Presence, resume, forfeit.
 - **Phase 9:** admin RBAC (private roles, append-only audit, MFA aal2 server-side), `admin-api`, `/admin` dashboard.
 - **Phase 12:** Discard Edition rules (DC1–DC7), engine + simulation, `game-*` functions, 2–8 player table UI, cutover migration; 1v1 TCG removed.

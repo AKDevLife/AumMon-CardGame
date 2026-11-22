@@ -5,7 +5,6 @@ import { useNavigate, useParams } from "react-router";
 import { StickerButton } from "../../components/StickerButton.tsx";
 import { ApiError, callFunction } from "../../lib/api.ts";
 import { useAuth } from "../auth/auth-context.ts";
-import { HandoffScreen } from "../passplay/HandoffScreen.tsx";
 import { AudioSettings } from "./AudioSettings.tsx";
 import { CardGallery } from "./CardGallery.tsx";
 import { CardView } from "./CardView.tsx";
@@ -84,31 +83,25 @@ export function GamePage() {
   const [reveal, setReveal] = useState<string[][] | null>(null);
   const lastEvent = useRef<string | null>(null);
   const idem = useRef<{ key: string; body: string } | null>(null);
-  const passPlay = useRef(false);
   const seconds = useCountdown(data?.botActing ? null : (data?.deadline ?? null));
 
-  const refresh = useCallback(
-    async (revealHand = false) => {
-      if (!client) return;
-      try {
-        const next = await callFunction<GameResponse>(client, "game-view", {
-          matchId,
-          reveal: revealHand,
-        });
-        passPlay.current = next.mode === "pass_play";
-        setData(next);
-        setError(null);
-      } catch (e) {
-        setError(e instanceof ApiError ? e.message : "โหลดเกมไม่สำเร็จ");
-      }
-    },
-    [client, matchId],
-  );
+  const refresh = useCallback(async () => {
+    if (!client) return;
+    try {
+      const next = await callFunction<GameResponse>(client, "game-view", {
+        matchId,
+      });
+      setData(next);
+      setError(null);
+    } catch (e) {
+      setError(e instanceof ApiError ? e.message : "โหลดเกมไม่สำเร็จ");
+    }
+  }, [client, matchId]);
 
   useEffect(() => {
     const first = setTimeout(() => void refresh(), 0);
     const id = setInterval(() => {
-      if (!passPlay.current) void refresh();
+      void refresh();
     }, POLL_MS);
     return () => {
       clearTimeout(first);
@@ -157,7 +150,7 @@ export function GamePage() {
     const last = keys.at(-1) ?? null;
     if (lastEvent.current !== null && last !== lastEvent.current) {
       const fresh = data.events.slice(keys.lastIndexOf(lastEvent.current) + 1);
-      const seat = data.mode === "pass_play" ? null : data.seat;
+      const seat = data.seat;
       const names = [...new Set(fresh.map((e) => soundFor(e, seat)).filter((n) => n !== null))];
       names.slice(0, 3).forEach((n, i) => {
         setTimeout(() => {
@@ -247,8 +240,6 @@ export function GamePage() {
   const { view } = data;
   const name = (s: number) => data.names[s] ?? `ผู้เล่น ${String(s + 1)}`;
   const finished = view.status === "finished";
-  const handoff =
-    data.mode === "pass_play" && !finished && data.seat === null && view.acting !== null;
   const myTurn = view.canDraw;
 
   const send = async (command: Record<string, unknown>) => {
@@ -270,7 +261,7 @@ export function GamePage() {
     } catch (e) {
       setError(e instanceof ApiError ? e.message : "ส่งคำสั่งไม่สำเร็จ");
       if (e instanceof ApiError && e.status >= 400 && e.status < 500) idem.current = null;
-      if (!passPlay.current) void refresh();
+      void refresh();
     } finally {
       setPending(false);
     }
@@ -367,133 +358,103 @@ export function GamePage() {
         onOpen={setPopup}
       />
 
-      {handoff ? (
-        <div className="flex min-h-0 flex-1 flex-col justify-center overflow-y-auto p-3">
-          <HandoffScreen
-            name={name(view.acting)}
-            pending={pending}
-            onReveal={() => {
-              setPending(true);
-              void refresh(true).finally(() => {
-                setPending(false);
-              });
-            }}
-          />
-        </div>
-      ) : (
-        <>
-          <Opponents
+      <>
+        <Opponents view={view} seats={seats} name={name} isBot={isBot} thinking={data.botActing} />
+        <div
+          role="region"
+          aria-label="โต๊ะ"
+          tabIndex={0}
+          className="relative flex min-h-0 flex-1 flex-col overflow-y-auto"
+        >
+          <CenterTable
             view={view}
-            seats={seats}
             name={name}
-            isBot={isBot}
-            thinking={data.botActing}
+            landKey={landKey}
+            lastAction={lastAction}
+            dense={seats.length > 4}
           />
-          <div
-            role="region"
-            aria-label="โต๊ะ"
-            tabIndex={0}
-            className="relative flex min-h-0 flex-1 flex-col overflow-y-auto"
-          >
-            <CenterTable
-              view={view}
-              name={name}
-              landKey={landKey}
-              lastAction={lastAction}
-              dense={seats.length > 4}
-            />
-            {banner && (
-              <p
-                key={banner.key}
-                role="status"
-                className="am-banner am-sticker absolute inset-x-6 top-2 z-10 mx-auto max-w-xs bg-am-title px-3 py-2 text-center font-display text-lg font-bold"
-              >
-                {banner.text}
-              </p>
-            )}
-            {error && (
-              <p
-                role="alert"
-                className="mx-3 mb-2 rounded-lg border-l-4 border-am-red bg-am-error-bg px-2 py-1 font-semibold text-am-danger-text"
-              >
-                {error}
-              </p>
-            )}
-          </div>
-
-          <div className="shrink-0 rounded-t-[1.75rem] border-t-[3px] border-am-ink bg-am-brand pb-[max(0.5rem,env(safe-area-inset-bottom))] text-am-inverse">
-            <div className="flex items-center gap-2 px-3 pt-2">
-              <span
-                className={`grid h-7 min-w-7 place-items-center rounded-full border-2 border-am-ink px-1 font-display text-sm font-bold text-am-text ${myTurn ? "am-active bg-am-title" : "bg-am-card"}`}
-                aria-label={`ไพ่ในมือ ${String(view.myHand.length)} ใบ`}
-              >
-                {view.myHand.length}
-              </span>
-              <span className="min-w-0 flex-1 text-[13px] font-semibold leading-tight">
-                {me !== null && data.mode === "pass_play" ? `${name(me)} · ` : ""}
-                {hint ?? `ไพ่ในมือ ${String(view.myHand.length)} ใบ`}
-              </span>
-              {myTurn && playableCount > 0 && (
-                <button
-                  type="button"
-                  disabled={pending}
-                  onClick={() => void send({ type: "draw" })}
-                  className="am-sticker am-pressable min-h-10 shrink-0 !rounded-full bg-am-card px-3 font-display text-sm font-bold text-am-text disabled:opacity-60"
-                >
-                  จั่วแล้วผ่าน
-                </button>
-              )}
-            </div>
-            <div
-              role="group"
-              aria-label="Hand"
-              className="am-no-scrollbar flex snap-x gap-2 overflow-x-auto scroll-px-3 px-3 pb-2 pt-3.5"
+          {banner && (
+            <p
+              key={banner.key}
+              role="status"
+              className="am-banner am-sticker absolute inset-x-6 top-2 z-10 mx-auto max-w-xs bg-am-title px-3 py-2 text-center font-display text-lg font-bold"
             >
-              {hand.length === 0 && (
-                <p className="py-6 text-center text-sm opacity-80">ไม่มีไพ่ในมือ</p>
-              )}
-              {hand.map((c) => {
-                const ok = myTurn && view.playable.includes(c.id);
-                return (
-                  <span key={c.id} className={`snap-start ${dealt.has(c.id) ? "am-deal" : ""}`}>
-                    <CardView
-                      cardId={c.cardId}
-                      playable={ok}
-                      dimmed={myTurn && !ok}
-                      selected={preview?.card.id === c.id}
-                      onSelect={() => {
-                        if (ok) setPlan({ card: c, useAbility: true, pair: [] });
-                        else setInspect({ card: c });
-                      }}
-                    />
-                  </span>
-                );
-              })}
-            </div>
-            {myTurn && playableCount === 0 && (
-              <div className="px-3 pt-1">
-                <button
-                  type="button"
-                  disabled={pending}
-                  onClick={() => void send({ type: "draw" })}
-                  className="am-sticker am-pressable am-active min-h-12 w-full !rounded-full bg-am-green font-display text-lg font-bold text-am-success-text disabled:opacity-60"
-                >
-                  จั่วแล้วผ่าน
-                </button>
-              </div>
+              {banner.text}
+            </p>
+          )}
+          {error && (
+            <p
+              role="alert"
+              className="mx-3 mb-2 rounded-lg border-l-4 border-am-red bg-am-error-bg px-2 py-1 font-semibold text-am-danger-text"
+            >
+              {error}
+            </p>
+          )}
+        </div>
+
+        <div className="shrink-0 rounded-t-[1.75rem] border-t-[3px] border-am-ink bg-am-brand pb-[max(0.5rem,env(safe-area-inset-bottom))] text-am-inverse">
+          <div className="flex items-center gap-2 px-3 pt-2">
+            <span
+              className={`grid h-7 min-w-7 place-items-center rounded-full border-2 border-am-ink px-1 font-display text-sm font-bold text-am-text ${myTurn ? "am-active bg-am-title" : "bg-am-card"}`}
+              aria-label={`ไพ่ในมือ ${String(view.myHand.length)} ใบ`}
+            >
+              {view.myHand.length}
+            </span>
+            <span className="min-w-0 flex-1 text-[13px] font-semibold leading-tight">
+              {hint ?? `ไพ่ในมือ ${String(view.myHand.length)} ใบ`}
+            </span>
+            {myTurn && playableCount > 0 && (
+              <button
+                type="button"
+                disabled={pending}
+                onClick={() => void send({ type: "draw" })}
+                className="am-sticker am-pressable min-h-10 shrink-0 !rounded-full bg-am-card px-3 font-display text-sm font-bold text-am-text disabled:opacity-60"
+              >
+                จั่วแล้วผ่าน
+              </button>
             )}
           </div>
-        </>
-      )}
+          <div
+            role="group"
+            aria-label="Hand"
+            className="am-no-scrollbar flex snap-x gap-2 overflow-x-auto scroll-px-3 px-3 pb-2 pt-3.5"
+          >
+            {hand.length === 0 && <p className="py-6 text-center text-sm opacity-80">ไม่มีไพ่ในมือ</p>}
+            {hand.map((c) => {
+              const ok = myTurn && view.playable.includes(c.id);
+              return (
+                <span key={c.id} className={`snap-start ${dealt.has(c.id) ? "am-deal" : ""}`}>
+                  <CardView
+                    cardId={c.cardId}
+                    playable={ok}
+                    dimmed={myTurn && !ok}
+                    selected={preview?.card.id === c.id}
+                    onSelect={() => {
+                      if (ok) setPlan({ card: c, useAbility: true, pair: [] });
+                      else setInspect({ card: c });
+                    }}
+                  />
+                </span>
+              );
+            })}
+          </div>
+          {myTurn && playableCount === 0 && (
+            <div className="px-3 pt-1">
+              <button
+                type="button"
+                disabled={pending}
+                onClick={() => void send({ type: "draw" })}
+                className="am-sticker am-pressable am-active min-h-12 w-full !rounded-full bg-am-green font-display text-lg font-bold text-am-success-text disabled:opacity-60"
+              >
+                จั่วแล้วผ่าน
+              </button>
+            </div>
+          )}
+        </div>
+      </>
 
       {finished && (
-        <WinOverlay
-          title={
-            view.winner === me && data.mode !== "pass_play"
-              ? "คุณชนะ! 🎉"
-              : `${name(view.winner ?? 0)} ชนะ 🏆`
-          }
-        />
+        <WinOverlay title={view.winner === me ? "คุณชนะ! 🎉" : `${name(view.winner ?? 0)} ชนะ 🏆`} />
       )}
 
       <Popup
@@ -612,7 +573,7 @@ export function GamePage() {
 
       <Popup
         title="☂️ ใช้ร่มไหม?"
-        open={view.canReact && !handoff}
+        open={view.canReact}
         onClose={() => void send({ type: "react", useUmbrella: false })}
       >
         <p className="mb-2">

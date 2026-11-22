@@ -109,16 +109,8 @@ describe.runIf(run)("discard matches via Edge Functions", () => {
     expect((await a("game-create", { mode: "solo", bots: 9 })).status).toBe(400);
   });
 
-  it("pass & play: hand hidden until reveal; owner acts for the current seat", async () => {
-    const created = await a("game-create", { mode: "pass_play", names: ["Ann", "Ben", "Cid"] });
-    const matchId = created.body["matchId"] as string;
-    const hidden = (await a("game-view", { matchId })).body as unknown as Game;
-    expect(hidden.seat).toBeNull();
-    expect(hidden.view.myHand).toHaveLength(0);
-    const shown = (await a("game-view", { matchId, reveal: true })).body as unknown as Game;
-    expect(shown.seat).toBe(shown.acting);
-    expect(shown.view.myHand).toHaveLength(7);
-    expect((await send(a, shown, { type: "draw" })).status).toBe(200);
+  it("pass & play mode is gone", async () => {
+    expect((await a("game-create", { mode: "pass_play", names: ["Ann", "Ben"] })).status).toBe(400);
   });
 
   it("leaving an online-style solo match ends it", async () => {

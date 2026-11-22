@@ -17,7 +17,7 @@ describe("app routes", () => {
     renderAt("/");
     expect(screen.getByRole("heading", { level: 1, name: "AumMon" })).toBeInTheDocument();
     expect(screen.getByText("Discard Edition · 2–8 คน")).toBeInTheDocument();
-    for (const name of ["Solo vs Bot", "Pass & Play", "Online"]) {
+    for (const name of ["Solo vs Bot", "Online"]) {
       expect(screen.getByRole("button", { name })).toBeDisabled();
     }
   });

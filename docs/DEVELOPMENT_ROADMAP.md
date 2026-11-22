@@ -84,7 +84,7 @@ Percentages: `pnpm progress` (top-level tasks only). Phase 0 (Rulebook v1 decisi
 
 **Acceptance:** 1 player + bots play to the end · bots run server-side with legal actions only · client cannot fake HP/damage/target
 
-## Phase 5 — Pass & Play
+## Phase 5 — Pass & Play (removed 2026-11-22, task 12.10)
 
 - [x] **5.1** Local seats (no `user_id`) owned by room owner — deps: 4.5 — PR #23 (2026-11-19)
 - [x] **5.2** Server-side current-seat control — deps: 5.1 — PR #23 (2026-11-19)
@@ -160,6 +160,7 @@ Owner brief: shedding-type card game for 2–8 players with the 16 Everyday Obje
 - [x] **12.5** UI: table for 2–8 players, discard pile, hand, reactions, reveals, rules + card gallery, sounds — deps: 12.4 — PR #90 (2026-11-22)
 - [x] **12.6** Remove the 1v1 TCG (ruleset 6) code, tests and docs; all modes play the new game — deps: 12.5 — PR #90 (2026-11-22)
 - [x] **12.9** Gameplay screen redesign (mobile): header, opponents 2–8, center table, card states + preview, thumb-zone actions, animations, responsive tokens — deps: 12.6 — PR #92 (2026-11-22)
+- [x] **12.10** Remove Pass & Play (owner 2026-11-22, DC8): UI, `game-create` pass_play, hand-off reveal, local seats; DB checks tightened — deps: 12.9 — PR #93 (2026-11-22)
 - [ ] **12.7** VIP + cosmetic gacha design doc (no payments until legal check + owner approval) — deps: 12.1
 - [ ] **12.8** Owner playtest on Dev; balance pass — deps: 12.6
 
