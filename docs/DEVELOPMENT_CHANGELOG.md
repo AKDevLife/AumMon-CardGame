@@ -2,6 +2,10 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-22 — 11.9 Link tap sounds + louder music (owner report)
+
+- React Router links call `preventDefault()`, which the tap-sound listener treated as "cancelled"; it now plays for them too (drags still stop the click first). Music volume 0.05 → 0.1. Verified in a browser: the Solo link plays its tap sound.
+
 ## 2026-11-22 — 11.8 Card counts in rules, sounds everywhere, background music (owner request)
 
 - Rules popup lists card counts. Tap sounds + audio unlock moved to `AppLayout` (every button / link on every page). `music.ts`: synthesized I–vi–IV–V loop via Web Audio (no files), on by default, starts on the first tap; `AudioSettings` (effects + music switches, remembered per browser) in the new home ⚙️ popup and the in-game settings.
