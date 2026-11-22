@@ -8,7 +8,7 @@
 
 ## Rules
 
-- Platform decisions (spec §1), Core Rules and the Card Library change only with owner approval; result-affecting changes require a new `ruleset_version` (current: `"9"` Quick Match + balance pack; `"8"` retired in task 12.14; `"7"` retired in task 12.12; `"1"`–`"6"` retired with the 1v1 TCG in task 12.4).
+- Platform decisions (spec §1), Core Rules and the Card Library change only with owner approval; result-affecting changes require a new `ruleset_version` (current: `"10"` Quick Match + balance pack + Magnifier / Box upgrade; `"9"` retired in task 12.17; `"8"` retired in task 12.14; `"7"` retired in task 12.12; `"1"`–`"6"` retired with the 1v1 TCG in task 12.4).
 - Never invent missing mechanics. Never silently resolve conflicting requirements; record them in `docs/discard/AumMon_Rule_Clarification.md`, mark affected tasks blocked, and continue with unblocked work.
 - Approved architecture: React + Vite + TS strict, Tailwind, Supabase (Auth, PostgreSQL, Edge Functions, Realtime), Vercel.
 - `packages/game-engine` stays pure TypeScript: no React, UI, Supabase, Node/Deno/browser APIs, I/O, `Math.random` or wall-clock time (enforced by ESLint, tsconfig and architecture test — never relax these).

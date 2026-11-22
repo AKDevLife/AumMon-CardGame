@@ -25,7 +25,7 @@ export interface PendingHit {
 }
 
 export interface GameState {
-  readonly rulesetVersion: "9";
+  readonly rulesetVersion: "10";
   status: "active" | "finished";
   players: PlayerState[];
   drawPile: CardInstance[];
@@ -158,7 +158,7 @@ export function startGame(
   if (!start) throw new Error("empty deck");
   const firstSeat = rng.nextInt(n);
   const state: GameState = {
-    rulesetVersion: "9",
+    rulesetVersion: "10",
     status: "active",
     players,
     drawPile: deck,
@@ -195,6 +195,8 @@ function clone(s: GameState): GameState {
 }
 
 const n = (s: GameState) => s.players.length;
+/** Box (ruleset 10): highest points of the extra card it may place. */
+export const BOX_MAX_POINTS = 3;
 export const nextSeat = (s: GameState, from: Seat): Seat => (from + s.direction + n(s)) % n(s);
 const points = (x: CardInstance) => getDiscardCard(x.cardId).points;
 export const topCard = (s: GameState): CardInstance | undefined => s.pile[s.pile.length - 1];
@@ -297,13 +299,13 @@ function resolveAbility(
       break;
     }
     case "box": {
-      const under = s.pile.splice(s.pile.length - 2, 1)[0];
-      if (choice.card === undefined || !hand.some((x) => x.id === choice.card))
-        throw new CommandError("invalid_choice");
-      const placed = take(s, me, choice.card);
-      if (under) hand.push(under);
-      s.pile.push(placed);
-      ev.push({ type: "played", seat: me, cardIds: [placed.cardId], ability: false });
+      // Ruleset 10 (12.17): you may also put 1 card of 1–3 points on the pile (no ability).
+      if (choice.card !== undefined) {
+        const extra = hand.find((x) => x.id === choice.card);
+        if (!extra || points(extra) > BOX_MAX_POINTS) throw new CommandError("invalid_choice");
+        s.pile.push(take(s, me, extra.id));
+        ev.push({ type: "played", seat: me, cardIds: [extra.cardId], ability: false });
+      }
       break;
     }
     case "alarm":
@@ -330,6 +332,13 @@ function resolveAbility(
         cards: theirs.map((x) => x.cardId),
         private: true,
       });
+      // Ruleset 10 (12.17): then you may play 1 more card (points rule, no ability).
+      if (choice.card !== undefined) {
+        const extra = hand.find((x) => x.id === choice.card);
+        if (!extra || !canPlay(s, me, extra)) throw new CommandError("invalid_choice");
+        s.pile.push(take(s, me, extra.id));
+        ev.push({ type: "played", seat: me, cardIds: [extra.cardId], ability: false });
+      }
       break;
     }
     case "ruler":

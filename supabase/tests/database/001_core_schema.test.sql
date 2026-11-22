@@ -21,7 +21,7 @@ insert into auth.users (id, email) values ('00000000-0000-0000-0000-00000000000a
 insert into public.game_rooms (id, owner_id, mode, max_players)
   values ('10000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-00000000000a', 'solo', 8);
 insert into public.matches (id, room_id, engine_version, ruleset_version)
-  values ('20000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001', '3.0.0', '9');
+  values ('20000000-0000-0000-0000-000000000001', '10000000-0000-0000-0000-000000000001', '4.0.0', '10');
 insert into public.match_players (id, match_id, user_id, seat, player_type, hand_count)
   values ('30000000-0000-0000-0000-000000000001', '20000000-0000-0000-0000-000000000001',
           '00000000-0000-0000-0000-00000000000a', 1, 'human', 7);

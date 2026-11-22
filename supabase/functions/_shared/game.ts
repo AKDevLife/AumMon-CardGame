@@ -60,7 +60,7 @@ function cryptoSeed(): RngState {
 
 async function lockGame(tx: Tx, matchId: string, userId: string): Promise<Locked> {
   const lock =
-    await tx`select id from public.matches where id = ${matchId} and ruleset_version = '9' for update`;
+    await tx`select id from public.matches where id = ${matchId} and ruleset_version = '10' for update`;
   if (lock.length === 0) throw new HttpError(404, "not_found", "Match not found");
   const [row] = await tx<
     {
@@ -194,7 +194,7 @@ function actorSeat(locked: Locked): number | null {
 
 export interface GameResponse {
   matchId: string;
-  rulesetVersion: "9";
+  rulesetVersion: "10";
   mode: Mode;
   version: number;
   deadline: string | null;
@@ -238,7 +238,7 @@ async function respondGame(
       : [];
   return {
     matchId: locked.matchId,
-    rulesetVersion: "9",
+    rulesetVersion: "10",
     mode: locked.mode,
     version,
     deadline: rt.deadline === null ? null : new Date(rt.deadline).toISOString(),
@@ -408,7 +408,7 @@ async function startMatch(tx: Tx, roomId: string): Promise<string> {
     throw new HttpError(409, "not_enough_players", "2–8 players needed");
   const [match] = await tx<{ id: string }[]>`
     insert into public.matches (room_id, status, phase, engine_version, ruleset_version, started_at)
-    values (${roomId}, 'active', 'play', ${ENGINE_VERSION}, '9', now()) returning id`;
+    values (${roomId}, 'active', 'play', ${ENGINE_VERSION}, '10', now()) returning id`;
   if (!match) throw new Error("match insert failed");
   const playerIds = seats.map(() => crypto.randomUUID());
   const rng = createSeededRandom(cryptoSeed());

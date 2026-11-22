@@ -16,20 +16,21 @@ import { normalizeSoundConfig, playSound, setSoundConfig, soundFor } from "./sou
 import type { GameResponse } from "./types.ts";
 
 const POLL_MS = 2000;
-type Need = "target" | "card" | "optionalCard" | "pair" | null;
+type Need = "target" | "targetOptional" | "card" | "optionalCard" | "pair" | null;
 
 /** What the player must choose before using an ability (Card Library). */
 function needOf(ability: discard.AbilityId, underTop: string | null): Need {
   switch (ability) {
     case "glue":
-    case "peek":
     case "flashlight":
       return "target";
-    case "box":
+    case "peek":
+      return "targetOptional";
     case "magnet":
     case "trash":
       return "card";
     case "scissors":
+    case "box":
       return "optionalCard";
     case "tape":
       return "pair";
@@ -334,13 +335,18 @@ export function GamePage() {
   const top = view.top;
   const planDef = plan ? discard.getDiscardCard(plan.card.cardId) : null;
   const need: Need = plan && planDef && plan.useAbility ? needOf(planDef.ability, top) : null;
+  /** The ability that actually resolves (Hourglass repeats the card under it). */
+  const effective =
+    planDef?.ability === "hourglass" && top
+      ? discard.getDiscardCard(top).ability
+      : (planDef?.ability ?? null);
   const rest = plan ? view.myHand.filter((c) => c.id !== plan.card.id) : [];
   const opponents = view.players.map((_, i) => i).filter((i) => i !== data.seat);
   const ready =
     plan !== null &&
     (need === null ||
       need === "optionalCard" ||
-      (need === "target" && plan.target !== undefined) ||
+      ((need === "target" || need === "targetOptional") && plan.target !== undefined) ||
       (need === "card" && plan.extra !== undefined) ||
       (need === "pair" && plan.pair.length === 2));
   const submitPlan = () => {
@@ -587,7 +593,7 @@ export function GamePage() {
                 </span>
               </label>
             )}
-            {need === "target" && (
+            {(need === "target" || need === "targetOptional") && (
               <div role="group" aria-label="เลือกผู้เล่น" className="flex flex-wrap gap-2">
                 {opponents.map((i) => (
                   <StickerButton
@@ -603,16 +609,21 @@ export function GamePage() {
                 ))}
               </div>
             )}
-            {(need === "card" || need === "optionalCard" || need === "pair") && (
+            {(need === "card" ||
+              need === "optionalCard" ||
+              need === "targetOptional" ||
+              need === "pair") && (
               <div role="group" aria-label="เลือกไพ่" className="flex gap-2 overflow-x-auto pb-1">
                 {rest.map((c) => {
                   const chosen = need === "pair" ? plan.pair.includes(c.id) : plan.extra === c.id;
                   const allowed =
                     need === "pair"
                       ? pairOk(c.id)
-                      : need === "optionalCard"
-                        ? discard.getDiscardCard(c.cardId).points >= planDef.points ||
-                          discard.getDiscardCard(c.cardId).ability === "eraser"
+                      : need === "optionalCard" || need === "targetOptional"
+                        ? effective === "box"
+                          ? discard.getDiscardCard(c.cardId).points <= discard.BOX_MAX_POINTS
+                          : discard.getDiscardCard(c.cardId).points >= planDef.points ||
+                            discard.getDiscardCard(c.cardId).ability === "eraser"
                         : true;
                   return (
                     <CardView
@@ -636,8 +647,12 @@ export function GamePage() {
                 })}
               </div>
             )}
-            {need === "optionalCard" && (
-              <p className="text-xs text-am-muted">เลือกไพ่ที่จะลงเพิ่มได้ 1 ใบ (ไม่เลือกก็ได้)</p>
+            {(need === "optionalCard" || need === "targetOptional") && (
+              <p className="text-xs text-am-muted">
+                {effective === "box"
+                  ? "เลือกไพ่แต้ม 1–3 ที่จะวางเพิ่มได้ 1 ใบ (ไม่เลือกก็ได้)"
+                  : "เลือกไพ่ที่จะลงเพิ่มได้ 1 ใบ (ไม่เลือกก็ได้)"}
+              </p>
             )}
             {need === "pair" && <p className="text-xs text-am-muted">เลือกไพ่ 2 ใบที่แต้มเท่ากัน</p>}
             <div className="grid grid-cols-[1fr_2fr] gap-2">

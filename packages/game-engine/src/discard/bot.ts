@@ -36,10 +36,18 @@ function choiceFor(
   const lowest = [...rest].sort((a, b) => pts(a) - pts(b))[0];
   switch (ability) {
     case "glue":
-    case "peek":
     case "flashlight":
       return { target: fewestOpponent(s, me) };
-    case "box":
+    case "box": {
+      const low = [...rest].filter((c) => pts(c) <= 3).sort((a, b) => pts(a) - pts(b))[0];
+      return low ? { card: low.id } : {};
+    }
+    case "peek": {
+      const extra = [...rest]
+        .filter((c) => pts(c) >= pts(played))
+        .sort((a, b) => pts(a) - pts(b))[0];
+      return { target: fewestOpponent(s, me), ...(extra && { card: extra.id }) };
+    }
     case "magnet":
     case "trash":
       return lowest ? { card: lowest.id } : null;

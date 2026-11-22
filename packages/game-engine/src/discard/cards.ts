@@ -7,10 +7,10 @@ export type AbilityId =
   | "glue" // กาวน้ำ: chosen player cannot play < 4 on their next turn
   | "eraser" // ยางลบ: wild; clears the pile conditions
   | "scissors" // กรรไกร: remove the card under, play 1 more card
-  | "box" // กล่องกระดาษ: card under → hand, place another hand card on top
+  | "box" // กล่องกระดาษ: also put 1 card of 1–3 points on the pile (ruleset 10)
   | "alarm" // นาฬิกาปลุก: reverse + the next player (new direction) draws 1
   | "magnet" // แม่เหล็ก: give 1 own card to the player with the fewest cards
-  | "peek" // แว่นขยาย: secretly see 2 random cards of a chosen player
+  | "peek" // แว่นขยาย: secretly see 2 cards of a player, then you may play 1 more (ruleset 10)
   | "ruler" // ไม้บรรทัด: next player must play exactly this value or draw & pass
   | "tape" // เทปกาว: also play 2 cards of equal points
   | "trash" // ถังขยะ: remove 1 own card from the game (ruleset 9: no redraw)
@@ -61,10 +61,10 @@ const SHORT: Record<AbilityId, string> = {
   glue: "เลือก 1 คน ห้ามลงแต้ม 1–3 เทิร์นหน้า",
   eraser: "ลงทับได้ทุกใบ ล้างกอง",
   scissors: "ตัดใบใต้ทิ้ง ลงเพิ่มได้ 1",
-  box: "ใบใต้ขึ้นมือ วางใบอื่นแทน",
+  box: "วางไพ่แต้ม 1–3 เพิ่มได้ 1 ใบ",
   alarm: "สลับทิศ คนถัดไปจั่ว 1",
   magnet: "ส่ง 1 ใบให้คนไพ่น้อยสุด",
-  peek: "แอบดูไพ่ 2 ใบของ 1 คน",
+  peek: "แอบดู 2 ใบ แล้วลงเพิ่มได้ 1",
   ruler: "คนถัดไปต้องลงแต้ม 5",
   tape: "ลงคู่แต้มเท่ากันเพิ่ม 2 ใบ",
   trash: "ทิ้ง 1 ใบออกจากเกม",
@@ -103,7 +103,7 @@ export const DISCARD_CARDS: readonly DiscardCard[] = [
     3,
     "box",
     "เก็บของ",
-    "นำไพ่ใบใต้กล่องขึ้นมือ แล้ววางไพ่ใบอื่นจากมือ 1 ใบไว้บนกอง",
+    "วางไพ่ในมือที่แต้ม 1–3 ลงบนกองเพิ่มได้อีก 1 ใบ (ไม่ใช้พลังของใบนั้น)",
   ),
   c(
     "D06",
@@ -115,7 +115,16 @@ export const DISCARD_CARDS: readonly DiscardCard[] = [
     "สลับทิศทางการเล่น แล้วผู้เล่นคนถัดไป (ตามทิศใหม่) จั่วเพิ่ม 1 ใบ",
   ),
   c("D07", "แม่เหล็ก", "Magnet", 4, "magnet", "ดูดติด", "ส่งไพ่ 1 ใบจากมือเราไปติดผู้เล่นที่มีไพ่น้อยที่สุด"),
-  c("D08", "แว่นขยาย", "Magnifier", 2, "peek", "ส่อง", "เลือกผู้เล่น 1 คน ดูไพ่ในมือเขาแบบลับ 2 ใบ", true),
+  c(
+    "D08",
+    "แว่นขยาย",
+    "Magnifier",
+    2,
+    "peek",
+    "ส่อง",
+    "เลือกผู้เล่น 1 คน ดูไพ่ในมือเขาแบบลับ 2 ใบ แล้วลงไพ่เพิ่มได้อีก 1 ใบ (ตามกฎแต้ม)",
+    true,
+  ),
   c(
     "D09",
     "ไม้บรรทัด",
@@ -160,7 +169,7 @@ export const DISCARD_CARDS: readonly DiscardCard[] = [
 ];
 
 export const DISCARD_RULES = {
-  version: "9",
+  version: "10",
   minPlayers: 2,
   maxPlayers: 8,
   copies: 4,

@@ -63,3 +63,33 @@ Nothing in this plan changes the win condition or the turn structure.
 | ------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
 | **B4B แว่นขยาย** — peek at 2 cards, then you may play 1 more card (points rule) | Magnifier 0.75 → 0.89 (4p), 0.71 → 0.88 (8p); rounds a little shorter; other cards unchanged | **Approve** → ruleset "10"                                                                             |
 | **B6B กล่องกระดาษ** — put 1 card from your hand on the pile (no ability)        | Box 0.85 → 1.11 (4p) and **1.28 (8p)** — overshoots; rounds shorter (8p ≤ 10 min 84 → 89 %)  | **Not as is.** Option: only a card with points ≤ the Box's (3), or keep the current Box with a UI hint |
+
+## 5. Decision 12.17 (delegated to Claude by the owner) → ruleset "10"
+
+| Config                                              | Players | Mean turns | Est. min median / p90 | ≤ 10 min | Win index range | แว่นขยาย | กล่องกระดาษ |
+| --------------------------------------------------- | ------: | ---------: | --------------------- | -------: | --------------- | ------: | ---------: |
+| R9 shipped                                          |       2 |         12 | 1.7 / 3.2             |    100 % | 0.85–1.15       |    0.85 |       0.85 |
+| R9 shipped                                          |       4 |         31 | 3.9 / 8.6             |     94 % | 0.75–1.38       |    0.75 |       0.85 |
+| R9 shipped                                          |       6 |         36 | 3.9 / 11.6            |     87 % | 0.65–1.53       |    0.68 |       0.77 |
+| R9 shipped                                          |       8 |         41 | 4.8 / 12.6            |     84 % | 0.67–1.57       |    0.71 |       0.82 |
+| R9 + Magnifier peek & play 1 more (proposal B4B)    |       2 |         11 | 1.6 / 2.9             |    100 % | 0.86–1.13       |    0.95 |       0.86 |
+| R9 + Magnifier peek & play 1 more (proposal B4B)    |       4 |         29 | 3.6 / 7.9             |     95 % | 0.79–1.35       |    0.89 |       0.87 |
+| R9 + Magnifier peek & play 1 more (proposal B4B)    |       6 |         34 | 3.8 / 10.4            |     89 % | 0.71–1.55       |    0.85 |       0.81 |
+| R9 + Magnifier peek & play 1 more (proposal B4B)    |       8 |         39 | 4.6 / 11.9            |     86 % | 0.63–1.55       |    0.88 |       0.84 |
+| R9 + Box put 1 card of 1–3 points (proposal B6C)    |       2 |         11 | 1.6 / 2.9             |    100 % | 0.84–1.15       |    0.84 |       0.97 |
+| R9 + Box put 1 card of 1–3 points (proposal B6C)    |       4 |         28 | 3.6 / 7.5             |     96 % | 0.76–1.35       |    0.76 |       1.05 |
+| R9 + Box put 1 card of 1–3 points (proposal B6C)    |       6 |         33 | 3.7 / 10.2            |     90 % | 0.67–1.54       |    0.67 |       1.01 |
+| R9 + Box put 1 card of 1–3 points (proposal B6C)    |       8 |         38 | 4.5 / 11.0            |     87 % | 0.64–1.63       |    0.64 |       1.09 |
+| R9 + Magnifier B4B + Box B6C (candidate ruleset 10) |       2 |         11 | 1.5 / 2.8             |    100 % | 0.86–1.16       |    0.96 |       0.94 |
+| R9 + Magnifier B4B + Box B6C (candidate ruleset 10) |       4 |         26 | 3.4 / 7.2             |     97 % | 0.77–1.35       |    0.91 |       1.05 |
+| R9 + Magnifier B4B + Box B6C (candidate ruleset 10) |       6 |         31 | 3.5 / 9.0             |     93 % | 0.67–1.60       |    0.89 |       1.00 |
+| R9 + Magnifier B4B + Box B6C (candidate ruleset 10) |       8 |         36 | 4.3 / 10.7            |     88 % | 0.65–1.64       |    0.82 |       1.11 |
+| R10 shipped                                         |       2 |         11 | 1.5 / 2.8             |    100 % | 0.86–1.15       |    0.92 |       0.89 |
+| R10 shipped                                         |       4 |         27 | 3.6 / 7.4             |     96 % | 0.78–1.37       |    0.90 |       0.92 |
+| R10 shipped                                         |       6 |         33 | 3.6 / 9.9             |     90 % | 0.69–1.58       |    0.91 |       0.88 |
+| R10 shipped                                         |       8 |         38 | 4.5 / 11.4            |     86 % | 0.67–1.56       |    0.84 |       0.96 |
+
+- **แว่นขยาย → B4B** ("peek 2, then you may play 1 more card"). It was the weakest card; now 0.84–0.92 on the shipped engine.
+- **กล่องกระดาษ → B6C** ("put 1 card of 1–3 points on the pile"). A softer version of B6B, which reached 1.28 at 8 players. Now 0.88–0.96.
+- Rounds get shorter: 8 players mean turns 41 → 38, ≤ 10 min 84 → 86 %. 4 players ≤ 10 min: 96 %.
+- Unchanged and still strongest: ร่ม and เทปกาว (up to ~1.56). Watch them in the human playtest.
