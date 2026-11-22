@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { defaultSoundConfig, PRESETS, SOUND_EVENTS } from "../../src/features/tcg/sound.ts";
+import { defaultSoundConfig, PRESETS, SOUND_EVENTS } from "../../src/features/game/sound.ts";
 import {
   SOUND_EVENT_IDS,
   SOUND_PRESET_IDS,

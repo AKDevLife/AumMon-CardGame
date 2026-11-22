@@ -11,7 +11,7 @@ const NAME_RE = /^[\p{L}\p{M}\p{N} _.-]{1,24}$/u;
 export function PassPlaySetupPage() {
   const auth = useAuth();
   const navigate = useNavigate();
-  const [names, setNames] = useState<[string, string]>(["ผู้เล่น 1", "ผู้เล่น 2"]);
+  const [names, setNames] = useState<string[]>(["ผู้เล่น 1", "ผู้เล่น 2", "ผู้เล่น 3"]);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const signedIn = auth.mode === "live" && auth.session !== null;
@@ -30,14 +30,14 @@ export function PassPlaySetupPage() {
     );
   }
 
-  const trimmed = names.map((n) => n.trim()) as [string, string];
+  const trimmed = names.map((n) => n.trim());
   const valid = trimmed.every((n) => NAME_RE.test(n));
 
   const start = async () => {
     setPending(true);
     setError(null);
     try {
-      const { matchId } = await callFunction<{ matchId: string }>(auth.client, "tcg-create", {
+      const { matchId } = await callFunction<{ matchId: string }>(auth.client, "game-create", {
         mode: "pass_play",
         names: trimmed,
       });
@@ -62,7 +62,7 @@ export function PassPlaySetupPage() {
             value={name}
             maxLength={24}
             onChange={(e) => {
-              const next: [string, string] = [...names];
+              const next = [...names];
               next[i] = e.target.value;
               setNames(next);
             }}
@@ -70,6 +70,25 @@ export function PassPlaySetupPage() {
           />
         </label>
       ))}
+      <div className="flex gap-2">
+        <StickerButton
+          disabled={names.length >= 8}
+          onClick={() => {
+            setNames([...names, `ผู้เล่น ${String(names.length + 1)}`]);
+          }}
+        >
+          + เพิ่มผู้เล่น
+        </StickerButton>
+        <StickerButton
+          disabled={names.length <= 2}
+          onClick={() => {
+            setNames(names.slice(0, -1));
+          }}
+        >
+          − ลดผู้เล่น
+        </StickerButton>
+      </div>
+      <p className="text-sm text-am-muted">{names.length} คน (2–8 คน) · ส่งเครื่องต่อกันตอนเปลี่ยนเทิร์น</p>
       {error && (
         <p
           role="alert"

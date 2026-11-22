@@ -2,10 +2,10 @@ import { useState } from "react";
 import { Link } from "react-router";
 import { StickerButton } from "../components/StickerButton.tsx";
 import { useAuth } from "../features/auth/auth-context.ts";
-import { AudioSettings } from "../features/tcg/AudioSettings.tsx";
-import { CardGallery } from "../features/tcg/CardGallery.tsx";
-import { Popup } from "../features/tcg/Popup.tsx";
-import { RulesText } from "../features/tcg/RulesText.tsx";
+import { AudioSettings } from "../features/game/AudioSettings.tsx";
+import { CardGallery } from "../features/game/CardGallery.tsx";
+import { Popup } from "../features/game/Popup.tsx";
+import { RulesText } from "../features/game/RulesText.tsx";
 
 const MODES = [
   { id: "solo", label: "Solo vs Bot" },

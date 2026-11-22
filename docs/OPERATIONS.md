@@ -11,7 +11,7 @@ select * from private.metrics_matches_daily;   -- matches created / finished / a
 
 - Raw rows: `private.function_metrics` (no user ids, no game data).
 - Function logs and errors: Supabase → Edge Functions → _function_ → Logs (`Unhandled error …`).
-- Scaling triggers (blueprint §11.4): `tcg-command` p95 > 800 ms, 5xx > 1 %, frequent 429 for normal play → investigate before adding a dedicated server.
+- Scaling triggers (blueprint §11.4): `game-command` p95 > 800 ms, 5xx > 1 %, frequent 429 for normal play → investigate before adding a dedicated server.
 - Retention: delete old metric rows periodically, e.g. `delete from private.function_metrics where created_at < now() - interval '30 days';`
 
 ## Load test (task 7.6)
@@ -28,9 +28,9 @@ Baseline ruleset 2 (2026-11-20, task 8.14, AumMon-Dev Free plan, 20 concurrent p
 
 | Function (server-side, `metrics_functions_24h`) | p50 ms | p95 ms |
 | ----------------------------------------------- | -----: | -----: |
-| `tcg-command`                                   |    138 |    360 |
-| `tcg-view`                                      |     59 |    450 |
-| `tcg-create`                                    |    727 |    854 |
+| `game-command`                                  |    138 |    360 |
+| `game-view`                                     |     59 |    450 |
+| `game-create`                                   |    727 |    854 |
 | `account-delete`                                |    120 |    590 |
 
 Earlier baseline, retired ruleset 1 (2026-11-20, task 7.6):

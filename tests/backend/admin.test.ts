@@ -129,7 +129,7 @@ describe.runIf(run)("admin RBAC via Edge Functions", () => {
     expect(overview.status).toBe(200);
     expect(JSON.stringify(overview.body)).not.toMatch(/internal_state|rng_state|service_role/);
     const cards = await admin.call({ action: "cards" });
-    expect((cards.body["cards"] as unknown[]).length).toBe(24);
+    expect((cards.body["cards"] as unknown[]).length).toBe(16);
     expect((await admin.call({ action: "settings" })).body["env"]).toBe("development");
   });
 
@@ -160,14 +160,14 @@ describe.runIf(run)("admin RBAC via Edge Functions", () => {
       .map((a) => a.action);
     expect(actions).toEqual(expect.arrayContaining(["player.disabled", "player.enabled"]));
     // Room cleanup: an open solo room is listed, can be closed (its game is abandoned), and is audited.
-    const created = await fetch(`${url}/functions/v1/tcg-create`, {
+    const created = await fetch(`${url}/functions/v1/game-create`, {
       method: "POST",
       headers: {
         "content-type": "application/json",
         authorization: `Bearer ${(await player.client.auth.getSession()).data.session?.access_token ?? ""}`,
         apikey: key ?? "",
       },
-      body: JSON.stringify({ mode: "solo" }),
+      body: JSON.stringify({ mode: "solo", bots: 1 }),
     });
     expect(created.status).toBe(200);
     const rooms = (await admin.call({ action: "rooms" })).body as unknown as {
@@ -202,7 +202,8 @@ describe.runIf(run)("admin RBAC via Edge Functions", () => {
       .eq("key", "sounds")
       .single();
     expect(
-      (read.data as { value: Record<string, { preset: string }> }).value["attack"]?.preset,
+      (read.data as { value: Record<string, { preset: string }> }).value[SOUND_EVENT_IDS[0]]
+        ?.preset,
     ).toBe("pop");
     const sim = await admin.call({ action: "bots.simulate", games: 3 });
     expect(sim.body["games"]).toBe(3);

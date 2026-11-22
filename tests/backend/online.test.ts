@@ -11,11 +11,10 @@ const url = process.env["VITE_SUPABASE_URL"];
 const key = process.env["VITE_SUPABASE_PUBLISHABLE_KEY"];
 const run = url !== undefined && key !== undefined && /127\.0\.0\.1|localhost/.test(url);
 
-interface Tcg {
+interface GameView {
   version: number;
-  seat: 0 | 1 | null;
-  legal: { type: string }[];
-  view: { status: string; myHand: { instanceId: string }[]; result: unknown };
+  seat: number | null;
+  view: { status: string; myHand: { id: string }[] };
 }
 
 async function user(name: string) {
@@ -82,8 +81,8 @@ describe.runIf(run)("online multiplayer via Edge Functions", () => {
     [a, b, c] = await Promise.all([user("Ann"), user("Ben"), user("Cat")]);
   });
 
-  it("owner creates a 1v1 lobby and gets a join code (stored hashed)", async () => {
-    const res = await a.call("rooms-create", { mode: "online" });
+  it("owner creates a 2-player lobby and gets a join code (stored hashed)", async () => {
+    const res = await a.call("rooms-create", { mode: "online", maxPlayers: 2 });
     expect(res.status).toBe(200);
     roomId = String(res.body["roomId"]);
     code = String(res.body["joinCode"]);
@@ -95,7 +94,7 @@ describe.runIf(run)("online multiplayer via Edge Functions", () => {
       .single();
     const room = data as { join_code_hash: string; max_players: number; ruleset_version: string };
     expect(room.join_code_hash).not.toContain(code);
-    expect([room.max_players, room.ruleset_version]).toEqual([2, "6"]);
+    expect([room.max_players, room.ruleset_version]).toEqual([2, "7"]);
   });
 
   it("joining validates code and capacity", async () => {
@@ -112,20 +111,20 @@ describe.runIf(run)("online multiplayer via Edge Functions", () => {
   });
 
   it("start requires everyone ready; only the owner can start", async () => {
-    expect((await a.call("tcg-start", { roomId })).body["error"]).toBe("not_ready");
+    expect((await a.call("game-start", { roomId })).body["error"]).toBe("not_ready");
     expect((await b.call("rooms-ready", { roomId, ready: true })).status).toBe(200);
-    expect((await b.call("tcg-start", { roomId })).status).toBe(404);
-    const start = await a.call("tcg-start", { roomId });
+    expect((await b.call("game-start", { roomId })).status).toBe(404);
+    const start = await a.call("game-start", { roomId });
     expect(start.status).toBe(200);
     matchId = String(start.body["matchId"]);
   });
 
   it("each player sees only their own hand; outsiders see nothing", async () => {
-    const va = (await a.call("tcg-view", { matchId })).body as unknown as Tcg;
-    const vb = (await b.call("tcg-view", { matchId })).body as unknown as Tcg;
+    const va = (await a.call("game-view", { matchId })).body as unknown as GameView;
+    const vb = (await b.call("game-view", { matchId })).body as unknown as GameView;
     expect(va.seat).not.toBe(vb.seat);
-    for (const h of vb.view.myHand) expect(JSON.stringify(va)).not.toContain(`"${h.instanceId}"`);
-    expect((await c.call("tcg-view", { matchId })).status).toBe(404);
+    for (const h of vb.view.myHand) expect(JSON.stringify(va)).not.toContain(`"${h.id}"`);
+    expect((await c.call("game-view", { matchId })).status).toBe(404);
     const { data } = await c.client.from("matches").select("id").eq("id", matchId);
     expect(data).toEqual([]);
   });
@@ -134,28 +133,23 @@ describe.runIf(run)("online multiplayer via Edge Functions", () => {
     const la = listen(a.client, matchId);
     const lc = listen(c.client, matchId);
     await Promise.all([la.ready, lc.ready]);
-    const va = (await a.call("tcg-view", { matchId })).body as unknown as Tcg;
-    const vb = (await b.call("tcg-view", { matchId })).body as unknown as Tcg;
-    // Both mulligan at once: the row lock serializes them; both succeed exactly once.
-    const mull = (v: Tcg) => ({
+    const va = (await a.call("game-view", { matchId })).body as unknown as GameView;
+    const vb = (await b.call("game-view", { matchId })).body as unknown as GameView;
+    // Both try to act at once: the row lock serializes them; only the current player may draw.
+    const draw = (v: GameView) => ({
       matchId,
       expectedVersion: v.version,
       idempotencyKey: randomUUID(),
-      command: { type: "mulligan", instanceIds: [] },
+      command: { type: "draw" },
     });
     const [ra, rb] = await Promise.all([
-      a.call("tcg-command", mull(va)),
-      b.call("tcg-command", mull(vb)),
+      a.call("game-command", draw(va)),
+      b.call("game-command", draw(vb)),
     ]);
     const statuses = [ra.status, rb.status].sort();
     expect(statuses[0]).toBe(200);
-    if (statuses[1] !== 200) {
-      const retry = (await b.call("tcg-view", { matchId })).body as unknown as Tcg;
-      const who = retry.legal.some((l) => l.type === "mulligan") ? b : a;
-      const v = (await who.call("tcg-view", { matchId })).body as unknown as Tcg;
-      expect((await who.call("tcg-command", mull(v))).status).toBe(200);
-    }
-    const after = (await a.call("tcg-view", { matchId })).body as unknown as Tcg;
+    expect([403, 409]).toContain(statuses[1]);
+    const after = (await a.call("game-view", { matchId })).body as unknown as GameView;
     expect(after.view.status).toBe("active");
     for (let i = 0; i < 40 && la.received.length === 0; i++) await wait(250);
     expect(la.received.length).toBeGreaterThan(0);
@@ -184,17 +178,10 @@ describe.runIf(run)("online multiplayer via Edge Functions", () => {
     expect(outsider).not.toBe(REALTIME_SUBSCRIBE_STATES.SUBSCRIBED);
   }, 20_000);
 
-  it("forfeit ends the match for the other player", async () => {
-    const vb = (await b.call("tcg-view", { matchId })).body as unknown as Tcg;
-    const r = await b.call("tcg-command", {
-      matchId,
-      expectedVersion: vb.version,
-      idempotencyKey: randomUUID(),
-      command: { type: "forfeit" },
-    });
-    expect(r.status).toBe(200);
-    const final = (await a.call("tcg-view", { matchId })).body as unknown as Tcg;
-    expect(final.view.status).toBe("finished");
-    expect(final.view.result).toEqual({ winner: final.seat });
+  it("leaving hands the seat to a bot; the match goes on", async () => {
+    expect((await b.call("game-leave", { matchId })).status).toBe(200);
+    const after = (await a.call("game-view", { matchId })).body as unknown as GameView;
+    expect(after.view.status).toBe("active");
+    expect((await b.call("game-view", { matchId })).status).toBe(404);
   });
 });

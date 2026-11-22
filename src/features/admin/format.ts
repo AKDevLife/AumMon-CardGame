@@ -1,5 +1,5 @@
-import type { v6 } from "@aummon/game-engine";
-import { cardName, describeEvent, KEYWORD_LABEL } from "../tcg/labels.ts";
+import type { discard } from "@aummon/game-engine";
+import { cardName, describeEvent } from "../game/labels.ts";
 
 /** Human-readable Thai text for admin data (no database/program words on screen). */
 
@@ -70,47 +70,30 @@ export function label(map: keyof typeof MAPS, v: unknown): string {
 
 export const yesNo = (v: unknown): string => (v === true ? "ใช่" : "ไม่");
 
-export function keywords(v: unknown): string {
-  if (!Array.isArray(v) || v.length === 0) return "—";
-  return v
-    .map((k) =>
-      typeof k === "string" && k in KEYWORD_LABEL ? KEYWORD_LABEL[k as v6.Keyword] : String(k),
-    )
-    .join(", ");
-}
-
-/** "🔁 Passive name · ✨ Active name (⚡cost)" from a card's effect_spec. */
-export function abilities(v: unknown): string {
-  if (typeof v !== "object" || v === null) return "—";
-  const spec = v as {
-    passive?: { name?: string } | null;
-    active?: { name?: string } | null;
-  };
-  const parts: string[] = [];
-  if (spec.passive?.name) parts.push(`🔁 ${spec.passive.name}`);
-  if (spec.active?.name) parts.push(`✨ ${spec.active.name}`);
-  return parts.length ? parts.join(" · ") : "—";
-}
-
 export const card = (v: unknown): string => (typeof v === "string" ? cardName(v) : "—");
 
 /** Readable game event sentence from its public payload (seats shown as Player 1/2). */
 export function eventText(payload: unknown): string {
   if (typeof payload !== "object" || payload === null) return "—";
-  return describeEvent(payload as v6.GameEvent, ["ผู้เล่น 1", "ผู้เล่น 2"]) ?? "จบเทิร์น / จั่วการ์ด";
+  return (
+    describeEvent(
+      payload as discard.GameEvent,
+      Array.from({ length: 8 }, (_, i) => `ผู้เล่น ${String(i + 1)}`),
+    ) ?? "—"
+  );
 }
 
 export function shortId(v: unknown): string {
   return typeof v === "string" ? `#${v.slice(0, 6)}` : "—";
 }
 
-/** Seats of a match as "ผู้เล่น ❤️12 · Bot ❤️5". */
+/** Seats of a match as "ผู้เล่น 🃏7 · Bot 🃏5" (cards in hand). */
 export function seats(v: unknown): string {
   if (!Array.isArray(v)) return "—";
   return v
     .map(
-      (p: { type?: string; hp?: number }) =>
-        `${label("seatType", p.type)} ❤️${String(p.hp ?? "?")}`,
+      (p: { type?: string; cards?: number }) =>
+        `${label("seatType", p.type)} 🃏${String(p.cards ?? "?")}`,
     )
     .join(" · ");
 }

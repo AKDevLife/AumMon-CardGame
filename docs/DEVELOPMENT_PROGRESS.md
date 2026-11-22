@@ -1,41 +1,41 @@
 # AumMon — Development Progress
 
-> Updated: 2026-11-21 · Numbers from `pnpm progress` (top-level roadmap tasks; verified tasks only)
+> Updated: 2026-11-22 · Numbers from `pnpm progress` (top-level roadmap tasks; verified tasks only)
 
 ## Current
 
-- **Status:** 🚧 Phase 12 — new game "Casual Discard Edition" (owner brief 2026-11-22); the 1v1 TCG (ruleset 6) stays live until the new game is ready.
-- **Phase:** 12 — rules approved (DC1–DC7), engine next.
-- **Current task:** 12.3 architecture / database / test plan for 2–8 player rooms
-- **Next:** 12.3 architecture docs → 12.4 backend → 12.5 UI → 12.6 remove 1v1 TCG → 12.8 playtest; 12.7 VIP/gacha design (build later).
+- **Status:** 🎮 Casual Discard Edition (ruleset "7", 2–8 players) is the only game; the 1v1 TCG was removed (code, tables, docs).
+- **Phase:** 12 — engine, backend, UI and cleanup done.
+- **Current task:** 12.8 owner playtest on Dev
+- **Next:** 12.8 playtest + balance → 12.7 VIP/gacha design doc (build later).
 - **Playtest URL (latest `main`):** https://aum-mon-card-game-git-playtest-aum-mon.vercel.app
 - **Dev backend:** Supabase `AumMon-Dev` (ref `yaxtzdhryctfjaspxvix`, ap-northeast-1), email confirmation OFF for playtesting.
 
 ## Completion
 
-| Phase                   |    Done |   Total |       % |
-| ----------------------- | ------: | ------: | ------: |
-| 1 Project Foundation    |      16 |      16 |    100% |
-| 2 Auth & Database       |      10 |      10 |    100% |
-| 3 Pure Game Engine      |      13 |      13 |    100% |
-| 4 Solo Vertical Slice   |      12 |      12 |    100% |
-| 5 Pass & Play           |       5 |       5 |    100% |
-| 6 Online Multiplayer    |       7 |       8 |     88% |
-| 7 Public Launch & Scale |       6 |       8 |     75% |
-| 8 1v1 TCG Ruleset       |      14 |      14 |    100% |
-| 9 Developer Admin       |      17 |      17 |    100% |
-| **Overall**             | **100** | **103** | **97%** |
+| Phase                   |   Done |  Total |       % |
+| ----------------------- | -----: | -----: | ------: |
+| 1 Project Foundation    |     16 |     16 |    100% |
+| 2 Auth & Database       |     10 |     10 |    100% |
+| 3 Pure Game Engine      |     13 |     13 |    100% |
+| 4 Solo Vertical Slice   |     12 |     12 |    100% |
+| 5 Pass & Play           |      5 |      5 |    100% |
+| 6 Online Multiplayer    |      7 |      8 |     88% |
+| 7 Public Launch & Scale |      6 |      8 |     75% |
+| 9 Developer Admin       |     17 |     17 |    100% |
+| 12 Discard Edition      |      6 |      8 |     75% |
+| **Overall**             | **92** | **97** | **95%** |
 
 ## Completed (summary)
 
 - **Phase 1:** monorepo, TS strict, lint/format, tests, CI, secret guard, operating rules, tracking; Supabase Dev + Vercel Preview + stable `playtest` URL; UI preview; branch rule (not enforced on Free plan — accepted).
-- **Phase 2:** 9 migrations, RLS, least-privilege grants, triggers, seed (4 characters, 40-card deck), auth + profile UI.
-- **Phase 3:** pure engine implementing Rulebook v1 + provisional clarifications Q1–Q12, normal bot, simulations.
+- **Phase 2:** migrations, RLS, least-privilege grants, triggers, auth + profile UI.
+- **Phase 3:** pure deterministic engine package + seeded RNG + isolation guards.
 - **Phase 4:** solo backend (Edge Functions, row-locked transactions, idempotency, timeouts) + UI.
 - **Phase 5:** Pass & Play with server-chosen seat and privacy handoff.
 - **Phase 6:** online lobby, join codes, rate limits, Realtime + Presence, resume, forfeit.
 - **Phase 9:** admin RBAC (private roles, append-only audit, MFA aal2 server-side), `admin-api`, `/admin` dashboard.
-- **Phase 8:** 8.1 single spec v3.0 (1v1 TCG) + docs aligned; 8.2 card data + validation; 8.3 engine core; 8.4 combat + keywords; 8.5 actions + equipment; 8.6 evolution + fusion; 8.7 simulation; 8.8 bot; 8.9 DB catalog; 8.10 backend `tcg-*` functions; 8.11 board UI + Solo; 8.12 Pass & Play; 8.13 Online; 8.14 ruleset 1 retired (`packages/game-engine/src/rules/v2`).
+- **Phase 12:** Discard Edition rules (DC1–DC7), engine + simulation, `game-*` functions, 2–8 player table UI, cutover migration; 1v1 TCG removed.
 - **Phase 7:** security review + CSP/headers, no-cost monitoring, account deletion + draft legal pages, WCAG 2.1 AA, load test (20 players) + region fix, smoke test + runbook.
 
 ## In progress
@@ -50,12 +50,11 @@ None
 | 7.3  | Backup/restore test — needs 6.8 / Pro plan                                                          |
 | 7.8  | Owner approval; final legal texts; email confirmation ON + SMTP; domain; Vercel protection decision |
 
-## Latest verification (2026-11-20)
+## Latest verification (2026-11-22)
 
-- Local: `pnpm check` ✅ 163 unit/integration tests · pgTAP ✅ (10 suites)
-- CI on PR #55: ✅ all jobs (backend + E2E on local Supabase)
-- Cloud (AumMon-Dev + playtest): smoke ✅ 8/8 · E2E ✅ solo, pass & play, online (two browsers) · load test ✅ 20/20 matches, `tcg-command` server p50 138 ms / p95 360 ms
+- Local: `pnpm check` ✅ (typecheck, lint, format, unit/integration tests, build, secrets)
+- CI on PR #90: see PR
 
 ## Rule questions
 
-- Ruleset 2 decisions R2-2…R2-8 in `docs/rule-clarifications.md` (owner, provisional) — revisit after playtesting.
+- Open questions and owner decisions: `docs/discard/AumMon_Rule_Clarification.md` — revisit after playtest (12.8).

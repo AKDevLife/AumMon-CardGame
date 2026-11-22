@@ -10,7 +10,7 @@ import {
   type PresetId,
   type SoundConfig,
   type SoundEvent,
-} from "../tcg/sound.ts";
+} from "../game/sound.ts";
 import { dateTime } from "./format.ts";
 
 /** Admin editor for the global sound settings (preset, volume, on/off per game moment). */

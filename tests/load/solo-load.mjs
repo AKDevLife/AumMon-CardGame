@@ -47,26 +47,31 @@ async function player(i) {
     return { status: res.status, body: json };
   };
 
-  const created = await call("tcg-create", { mode: "solo" });
+  const created = await call("game-create", { mode: "solo", bots: 1 });
   const matchId = created.body.matchId;
-  let r = (await call("tcg-view", { matchId })).body;
-  // Human plays the simplest legal line (attack > summon > mulligan > end turn) vs the server bot.
-  const order = ["attack", "summon", "mulligan", "end_turn"];
-  for (let step = 0; step < 300 && r.view?.status !== "finished"; step++) {
-    const pick = order.map((t) => r.legal?.find((c) => c.type === t)).find(Boolean);
-    if (!pick) {
+  let r = (await call("game-view", { matchId })).body;
+  // Human plays the simplest legal line (react: decline · play first playable without ability · draw).
+  for (let step = 0; step < 400 && r.view?.status !== "finished"; step++) {
+    const v = r.view ?? {};
+    const command = v.canReact
+      ? { type: "react", useUmbrella: false }
+      : v.playable?.length
+        ? { type: "play", card: v.playable[0], useAbility: false }
+        : v.canDraw
+          ? { type: "draw" }
+          : null;
+    if (!command) {
       await new Promise((res) => setTimeout(res, 750)); // server bot is pacing its turn
-      r = (await call("tcg-view", { matchId })).body;
+      r = (await call("game-view", { matchId })).body;
       continue;
     }
-    const command = pick.type === "mulligan" ? { type: "mulligan", instanceIds: [] } : pick;
-    const res = await call("tcg-command", {
+    const res = await call("game-command", {
       matchId,
       expectedVersion: r.version,
       idempotencyKey: randomUUID(),
       command,
     });
-    r = res.status === 200 ? res.body : (await call("tcg-view", { matchId })).body;
+    r = res.status === 200 ? res.body : (await call("game-view", { matchId })).body;
   }
   await call("account-delete", { confirm: "DELETE" }); // clean up test account
   return r.view?.status === "finished" ? "finished" : "ongoing";

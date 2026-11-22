@@ -1,10 +1,9 @@
 import { expect, test } from "@playwright/test";
+import { act, closePopups, leave } from "./game-helpers.ts";
 
 test.skip(!process.env["VITE_SUPABASE_URL"], "Supabase backend not configured");
 
-test("pass & play 1v1: privacy handoff between turns, then forfeit ends the match", async ({
-  page,
-}) => {
+test("pass & play with 3 players: privacy handoff between turns, then leave", async ({ page }) => {
   test.setTimeout(240_000);
   await page.goto("/register");
   await page.getByLabel("ชื่อที่แสดง").fill("Host");
@@ -12,18 +11,16 @@ test("pass & play 1v1: privacy handoff between turns, then forfeit ends the matc
   await page.getByLabel("รหัสผ่าน").fill("secret123");
   await page.getByRole("button", { name: "สร้างบัญชี" }).click();
   await page.getByRole("link", { name: "Pass & Play" }).click();
-  await expect(page.getByText(/เล่นบนเครื่องเดียวกัน/)).toBeVisible();
   await page.getByLabel("ชื่อผู้เล่น 1").fill("Ann");
   await page.getByLabel("ชื่อผู้เล่น 2").fill("Ben");
+  await page.getByLabel("ชื่อผู้เล่น 3").fill("Cid");
   await page.getByRole("button", { name: "เริ่มเกม" }).click();
   await expect(page).toHaveURL(/\/game\//);
 
-  const result = page.getByRole("heading", { name: /ชนะ|เสมอ/ });
-  const idle = page.getByRole("button", { name: "กำลังส่ง…" });
   let handoffs = 0;
-  // A full 1v1 game is long; check several handoffs/turns (incl. mulligans), then forfeit.
-  for (let step = 0; step < 120 && handoffs < 5; step++) {
-    if (await result.isVisible()) break;
+  for (let step = 0; step < 120 && handoffs < 4; step++) {
+    if (await page.getByRole("heading", { name: /ชนะ/ }).isVisible()) break;
+    if (await closePopups(page)) continue;
     const reveal = page.getByRole("button", { name: /แสดงการ์ด/ });
     if ((await reveal.isVisible()) && (await reveal.isEnabled())) {
       await expect(page.getByRole("group", { name: "Hand" })).toHaveCount(0); // nothing private before handoff
@@ -32,60 +29,15 @@ test("pass & play 1v1: privacy handoff between turns, then forfeit ends the matc
       handoffs++;
       continue;
     }
-    const keep = page.getByRole("button", { name: "เก็บมือนี้" });
-    if ((await keep.isVisible()) && (await keep.isEnabled())) {
-      await keep.click();
-      await expect(idle).toHaveCount(0);
-      continue;
-    }
-    const unit = page
-      .getByRole("group", { name: "Your units" })
-      .getByRole("button")
-      .and(page.locator(":enabled"))
-      .first();
-    const hand = page
-      .getByRole("group", { name: "Hand" })
-      .getByRole("button")
-      .and(page.locator(":enabled"))
-      .first();
-    let acted = false;
-    for (const subject of [unit, hand]) {
-      if (!(await subject.isVisible().catch(() => false))) continue;
-      await subject.click();
-      const action = page
-        .getByRole("group", { name: "Actions" })
-        .getByRole("button", { name: /โจมตี|ลงสนาม/ })
-        .first();
-      if (await action.isVisible().catch(() => false)) {
-        await action.click();
-        await expect(idle).toHaveCount(0);
-        acted = true;
-        break;
-      }
-      // Popup opened with other commands only or an info card: close it before trying the next card.
-      if (
-        await page
-          .getByRole("dialog")
-          .isVisible()
-          .catch(() => false)
-      )
-        await page.keyboard.press("Escape");
-    }
-    if (!acted) {
-      const endTurn = page.getByRole("button", { name: "จบเทิร์น", exact: true });
-      if (await endTurn.isVisible().catch(() => false)) {
-        await endTurn.click();
-        await expect(idle).toHaveCount(0);
-      } else await page.waitForTimeout(300);
-    }
+    if (!(await act(page))) await page.waitForTimeout(300);
   }
-  expect(handoffs).toBe(5);
-  await page.getByRole("button", { name: "กติกา", exact: true }).click(); // top-bar rules button
-  await expect(page.getByRole("dialog", { name: "กติกา" })).toBeVisible();
-  await page.getByRole("dialog", { name: "กติกา" }).getByRole("button", { name: "ปิด" }).click();
-  await page.getByRole("button", { name: "ตั้งค่า" }).click();
-  await page.getByRole("button", { name: "ยอมแพ้" }).click();
-  await page.getByRole("button", { name: "ยืนยันยอมแพ้" }).click();
-  await expect(result).toBeVisible();
-  await expect(page.getByRole("alert")).toHaveCount(0);
+  expect(handoffs).toBeGreaterThanOrEqual(2);
+  if (!(await page.getByRole("heading", { name: /ชนะ/ }).isVisible())) {
+    await page
+      .getByRole("button", { name: /แสดงการ์ด/ })
+      .click({ timeout: 5000 })
+      .catch(() => undefined);
+    await leave(page);
+    await expect(page).toHaveURL(/\/$/);
+  }
 });

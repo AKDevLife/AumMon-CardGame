@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { abilities, card, eventText, keywords, label, seats, shortId, yesNo } from "./format.ts";
+import { card, eventText, label, seats, shortId, yesNo } from "./format.ts";
 
 describe("admin readable formatting", () => {
   it("translates codes into Thai", () => {
@@ -13,19 +13,15 @@ describe("admin readable formatting", () => {
   });
 
   it("formats game data", () => {
-    expect(card("O01")).toBe("ดินสอไม้");
-    expect(abilities({ passive: { name: "ไส้หัก" }, active: { name: "ดีด" } })).toBe(
-      "🔁 ไส้หัก · ✨ ดีด",
-    );
-    expect(keywords(["haste", "guard"])).toBe("โจมตีทันที, โล่กำบัง");
-    expect(eventText({ type: "turn_ended", seat: 0 })).toBe("จบเทิร์น / จั่วการ์ด");
-    expect(eventText({ type: "forfeit", seat: 1 })).toBe("ผู้เล่น 2 ยอมแพ้");
+    expect(card("D01")).toBe("หนังยาง");
+    expect(eventText({ type: "unknown_old_event" })).toBe("—");
+    expect(eventText({ type: "passed", seat: 1, forced: false })).toBe("ผู้เล่น 2 ผ่าน");
     expect(
       seats([
-        { type: "human", hp: 12 },
-        { type: "bot", hp: 5 },
+        { type: "human", cards: 7 },
+        { type: "bot", cards: 5 },
       ]),
-    ).toBe("ผู้เล่น ❤️12 · Bot ❤️5");
+    ).toBe("ผู้เล่น 🃏7 · Bot 🃏5");
     expect(shortId("abcdef123")).toBe("#abcdef");
   });
 });

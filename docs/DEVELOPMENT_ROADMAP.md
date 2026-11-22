@@ -1,6 +1,6 @@
 # AumMon — Development Roadmap
 
-Source: `aummon_project_blueprint.md` §9 (phases), §14 (first sprint); rules: `aummon_game_spec.md`.
+Architecture: `aummon_project_blueprint.md`; rules: `aummon_game_spec.md` → `docs/discard/`.
 Format: `- [ ] **P.N** task — deps: … — PR #n (date)` · `[ ]` not started · `[~]` in progress · `[x]` completed (verified) · `[!]` blocked (reason inline).
 Percentages: `pnpm progress` (top-level tasks only). Phase 0 (Rulebook v1 decisions) is complete in Spec v2.1.
 
@@ -120,27 +120,6 @@ Percentages: `pnpm progress` (top-level tasks only). Phase 0 (Rulebook v1 decisi
 
 **Acceptance:** no open Critical/High issues · test suite passes on staging · baseline scaling metrics recorded
 
-## Phase 8 — 1v1 TCG Ruleset (Spec v3.0, `ruleset_version = "2"`)
-
-Owner decision 2026-11-20: replace the 2–4 player game with the 1v1 TCG in `aummon_game_spec.md` (Core Rules V1.1). Auth, menus, lobby, UI design system and platform stay as they are.
-
-- [x] **8.1** Consolidate spec into `aummon_game_spec.md` v3.0; align blueprint, rules and docs — deps: — — PR #41 (2026-11-20)
-- [x] **8.2** Card data: 25 card definitions, 11 recipes, Starter Deck as typed data + validation tests (power budget, ≤3 copies, recipe graph) — deps: 8.1 — PR #43 (2026-11-20)
-- [x] **8.3** Engine v2 core: setup, mulligan, SPARK, 3-phase turn, summon, fatigue, win/draw, client-safe view — deps: 8.2 — PR #44 (2026-11-20)
-- [x] **8.4** Combat + keywords (Haste, Guard, Flying, Piercing, Boost) — deps: 8.3 — PR #45 (2026-11-20)
-- [x] **8.5** Actions + Equipment (Draw, Search, Scrap Return, slots, compatibility) — deps: 8.3 — PR #46 (2026-11-20)
-- [x] **8.6** Evolution + Fusion (instance rules, full HP, equipment handling, inheritance) — deps: 8.4, 8.5 — PR #47 (2026-11-20)
-- [x] **8.7** Scenario tests T-001–T-007 + spec §5.17 acceptance + determinism/simulation — deps: 8.6 — PR #48 (2026-11-20) — §5.17 #11, #12, #15 (triggers, target loss, loop limit) N/A: no triggered effects in the V1.1 card set
-- [x] **8.8** Server bot v2 (legal actions only, seat-visible data) — deps: 8.7 — PR #49 (2026-11-20)
-- [x] **8.9** DB migration + seed for ruleset 2 (definitions, recipes, match state/events, RLS) — deps: 8.2 — PR #50 (2026-11-20)
-- [x] **8.10** Backend: turn-based commands, 90 s turn timer → auto end turn, idempotency — deps: 8.8, 8.9 — PR #51 (2026-11-20)
-- [x] **8.11** UI: 1v1 board + Solo mode — deps: 8.10 — PR #52 (2026-11-20)
-- [x] **8.12** Pass & Play 1v1 (privacy handoff per turn, no timer) — deps: 8.11 — PR #53 (2026-11-20)
-- [x] **8.13** Online 1v1 (lobby 2 seats, realtime, resume, forfeit, timer) — deps: 8.11 — PR #54 (2026-11-20)
-- [x] **8.14** Retire ruleset 1 code paths; E2E + smoke + load test on Dev — deps: 8.12, 8.13 — PR #55, #56 (2026-11-20) — DB tables of ruleset 1 kept (no destructive migration)
-
-**Acceptance:** all three modes playable 1v1 to the end on Dev · scenario tests T-001–T-007 pass · no hidden info leaks (hand, deck order, search) · `pnpm check`, E2E and CI green
-
 ## Phase 9 — Developer Admin
 
 Owner request 2026-11-20 (dev tooling; production tasks 6.8/7.3/7.8 stay deferred). Owner decisions: catalog read-only, no character management, admin created in the Supabase Dashboard + server-side grant, MFA required.
@@ -166,28 +145,9 @@ Owner request 2026-11-20 (dev tooling; production tasks 6.8/7.3/7.8 stay deferre
 
 **Acceptance:** admin logs in without Register · non-admins get 403 on every admin action · players cannot self-grant · MFA enforced server-side · audited mutations · no secret in the client bundle · per-environment bootstrap documented (`docs/ADMIN.md`)
 
-## Phase 10 — Everyday Objects Battle (`ruleset_version = "3"`)
+## Retired — 1v1 TCG (Phases 8, 10, 11; rulesets 2–6)
 
-Owner-approved direction 2026-11-21 (R3 in `docs/rule-clarifications.md`, rules in `aummon_game_spec.md` v4.0).
-
-- [x] **10.1** Decisions D1–D11 recorded; Object/Ability framework + 24-card prototype set + Starter Deck v3 designed; Phase 10 plan — deps: 9.18 — PR #75 (2026-11-21)
-- [x] **10.2** Engine ruleset 3 (pure TS): Object cards, 1 Passive + 1 Active, triggers, effects, durations, safety limits, card data validation, bot; simulation of the framework cards then the 24-card set — deps: 10.1 — PR #76 (2026-11-21)
-- [x] **10.3** Database + server: additive migration for ruleset 3 cards / starter deck, seed, Edge Functions run ruleset 3 for new matches (`activate` command) — deps: 10.2 — PR #77 (2026-11-21)
-- [x] **10.4** UI: Object card frame with Passive/Active text, activate flow with targets, rules popup, sounds, placeholder Living-Objects art — deps: 10.3 — PR #77 (2026-11-21)
-- [x] **10.5** Remove ruleset 2 (Evolution, Fusion, Equipment, Action, recipes tables, old cards, tests); Game Spec v4.0 + blueprint/domain rules updated — deps: 10.4 — PR #78 (2026-11-21)
-- [ ] **10.6** Owner playtest on Dev; balance pass — deps: 10.5
-
-- [x] **11.1** Owner changes: free Active abilities (ruleset "4", spec v5.0) with higher summon costs for strong cards and Turbo "sleeps at end of turn"; "เหนื่อย" → "หลับ"; Thai category names; "All cards" gallery (home + in game, filter by category, tap for details); history button moved into settings — deps: 10.5 — PR #79 (2026-11-21)
-- [x] **11.2** Categories: ภาชนะ → ที่เก็บของ; ของใช้ในบ้าน → อิสระ (FREE: no other category); Bottle Rocket not a vehicle; Vacuum electronic only (ruleset stays "4", owner choice) — deps: 11.1 — PR #80 (2026-11-21)
-- [x] **11.3** Hand and "All cards" gallery sorted by SPARK cost, cheapest first (same cost: playable first) — deps: 11.2 — PR #81 (2026-11-21)
-- [x] **11.4** Owner rules update (ruleset "5", spec v6.0): actions in any order; Active usable while asleep, no sleep on use, once per turn; Guard works while asleep and must be hit first; no Guard + Flying; rules popup rewritten in the owner's words — deps: 11.3 — PR #82 (2026-11-21)
-- [x] **11.5** Balance pass (card data only, ruleset "5"): 8,000-game bot simulation; replaced abilities that do nothing under ruleset 5 (Door, Alarm Clock, Power Strip), toned down / buffed costs and stats; win rate when drawn 38–56 % → 47–54 % — deps: 11.4 — PR #83 (2026-11-21)
-- [x] **11.6** Save GitHub Actions minutes: CI only on pull requests (no duplicate run on main), docs-only changes skip CI — deps: 11.5 — PR #84 (2026-11-21)
-- [x] **11.7** First-player balance (ruleset "6", spec v7.0): first player cannot attack on turn 1; second player opens with 6 cards and +1 SPARK on their first turn — simulated first-player win 70 % → 51 % — deps: 11.6 — PR #85 (2026-11-22)
-- [x] **11.8** Rules state card counts (deck 30, max 3 copies, hand 10, field 3); tap sounds on every button app-wide; synthesized background music (on by default) with a ⚙️ settings popup on the home page and in game (effects + music switches) — deps: 11.7 — PR #86 (2026-11-22)
-- [x] **11.9** Fix: in-app links (home play-mode buttons) had no tap sound (router preventDefault); background music volume doubled — deps: 11.8 — PR #87 (2026-11-22)
-
-**Acceptance:** only ruleset 3 playable in all 3 modes · every handoff §10.2 case covered by engine tests · 1,000 simulated bot matches without errors · E2E + a11y pass · spec v4.0 is the single authoritative rule source
+Built 2026-11-20 → 2026-11-21 (PRs #50–#87) and removed in task 12.4 when the owner replaced the game with the Casual Discard Edition. Details: git history and `docs/DEVELOPMENT_CHANGELOG.md`.
 
 ## Phase 12 — Casual Discard Edition (new game, owner 2026-11-22)
 
@@ -195,10 +155,10 @@ Owner brief: shedding-type card game for 2–8 players with the 16 Everyday Obje
 
 - [x] **12.1** Phase 1 audit (simulation: base rule stalls — 0.1–5 % of games finish; pile reset → ~100 %) + owner decisions DC1–DC7 + Core Rules + Card Library — deps: 11.9 — PR #88 (2026-11-22)
 - [x] **12.2** Engine prototype (pure TS, data-driven cards, reactions) + simulation 2–8 players, balance report `AumMon_Card_Balance.md` — deps: 12.1 — PR #89 (2026-11-22)
-- [ ] **12.3** Architecture, database schema and test plan docs for 2–8 player rooms — deps: 12.2
-- [ ] **12.4** Backend: N-player rooms (2–8), turn direction, reactions, private reveals, bots, timers — deps: 12.3
-- [ ] **12.5** UI: table for 2–8 players, discard pile, hand, reactions, reveals, rules + card gallery, sounds — deps: 12.4
-- [ ] **12.6** Remove the 1v1 TCG (ruleset 6) and switch all modes to the new game — deps: 12.5
+- [x] **12.3** Architecture, database schema and test plan docs for 2–8 player rooms (blueprint rewritten) — deps: 12.2 — PR #90 (2026-11-22)
+- [x] **12.4** Backend: N-player rooms (2–8), turn direction, reactions, private reveals, bots, timers; cleanup migration drops TCG tables/data — deps: 12.3 — PR #90 (2026-11-22)
+- [x] **12.5** UI: table for 2–8 players, discard pile, hand, reactions, reveals, rules + card gallery, sounds — deps: 12.4 — PR #90 (2026-11-22)
+- [x] **12.6** Remove the 1v1 TCG (ruleset 6) code, tests and docs; all modes play the new game — deps: 12.5 — PR #90 (2026-11-22)
 - [ ] **12.7** VIP + cosmetic gacha design doc (no payments until legal check + owner approval) — deps: 12.1
 - [ ] **12.8** Owner playtest on Dev; balance pass — deps: 12.6
 

@@ -11,8 +11,8 @@
 | -------------------------- | ----------------------- | -------------------------------------- |
 | Brand Identity             | Deep Purple `#30205B`   | headers, hero panel, primary text      |
 | Primary Highlight / CTA    | Golden Yellow `#FFC83D` | Play buttons, selection                |
-| HP / liveliness            | Candy Pink `#FF4F9A`    | player HP, decoration                  |
-| SPARK / energy             | Sky Blue `#55C9F4`      | SPARK, card cost, info                 |
+| Liveliness                 | Candy Pink `#FF4F9A`    | decoration                             |
+| Info                       | Sky Blue `#55C9F4`      | info, reactions                        |
 | Healing / Success / Growth | Mint Green `#65D69A`    | confirm, heal, Evolution, valid target |
 | Attack / Boost             | Orange `#FF914D`        | ATK, Haste, attack effects             |
 | Damage / Danger / Error    | Red `#ED4966`           | damage, danger buttons, errors         |
@@ -51,7 +51,7 @@ Identity kept unchanged: border `3px solid #2A1650` (`--border-color`), sticker 
 | `--color-text-accent`    | `#5B2FB8` | `am-accent`       | links, focus ring      |
 | `--color-text-danger`    | `#B9284A` | `am-danger-text`  | error messages         |
 | `--color-text-success`   | `#164E35` | `am-success-text` | text on green          |
-| `--color-text-info`      | `#173C55` | `am-info-text`    | text on blue / SPARK   |
+| `--color-text-info`      | `#173C55` | `am-info-text`    | text on blue           |
 
 Legacy aliases (`--am-*`) still exist and point at these tokens, so older components keep working.
 
@@ -67,36 +67,23 @@ Legacy aliases (`--am-*`) still exist and point at these tokens, so older compon
 | Header highlight           | `#FFC83D`                             | "AumMon" title, Play mode buttons |
 | Accent pink / blue / green | `#FF4F9A` / `#55C9F4` / `#65D69A`     | decoration, register (green)      |
 
-## 4. Battlefield
+## 4. Game table
 
-| Component              | HEX                          | Token                                             |
-| ---------------------- | ---------------------------- | ------------------------------------------------- |
-| Battlefield background | `#E9DFFF`                    | `--color-battlefield-bg`                          |
-| Board surface          | `#FFFBEB`                    | `--color-surface`                                 |
-| Board border           | `#2A1650`                    | `--border-color`                                  |
-| Player area            | `#DDF5FF`                    | `--color-player-area`                             |
-| Opponent area          | `#FFE0EF`                    | `--color-opponent-area`                           |
-| Unit slot / empty slot | `#F6F0FF` + dashed `#D8C6FA` | `EmptySlot` ("ช่องว่าง")                            |
-| Selection highlight    | `#FFC83D`                    | yellow ring                                       |
-| Valid target           | `#65D69A`                    | green ring on units the selected attacker can hit |
-| Invalid target         | `#ED4966`                    | reserved (invalid targets are simply not offered) |
-| Exhausted              | `#75658F`                    | "💤 เหนื่อย" label with inverse text                |
+| Element          | HEX       | Usage                                   |
+| ---------------- | --------- | --------------------------------------- |
+| Table background | `#FFFBEB` | play area                               |
+| Current turn     | `#FFC83D` | yellow ring on the acting player        |
+| Playable card    | `#65D69A` | green ring on cards the player may play |
+| Reaction prompt  | `#55C9F4` | Umbrella reaction bar                   |
 
-## 5. Card frame (`src/features/tcg/CardFrame.tsx`)
+## 5. Card frame (`src/features/game/CardView.tsx`)
 
-| Part                 | HEX                                               |
-| -------------------- | ------------------------------------------------- |
-| Surface / border     | `#FFFBEB` / `#2A1650`                             |
-| Title band           | `#E9DFFF` (Thai name, full width, word-safe wrap) |
-| Text / description   | `#30205B` / `#75658F`                             |
-| Stat chip background | `#FFF0C2`                                         |
-| ATK underline        | `#FF914D` (⚔️ + number)                           |
-| HP underline         | `#FF4F9A` (❤️ + number)                           |
-| Cost badge           | `#55C9F4` with `#173C55` text (⚡ + number)       |
-| Evolution form       | top stripe `#65D69A`                              |
-| Fusion form          | top stripe `#8064C8`                              |
-
-Works for Unit, Action, Equipment and Field (type label shown as text). Rarity never changes colors (rarity ≠ power).
+| Part             | HEX                           |
+| ---------------- | ----------------------------- |
+| Surface / border | `#FFFBEB` / `#2A1650`         |
+| Title band       | `#E9DFFF` (Thai name)         |
+| Points badge     | `#FFC83D` with `#30205B` text |
+| Ability text     | `#30205B` / `#75658F`         |
 
 ## 6. Buttons (`src/components/StickerButton.tsx`)
 
@@ -112,27 +99,7 @@ Works for Unit, Action, Equipment and Field (type label shown as text). Rarity n
 
 States: hover `#FFE36E` · pressed `translateY(3px)` + pressed shadow · focus `3px` ring `#5B2FB8` (global `:focus-visible`) · loading = button text changes ("กำลังส่ง…") and the button is disabled, never shown as success. Small danger actions (admin) use `#FFE0EF` + `#B9284A` text.
 
-## 7. HP & SPARK (`GameIcons.tsx`)
-
-|       | Main            | Background | Text      | Other                                                        |
-| ----- | --------------- | ---------- | --------- | ------------------------------------------------------------ |
-| HP    | `#FF4F9A` heart | `#FFE0EF`  | `#30205B` | damage `#ED4966` shake+pulse · heal `#65D69A` pulse          |
-| SPARK | `#55C9F4` bolt  | `#DDF5FF`  | `#173C55` | pips: active `#55C9F4`, used `#C7D8E5` · highlight `#FFC83D` |
-
-HP and SPARK differ by color **and** icon (heart vs bolt). Numbers sit on solid chips and never animate.
-
-## 8. Keywords (icon + Thai text + color stripe)
-
-| Keyword       | Thai      | HEX       | Icon |
-| ------------- | --------- | --------- | ---- |
-| Haste         | โจมตีทันที   | `#FF914D` | 💨   |
-| Guard         | โล่กำบัง    | `#65D69A` | 🛡️   |
-| Flying        | บินได้      | `#55C9F4` | 🪽   |
-| Piercing      | เจาะทะลุ   | `#ED4966` | 🎯   |
-| Boost         | เร่งพลัง    | `#FFC83D` | 🔥   |
-| Draw / Search | จั่ว / ค้นหา | `#8064C8` | 🃏   |
-
-## 9. Feedback & effects
+## 7. Feedback & effects
 
 | Event                | Primary               | Secondary             | Implemented as                                  |
 | -------------------- | --------------------- | --------------------- | ----------------------------------------------- |
@@ -150,14 +117,14 @@ HP and SPARK differ by color **and** icon (heart vs bolt). Numbers sit on solid 
 
 Effects use only `transform`/`box-shadow`, last ≤ 700 ms, never cover card text, and are disabled under `prefers-reduced-motion`.
 
-## 10. Typography
+## 8. Typography
 
 - **Fredoka** (English, numbers, headings) + **Kanit** (Thai, body) — Google Fonts, SIL Open Font License 1.1, loaded in `index.html` with `display=swap`.
 - `--font-display`: Fredoka → Kanit · `--font-body`: Kanit → Fredoka.
 - Hierarchy: page title `text-3xl` display bold · section `text-xl` · card name `13px` bold · card text `11px` · stats `text-sm` bold tabular numbers.
 - Thai card names use the full title width with `word-break: keep-all` so they wrap at word boundaries.
 
-## 11. Accessibility (measured contrast, WCAG 2.1)
+## 9. Accessibility (measured contrast, WCAG 2.1)
 
 | Pair                              |         Ratio | Result                                              |
 | --------------------------------- | ------------: | --------------------------------------------------- |
@@ -170,13 +137,13 @@ Effects use only `transform`/`box-shadow`, last ≤ 700 ms, never cover card tex
 | Success text on green             |          5.35 | AA                                                  |
 | Info text on blue                 |          6.09 | AA                                                  |
 | White on danger red               |          3.65 | large bold only (danger buttons are `text-xl` bold) |
-| Primary text on HP pink           |          4.61 | AA                                                  |
+| Primary text on Candy Pink        |          4.61 | AA                                                  |
 | Danger text on error bg           |          4.95 | AA                                                  |
 | Inverse text on exhausted         |          5.04 | AA                                                  |
 
 No white text on yellow, light blue or light pink. Every state has an icon or text in addition to color. Axe (WCAG 2.1 AA) runs in E2E (`tests/e2e/a11y.spec.ts`).
 
-## 12. Usage guidelines
+## 10. Usage guidelines
 
 1. Add a new color only as a token in `src/styles/index.css` + a row in this document, with a reason.
 2. Choose by **role** (`am-player`, `am-danger-text`), not by hue.

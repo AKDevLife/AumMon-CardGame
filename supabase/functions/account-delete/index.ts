@@ -1,11 +1,10 @@
 // POST { confirm: "DELETE" } → { ok }   Task 7.4: delete the caller's account.
-// Active matches are forfeited first; finished history stays anonymized (migration 20261120000100).
-import { v6 } from "@aummon/game-engine";
+// Active matches are left first (online: a bot takes the seat); finished history stays anonymized (migration 20261120000100).
 import { requireUser } from "../_shared/auth.ts";
 import { db } from "../_shared/db.ts";
 import { handler, HttpError, readJson } from "../_shared/http.ts";
 import { rateLimit } from "../_shared/ratelimit.ts";
-import { withTcg } from "../_shared/tcg.ts";
+import { leaveGame } from "../_shared/game.ts";
 
 Deno.serve(
   handler(async (request) => {
@@ -15,22 +14,12 @@ Deno.serve(
       throw new HttpError(400, "confirmation_required", 'Send { "confirm": "DELETE" }');
     await rateLimit(userId, "account.delete", 3, 3600);
 
-    // 1. Forfeit every active 1v1 match the user is seated in (the opponent wins).
+    // 1. Leave every active online match the user is seated in (a bot takes the seat).
     const seats = await db()<{ match_id: string }[]>`
       select mp.match_id from public.match_players mp join public.matches m on m.id = mp.match_id
       join public.game_rooms r on r.id = m.room_id
-      where mp.user_id = ${userId} and m.status = 'active' and m.ruleset_version = '6' and r.mode <> 'pass_play'`;
-    for (const { match_id } of seats) {
-      await withTcg(userId, match_id, {
-        act: (state, seat, rng) =>
-          v6.applyCommand(state, { type: "forfeit", playerId: state.players[seat].playerId }, rng),
-      });
-    }
-    // Retired ruleset 1–5 matches cannot be played any more.
-    await db()`
-      update public.matches m set status = 'abandoned', finished_at = now()
-      from public.match_players mp
-      where mp.match_id = m.id and mp.user_id = ${userId} and m.status = 'active' and m.ruleset_version in ('1','2','3','4','5')`;
+      where mp.user_id = ${userId} and m.status = 'active' and r.mode = 'online'`;
+    for (const { match_id } of seats) await leaveGame(userId, match_id);
     // 2. Pass & Play matches the user hosted cannot continue without the device owner.
     await db()`
       update public.matches m set status = 'abandoned', finished_at = now()

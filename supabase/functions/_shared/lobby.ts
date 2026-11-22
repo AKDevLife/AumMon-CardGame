@@ -23,14 +23,14 @@ async function displayName(tx: Tx, userId: string) {
   return p?.display_name ?? "Player";
 }
 
-/** Online 1v1 room (ruleset 6): no characters, exactly 2 seats. */
-export async function createOnlineRoom(userId: string) {
+/** Online room for 2–8 players (Discard Edition). Sizes 5–8 become VIP-host rooms later (DC7). */
+export async function createOnlineRoom(userId: string, maxPlayers = 4) {
   await rateLimit(userId, "room.create", 10, 60); // outside the transaction (own connection)
   return db().begin(async (tx) => {
     const code = newCode();
     const [room] = await tx<{ id: string }[]>`
       insert into public.game_rooms (owner_id, join_code_hash, mode, status, max_players, ruleset_version, expires_at)
-      values (${userId}, ${await hashRequest(code)}, 'online', 'lobby', 2, '6', now() + ${`${LOBBY_TTL_MINUTES} minutes`}::interval)
+      values (${userId}, ${await hashRequest(code)}, 'online', 'lobby', ${maxPlayers}, '7', now() + ${`${LOBBY_TTL_MINUTES} minutes`}::interval)
       returning id`;
     if (!room) throw new Error("room insert failed");
     await tx`
@@ -49,7 +49,7 @@ export async function joinRoom(userId: string, rawCode: string) {
       throw new HttpError(404, "room_not_found", "Room not found or expired");
     const [room] = await tx<{ id: string; max_players: number }[]>`
       select id, max_players from public.game_rooms
-      where join_code_hash = ${await hashRequest(code)} and mode = 'online' and ruleset_version = '6'
+      where join_code_hash = ${await hashRequest(code)} and mode = 'online' and ruleset_version = '7'
         and status = 'lobby' and expires_at > now()
       for update`;
     if (!room) throw new HttpError(404, "room_not_found", "Room not found or expired");
@@ -58,7 +58,8 @@ export async function joinRoom(userId: string, rawCode: string) {
     if (seats.some((s) => s.user_id === userId)) return { roomId: room.id };
     if (seats.length >= room.max_players) throw new HttpError(409, "room_full", "Room is full");
     const used = new Set(seats.map((s) => s.seat));
-    const seat = [1, 2].find((n) => !used.has(n)) ?? 0;
+    const seat =
+      Array.from({ length: room.max_players }, (_, i) => i + 1).find((n) => !used.has(n)) ?? 0;
     await tx`delete from public.room_players where room_id = ${room.id} and seat = ${seat} and status = 'left'`;
     await tx`
       insert into public.room_players (room_id, user_id, seat, player_type, display_name_snapshot, status)

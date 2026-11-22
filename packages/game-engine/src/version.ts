@@ -1,10 +1,11 @@
 /**
- * Version identifiers stored on every match (spec §10).
+ * Version identifiers stored on every match.
  *
  * - ENGINE_VERSION must match this package's `version` in package.json
- *   (enforced by tests/architecture/engine-isolation.test.ts).
- * - RULESET_VERSION "6" is Everyday Objects Battle (free Actives, any action order, Guard works while asleep, second-player compensation). Any rule change that
- *   affects game results MUST bump it. Rulesets "1"–"5" are retired.
+ *   (enforced by tests/architecture/engine-isolation.test.ts). 1.0.0 = first engine of the
+ *   Casual Discard Edition (the earlier 1v1 card games were removed in task 12.4).
+ * - RULESET_VERSION identifies the game rules stored with each match ("7" = Casual Discard
+ *   Edition, docs/discard/AumMon_Core_Rules.md). Any rule change that affects results MUST bump it.
  */
-export const ENGINE_VERSION = "0.6.0";
-export const RULESET_VERSION = "6";
+export const ENGINE_VERSION = "1.0.0";
+export const RULESET_VERSION = "7";

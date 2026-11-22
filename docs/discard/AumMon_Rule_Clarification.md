@@ -2,7 +2,7 @@
 
 > Status: **Owner decisions recorded 2026-11-22 (§0)**; remaining small rulings marked PROPOSED.
 > Source: owner brief "AumMon — Everyday Objects Battle · Master Game Design & Development Handoff" (2026-11-22).
-> The current 1v1 TCG (ruleset "6") stays live until the owner approves the new rules; login, sign-up, profile, UI/UX, sounds, admin and other non-rule systems are kept as they are.
+> Status 2026-11-22: implemented — the 1v1 TCG has been removed (task 12.6); login, sign-up, profile, UI/UX, sounds, admin and other non-rule systems are kept as they are.
 > Labels: **[BRIEF]** = owner's text · **[FOUND]** = verified by analysis / simulation · **[PROPOSED]** = my recommendation · **[OPEN]** = owner must decide.
 
 ## 0. Owner decisions (2026-11-22) — APPROVED

@@ -1,0 +1,667 @@
+import { discard } from "@aummon/game-engine";
+import { REALTIME_SUBSCRIBE_STATES } from "@supabase/supabase-js";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router";
+import { StickerButton } from "../../components/StickerButton.tsx";
+import { ApiError, callFunction } from "../../lib/api.ts";
+import { useAuth } from "../auth/auth-context.ts";
+import { HandoffScreen } from "../passplay/HandoffScreen.tsx";
+import { AudioSettings } from "./AudioSettings.tsx";
+import { CardGallery } from "./CardGallery.tsx";
+import { CardView } from "./CardView.tsx";
+import { CardBack, DeckPile } from "./GameIcons.tsx";
+import { cardName, historyLines } from "./labels.ts";
+import { Popup } from "./Popup.tsx";
+import { RulesText } from "./RulesText.tsx";
+import { normalizeSoundConfig, playSound, setSoundConfig, soundFor } from "./sound.ts";
+import type { GameResponse } from "./types.ts";
+
+const POLL_MS = 2000;
+type Need = "target" | "card" | "optionalCard" | "pair" | null;
+
+/** What the player must choose before using an ability (Card Library). */
+function needOf(ability: discard.AbilityId, underTop: string | null): Need {
+  switch (ability) {
+    case "glue":
+    case "peek":
+    case "flashlight":
+      return "target";
+    case "box":
+    case "magnet":
+    case "trash":
+      return "card";
+    case "scissors":
+      return "optionalCard";
+    case "tape":
+      return "pair";
+    case "hourglass":
+      return underTop ? needOf(discard.getDiscardCard(underTop).ability, null) : null;
+    default:
+      return null;
+  }
+}
+
+function useCountdown(deadline: string | null): number | null {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    if (!deadline) return;
+    const id = setInterval(() => {
+      setNow(Date.now());
+    }, 500);
+    return () => {
+      clearInterval(id);
+    };
+  }, [deadline]);
+  return deadline ? Math.max(0, Math.ceil((Date.parse(deadline) - now) / 1000)) : null;
+}
+
+interface Plan {
+  card: { id: string; cardId: string };
+  useAbility: boolean;
+  target?: number;
+  extra?: string | undefined;
+  pair: string[];
+}
+
+export function GamePage() {
+  const { matchId = "" } = useParams();
+  const navigate = useNavigate();
+  const auth = useAuth();
+  const client = auth.mode === "live" ? auth.client : null;
+  const [data, setData] = useState<GameResponse | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
+  const [plan, setPlan] = useState<Plan | null>(null);
+  const [popup, setPopup] = useState<"rules" | "cards" | "settings" | "history" | "leave" | null>(
+    null,
+  );
+  const [peek, setPeek] = useState<{ target: number; cards: string[] } | null>(null);
+  const [reveal, setReveal] = useState<string[][] | null>(null);
+  const lastEvent = useRef<string | null>(null);
+  const idem = useRef<{ key: string; body: string } | null>(null);
+  const passPlay = useRef(false);
+  const seconds = useCountdown(data?.botActing ? null : (data?.deadline ?? null));
+
+  const refresh = useCallback(
+    async (revealHand = false) => {
+      if (!client) return;
+      try {
+        const next = await callFunction<GameResponse>(client, "game-view", {
+          matchId,
+          reveal: revealHand,
+        });
+        passPlay.current = next.mode === "pass_play";
+        setData(next);
+        setError(null);
+      } catch (e) {
+        setError(e instanceof ApiError ? e.message : "โหลดเกมไม่สำเร็จ");
+      }
+    },
+    [client, matchId],
+  );
+
+  useEffect(() => {
+    const first = setTimeout(() => void refresh(), 0);
+    const id = setInterval(() => {
+      if (!passPlay.current) void refresh();
+    }, POLL_MS);
+    return () => {
+      clearTimeout(first);
+      clearInterval(id);
+    };
+  }, [refresh]);
+
+  // Online: private Realtime channel (members only) for instant updates.
+  const mode = data?.mode;
+  useEffect(() => {
+    if (!client || mode !== "online") return;
+    const channel = client
+      .channel(`match:${matchId}`, { config: { private: true } })
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "matches", filter: `id=eq.${matchId}` },
+        () => {
+          void refresh();
+        },
+      )
+      .subscribe((status) => {
+        if (status === REALTIME_SUBSCRIBE_STATES.CHANNEL_ERROR) void refresh();
+      });
+    return () => {
+      void client.removeChannel(channel);
+    };
+  }, [client, mode, matchId, refresh]);
+
+  // Admin-chosen sound settings.
+  useEffect(() => {
+    if (!client) return;
+    void client
+      .from("game_settings")
+      .select("value")
+      .eq("key", "sounds")
+      .maybeSingle<{ value: unknown }>()
+      .then(({ data: row }) => {
+        setSoundConfig(normalizeSoundConfig(row?.value));
+      });
+  }, [client]);
+
+  // Sounds, Flashlight reveals and Magnifier peeks for events since the last response.
+  useEffect(() => {
+    if (!data) return;
+    const keys = data.events.map((e) => JSON.stringify(e));
+    const last = keys.at(-1) ?? null;
+    if (lastEvent.current !== null && last !== lastEvent.current) {
+      const fresh = data.events.slice(keys.lastIndexOf(lastEvent.current) + 1);
+      const seat = data.mode === "pass_play" ? null : data.seat;
+      const names = [...new Set(fresh.map((e) => soundFor(e, seat)).filter((n) => n !== null))];
+      names.slice(0, 3).forEach((n, i) => {
+        setTimeout(() => {
+          playSound(n);
+        }, i * 180);
+      });
+      const shown = [...fresh].reverse().find((e) => e.type === "reveal_all");
+      if (shown?.type === "reveal_all")
+        setTimeout(() => {
+          setReveal(shown.hands);
+        }, 0);
+      const became = data.view.acting === data.seat && data.seat !== null;
+      if (
+        became &&
+        fresh.some((e) => e.type === "game_started" || e.type === "passed" || e.type === "played")
+      )
+        playSound("turn");
+    }
+    lastEvent.current = last;
+    const mine = data.peeks[0];
+    if (mine)
+      setTimeout(() => {
+        setPeek(mine);
+      }, 0);
+  }, [data]);
+
+  // Flashlight shows every hand for 5 seconds.
+  useEffect(() => {
+    if (!reveal) return;
+    const id = setTimeout(() => {
+      setReveal(null);
+    }, 5000);
+    return () => {
+      clearTimeout(id);
+    };
+  }, [reveal]);
+
+  // Bots act one step at a time; timeouts are applied when asked after the deadline.
+  const botDeadline = data?.botActing ? data.deadline : null;
+  useEffect(() => {
+    if (!botDeadline) return;
+    const id = setTimeout(
+      () => void refresh(),
+      Math.max(50, Date.parse(botDeadline) - Date.now() + 60),
+    );
+    return () => {
+      clearTimeout(id);
+    };
+  }, [botDeadline, refresh]);
+  useEffect(() => {
+    if (seconds !== 0) return;
+    const id = setTimeout(() => void refresh(), 300);
+    return () => {
+      clearTimeout(id);
+    };
+  }, [seconds, refresh]);
+
+  if (!client) return <p className="text-center text-am-muted">ต้องเชื่อมระบบก่อนเล่น (Preview)</p>;
+  if (!data) return <p className="text-center text-am-muted">{error ?? "กำลังโหลด…"}</p>;
+
+  const { view } = data;
+  const name = (s: number) => data.names[s] ?? `ผู้เล่น ${String(s + 1)}`;
+  const finished = view.status === "finished";
+  const handoff =
+    data.mode === "pass_play" && !finished && data.seat === null && view.acting !== null;
+  const myTurn = view.canDraw;
+
+  const send = async (command: Record<string, unknown>) => {
+    setPending(true);
+    const body = JSON.stringify(command);
+    if (idem.current?.body !== body) idem.current = { key: crypto.randomUUID(), body };
+    try {
+      const next = await callFunction<GameResponse>(client, "game-command", {
+        matchId,
+        expectedVersion: data.version,
+        idempotencyKey: idem.current.key,
+        command,
+      });
+      setData(next);
+      setPlan(null);
+      idem.current = null;
+      setError(null);
+    } catch (e) {
+      setError(e instanceof ApiError ? e.message : "ส่งคำสั่งไม่สำเร็จ");
+      if (e instanceof ApiError && e.status >= 400 && e.status < 500) idem.current = null;
+      if (!passPlay.current) void refresh();
+    } finally {
+      setPending(false);
+    }
+  };
+
+  const leave = async () => {
+    setPending(true);
+    try {
+      await callFunction(client, "game-leave", { matchId });
+      void navigate("/");
+    } catch (e) {
+      setError(e instanceof ApiError ? e.message : "ออกจากเกมไม่สำเร็จ");
+      setPending(false);
+    }
+  };
+
+  const top = view.top;
+  const planDef = plan ? discard.getDiscardCard(plan.card.cardId) : null;
+  const need: Need = plan && planDef && plan.useAbility ? needOf(planDef.ability, top) : null;
+  const rest = plan ? view.myHand.filter((c) => c.id !== plan.card.id) : [];
+  const opponents = view.players.map((_, i) => i).filter((i) => i !== data.seat);
+  const ready =
+    plan !== null &&
+    (need === null ||
+      need === "optionalCard" ||
+      (need === "target" && plan.target !== undefined) ||
+      (need === "card" && plan.extra !== undefined) ||
+      (need === "pair" && plan.pair.length === 2));
+  const submitPlan = () => {
+    if (!plan) return;
+    const choice: Record<string, unknown> = {};
+    if (plan.target !== undefined) choice["target"] = plan.target;
+    if (plan.extra !== undefined) choice["card"] = plan.extra;
+    if (plan.pair.length === 2) choice["pair"] = plan.pair;
+    void send({ type: "play", card: plan.card.id, useAbility: plan.useAbility, choice });
+  };
+  const pairOk = (id: string) => {
+    const pts = discard.getDiscardCard(rest.find((c) => c.id === id)?.cardId ?? "D01").points;
+    const first = plan?.pair[0];
+    return (
+      !first ||
+      first === id ||
+      discard.getDiscardCard(rest.find((c) => c.id === first)?.cardId ?? "D01").points === pts
+    );
+  };
+
+  const status = finished
+    ? `จบเกม — ${name(view.winner ?? 0)} ชนะ!`
+    : view.reaction
+      ? `${name(view.reaction.target)} กำลังตัดสินใจใช้ร่ม…`
+      : data.botActing
+        ? `🤖 ${name(view.acting ?? 0)} กำลังเล่น…`
+        : `เทิร์นของ ${name(view.current)}`;
+
+  return (
+    <section
+      aria-label="กระดานเกม"
+      className="fixed inset-0 z-20 flex flex-col bg-am-bg pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]"
+    >
+      <div className="flex shrink-0 items-center gap-2 border-b-[3px] border-am-ink bg-am-card px-3 py-2">
+        <span className="min-w-0 flex-1 truncate text-sm font-semibold">
+          {status}
+          {seconds !== null && !finished && ` · ⏱ ${String(seconds)}s`}
+        </span>
+        <button
+          type="button"
+          aria-label="กติกา"
+          onClick={() => {
+            setPopup("rules");
+          }}
+          className="am-sticker am-pressable h-11 w-11 !rounded-xl bg-am-deco-purple text-lg"
+        >
+          📖
+        </button>
+        <button
+          type="button"
+          aria-label="การ์ดทั้งหมด"
+          onClick={() => {
+            setPopup("cards");
+          }}
+          className="am-sticker am-pressable h-11 w-11 !rounded-xl bg-am-deco-purple text-lg"
+        >
+          🗂️
+        </button>
+        <button
+          type="button"
+          aria-label="ตั้งค่า"
+          onClick={() => {
+            setPopup("settings");
+          }}
+          className="am-sticker am-pressable h-11 w-11 !rounded-xl bg-am-deco-purple text-lg"
+        >
+          ⚙️
+        </button>
+      </div>
+
+      <div
+        role="region"
+        aria-label="โต๊ะ"
+        tabIndex={0}
+        className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto bg-am-field p-3"
+      >
+        <ul aria-label="ผู้เล่น" className="flex flex-wrap justify-center gap-2">
+          {view.players.map((p, i) => (
+            <li
+              key={p.playerId}
+              className={`am-sticker flex items-center gap-1.5 px-2 py-1 text-sm ${i === view.current && !finished ? "bg-am-title" : i === data.seat ? "bg-am-player" : "bg-am-opponent"}`}
+            >
+              <span className="max-w-24 truncate font-display font-bold">
+                {name(i)}
+                {i === data.seat ? " (คุณ)" : ""}
+              </span>
+              <CardBack small />
+              <span
+                aria-label={`ไพ่ในมือ ${String(p.handCount)} ใบ`}
+                className="font-display font-bold"
+              >
+                {p.handCount}
+              </span>
+              {view.glue === i && <span title="ติดกาว: ลงแต้มต่ำกว่า 4 ไม่ได้">🧴</span>}
+              {view.ruler?.seat === i && <span title="ต้องลงแต้ม 5">📏</span>}
+            </li>
+          ))}
+        </ul>
+
+        <div className="flex flex-1 items-center justify-center gap-4">
+          <div className="flex flex-col items-center gap-1">
+            <DeckPile count={view.drawCount} />
+            <span className="text-xs font-bold">กองจั่ว</span>
+          </div>
+          <div className="flex flex-col items-center gap-1">
+            {top ? <CardView cardId={top} compact /> : <span className="text-am-muted">ว่าง</span>}
+            <span className="text-xs font-semibold">
+              {view.open ? "เริ่มกองใหม่ — ลงแต้มไหนก็ได้" : "กองกลาง"} ·{" "}
+              {view.direction === 1 ? "↻" : "↺"}
+            </span>
+          </div>
+        </div>
+
+        {finished && (
+          <div role="status" className="am-sticker bg-am-title p-3 text-center">
+            <h1 className="font-display text-2xl font-bold">
+              {view.winner === data.seat && data.mode !== "pass_play"
+                ? "คุณชนะ! 🎉"
+                : `${name(view.winner ?? 0)} ชนะ`}
+            </h1>
+            <Link to="/" className="mt-1 inline-block font-semibold text-am-accent underline">
+              กลับหน้าหลัก
+            </Link>
+          </div>
+        )}
+        {error && (
+          <p
+            role="alert"
+            className="rounded-lg border-l-4 border-am-red bg-am-error-bg px-2 py-1 font-semibold text-am-danger-text"
+          >
+            {error}
+          </p>
+        )}
+        {handoff && (
+          <HandoffScreen
+            name={name(view.acting)}
+            pending={pending}
+            onReveal={() => {
+              setPending(true);
+              void refresh(true).finally(() => {
+                setPending(false);
+              });
+            }}
+          />
+        )}
+      </div>
+
+      {!handoff && (
+        <div className="shrink-0 rounded-t-3xl border-t-[3px] border-am-ink bg-am-brand p-2 pb-3">
+          <div className="mb-2 flex items-center justify-between px-1 text-am-inverse">
+            <span className="text-xs font-semibold">ไพ่ในมือ {view.myHand.length} ใบ</span>
+            {myTurn && (
+              <button
+                type="button"
+                disabled={pending}
+                onClick={() => void send({ type: "draw" })}
+                className="am-sticker am-pressable min-h-10 !rounded-full bg-am-green px-4 font-display text-sm font-bold text-am-success-text"
+              >
+                จั่วแล้วผ่าน
+              </button>
+            )}
+          </div>
+          <div role="group" aria-label="Hand" className="flex gap-2 overflow-x-auto pb-1">
+            {[...view.myHand]
+              .sort(
+                (a, b) =>
+                  discard.getDiscardCard(a.cardId).points - discard.getDiscardCard(b.cardId).points,
+              )
+              .map((c) => {
+                const ok = view.playable.includes(c.id);
+                return (
+                  <CardView
+                    key={c.id}
+                    cardId={c.cardId}
+                    dimmed={!ok}
+                    {...(ok && {
+                      onSelect: () => {
+                        setPlan({ card: c, useAbility: true, pair: [] });
+                      },
+                    })}
+                  />
+                );
+              })}
+          </div>
+        </div>
+      )}
+
+      <Popup
+        title={plan ? `ลง ${cardName(plan.card.cardId)}` : "ลงไพ่"}
+        open={plan !== null}
+        onClose={() => {
+          setPlan(null);
+        }}
+      >
+        {plan && planDef && (
+          <div className="flex flex-col gap-2">
+            <CardView cardId={plan.card.cardId} />
+            {planDef.ability !== "umbrella" && (
+              <label className="flex items-center gap-2 font-semibold">
+                <input
+                  type="checkbox"
+                  checked={plan.useAbility}
+                  onChange={(e) => {
+                    setPlan({ ...plan, useAbility: e.target.checked });
+                  }}
+                />
+                ใช้ความสามารถ “{planDef.abilityName}”
+              </label>
+            )}
+            {need === "target" && (
+              <div role="group" aria-label="เลือกผู้เล่น" className="flex flex-wrap gap-2">
+                {opponents.map((i) => (
+                  <StickerButton
+                    key={i}
+                    aria-pressed={plan.target === i}
+                    onClick={() => {
+                      setPlan({ ...plan, target: i });
+                    }}
+                    className={plan.target === i ? "!bg-am-title" : ""}
+                  >
+                    {name(i)}
+                  </StickerButton>
+                ))}
+              </div>
+            )}
+            {(need === "card" || need === "optionalCard" || need === "pair") && (
+              <div role="group" aria-label="เลือกไพ่" className="flex gap-2 overflow-x-auto pb-1">
+                {rest.map((c) => {
+                  const chosen = need === "pair" ? plan.pair.includes(c.id) : plan.extra === c.id;
+                  const allowed =
+                    need === "pair"
+                      ? pairOk(c.id)
+                      : need === "optionalCard"
+                        ? discard.getDiscardCard(c.cardId).points >= planDef.points ||
+                          discard.getDiscardCard(c.cardId).ability === "eraser"
+                        : true;
+                  return (
+                    <CardView
+                      key={c.id}
+                      compact
+                      cardId={c.cardId}
+                      selected={chosen}
+                      dimmed={!allowed}
+                      {...(allowed && {
+                        onSelect: () => {
+                          if (need === "pair") {
+                            const pair = chosen
+                              ? plan.pair.filter((x) => x !== c.id)
+                              : [...plan.pair, c.id].slice(-2);
+                            setPlan({ ...plan, pair });
+                          } else setPlan({ ...plan, extra: chosen ? undefined : c.id });
+                        },
+                      })}
+                    />
+                  );
+                })}
+              </div>
+            )}
+            {need === "optionalCard" && (
+              <p className="text-xs text-am-muted">เลือกไพ่ที่จะลงเพิ่มได้ 1 ใบ (ไม่เลือกก็ได้)</p>
+            )}
+            {need === "pair" && <p className="text-xs text-am-muted">เลือกไพ่ 2 ใบที่แต้มเท่ากัน</p>}
+            <StickerButton variant="confirm" disabled={pending || !ready} onClick={submitPlan}>
+              ลงไพ่
+            </StickerButton>
+          </div>
+        )}
+      </Popup>
+
+      <Popup
+        title="☂️ ใช้ร่มไหม?"
+        open={view.canReact && !handoff}
+        onClose={() => void send({ type: "react", useUmbrella: false })}
+      >
+        <p className="mb-2">
+          คุณกำลังถูก{view.reaction?.kind === "skip" ? "ข้ามเทิร์น" : "บังคับจั่วไพ่"} — ลงร่มเพื่อกันได้
+        </p>
+        <div className="flex flex-col gap-2">
+          <StickerButton
+            variant="confirm"
+            disabled={pending}
+            onClick={() => void send({ type: "react", useUmbrella: true })}
+          >
+            ☂️ กางร่มกัน
+          </StickerButton>
+          <StickerButton
+            disabled={pending}
+            onClick={() => void send({ type: "react", useUmbrella: false })}
+          >
+            ไม่ใช้
+          </StickerButton>
+        </div>
+      </Popup>
+
+      <Popup
+        title={peek ? `🔍 ไพ่ของ ${name(peek.target)}` : "แอบดู"}
+        open={peek !== null}
+        onClose={() => {
+          setPeek(null);
+        }}
+      >
+        <div className="flex gap-2">
+          {peek?.cards.map((c, i) => (
+            <CardView key={i} cardId={c} compact />
+          ))}
+        </div>
+      </Popup>
+
+      <Popup
+        title="🔦 ไฟฉาย: ไพ่ของทุกคน"
+        open={reveal !== null}
+        onClose={() => {
+          setReveal(null);
+        }}
+      >
+        <ul className="flex flex-col gap-1 text-sm">
+          {reveal?.map((hand, i) => (
+            <li key={i}>
+              <b>{name(i)}:</b> {hand.map(cardName).join(", ") || "—"}
+            </li>
+          ))}
+        </ul>
+      </Popup>
+
+      <Popup
+        title="วิธีเล่น & กติกา"
+        open={popup === "rules"}
+        onClose={() => {
+          setPopup(null);
+        }}
+      >
+        <RulesText />
+      </Popup>
+      <Popup
+        title="การ์ดทั้งหมด"
+        open={popup === "cards"}
+        onClose={() => {
+          setPopup(null);
+        }}
+      >
+        <CardGallery />
+      </Popup>
+      <Popup
+        title="ตั้งค่า"
+        open={popup === "settings"}
+        onClose={() => {
+          setPopup(null);
+        }}
+      >
+        <div className="flex flex-col gap-2">
+          <AudioSettings />
+          <StickerButton
+            onClick={() => {
+              setPopup("history");
+            }}
+          >
+            📜 ประวัติการเล่น
+          </StickerButton>
+          {!finished && (
+            <StickerButton
+              variant="danger"
+              onClick={() => {
+                setPopup("leave");
+              }}
+            >
+              ออกจากเกม
+            </StickerButton>
+          )}
+        </div>
+      </Popup>
+      <Popup
+        title="ประวัติการเล่น"
+        open={popup === "history"}
+        onClose={() => {
+          setPopup(null);
+        }}
+      >
+        <ol aria-label="Event log" className="flex flex-col gap-1 text-sm">
+          {historyLines(data.events, data.names).map((line, i) => (
+            <li key={i}>{line}</li>
+          ))}
+        </ol>
+      </Popup>
+      <Popup
+        title="ออกจากเกม?"
+        open={popup === "leave"}
+        onClose={() => {
+          setPopup(null);
+        }}
+      >
+        <p className="mb-2 text-sm">
+          {data.mode === "online" ? "Bot จะเล่นแทนคุณ และคุณกลับเข้ามาเกมนี้ไม่ได้" : "เกมนี้จะจบลงทันที"}
+        </p>
+        <StickerButton variant="danger" disabled={pending} onClick={() => void leave()}>
+          ยืนยันออกจากเกม
+        </StickerButton>
+      </Popup>
+    </section>
+  );
+}
