@@ -4,6 +4,7 @@ import {
   actingSeat,
   advanceGame,
   BOT_STEP_MS,
+  effectiveKinds,
   type GameRuntime,
   type Kind,
 } from "../../supabase/functions/_shared/game-flow.ts";
@@ -14,7 +15,7 @@ function runtime(players: number, seed = 3): GameRuntime {
     Array.from({ length: players }, (_, i) => `p${String(i)}`),
     rng,
   );
-  return { state, rng: rng.getState(), deadline: null };
+  return { state, rng: rng.getState(), deadline: null, timeouts: [] };
 }
 
 describe("discard server flow", () => {
@@ -26,7 +27,7 @@ describe("discard server flow", () => {
       const out = advanceGame(rt, kinds, now);
       const seat = actingSeat(out.state);
       if (seat !== null && kinds[seat] === "bot") expect(out.deadline).toBe(now + BOT_STEP_MS);
-      if (seat === 0 && out.state.reactions.length === 0)
+      if (seat === 0 && out.state.reactions.length === 0 && !out.state.drawn)
         expect(out.deadline).toBe(now + discard.DISCARD_RULES.turnTimeoutMs);
       rt = out;
       now = (out.deadline ?? now) + 1; // human times out → auto draw & pass
@@ -39,5 +40,41 @@ describe("discard server flow", () => {
     const first = advanceGame(runtime(2), kinds, 0);
     if (first.state.status === "active" && first.deadline !== null)
       expect(advanceGame(first, kinds, first.deadline - 1).events).toEqual([]);
+  });
+
+  it("timeout = draw & pass with a timeout event; a playable drawn card is kept", () => {
+    const kinds: Kind[] = ["human", "human"];
+    const start = advanceGame(runtime(2, 7), kinds, 0, "online");
+    const seat = actingSeat(start.state) ?? 0;
+    const before = start.state.players[seat]?.hand.length ?? 0;
+    const out = advanceGame(start, kinds, (start.deadline ?? 0) + 1, "online");
+    expect(out.events[0]).toEqual({ type: "timeout", seat });
+    expect(out.state.drawn ?? null).toBeNull();
+    expect(out.state.players[seat]?.hand.length).toBe(before + 1);
+    expect(actingSeat(out.state)).not.toBe(seat);
+    expect(out.timeouts[seat]).toBe(1);
+  });
+
+  it("Online: two timeouts in a row → the server plays that seat (QM4); Solo never", () => {
+    const rt = { ...runtime(2, 9), timeouts: [2, 0] };
+    expect(effectiveKinds(["human", "human"], rt.timeouts, "online")).toEqual(["bot", "human"]);
+    expect(effectiveKinds(["human", "human"], rt.timeouts, "solo")).toEqual(["human", "human"]);
+  });
+
+  it("deciding on a drawn card always gets at least 5 seconds", () => {
+    const rt = runtime(2, 11);
+    const seat = actingSeat(rt.state) ?? 0;
+    const playerId = rt.state.players[seat]?.playerId ?? "";
+    // Make the next draw playable.
+    const top = rt.state.pile[rt.state.pile.length - 1];
+    if (top) rt.state.drawPile.unshift({ id: "x", cardId: "D03" });
+    const drawn = discard.applyCommand(
+      rt.state,
+      { type: "draw", playerId },
+      createSeededRandom(rt.rng),
+    );
+    expect(drawn.state.drawn?.id).toBe("x");
+    const out = advanceGame({ ...rt, state: drawn.state, deadline: 1000 }, ["human", "human"], 900);
+    expect(out.deadline).toBe(900 + discard.DISCARD_RULES.drawnDecisionMinMs);
   });
 });

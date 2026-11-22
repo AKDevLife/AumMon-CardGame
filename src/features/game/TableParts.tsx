@@ -23,7 +23,7 @@ export function GameHeader({
   direction: 1 | -1;
   onOpen: (p: "rules" | "cards" | "settings") => void;
 }) {
-  const low = seconds !== null && seconds <= 10;
+  const low = seconds !== null && seconds <= 5;
   return (
     <header className="flex shrink-0 items-center gap-1.5 bg-am-brand px-2.5 py-2 text-am-inverse">
       <div
@@ -250,7 +250,15 @@ export function CenterTable({
 }
 
 /** End of game: winner banner with confetti and a way home. */
-export function WinOverlay({ title }: { title: string }) {
+export function WinOverlay({
+  title,
+  pending = false,
+  onRematch,
+}: {
+  title: string;
+  pending?: boolean;
+  onRematch?: () => void;
+}) {
   const colors = ["bg-am-title", "bg-am-pink", "bg-am-blue", "bg-am-green", "bg-am-orange"];
   return (
     <div className="pointer-events-none fixed inset-0 z-30 overflow-hidden" aria-hidden="false">
@@ -268,12 +276,24 @@ export function WinOverlay({ title }: { title: string }) {
       <div className="pointer-events-auto absolute inset-x-4 top-1/3 mx-auto max-w-sm">
         <div role="status" className="am-sticker am-land bg-am-title p-4 text-center">
           <h1 className="font-display text-3xl font-bold">{title}</h1>
-          <Link
-            to="/"
-            className="am-sticker am-pressable mt-3 inline-block bg-am-card px-5 py-2 font-display font-bold"
-          >
-            กลับหน้าหลัก
-          </Link>
+          <div className="mt-3 flex flex-wrap justify-center gap-2">
+            {onRematch && (
+              <button
+                type="button"
+                disabled={pending}
+                onClick={onRematch}
+                className="am-sticker am-pressable bg-am-green px-5 py-2 font-display font-bold text-am-success-text disabled:opacity-60"
+              >
+                เล่นอีกรอบ
+              </button>
+            )}
+            <Link
+              to="/"
+              className="am-sticker am-pressable inline-block bg-am-card px-5 py-2 font-display font-bold"
+            >
+              กลับหน้าหลัก
+            </Link>
+          </div>
         </div>
       </div>
     </div>

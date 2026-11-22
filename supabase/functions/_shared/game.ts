@@ -9,7 +9,15 @@ import { HttpError } from "./http.ts";
 import { rateLimit } from "./ratelimit.ts";
 import { findReceipt, storeReceipt } from "./receipts.ts";
 import { decodeRng, encodeRng, type Tx } from "./store.ts";
-import { actingSeat, advanceGame, type GameRuntime, type Kind, type Mode } from "./game-flow.ts";
+import {
+  actingSeat,
+  advanceGame,
+  effectiveKinds,
+  GRACE_MS,
+  type GameRuntime,
+  type Kind,
+  type Mode,
+} from "./game-flow.ts";
 
 interface SeatRow {
   id: string;
@@ -22,11 +30,15 @@ interface SeatRow {
 
 interface Locked extends GameRuntime {
   matchId: string;
+  roomId: string;
+  status: string;
   userId: string;
   ownerId: string;
   mode: Mode;
   version: number;
   seats: SeatRow[];
+  /** Runtime changed outside the engine (e.g. resume) — save even without events. */
+  dirty?: boolean;
 }
 
 /** DB seats are 1-based; engine seats are 0-based. */
@@ -42,11 +54,14 @@ function cryptoSeed(): RngState {
 
 async function lockGame(tx: Tx, matchId: string, userId: string): Promise<Locked> {
   const lock =
-    await tx`select id from public.matches where id = ${matchId} and ruleset_version = '7' for update`;
+    await tx`select id from public.matches where id = ${matchId} and ruleset_version = '8' for update`;
   if (lock.length === 0) throw new HttpError(404, "not_found", "Match not found");
   const [row] = await tx<
     {
       owner_id: string;
+      room_id: string;
+      status: string;
+      seat_timeouts: number[];
       mode: Mode;
       version: string;
       internal_state: discard.GameState;
@@ -54,7 +69,7 @@ async function lockGame(tx: Tx, matchId: string, userId: string): Promise<Locked
       phase_deadline: Date | null;
     }[]
   >`
-    select r.owner_id, r.mode, m.version, rt.internal_state, rt.rng_state, rt.phase_deadline
+    select r.owner_id, m.room_id, m.status, rt.seat_timeouts, r.mode, m.version, rt.internal_state, rt.rng_state, rt.phase_deadline
     from public.matches m
     join public.game_rooms r on r.id = m.room_id
     join private.match_runtime rt on rt.match_id = m.id
@@ -71,6 +86,9 @@ async function lockGame(tx: Tx, matchId: string, userId: string): Promise<Locked
     matchId,
     userId,
     ownerId: row.owner_id,
+    roomId: row.room_id,
+    status: row.status,
+    timeouts: row.seat_timeouts,
     mode: row.mode,
     version: Number(row.version),
     seats,
@@ -104,7 +122,7 @@ async function saveGame(
   }
   await tx`
     update private.match_runtime set internal_state = ${tx.json(state as never)},
-      rng_state = ${encodeRng(rt.rng)}, phase_deadline = ${rt.deadline === null ? null : new Date(rt.deadline)}
+      rng_state = ${encodeRng(rt.rng)}, seat_timeouts = ${rt.timeouts}, phase_deadline = ${rt.deadline === null ? null : new Date(rt.deadline)}
     where match_id = ${locked.matchId}`;
   if (events.length > 0) {
     const [seq] = await tx<{ next: string }[]>`
@@ -138,7 +156,7 @@ function actorSeat(locked: Locked): number | null {
 
 export interface GameResponse {
   matchId: string;
-  rulesetVersion: "7";
+  rulesetVersion: "8";
   mode: Mode;
   version: number;
   deadline: string | null;
@@ -151,6 +169,12 @@ export interface GameResponse {
   events: unknown[];
   /** Cards the caller saw with Magnifier during this request (private). */
   peeks: { target: number; cards: string[] }[];
+  /** Server clock (ms) so the client can correct its countdown; the client never decides time. */
+  serverNow: number;
+  /** Seats the server is playing because of repeated timeouts (Online). */
+  autoSeats: number[];
+  /** Finished match: the rematch in the same room, once someone started it. */
+  nextMatchId: string | null;
 }
 
 async function respondGame(
@@ -166,22 +190,32 @@ async function respondGame(
   const events = await tx<{ public_payload: unknown }[]>`
     select public_payload from public.match_events where match_id = ${locked.matchId}
     order by event_seq desc limit 60`;
-  const kindOf = (s: number) => locked.seats.find((x) => toEngine(x.seat) === s)?.player_type;
+  const kinds = effectiveKinds(kindsOf(locked), rt.timeouts, locked.mode);
+  const [next] =
+    state.status === "finished"
+      ? await tx<{ id: string }[]>`
+          select id from public.matches where room_id = ${locked.roomId} and id <> ${locked.matchId}
+            and created_at > (select created_at from public.matches where id = ${locked.matchId})
+          order by created_at desc limit 1`
+      : [];
   return {
     matchId: locked.matchId,
-    rulesetVersion: "7",
+    rulesetVersion: "8",
     mode: locked.mode,
     version,
     deadline: rt.deadline === null ? null : new Date(rt.deadline).toISOString(),
     seat,
     acting,
-    botActing: acting !== null && kindOf(acting) === "bot",
+    botActing: acting !== null && kinds[acting] === "bot",
     names: [...locked.seats].sort((a, b) => a.seat - b.seat).map((s) => s.display_name),
     view: discard.getView(state, seat),
     events: events.map((e) => e.public_payload).reverse(),
     peeks: fresh.flatMap((e) =>
       e.type === "peek" && e.seat === seat ? [{ target: e.target, cards: e.cards }] : [],
     ),
+    serverNow: Date.now(),
+    autoSeats: kinds.flatMap((k, i) => (k === "bot" && kindsOf(locked)[i] === "human" ? [i] : [])),
+    nextMatchId: next?.id ?? null,
   };
 }
 
@@ -202,6 +236,8 @@ export async function withGame(
     ) => discard.Transition;
     expectedVersion?: number;
     receipt?: { key: string; hash: string };
+    /** Online auto-play: the player is back — clear their timeout streak. */
+    resume?: boolean;
   } = {},
 ): Promise<unknown> {
   await rateLimit(userId, "match.read", 240, 60);
@@ -219,7 +255,14 @@ export async function withGame(
     }
     const now = Date.now();
     const kinds = kindsOf(locked);
-    let rt = advanceGame(locked, kinds, now);
+    const own = actorSeat(locked);
+    if (options.resume && own !== null && (locked.timeouts[own] ?? 0) > 0) {
+      locked.timeouts = [...locked.timeouts];
+      locked.timeouts[own] = 0;
+      locked.dirty = true;
+    }
+    // A command that reached the server within the grace window still beats the timeout.
+    let rt = advanceGame(locked, kinds, options.act ? now - GRACE_MS : now, locked.mode);
     const events = [...rt.events];
     if (options.act) {
       if (options.expectedVersion !== undefined && options.expectedVersion !== locked.version)
@@ -235,15 +278,23 @@ export async function withGame(
         throw e;
       }
       events.push(...t.events);
+      // Acting resets this seat's timeout streak (and ends auto-play).
+      const timeouts = [...rt.timeouts];
+      timeouts[seat] = 0;
       const after = advanceGame(
-        { state: t.state, rng: rng.getState(), deadline: rt.deadline },
+        { state: t.state, rng: rng.getState(), deadline: rt.deadline, timeouts },
         kinds,
         now,
+        locked.mode,
       );
       events.push(...after.events);
       rt = after;
     }
-    const changed = events.length > 0 || rt.deadline !== locked.deadline;
+    const changed =
+      events.length > 0 ||
+      rt.deadline !== locked.deadline ||
+      rt.timeouts.join() !== locked.timeouts.join() ||
+      locked.dirty === true;
     const version = changed ? await saveGame(tx, locked, rt, events) : locked.version;
     const response = await respondGame(tx, locked, rt, version, events);
     if (options.receipt)
@@ -252,6 +303,21 @@ export async function withGame(
         ...response,
       });
     return response;
+  });
+}
+
+/** "เล่นอีกรอบ": a new match in the same room with the same seats (QM6). Idempotent per match. */
+export async function rematch(userId: string, matchId: string): Promise<{ matchId: string }> {
+  await rateLimit(userId, "room.create", 20, 60);
+  return db().begin(async (tx) => {
+    const locked = await lockGame(tx, matchId, userId);
+    if (locked.status === "active") throw new HttpError(409, "match_active", "Match still running");
+    if (!locked.seats.some((x) => x.user_id === userId))
+      throw new HttpError(403, "not_seated", "Only players can start a rematch");
+    const [existing] = await tx<{ id: string }[]>`
+      select id from public.matches where room_id = ${locked.roomId} and status = 'active' limit 1`;
+    if (existing) return { matchId: existing.id };
+    return { matchId: await startMatch(tx, locked.roomId) };
   });
 }
 
@@ -290,7 +356,7 @@ async function startMatch(tx: Tx, roomId: string): Promise<string> {
     throw new HttpError(409, "not_enough_players", "2–8 players needed");
   const [match] = await tx<{ id: string }[]>`
     insert into public.matches (room_id, status, phase, engine_version, ruleset_version, started_at)
-    values (${roomId}, 'active', 'play', ${ENGINE_VERSION}, '7', now()) returning id`;
+    values (${roomId}, 'active', 'play', ${ENGINE_VERSION}, '8', now()) returning id`;
   if (!match) throw new Error("match insert failed");
   const playerIds = seats.map(() => crypto.randomUUID());
   const rng = createSeededRandom(cryptoSeed());

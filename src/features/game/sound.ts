@@ -132,6 +132,7 @@ export const SOUND_EVENTS = {
   skip: { label: "ถูกข้ามเทิร์น", preset: "thud" },
   reset: { label: "เริ่มกองใหม่", preset: "whoosh" },
   turn: { label: "ถึงเทิร์นของคุณ", preset: "chime" },
+  warning: { label: "เวลาใกล้หมด (5 วินาที)", preset: "bell" },
   win: { label: "ชนะ", preset: "fanfare" },
   lose: { label: "แพ้", preset: "sad" },
   tap: { label: "กดปุ่มทั่วไป", preset: "tap" },

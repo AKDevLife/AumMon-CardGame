@@ -1,6 +1,6 @@
 # AumMon — Game Spec (Casual Discard Edition)
 
-> Version 8.0 · `ruleset_version = "7"` · approved by owner 2026-11-22 (DC1–DC7). Replaces the retired 1v1 TCG (rulesets 1–6).
+> Version 9.0 · `ruleset_version = "8"` (Quick Match, owner 2026-11-22 QM1–QM6) · approved by owner 2026-11-22 (DC1–DC7). Replaces the retired 1v1 TCG (rulesets 1–6).
 > Architecture, database and security: `aummon_project_blueprint.md`.
 
 ## 1. Platform decisions (LOCKED)
@@ -18,7 +18,7 @@
 | Core rules (turns, pile, reset, reactions, winning) | [`docs/discard/AumMon_Core_Rules.md`](./docs/discard/AumMon_Core_Rules.md) |
 | 16 cards × 4 copies = 64 | [`docs/discard/AumMon_Card_Library.md`](./docs/discard/AumMon_Card_Library.md) |
 | Owner decisions DC1–DC7, open questions | [`docs/discard/AumMon_Rule_Clarification.md`](./docs/discard/AumMon_Rule_Clarification.md) |
-| Quick Match proposal (ruleset "8", not approved) | [`docs/discard/AumMon_Quick_Match_Proposal.md`](./docs/discard/AumMon_Quick_Match_Proposal.md) |
+| Quick Match (ruleset "8", approved) | [`docs/discard/AumMon_Quick_Match_Proposal.md`](./docs/discard/AumMon_Quick_Match_Proposal.md) |
 | Simulation and balance | [`docs/discard/AumMon_Card_Balance.md`](./docs/discard/AumMon_Card_Balance.md) |
 
 Card data in code: `packages/game-engine/src/discard/cards.ts` (must match the Card Library).

@@ -24,6 +24,7 @@ interface Game {
     players: { handCount: number }[];
     playable: string[];
     canDraw: boolean;
+    canKeep: boolean;
     canReact: boolean;
     winner: number | null;
   };
@@ -77,12 +78,12 @@ describe.runIf(run)("discard matches via Edge Functions", () => {
     let v = (await a("game-view", { matchId })).body as unknown as Game;
     expect(v.seat).toBe(0);
     expect(v.view.players).toHaveLength(4);
-    expect(v.view.myHand).toHaveLength(7);
+    expect(v.view.myHand).toHaveLength(5);
     expect(JSON.stringify(v)).not.toContain('"drawPile"');
     expect((await b("game-view", { matchId })).status).toBe(404);
 
     for (let i = 0; i < 400 && v.view.status !== "finished"; i++) {
-      if (!v.view.canDraw && !v.view.canReact) {
+      if (!v.view.canDraw && !v.view.canKeep && !v.view.canReact) {
         await new Promise((r) => setTimeout(r, 750));
         v = (await a("game-view", { matchId })).body as unknown as Game;
         continue;
@@ -91,7 +92,9 @@ describe.runIf(run)("discard matches via Edge Functions", () => {
         ? { type: "react", useUmbrella: true }
         : v.view.playable[0]
           ? { type: "play", card: v.view.playable[0], useAbility: false }
-          : { type: "draw" };
+          : v.view.canKeep
+            ? { type: "keep" }
+            : { type: "draw" };
       const res = await send(a, v, command);
       expect(res.status).toBe(200);
       v = res.body as unknown as Game;
@@ -111,6 +114,20 @@ describe.runIf(run)("discard matches via Edge Functions", () => {
 
   it("pass & play mode is gone", async () => {
     expect((await a("game-create", { mode: "pass_play", names: ["Ann", "Ben"] })).status).toBe(400);
+  });
+
+  it("rematch: refused while running, starts a new match after the game ended", async () => {
+    const matchId = (await a("game-create", { mode: "solo", bots: 2 })).body["matchId"] as string;
+    expect((await a("game-rematch", { matchId })).status).toBe(409);
+    expect((await a("game-leave", { matchId })).status).toBe(200);
+    const again = await a("game-rematch", { matchId });
+    expect(again.status).toBe(200);
+    const next = again.body["matchId"] as string;
+    expect(next).not.toBe(matchId);
+    expect((await a("game-rematch", { matchId })).body["matchId"]).toBe(next);
+    const v = (await a("game-view", { matchId: next })).body as unknown as Game;
+    expect(v.view.players).toHaveLength(3);
+    expect((await b("game-rematch", { matchId })).status).toBe(404);
   });
 
   it("leaving an online-style solo match ends it", async () => {

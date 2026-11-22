@@ -2,6 +2,13 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-22 — 12.12 Quick Match, ruleset "8" (owner approved QM1–QM6)
+
+- Engine 2.0.0 / ruleset "8": deal 5 (2–4) / 4 (5–8); Draw Then Play (`draw` may leave a playable drawn card pending; only that card may be played, or `keep` ends the turn); Alarm Clock = reverse + next player draws 1; bot handles the drawn card. New tests (Draw Then Play, Ruler on drawn card, Alarm).
+- Server: 20 s turn / 5 s Umbrella timers; timeout = draw (drawn card kept) + `timeout` event; 0.5 s grace for commands; drawn-card decision ≥ 5 s; Online auto-play after 2 timeouts in a row (`private.match_runtime.seat_timeouts`, `game-view {resume}`); `serverNow`, `autoSeats`, `nextMatchId` in responses; new `game-rematch`. Migration `20261122000300_ruleset8_quick_match.sql` (rulesets 7/8, default 8, active ruleset 7 matches ended).
+- UI: "จั่วไพ่" → "ลงใบที่จั่ว" / "เก็บไว้ จบเทิร์น", red timer + warning sound at 5 s, timeout banner, auto-play bar with "กลับมาเล่นเอง", "เล่นอีกรอบ" (other players follow automatically), rules text. Docs: Core Rules, Card Library, Quick Match docs (approved), DC9, spec v9.0, blueprint.
+- Simulation on the shipped engine matches the 12.11 estimate (8 players: mean 53 turns, est. median 5.8 min).
+
 ## 2026-11-22 — 12.11 Quick Match analysis (proposal, no rule change)
 
 - `tests/integration/quick-match-sim.test.ts`: simulation harness on the real engine with 4 player profiles, hand-size / Draw Then Play / timer / Alarm variants and a time model; CI smoke, full run by env. 112,000 games (8 configs × 2–8 players × 2,000) + 32,000-game ability ablation.

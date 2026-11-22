@@ -4,14 +4,14 @@
 
 ## Product
 
-Casual Discard Edition — 2–8 player shed-your-hand card game with 16 Everyday Objects (`aummon_game_spec.md`, rules in `docs/discard/`). Modes: Solo vs bots, Online. Ruleset `7`, engine `1.0.0`.
+Casual Discard Edition — 2–8 player shed-your-hand card game with 16 Everyday Objects (`aummon_game_spec.md`, rules in `docs/discard/`). Modes: Solo vs bots, Online. Ruleset `8` (Quick Match), engine `2.0.0`.
 
 ## Status
 
 | Area                               | State                                                                  | Details                                                |
 | ---------------------------------- | ---------------------------------------------------------------------- | ------------------------------------------------------ |
 | Game (engine, backend, UI)         | Live on Dev, awaiting owner playtest (12.8)                            | `docs/DEVELOPMENT_PROGRESS.md`                         |
-| Quick Match (5–10 min, 20 s turns) | analysis done, **waiting for owner approval** of QM1–QM6               | `docs/discard/AumMon_Quick_Match_Proposal.md`          |
+| Quick Match (5–10 min, 20 s turns) | **live on Dev — ruleset "8"** (12.12); playtest next                   | `docs/discard/AumMon_Quick_Match_Rules.md`             |
 | VIP / gacha                        | design later (12.7), no payments                                       | spec §1                                                |
 | Art production                     | pipeline ready, waiting for Art Direction choice (13.2); no images yet | `docs/art-production/AumMon_Art_Production_Handoff.md` |
 | Production deploy                  | blocked on owner (6.8, 7.3, 7.8)                                       | progress file                                          |

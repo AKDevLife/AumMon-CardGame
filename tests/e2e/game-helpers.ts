@@ -8,7 +8,7 @@ export async function closePopups(page: Page): Promise<boolean> {
   return true;
 }
 
-/** One step for this page if it can act now: Umbrella answer, play a card, or draw & pass. */
+/** One step for this page if it can act now: Umbrella answer, play a card, or draw (keep the drawn card). */
 export async function act(page: Page): Promise<boolean> {
   const umbrella = page.getByRole("button", { name: "☂️ กางร่มกัน" });
   if (await umbrella.isVisible().catch(() => false)) {
@@ -17,7 +17,13 @@ export async function act(page: Page): Promise<boolean> {
     return true;
   }
   if (await closePopups(page)) return true;
-  const draw = page.getByRole("button", { name: "จั่วแล้วผ่าน" });
+  const keep = page.getByRole("button", { name: "เก็บไว้ จบเทิร์น" });
+  if (await keep.isVisible().catch(() => false)) {
+    await keep.click();
+    await page.waitForTimeout(300);
+    return true;
+  }
+  const draw = page.getByRole("button", { name: "จั่วไพ่", exact: true });
   if (!(await draw.isVisible().catch(() => false)) || !(await draw.isEnabled())) return false;
   const card = page.getByRole("group", { name: "Hand" }).locator('[data-playable="true"]').first();
   if (await card.isVisible().catch(() => false)) {

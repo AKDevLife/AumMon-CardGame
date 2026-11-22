@@ -6,7 +6,7 @@
 
 - **Status:** 🎮 Casual Discard Edition (ruleset "7", 2–8 players) is the only game; the 1v1 TCG was removed (code, tables, docs).
 - **Phase:** 12 — engine, backend, UI and cleanup done.
-- **Current task:** 12.8 owner playtest on Dev
+- **Current task:** 12.8 owner playtest of Quick Match (ruleset "8") on Dev
 - **Next:** 12.8 playtest + balance → 12.7 VIP/gacha design doc (build later). Art: 13.2 owner chooses Art Direction (`docs/art-production/`).
 - **Playtest URL (latest `main`):** https://aum-mon-card-game-git-playtest-aum-mon.vercel.app
 - **Dev backend:** Supabase `AumMon-Dev` (ref `yaxtzdhryctfjaspxvix`, ap-northeast-1), email confirmation OFF for playtesting.
@@ -23,9 +23,9 @@
 | 6 Online Multiplayer    |      7 |       8 |     88% |
 | 7 Public Launch & Scale |      6 |       8 |     75% |
 | 9 Developer Admin       |     17 |      17 |    100% |
-| 12 Discard Edition      |      9 |      12 |     75% |
+| 12 Discard Edition      |     10 |      12 |     83% |
 | 13 AI Art Production    |      1 |       9 |     11% |
-| **Overall**             | **96** | **110** | **87%** |
+| **Overall**             | **97** | **110** | **88%** |
 
 ## Completed (summary)
 
@@ -45,10 +45,10 @@ None
 
 ## Waiting for the owner
 
-| Task  | Needs                                                                                 |
-| ----- | ------------------------------------------------------------------------------------- |
-| 12.12 | Approve Quick Match decisions QM1–QM6 (`docs/discard/AumMon_Quick_Match_Proposal.md`) |
-| 13.2  | Choose the Art Direction (`docs/art-production/AumMon_Art_Direction.md`)              |
+| Task | Needs                                                                    |
+| ---- | ------------------------------------------------------------------------ |
+| 12.8 | Playtest Quick Match on Dev; choose best-of-3 for 2–3 players (yes / no) |
+| 13.2 | Choose the Art Direction (`docs/art-production/AumMon_Art_Direction.md`) |
 
 ## Deferred (production — owner decision)
 

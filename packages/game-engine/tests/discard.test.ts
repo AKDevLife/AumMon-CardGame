@@ -47,13 +47,19 @@ const play = (s: GameState, seat: number, cardId: string, useAbility = false, ch
     choice,
   });
 
+/** Draw; if the drawn card could be played (Draw Then Play), keep it — a plain "draw & pass". */
+const drawPass = (s: GameState, seat: number) => {
+  const t = run(s, { type: "draw", playerId: `p${String(seat)}` });
+  return t.state.drawn ? run(t.state, { type: "keep", playerId: `p${String(seat)}` }) : t;
+};
+
 describe("discard edition — core rules", () => {
-  it("deals 7 (2–4 players) / 5 (5–8), 64-card deck, starts on a normal card", () => {
+  it("deals 5 (2–4 players) / 4 (5–8), 64-card deck, starts on a normal card", () => {
     const four = startGame(["a", "b", "c", "d"], rng()).state;
-    expect(four.players.every((p) => p.hand.length === 7)).toBe(true);
+    expect(four.players.every((p) => p.hand.length === 5)).toBe(true);
     const eight = startGame(["a", "b", "c", "d", "e", "f", "g", "h"], rng()).state;
-    expect(eight.players.every((p) => p.hand.length === 5)).toBe(true);
-    expect(eight.drawPile.length + eight.pile.length + 40).toBe(64);
+    expect(eight.players.every((p) => p.hand.length === 4)).toBe(true);
+    expect(eight.drawPile.length + eight.pile.length + 32).toBe(64);
     expect(DISCARD_CARDS).toHaveLength(16);
   });
 
@@ -96,12 +102,13 @@ describe("discard edition — abilities", () => {
     expect(r.state.pile.at(-1)?.cardId).toBe("D16");
   });
 
-  it("Key skips the next player; Alarm reverses and makes everyone else draw", () => {
+  it("Key skips the next player; Alarm reverses and only the new next player draws", () => {
     const s = table("D01", [["D13", "D02"], ["D04"], ["D04"]]);
     expect(play(s, 0, "D13", true).state.current).toBe(2);
     const a = play(table("D01", [["D06", "D02"], ["D04"], ["D04"]]), 0, "D06", true).state;
     expect(a.direction).toBe(-1);
-    expect(a.players[1]?.hand).toHaveLength(2);
+    expect(a.players[2]?.hand).toHaveLength(2);
+    expect(a.players[1]?.hand).toHaveLength(1);
     expect(a.current).toBe(2);
   });
 
@@ -159,12 +166,52 @@ describe("discard edition — abilities", () => {
       ["D04", "D04"],
     ]);
     s = play(s, 0, "D01").state;
-    s = run(s, { type: "draw", playerId: "p1" }).state;
-    s = run(s, { type: "draw", playerId: "p2" }).state; // reset → p0 again
+    s = drawPass(s, 1).state;
+    s = drawPass(s, 2).state; // reset → p0 again
     const t = play(s, 0, "D15", true);
     expect(t.events.flatMap((e) => (e.type === "ability" ? [e.ability] : []))).toContain(
       "next_draw",
     );
+  });
+});
+
+describe("discard edition — Draw Then Play (ruleset 8)", () => {
+  it("a legal drawn card may be played — only that card", () => {
+    const s = table("D01", [["D13"], ["D04"], ["D04"]]);
+    s.drawPile = [card("D05"), ...s.drawPile];
+    const d = run(s, { type: "draw", playerId: "p0" }).state;
+    expect(d.drawn?.seat).toBe(0);
+    expect(d.current).toBe(0);
+    expect(getView(d, 0).playable).toEqual([d.drawn?.id]);
+    expect(err(() => play(d, 0, "D13"))).toBe("cannot_play");
+    expect(err(() => run(d, { type: "draw", playerId: "p0" }))).toBe("cannot_play");
+    const p = play(d, 0, "D05");
+    expect(p.state.pile.at(-1)?.cardId).toBe("D05");
+    expect(p.state.current).toBe(1);
+    expect(p.state.drawn).toBeNull();
+  });
+
+  it("keep ends the turn as a pass; an illegal drawn card passes at once", () => {
+    const s = table("D09", [["D01"], ["D13"], ["D04"]]);
+    s.drawPile = [card("D13"), card("D02"), ...s.drawPile];
+    const d = run(s, { type: "draw", playerId: "p0" }).state;
+    const k = run(d, { type: "keep", playerId: "p0" }).state;
+    expect(k.current).toBe(1);
+    expect(k.passStreak).toBe(1);
+    expect(k.players[0]?.hand).toHaveLength(2);
+    const illegal = run(k, { type: "draw", playerId: "p1" });
+    expect(illegal.state.drawn).toBeNull();
+    expect(illegal.state.current).toBe(2);
+    expect(illegal.events.some((e) => e.type === "passed")).toBe(true);
+    expect(err(() => run(illegal.state, { type: "keep", playerId: "p2" }))).toBe("cannot_play");
+  });
+
+  it("Ruler and Glue apply to the drawn card", () => {
+    const r = play(table("D01", [["D09", "D01"], ["D13"], ["D04"]]), 0, "D09", true).state;
+    r.drawPile = [card("D13"), ...r.drawPile];
+    const forced = run(r, { type: "draw", playerId: "p1" });
+    expect(forced.state.drawn).toBeNull();
+    expect(forced.events).toContainEqual({ type: "passed", seat: 1, forced: true });
   });
 });
 

@@ -162,3 +162,40 @@
 4. **20 s timer (D):** shortens each turn but adds 1–4 timeouts per game. Timeouts are auto-draws, so slower players lose more (slow profile win rate at 2 players: 58 % → 36 %). It needs clear warnings and AFK handling.
 5. **Alarm Clock** is by far the biggest game-extender (+27 turns / +2.8 min at 8 players), because "everyone else draws" grows with the player count. **E** (Alarm next-only) cuts the 8-player mean from 80 to 54 turns and the p90 from 177 to 111, and finishes 100 % of games.
 6. **4 / 3 cards (X2 / X3):** faster still, but very short at 2–5 players (median ≈ 1.4–3 min), with a bigger first-player edge (2 players: 56 %) and fewer combos. Kept as a fallback.
+
+## 5. Verification on the shipped engine (ruleset "8", task 12.12)
+
+Same harness and time model, 2,000 games per row, run on engine 2.0.0 (the configs above were run on the ruleset 7 engine at commit 07ebd61). "R8 shipped" reproduces configuration E (8 players: mean 53 vs 54 turns, est. median 5.8 vs 5.8 min).
+
+| Config         | Players | Finished % | Turns mean / p50 / p90 / max | Est. min p50 / p90 | ≤ 10 min % | Longest wait p90 (s) | First player wins % | Timeouts / game | Drawn-card plays / game |
+| -------------- | ------: | ---------: | ---------------------------- | ------------------ | ---------: | -------------------: | ------------------: | --------------: | ----------------------: |
+| R8 shipped     |       2 |      100.0 | 13 / 11 / 20 / 55            | 1.8 / 3.4          |        100 |                   44 |                  55 |            0.85 |                     0.7 |
+| R8 shipped     |       3 |      100.0 | 22 / 19 / 39 / 79            | 3.0 / 5.9          |         99 |                   64 |                  36 |            1.31 |                     1.8 |
+| R8 shipped     |       4 |      100.0 | 34 / 28 / 66 / 215           | 4.3 / 9.8          |         91 |                   90 |                  27 |            1.88 |                     3.1 |
+| R8 shipped     |       5 |      100.0 | 35 / 25 / 72 / 324           | 3.9 / 10.4         |         89 |                  111 |                  24 |            1.81 |                     3.5 |
+| R8 shipped     |       6 |      100.0 | 43 / 30 / 87 / 663           | 4.6 / 13.0         |         83 |                  140 |                  21 |            2.19 |                     4.3 |
+| R8 shipped     |       7 |      100.0 | 51 / 35 / 109 / 466          | 5.3 / 16.2         |         76 |                  164 |                  16 |            2.52 |                     5.5 |
+| R8 shipped     |       8 |      100.0 | 53 / 39 / 107 / 446          | 5.8 / 16.0         |         74 |                  197 |                  15 |            2.58 |                     5.8 |
+| R8 without DTP |       2 |      100.0 | 13 / 11 / 20 / 57            | 1.8 / 3.4          |        100 |                   44 |                  54 |            0.86 |                     0.0 |
+| R8 without DTP |       3 |      100.0 | 22 / 19 / 37 / 85            | 2.9 / 5.7          |         99 |                   62 |                  35 |            1.31 |                     0.0 |
+| R8 without DTP |       4 |      100.0 | 34 / 28 / 62 / 160           | 4.2 / 9.2          |         92 |                   87 |                  26 |            1.94 |                     0.0 |
+| R8 without DTP |       5 |      100.0 | 34 / 25 / 68 / 353           | 3.8 / 9.8          |         91 |                  108 |                  22 |            1.84 |                     0.0 |
+| R8 without DTP |       6 |      100.0 | 44 / 31 / 90 / 506           | 4.7 / 13.0         |         83 |                  134 |                  18 |            2.28 |                     0.0 |
+| R8 without DTP |       7 |      100.0 | 54 / 37 / 114 / 471          | 5.4 / 16.1         |         76 |                  162 |                  17 |            2.73 |                     0.0 |
+| R8 without DTP |       8 |      100.0 | 59 / 40 / 126 / 564          | 5.9 / 18.1         |         71 |                  187 |                  15 |            2.90 |                     0.0 |
+| R8 4/3 cards   |       2 |      100.0 | 10 / 9 / 16 / 51             | 1.4 / 2.8          |        100 |                   42 |                  55 |            0.70 |                     0.6 |
+| R8 4/3 cards   |       3 |      100.0 | 18 / 14 / 32 / 96            | 2.2 / 4.9          |        100 |                   60 |                  37 |            0.96 |                     1.5 |
+| R8 4/3 cards   |       4 |      100.0 | 26 / 20 / 49 / 188           | 3.1 / 7.5          |         96 |                   86 |                  28 |            1.40 |                     2.4 |
+| R8 4/3 cards   |       5 |      100.0 | 23 / 15 / 49 / 334           | 2.3 / 7.1          |         95 |                   99 |                  26 |            1.11 |                     2.3 |
+| R8 4/3 cards   |       6 |      100.0 | 27 / 17 / 59 / 327           | 2.6 / 8.6          |         92 |                  125 |                  22 |            1.31 |                     2.8 |
+| R8 4/3 cards   |       7 |      100.0 | 31 / 20 / 67 / 367           | 3.0 / 9.9          |         90 |                  147 |                  19 |            1.44 |                     3.2 |
+| R8 4/3 cards   |       8 |      100.0 | 35 / 22 / 77 / 314           | 3.3 / 11.3         |         88 |                  171 |                  18 |            1.62 |                     3.8 |
+| R8 45 s timer  |       2 |      100.0 | 12 / 11 / 17 / 44            | 1.8 / 3.1          |        100 |                   49 |                  57 |            0.03 |                     0.7 |
+| R8 45 s timer  |       3 |      100.0 | 20 / 17 / 34 / 95            | 2.9 / 5.3          |        100 |                   73 |                  36 |            0.04 |                     1.7 |
+| R8 45 s timer  |       4 |      100.0 | 30 / 25 / 53 / 269           | 4.0 / 8.1          |         96 |                   97 |                  27 |            0.05 |                     2.8 |
+| R8 45 s timer  |       5 |      100.0 | 31 / 23 / 61 / 300           | 3.7 / 9.5          |         91 |                  118 |                  23 |            0.04 |                     3.2 |
+| R8 45 s timer  |       6 |      100.0 | 37 / 26 / 74 / 355           | 4.2 / 11.2         |         88 |                  142 |                  22 |            0.05 |                     3.8 |
+| R8 45 s timer  |       7 |      100.0 | 43 / 30 / 88 / 451           | 4.9 / 13.0         |         81 |                  173 |                  17 |            0.07 |                     4.7 |
+| R8 45 s timer  |       8 |      100.0 | 47 / 33 / 95 / 371           | 5.2 / 14.5         |         79 |                  203 |                  15 |            0.07 |                     5.2 |
+
+Note: in this model a 45 s timer gives slightly shorter rounds than 20 s, because 20 s causes more timeouts (auto-draws). The 20 s timer (owner decision) mainly limits waiting for slow / away players; playtest data will decide whether to tune it.

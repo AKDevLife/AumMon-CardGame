@@ -7,6 +7,7 @@ export const SOUND_EVENT_IDS = [
   "skip",
   "reset",
   "turn",
+  "warning",
   "win",
   "lose",
   "tap",
