@@ -77,4 +77,15 @@ describe("discard server flow", () => {
     const out = advanceGame({ ...rt, state: drawn.state, deadline: 1000 }, ["human", "human"], 900);
     expect(out.deadline).toBe(900 + discard.DISCARD_RULES.drawnDecisionMinMs);
   });
+
+  it("a bot's drawn card never delays the bot (regression)", () => {
+    const kinds: Kind[] = ["bot", "bot", "bot"];
+    let rt = runtime(3, 5);
+    let now = 0;
+    for (let i = 0; i < 2000 && rt.state.status === "active"; i++) {
+      rt = advanceGame(rt, kinds, now);
+      now = rt.deadline ?? now + 1;
+    }
+    expect(rt.state.status).toBe("finished");
+  });
 });

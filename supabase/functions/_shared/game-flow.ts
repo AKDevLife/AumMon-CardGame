@@ -99,7 +99,7 @@ export function advanceGame(
           : discard.DISCARD_RULES.turnTimeoutMs);
   }
   // Draw Then Play: deciding on the drawn card always gets a few seconds.
-  if (state.drawn && deadline !== null)
+  if (state.drawn && deadline !== null && kindAt(state.drawn.seat) === "human")
     deadline = Math.max(deadline, now + discard.DISCARD_RULES.drawnDecisionMinMs);
   return { state, rng: rng.getState(), deadline, timeouts, events };
 }
