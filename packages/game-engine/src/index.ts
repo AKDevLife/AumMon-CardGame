@@ -1,5 +1,5 @@
 /**
- * @aummon/game-engine — public entry point (ruleset 4: Everyday Objects Battle, aummon_game_spec.md v5.0).
+ * @aummon/game-engine — public entry point (ruleset 4: Everyday Objects Battle, aummon_game_spec.md v6.0).
  *
  * Pure TypeScript: no React, Supabase, UI, HTTP, database, Node.js or Deno
  * APIs. Relative imports use explicit `.ts` extensions so the same sources
@@ -12,4 +12,4 @@ export {
   type RngState,
   type SeededRandom,
 } from "./rng/seeded-random.ts";
-export * as v5 from "./rules/v5/index.ts";
+export * as v6 from "./rules/v6/index.ts";

@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import { ENGINE_VERSION, RULESET_VERSION } from "../src/index.ts";
 
 describe("engine versioning", () => {
-  it("is ruleset 5 (Everyday Objects)", () => {
-    expect(RULESET_VERSION).toBe("5");
+  it("is ruleset 6 (Everyday Objects)", () => {
+    expect(RULESET_VERSION).toBe("6");
   });
 
   it("exposes a semver engine version", () => {

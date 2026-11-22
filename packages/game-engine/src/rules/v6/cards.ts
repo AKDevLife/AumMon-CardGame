@@ -35,7 +35,7 @@ function obj(
   };
 }
 
-export const CARD_DEFINITIONS_V5: readonly CardDefinition[] = [
+export const CARD_DEFINITIONS_V6: readonly CardDefinition[] = [
   // ---- Aggro
   obj(
     "O01",
@@ -574,7 +574,7 @@ export const CARD_DEFINITIONS_V5: readonly CardDefinition[] = [
   ),
 ];
 
-const BY_ID = new Map(CARD_DEFINITIONS_V5.map((c) => [c.cardId, c]));
+const BY_ID = new Map(CARD_DEFINITIONS_V6.map((c) => [c.cardId, c]));
 
 export function getCardDefinition(cardId: string): CardDefinition {
   const def = BY_ID.get(cardId);

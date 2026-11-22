@@ -1,4 +1,4 @@
-import type { v5 } from "@aummon/game-engine";
+import type { v6 } from "@aummon/game-engine";
 
 /**
  * Synthesized sound effects (Web Audio, no asset files). Each game event plays a preset
@@ -262,7 +262,7 @@ export const previewPreset = (preset: PresetId, volume = 1): void => {
 };
 
 /** Which sound a public game event makes (null = silent). `mySeat` decides win/lose and turn chime. */
-export function soundFor(e: v5.GameEvent, mySeat: v5.Seat | null): SoundEvent | null {
+export function soundFor(e: v6.GameEvent, mySeat: v6.Seat | null): SoundEvent | null {
   switch (e.type) {
     case "unit_summoned":
       return "summon";

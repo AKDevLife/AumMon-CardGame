@@ -2,6 +2,10 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-22 — 11.7 First-player balance (ruleset 6)
+
+- Simulated (8,000 bot games each): today 70 % first-player wins; "no attack on turn 1" alone ≈ 70 % (new Objects sleep anyway); + extra card 67 %; + 1 SPARK 54 %; all together 51 %. Owner chose all three. Engine `rules/v6` (0.6.0), mulligan accepts 6 cards, migration `20261122000000_ruleset6.sql`, spec v7.0, R5 closed. Repo is now public (unlimited CI).
+
 ## 2026-11-21 — 11.6 Save Actions minutes
 
 - GitHub warned 90 % of the 2,000 free Actions minutes were used (resets 2026-12-01). CI now runs once per PR (the duplicate run on `main` after each squash merge is gone) and skips docs-only changes. Owner asked to set the Actions budget to $0 so nothing is ever charged.

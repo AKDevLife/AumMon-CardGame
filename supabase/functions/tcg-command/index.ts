@@ -1,6 +1,6 @@
 // POST { matchId, expectedVersion, idempotencyKey, command: { type, ... } } → TcgResponse
 // Intent only: the server picks the acting seat and computes every result (spec §1.3).
-import { v5 } from "@aummon/game-engine";
+import { v6 } from "@aummon/game-engine";
 import { requireUser } from "../_shared/auth.ts";
 import { handler, HttpError, readJson } from "../_shared/http.ts";
 import { int, rejectServerFields, uuid } from "../_shared/input.ts";
@@ -29,7 +29,7 @@ function parseCommand(raw: unknown): Intent {
   const c = raw as Record<string, unknown>;
   switch (c["type"]) {
     case "mulligan":
-      return { type: "mulligan", instanceIds: idList(c["instanceIds"], "instanceIds", 0, 5) };
+      return { type: "mulligan", instanceIds: idList(c["instanceIds"], "instanceIds", 0, 6) };
     case "summon":
       return { type: "summon", instanceId: idValue(c["instanceId"], "instanceId") };
     case "activate":
@@ -72,9 +72,9 @@ Deno.serve(
       receipt: { key, hash },
       act: (state, seat, rng) =>
         // Shape validated above; the engine validates every rule and throws CommandError otherwise.
-        v5.applyCommand(
+        v6.applyCommand(
           state,
-          { ...intent, playerId: state.players[seat].playerId } as v5.Command,
+          { ...intent, playerId: state.players[seat].playerId } as v6.Command,
           rng,
         ),
     });

@@ -1,6 +1,16 @@
 import { describe, expect, it } from "vitest";
-import { unitAtk, unitHp, unitKeywords, type MatchState } from "../src/rules/v5/index.ts";
-import { at, board, errorOf, giveCard, obj, play } from "./v5-fixtures.ts";
+import { createSeededRandom } from "../src/rng/seeded-random.ts";
+import {
+  applyCommand,
+  getLegalCommands,
+  initializeMatch,
+  STARTER_DECK_V6,
+  unitAtk,
+  unitHp,
+  unitKeywords,
+  type MatchState,
+} from "../src/rules/v6/index.ts";
+import { at, board, errorOf, giveCard, obj, play } from "./v6-fixtures.ts";
 
 const u = (s: MatchState, seat: 0 | 1, id: string) => {
   const x = s.players[seat].units.find((v) => v.instanceId === id);
@@ -247,5 +257,36 @@ describe("ruleset 3 — Passive abilities (framework §3.2)", () => {
     expect(errorOf(() => play(t.state, { type: "activate", instanceId: "a", target: "x" }))).toBe(
       "active_used",
     );
+  });
+});
+
+describe("ruleset 6 — first-player balance (owner 2026-11-22)", () => {
+  it("second player opens with 6 cards; first player cannot attack on turn 1; +1 SPARK on turn 2", () => {
+    const r = createSeededRandom([1, 2, 3, 4]);
+    let s = initializeMatch(
+      { playerIds: ["a", "b"], decks: [STARTER_DECK_V6, STARTER_DECK_V6] },
+      r,
+    );
+    const first = s.firstSeat;
+    const second = first === 0 ? 1 : 0;
+    expect(s.players[first].hand).toHaveLength(5);
+    expect(s.players[second].hand).toHaveLength(6);
+    for (const id of ["a", "b"])
+      s = applyCommand(s, { type: "mulligan", playerId: id, instanceIds: [] }, r).state;
+    expect(s.turn).toBe(1);
+    const p = s.players[first];
+    p.units.push(obj("h", "O02"));
+    expect(getLegalCommands(s, first).some((c) => c.type === "attack")).toBe(false);
+    expect(
+      errorOf(() =>
+        applyCommand(
+          s,
+          { type: "attack", playerId: p.playerId, attackerId: "h", target: "player" },
+          r,
+        ),
+      ),
+    ).toBe("first_turn_no_attack");
+    s = applyCommand(s, { type: "end_turn", playerId: p.playerId }, r).state;
+    expect(s.players[second].spark).toBe(2);
   });
 });

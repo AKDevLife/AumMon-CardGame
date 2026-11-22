@@ -1,11 +1,11 @@
-/** Ruleset 4 (Everyday Objects Battle — aummon_game_spec.md v5.0). */
+/** Ruleset 4 (Everyday Objects Battle — aummon_game_spec.md v6.0). */
 export type * from "./types.ts";
-export { CARD_DEFINITIONS_V5, getCardDefinition } from "./cards.ts";
+export { CARD_DEFINITIONS_V6, getCardDefinition } from "./cards.ts";
 export {
   ABILITY_BUDGET_ALLOWANCE,
-  POWER_BUDGET_V5,
-  RULESET_V5,
-  STARTER_DECK_V5,
+  POWER_BUDGET_V6,
+  RULESET_V6,
+  STARTER_DECK_V6,
 } from "./constants.ts";
 export { validateCardData, type DataReport } from "./validate.ts";
 export type * from "./state.ts";

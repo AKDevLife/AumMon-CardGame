@@ -1,10 +1,10 @@
-# AumMon — Game Spec v6.1 (Everyday Objects Battle · 1v1 TCG)
+# AumMon — Game Spec v7.0 (Everyday Objects Battle · 1v1 TCG)
 
 > แหล่งอ้างอิงหลักเพียงไฟล์เดียวของ **กติกาเกม การ์ด และข้อกำหนดผลิตภัณฑ์ AumMon**
 > Architecture, Database, Security, เครื่องมือ และแผนพัฒนาอยู่ใน `aummon_project_blueprint.md`
 > เวอร์ชัน: 6.0 (2026-11-21; v4.0–v5.1 วันเดียวกัน) — ทิศทางใหม่ "Everyday Objects Battle" ที่เจ้าของอนุมัติ (การตัดสินใจ D1–D11 ใน `docs/rule-clarifications.md` §R3; brief ต้นฉบับ `docs/design/AumMon_New_Game_Direction_Handoff.zip`)
 > สถานะ: Design Baseline — **Provisional จนกว่าจะผ่าน Playtest / Balance**
-> Ruleset: `ruleset_version = "5"`. Ruleset `"1"` (2–4 คน), `"2"` (Evolution / Fusion / Equipment), `"3"` (Active จ่าย SPARK) และ `"4"` (ลำดับ Main → Battle, Guard เฉพาะตอนตื่น) **ยกเลิกแล้ว** — ดูได้จาก Git history เท่านั้น
+> Ruleset: `ruleset_version = "6"`. Ruleset `"1"` (2–4 คน), `"2"` (Evolution / Fusion / Equipment), `"3"` (Active จ่าย SPARK) `"4"` (ลำดับ Main → Battle, Guard เฉพาะตอนตื่น) และ `"5"` (ไม่มีการชดเชยคนเริ่มทีหลัง) **ยกเลิกแล้ว** — ดูได้จาก Git history เท่านั้น
 
 ---
 
@@ -67,7 +67,8 @@
 ## 4.1 Match Setup
 - 2 ผู้เล่น · Player HP **20** · Deck **30** · มือเริ่ม **5** · สูงสุด **3 ใบต่อ Card ID**
 - สนาม: **สูงสุด 3 Objects ต่อผู้เล่น**
-- Server สุ่มผู้เล่นคนแรก; คนแรกไม่จั่วในเทิร์นแรก
+- Server สุ่มผู้เล่นคนแรก; คนแรกไม่จั่วในเทิร์นแรก และ **โจมตีไม่ได้ในเทิร์นแรกของเกม**
+- **คนเริ่มทีหลังได้การ์ดในมือเริ่มต้น 6 ใบ** (คนเริ่มก่อน 5 ใบ) และ **+1 SPARK ในเทิร์นแรกของตัวเอง** (เฉพาะเทิร์นนั้น) — เจ้าของ 2026-11-22 จากการจำลอง: คนเริ่มก่อนชนะ 70% → 51%
 - Mulligan 1 ครั้ง (ทั้งสองฝ่ายก่อนเริ่ม): เลือกการ์ดคืน Deck สับ แล้วจั่วจำนวนเท่าเดิม (ส่งรายการว่างได้)
 - มือสูงสุด **10 ใบ**: การ์ดที่เข้ามือตอนมือเต็มลง Discard
 
@@ -213,6 +214,10 @@ Active: ต้นทางหลับก็ใช้ได้ · ใช้ห�
 ---
 
 # Appendix — Change Log
+
+## 2026-11-22 — v7.0 First-player balance (ruleset "6")
+- คนเริ่มก่อนโจมตีไม่ได้ในเทิร์นแรก; คนเริ่มทีหลังได้การ์ด 6 ใบ และ +1 SPARK ในเทิร์นแรกของตัวเอง (ปิดประเด็น R5)
+- ผลจำลอง Bot vs Bot 8,000 เกม: คนเริ่มก่อนชนะ 70% → 51%
 
 ## 2026-11-21 — v6.1 Balance pass (ruleset "5", card data only)
 - วัดจากการจำลอง Bot vs Bot 8,000 เกม (win rate เมื่อการ์ดอยู่ในมือ): ก่อนปรับ 38–56% → หลังปรับ 47–54%

@@ -1,6 +1,6 @@
-/** Ruleset 4 constants (aummon_game_spec.md v5.0 §4, §5.5, §6). */
-export const RULESET_V5 = {
-  version: "5",
+/** Ruleset 4 constants (aummon_game_spec.md v6.0 §4, §5.5, §6). */
+export const RULESET_V6 = {
+  version: "6",
   players: 2,
   playerHp: 20,
   deckSize: 30,
@@ -17,7 +17,7 @@ export const RULESET_V5 = {
 } as const;
 
 /** Power budget: cost → [min, max] of ATK + HP; Objects with abilities may go up to 3 below min. */
-export const POWER_BUDGET_V5: Readonly<Record<number, readonly [number, number]>> = {
+export const POWER_BUDGET_V6: Readonly<Record<number, readonly [number, number]>> = {
   1: [4, 6],
   2: [6, 8],
   3: [8, 10],
@@ -27,8 +27,8 @@ export const POWER_BUDGET_V5: Readonly<Record<number, readonly [number, number]>
 };
 export const ABILITY_BUDGET_ALLOWANCE = 3;
 
-/** Starter Deck v5 (30): all 24 × 1 plus a second O01, O03, O08, O13, O19, O23. */
-export const STARTER_DECK_V5: Readonly<Record<string, number>> = Object.fromEntries(
+/** Starter Deck v6 (30): all 24 × 1 plus a second O01, O03, O08, O13, O19, O23. */
+export const STARTER_DECK_V6: Readonly<Record<string, number>> = Object.fromEntries(
   Array.from({ length: 24 }, (_, i) => {
     const id = `O${String(i + 1).padStart(2, "0")}`;
     return [id, ["O01", "O03", "O08", "O13", "O19", "O23"].includes(id) ? 2 : 1];
