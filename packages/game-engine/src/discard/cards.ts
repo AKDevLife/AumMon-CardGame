@@ -8,15 +8,15 @@ export type AbilityId =
   | "eraser" // ยางลบ: wild; clears the pile conditions
   | "scissors" // กรรไกร: remove the card under, play 1 more card
   | "box" // กล่องกระดาษ: also put 1 card of 1–3 points on the pile (ruleset 10)
-  | "alarm" // นาฬิกาปลุก: reverse + the next player (new direction) draws 1
+  | "alarm" // พัดลม (ruleset 12): reverse direction only
   | "magnet" // แม่เหล็ก: give 1 own card to the player with the fewest cards
-  | "peek" // แว่นขยาย: secretly see 2 cards of a player, then you may play 1 more (ruleset 10)
+  | "peek" // แว่นขยาย (ruleset 12): secretly see the top 2 cards of the draw pile
   | "ruler" // ไม้บรรทัด: next player must play exactly this value or draw & pass
   | "tape" // เทปกาว: also play 2 cards of equal points
   | "trash" // ถังขยะ: remove 1 own card from the game (ruleset 9: no redraw)
-  | "flashlight" // ไฟฉาย: reveal all hands, a chosen player draws 1
+  | "flashlight" // ไฟฉาย (ruleset 12): secretly see one opponent's whole hand
   | "skip" // กุญแจ: skip the next player
-  | "fan" // พัดลม: the player with the fewest cards (not you) draws 1
+  | "fan" // นาฬิกาปลุก (ruleset 12): the player with the fewest cards (not you) draws 1
   | "hourglass" // นาฬิกาทราย: repeat the ability of the card under it
   | "umbrella"; // ร่ม: reaction — cancel a draw / skip aimed at you
 
@@ -62,13 +62,13 @@ const SHORT: Record<AbilityId, string> = {
   eraser: "ลงทับได้ทุกใบ ล้างกอง",
   scissors: "ตัดใบใต้ทิ้ง ลงเพิ่มได้ 1",
   box: "วางไพ่แต้ม 1–3 เพิ่มได้ 1 ใบ",
-  alarm: "สลับทิศ คนถัดไปจั่ว 1",
+  alarm: "สลับทิศทางการเล่น",
   magnet: "ส่ง 1 ใบให้คนไพ่น้อยสุด",
-  peek: "แอบดู 2 ใบ แล้วลงเพิ่มได้ 1",
+  peek: "แอบดู 2 ใบบนกองจั่ว",
   ruler: "คนถัดไปต้องลงแต้ม 5",
   tape: "ลงคู่แต้มเท่ากันเพิ่ม 2 ใบ",
   trash: "ทิ้ง 1 ใบออกจากเกม",
-  flashlight: "เปิดไพ่ทุกคน เลือก 1 คนจั่ว",
+  flashlight: "ดูไพ่ทั้งมือของ 1 คน",
   skip: "ข้ามคนถัดไป 1 เทิร์น",
   fan: "คนไพ่น้อยสุดจั่ว 1",
   hourglass: "ใช้พลังใบใต้ซ้ำ",
@@ -105,26 +105,9 @@ export const DISCARD_CARDS: readonly DiscardCard[] = [
     "เก็บของ",
     "วางไพ่ในมือที่แต้ม 1–3 ลงบนกองเพิ่มได้อีก 1 ใบ (ไม่ใช้พลังของใบนั้น)",
   ),
-  c(
-    "D06",
-    "นาฬิกาปลุก",
-    "Alarm Clock",
-    5,
-    "alarm",
-    "ปลุก",
-    "สลับทิศทางการเล่น แล้วผู้เล่นคนถัดไป (ตามทิศใหม่) จั่วเพิ่ม 1 ใบ",
-  ),
+  c("D06", "นาฬิกาปลุก", "Alarm Clock", 5, "fan", "ปลุก", "ปลุกผู้เล่นที่มีไพ่น้อยที่สุด (ไม่นับเรา) ให้จั่วเพิ่ม 1 ใบ"),
   c("D07", "แม่เหล็ก", "Magnet", 4, "magnet", "ดูดติด", "ส่งไพ่ 1 ใบจากมือเราไปติดผู้เล่นที่มีไพ่น้อยที่สุด"),
-  c(
-    "D08",
-    "แว่นขยาย",
-    "Magnifier",
-    2,
-    "peek",
-    "ส่อง",
-    "เลือกผู้เล่น 1 คน ดูไพ่ในมือเขาแบบลับ 2 ใบ แล้วลงไพ่เพิ่มได้อีก 1 ใบ (ตามกฎแต้ม)",
-    true,
-  ),
+  c("D08", "แว่นขยาย", "Magnifier", 2, "peek", "ส่อง", "แอบดูไพ่ 2 ใบบนสุดของกองจั่ว (เห็นคนเดียว)"),
   c(
     "D09",
     "ไม้บรรทัด",
@@ -143,11 +126,11 @@ export const DISCARD_CARDS: readonly DiscardCard[] = [
     6,
     "flashlight",
     "ส่องสว่าง",
-    "เปิดไพ่ในมือทุกคนให้ทุกคนเห็น แล้วเลือกผู้เล่น 1 คนจั่วเพิ่ม 1 ใบ",
+    "เลือกผู้เล่น 1 คน ดูไพ่ในมือเขาทั้งหมด (เห็นคนเดียว)",
     true,
   ),
   c("D13", "กุญแจ", "Key", 6, "skip", "ล็อก", "ข้ามเทิร์นของผู้เล่นคนถัดไป 1 เทิร์น"),
-  c("D14", "พัดลม", "Fan", 4, "fan", "เป่า", "ผู้เล่นที่มีไพ่น้อยที่สุด (ไม่นับเรา) จั่วเพิ่ม 1 ใบ"),
+  c("D14", "พัดลม", "Fan", 4, "alarm", "เป่ากลับ", "สลับทิศทางการเล่น"),
   c(
     "D15",
     "นาฬิกาทราย",
@@ -169,7 +152,7 @@ export const DISCARD_CARDS: readonly DiscardCard[] = [
 ];
 
 export const DISCARD_RULES = {
-  version: "11",
+  version: "12",
   minPlayers: 2,
   maxPlayers: 8,
   copies: 4,

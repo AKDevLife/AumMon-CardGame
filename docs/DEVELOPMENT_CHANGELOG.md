@@ -2,6 +2,12 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-22 — 12.20 Ruleset "12": card changes + loading spinners (owner)
+
+- Engine 6.0.0 / ruleset "12": ไฟฉาย = see one opponent's whole hand (private `peek`, no draw); แว่นขยาย = see the top 2 draw-pile cards (private, `target: null`); พัดลม = reverse only; นาฬิกาปลุก = fewest-cards player draws 1; the Flashlight "reveal all" popup is removed; private views show cards with ability text (tap to enlarge). กุญแจ art 🔑 → 🔒. Migration `20261122000800_ruleset12_cards.sql`. DC14.
+- Spinner on buttons while their request runs: `StickerButton` (automatic for the clicked button), draw / keep and rematch buttons.
+- Glue: proposals G1–G3; G2 "give 1 card to a chosen player" simulated (Glue 0.77–0.81 → 0.93–1.01). Waiting for the owner (12.21).
+
 ## 2026-11-22 — 12.19 Online playtest fixes (owner)
 
 - **Bug:** after a player's command the server kept the old deadline when the turn passed to another human, so the next player got only the remaining time. Now `deadlineAfterAct` starts a fresh 60 s timer for every new turn / reaction (kept only while the same player decides on a drawn card). Integration test added.

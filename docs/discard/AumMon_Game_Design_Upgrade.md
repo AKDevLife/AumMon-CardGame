@@ -93,3 +93,15 @@ Nothing in this plan changes the win condition or the turn structure.
 - **กล่องกระดาษ → B6C** ("put 1 card of 1–3 points on the pile"). A softer version of B6B, which reached 1.28 at 8 players. Now 0.88–0.96.
 - Rounds get shorter: 8 players mean turns 41 → 38, ≤ 10 min 84 → 86 %. 4 players ≤ 10 min: 96 %.
 - Unchanged and still strongest: ร่ม and เทปกาว (up to ~1.56). Watch them in the human playtest.
+
+## 6. Glue proposals (owner principle: low-point cards should have stronger abilities)
+
+Ruleset "12" baseline (1,500 rounds per size): กาวน้ำ (3 points) has a win index of 0.77–0.81 — one of the weakest cards.
+
+| ID                   | New กาวน้ำ ability                                                                          | Simulated      | Effect                                                                                       | Pros / cons                                                                                                                              |
+| -------------------- | ------------------------------------------------------------------------------------------ | -------------- | -------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| **G2 (recommended)** | **"ติดหนึบ: ส่งไพ่ 1 ใบจากมือเราไปติดผู้เล่นที่เลือก"**                                                | yes (emulated) | Glue 0.77–0.81 → **0.93–1.01**; 8 players ≤ 10 min 88 → 90 %; losers ≥ 2× start hand ≤ 0.2 % | Simple, fits "glue sticks"; you shed a card and choose the victim. Unlike แม่เหล็ก, which always goes to the player with the fewest cards. |
+| G1                   | "ติดหนึบ: เลือกผู้เล่น 1 คน ข้ามเทิร์นถัดไปของเขา" (Umbrella can block)                              | no             | expected strong                                                                              | Very simple; overlaps กุญแจ (6 points), but a 3-point card with a choice fits the principle.                                              |
+| G3                   | keep the rule effect, but stronger: "the chosen player cannot play 1–5 on their next turn" | no             | expected small gain                                                                          | Least change; still a weak, situational card.                                                                                            |
+
+Note: bots do not use secret information yet, so in simulation the value of ไฟฉาย / แว่นขยาย is a lower bound.

@@ -25,7 +25,7 @@ export interface PendingHit {
 }
 
 export interface GameState {
-  readonly rulesetVersion: "11";
+  readonly rulesetVersion: "12";
   status: "active" | "finished";
   players: PlayerState[];
   drawPile: CardInstance[];
@@ -65,8 +65,9 @@ export type GameEvent =
   | { type: "removed"; seat: Seat; cardId: string }
   /** Flashlight: every hand is shown to every player (public by design). */
   | { type: "reveal_all"; hands: string[][] }
+  /** Flashlight (ruleset 12): PRIVATE — only `seat` sees the whole hand of `target`. */
   /** Magnifier: PRIVATE — only `seat` may see `cards` (the server must filter it). */
-  | { type: "peek"; seat: Seat; target: Seat; cards: string[]; private: true }
+  | { type: "peek"; seat: Seat; target: Seat | null; cards: string[]; private: true }
   | { type: "game_over"; winner: Seat }
   /** Server-only: the turn or reaction timer ran out for `seat` (never emitted by the engine). */
   | { type: "timeout"; seat: Seat };
@@ -158,7 +159,7 @@ export function startGame(
   if (!start) throw new Error("empty deck");
   const firstSeat = rng.nextInt(n);
   const state: GameState = {
-    rulesetVersion: "11",
+    rulesetVersion: "12",
     status: "active",
     players,
     drawPile: deck,
@@ -309,11 +310,9 @@ function resolveAbility(
       break;
     }
     case "alarm":
-      // Ruleset 8 (QM5): reverse, then only the next player in the new direction draws 1.
+      // Ruleset 12: reverse only (now on พัดลม).
       s.direction = s.direction === 1 ? -1 : 1;
       ev.push({ type: "direction", direction: s.direction });
-      target = nextSeat(s, me);
-      hits.push({ kind: "draw", target, amount: 1 });
       break;
     case "magnet": {
       target = fewest(s, me);
@@ -323,22 +322,19 @@ function resolveAbility(
       break;
     }
     case "peek": {
-      target = opponent(s, me, choice.target);
-      const theirs = shuffle(s.players[target]?.hand ?? [], rng).slice(0, 2);
+      // Ruleset 12: secretly look at the top 2 cards of the draw pile (target null = draw pile).
+      if (s.drawPile.length < 2 && s.pile.length > 1) {
+        const top = s.pile.pop();
+        s.drawPile = [...s.drawPile, ...shuffle(s.pile, rng)];
+        s.pile = top ? [top] : [];
+      }
       ev.push({
         type: "peek",
         seat: me,
-        target,
-        cards: theirs.map((x) => x.cardId),
+        target: null,
+        cards: s.drawPile.slice(0, 2).map((x) => x.cardId),
         private: true,
       });
-      // Ruleset 10 (12.17): then you may play 1 more card (points rule, no ability).
-      if (choice.card !== undefined) {
-        const extra = hand.find((x) => x.id === choice.card);
-        if (!extra || !canPlay(s, me, extra)) throw new CommandError("invalid_choice");
-        s.pile.push(take(s, me, extra.id));
-        ev.push({ type: "played", seat: me, cardIds: [extra.cardId], ability: false });
-      }
       break;
     }
     case "ruler":
@@ -364,9 +360,15 @@ function resolveAbility(
       break;
     }
     case "flashlight":
+      // Ruleset 12: secretly see the whole hand of one opponent; nothing else.
       target = opponent(s, me, choice.target);
-      ev.push({ type: "reveal_all", hands: s.players.map((p) => p.hand.map((x) => x.cardId)) });
-      hits.push({ kind: "draw", target, amount: 1 });
+      ev.push({
+        type: "peek",
+        seat: me,
+        target,
+        cards: (s.players[target]?.hand ?? []).map((x) => x.cardId),
+        private: true,
+      });
       break;
     case "skip":
       target = nextSeat(s, me);

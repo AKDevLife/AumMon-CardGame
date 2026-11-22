@@ -102,14 +102,17 @@ describe("discard edition — abilities", () => {
     expect(r.state.pile.at(-1)?.cardId).toBe("D16");
   });
 
-  it("Key skips the next player; Alarm reverses and only the new next player draws", () => {
+  it("Key skips; Fan reverses only; Alarm wakes the player with the fewest cards (ruleset 12)", () => {
     const s = table("D01", [["D13", "D02"], ["D04"], ["D04"]]);
     expect(play(s, 0, "D13", true).state.current).toBe(2);
-    const a = play(table("D01", [["D06", "D02"], ["D04"], ["D04"]]), 0, "D06", true).state;
-    expect(a.direction).toBe(-1);
-    expect(a.players[2]?.hand).toHaveLength(2);
-    expect(a.players[1]?.hand).toHaveLength(1);
-    expect(a.current).toBe(2);
+    const f = play(table("D01", [["D14", "D02"], ["D04"], ["D04"]]), 0, "D14", true).state;
+    expect(f.direction).toBe(-1);
+    expect(f.current).toBe(2);
+    expect(f.players[1]?.hand).toHaveLength(1);
+    expect(f.players[2]?.hand).toHaveLength(1);
+    const a = play(table("D01", [["D06", "D02"], ["D04", "D04"], ["D04"]]), 0, "D06", true).state;
+    expect(a.direction).toBe(1);
+    expect(a.players[2]?.hand).toHaveLength(2); // fewest cards → draws 1
   });
 
   it("Glue and Ruler restrict the next play; Eraser answers them", () => {
@@ -157,19 +160,18 @@ describe("discard edition — abilities", () => {
     expect(trashed.drawPile).toHaveLength(tr.drawPile.length);
     const last = table("D11", [["D11", "D02"], ["D04"], ["D04"]]);
     expect(play(last, 0, "D11", true, { card: id(last, 0, "D02") }).state.winner).toBe(0);
-    const pk = play(table("D01", [["D08", "D01"], ["D04", "D13"], ["D04"]]), 0, "D08", true, {
-      target: 1,
-    });
+    // Ruleset 12: Magnifier sees the top 2 cards of the draw pile (target null).
+    const pkT = table("D01", [["D08", "D01"], ["D04", "D13"], ["D04"]]);
+    pkT.drawPile = [card("D16"), card("D10"), ...pkT.drawPile];
+    const pk = play(pkT, 0, "D08", true);
     const peek = pk.events.find((e) => e.type === "peek");
-    expect(peek && "private" in peek && peek.cards.length).toBe(2);
-    // Ruleset 10: Magnifier may play 1 more card (points rule).
-    const pt = table("D01", [["D08", "D06", "D11"], ["D04"], ["D04"]]);
-    const more = play(pt, 0, "D08", true, { target: 1, card: id(pt, 0, "D06") }).state;
-    expect(more.pile.at(-1)?.cardId).toBe("D06");
-    expect(more.players[0]?.hand).toHaveLength(1);
-    expect(err(() => play(pt, 0, "D08", true, { target: 1, card: id(pt, 0, "D11") }))).toBe(
-      "invalid_choice",
-    );
+    expect(peek?.type === "peek" && peek.target === null && peek.cards).toEqual(["D16", "D10"]);
+    // Ruleset 12: Flashlight shows one opponent's whole hand privately; no draw.
+    const fl = table("D01", [["D12", "D02"], ["D04", "D13"], ["D04"]]);
+    const lit = play(fl, 0, "D12", true, { target: 1 });
+    const seen = lit.events.find((e) => e.type === "peek");
+    expect(seen?.type === "peek" && seen.target === 1 && seen.cards).toEqual(["D04", "D13"]);
+    expect(lit.state.players[1]?.hand).toHaveLength(2);
   });
 
   it("Hourglass repeats the ability of the card under it", () => {

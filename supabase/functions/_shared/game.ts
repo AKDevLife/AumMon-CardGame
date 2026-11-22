@@ -61,7 +61,7 @@ function cryptoSeed(): RngState {
 
 async function lockGame(tx: Tx, matchId: string, userId: string): Promise<Locked> {
   const lock =
-    await tx`select id from public.matches where id = ${matchId} and ruleset_version = '11' for update`;
+    await tx`select id from public.matches where id = ${matchId} and ruleset_version = '12' for update`;
   if (lock.length === 0) throw new HttpError(404, "not_found", "Match not found");
   const [row] = await tx<
     {
@@ -199,7 +199,7 @@ function actorSeat(locked: Locked): number | null {
 
 export interface GameResponse {
   matchId: string;
-  rulesetVersion: "11";
+  rulesetVersion: "12";
   mode: Mode;
   version: number;
   deadline: string | null;
@@ -211,7 +211,7 @@ export interface GameResponse {
   view: discard.SeatView;
   events: unknown[];
   /** Cards the caller saw with Magnifier during this request (private). */
-  peeks: { target: number; cards: string[] }[];
+  peeks: { target: number | null; cards: string[] }[];
   /** Server clock (ms) so the client can correct its countdown; the client never decides time. */
   serverNow: number;
   /** Seats the server is playing because of repeated timeouts (Online). */
@@ -245,7 +245,7 @@ async function respondGame(
       : [];
   return {
     matchId: locked.matchId,
-    rulesetVersion: "11",
+    rulesetVersion: "12",
     mode: locked.mode,
     version,
     deadline: rt.deadline === null ? null : new Date(rt.deadline).toISOString(),
@@ -428,7 +428,7 @@ async function startMatch(tx: Tx, roomId: string): Promise<string> {
     throw new HttpError(409, "not_enough_players", "2–8 players needed");
   const [match] = await tx<{ id: string }[]>`
     insert into public.matches (room_id, status, phase, engine_version, ruleset_version, started_at)
-    values (${roomId}, 'active', 'play', ${ENGINE_VERSION}, '11', now()) returning id`;
+    values (${roomId}, 'active', 'play', ${ENGINE_VERSION}, '12', now()) returning id`;
   if (!match) throw new Error("match insert failed");
   const playerIds = seats.map(() => crypto.randomUUID());
   const rng = createSeededRandom(cryptoSeed());
