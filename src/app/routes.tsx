@@ -8,6 +8,7 @@ import { LobbyPage } from "../features/online/LobbyPage.tsx";
 import { OnlinePage } from "../features/online/OnlinePage.tsx";
 import { SoloSetupPage } from "../features/solo/SoloSetupPage.tsx";
 import { GamePage } from "../features/game/GamePage.tsx";
+import { TutorialPage } from "../features/tutorial/TutorialPage.tsx";
 import { AppLayout } from "./AppLayout.tsx";
 import { HomePage } from "./HomePage.tsx";
 import { NotFoundPage } from "./NotFoundPage.tsx";
@@ -23,6 +24,7 @@ export const routes: RouteObject[] = [
       { path: "privacy", element: <PrivacyPage /> },
       { path: "terms", element: <TermsPage /> },
       { path: "play/solo", element: <SoloSetupPage /> },
+      { path: "tutorial", element: <TutorialPage /> },
       { path: "play/online", element: <OnlinePage /> },
       { path: "lobby/:roomId", element: <LobbyPage /> },
       { path: "game/:matchId", element: <GamePage /> },

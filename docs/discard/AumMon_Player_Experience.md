@@ -40,8 +40,8 @@
 
 ## 5. Priority
 
-| Priority             | Items                                                                                              |
-| -------------------- | -------------------------------------------------------------------------------------------------- |
-| P1 (before playtest) | Tutorial (`AumMon_Tutorial_Design.md`), S2 short text, X8 last-card badge, telemetry (Protocol §5) |
-| P2                   | X1 timer bar, X4 tap-target on table, X5 / X6 turn preview                                         |
-| P3                   | X2, X3, X7 effects (after card art)                                                                |
+| Priority             | Items                                                                                                               |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| P1 (before playtest) | ✅ Tutorial, ✅ S2 short text, ✅ X8 last-card badge, ✅ 4-line rules, ✅ Hourglass hint (12.15); telemetry (12.16) |
+| P2                   | X1 timer bar, X4 tap-target on table, X5 / X6 turn preview                                                          |
+| P3                   | X2, X3, X7 effects (after card art)                                                                                 |

@@ -384,7 +384,7 @@ export function GamePage() {
     if (!myTurn) return "ยังไม่ถึงตาคุณ — อ่านความสามารถไว้ก่อนได้";
     const pts = discard.getDiscardCard(cardId).points;
     if (view.ruler?.seat === me) return "ไม้บรรทัด: ต้องลงแต้ม 5 เท่านั้น (หรือยางลบ)";
-    if (view.glue === me && pts < 4) return "ติดกาว: เทิร์นนี้ลงแต้มต่ำกว่า 4 ไม่ได้";
+    if (view.glue === me && pts < 4) return "ติดกาว: เทิร์นนี้ห้ามลงแต้ม 1–3";
     return top
       ? `ต้องลงแต้มตั้งแต่ ${String(discard.getDiscardCard(top).points)} ขึ้นไป (หรือยางลบ)`
       : "ลงไพ่ใบนี้ไม่ได้ตอนนี้";
@@ -561,6 +561,14 @@ export function GamePage() {
             <div className="flex justify-center">
               <CardView cardId={plan.card.cardId} size="lg" />
             </div>
+            {planDef.ability === "hourglass" && (
+              <p className="rounded-xl bg-am-deco-yellow px-3 py-2 text-sm font-semibold">
+                ⏳ จะใช้ซ้ำ:{" "}
+                {top && discard.getDiscardCard(top).ability !== "hourglass"
+                  ? `${cardName(top)} — ${discard.getDiscardCard(top).short}`
+                  : "ไม่มีพลังให้ใช้ซ้ำ"}
+              </p>
+            )}
             {planDef.ability !== "umbrella" && (
               <label className="am-sticker flex cursor-pointer items-center gap-3 !rounded-xl bg-am-deco-purple px-3 py-2 font-semibold">
                 <input

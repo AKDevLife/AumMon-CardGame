@@ -131,8 +131,13 @@ export function Opponents({
                 >
                   {p?.handCount ?? 0}
                 </span>
-                {view.glue === i && <span title="ติดกาว: ลงแต้มต่ำกว่า 4 ไม่ได้">🧴</span>}
+                {view.glue === i && <span title="ติดกาว: ห้ามลงแต้ม 1–3">🧴</span>}
                 {view.ruler?.seat === i && <span title="ต้องลงแต้ม 5">📏</span>}
+                {p?.handCount === 1 && !finished && (
+                  <span className="rounded-full border-2 border-am-ink bg-am-pink px-1.5 text-[11px] font-bold text-am-text">
+                    เหลือ 1 ใบ!
+                  </span>
+                )}
                 {active && thinking && (
                   <span role="img" aria-label="กำลังคิด" className="ml-auto flex gap-0.5">
                     <i className="am-dot h-1 w-1 rounded-full bg-am-text" />
@@ -237,7 +242,7 @@ export function CenterTable({
         )}
         {view.ruler && <Chip tone="bg-am-title">📏 {name(view.ruler.seat)} ต้องลงแต้ม 5 เท่านั้น</Chip>}
         {view.glue !== null && (
-          <Chip tone="bg-am-deco-purple">🧴 {name(view.glue)} ลงแต้มต่ำกว่า 4 ไม่ได้</Chip>
+          <Chip tone="bg-am-deco-purple">🧴 {name(view.glue)} ห้ามลงแต้ม 1–3</Chip>
         )}
         {view.reaction && (
           <Chip tone="bg-am-blue text-am-info-text">
