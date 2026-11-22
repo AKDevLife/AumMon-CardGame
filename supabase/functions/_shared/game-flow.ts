@@ -49,7 +49,8 @@ export function advanceGame(
 ): GameRuntime & { events: discard.GameEvent[] } {
   const rng = createSeededRandom(input.rng);
   let { state, deadline } = input;
-  const timeouts = [...input.timeouts];
+  // Dense per-seat array (stored as integer[]; no holes).
+  const timeouts = state.players.map((_, i) => input.timeouts[i] ?? 0);
   const events: discard.GameEvent[] = [];
   const key = (s: discard.GameState) =>
     `${s.status}:${String(s.turnNumber)}:${String(s.reactions.length)}`;

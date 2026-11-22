@@ -257,8 +257,9 @@ export async function withGame(
     const kinds = kindsOf(locked);
     const own = actorSeat(locked);
     if (options.resume && own !== null && (locked.timeouts[own] ?? 0) > 0) {
-      locked.timeouts = [...locked.timeouts];
-      locked.timeouts[own] = 0;
+      locked.timeouts = locked.state.players.map((_, i) =>
+        i === own ? 0 : (locked.timeouts[i] ?? 0),
+      );
       locked.dirty = true;
     }
     // A command that reached the server within the grace window still beats the timeout.
@@ -279,8 +280,7 @@ export async function withGame(
       }
       events.push(...t.events);
       // Acting resets this seat's timeout streak (and ends auto-play).
-      const timeouts = [...rt.timeouts];
-      timeouts[seat] = 0;
+      const timeouts = rt.timeouts.map((x, i) => (i === seat ? 0 : x));
       const after = advanceGame(
         { state: t.state, rng: rng.getState(), deadline: rt.deadline, timeouts },
         kinds,
