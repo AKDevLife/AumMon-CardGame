@@ -40,6 +40,23 @@ function timeoutCommands(s: discard.GameState, seat: number): discard.Command[] 
   return [{ type: "draw", playerId }];
 }
 
+/**
+ * Deadline to keep after a player's own command: the same timer only while the same seat is still
+ * deciding (Draw Then Play); a new turn or a new reaction always starts a fresh timer.
+ */
+export function deadlineAfterAct(
+  before: discard.GameState,
+  after: discard.GameState,
+  deadline: number | null,
+): number | null {
+  const same =
+    after.status === "active" &&
+    actingSeat(after) === actingSeat(before) &&
+    after.turnNumber === before.turnNumber &&
+    after.reactions.length === before.reactions.length;
+  return same ? deadline : null;
+}
+
 /** Runs bots and timeouts until a human must act. */
 export function advanceGame(
   input: GameRuntime,

@@ -66,7 +66,11 @@ The **server** owns every clock; the client only displays it.
 | Client clock wrong                                    | Ignored for results; display uses `deadline − (serverNow − clientNow)`.                                                                                                                           |
 | Bots                                                  | Act after a short step (0.7 s) and never wait for the full timer.                                                                                                                                 |
 
-## 10. Quick Match flow — new (UI proposal)
+## 10. Quick Match flow
+
+Online update (DC13): after a round everyone returns to the room; non-owners press ready again, and the owner starts when ≥ 2 players are in and all are ready. Solo keeps the one-tap "เล่นอีกรอบ".
+
+### Original proposal
 
 - Start: Solo starts instantly; Online room → "เริ่ม" when everyone is ready.
 - End: winner banner immediately; **"เล่นอีกรอบ"** button for the same room/bots (one tap). Online: same players, a new shuffle, the previous winner does not get the first turn (random).

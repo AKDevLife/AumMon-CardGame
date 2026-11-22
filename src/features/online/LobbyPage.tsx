@@ -50,6 +50,7 @@ export function LobbyPage() {
         .from("matches")
         .select("id")
         .eq("room_id", roomId)
+        .eq("status", "active")
         .limit(1)
         .overrideTypes<{ id: string }[], { merge: false }>(),
     ]);
@@ -63,7 +64,7 @@ export function LobbyPage() {
       return;
     }
     setRoom(r.data);
-    setSeats(s.data);
+    setSeats(s.data.filter((x) => x.status !== "left"));
   }, [client, roomId, navigate]);
 
   useEffect(() => {
@@ -101,7 +102,8 @@ export function LobbyPage() {
 
   const isOwner = room.owner_id === userId;
   const mine = seats.find((s) => s.user_id === userId);
-  const canStart = isOwner && seats.length >= 2 && seats.every((s) => s.status === "ready");
+  const notReady = seats.filter((s) => s.status !== "ready").length;
+  const canStart = isOwner && seats.length >= 2 && notReady === 0;
 
   const act = async (fn: string, body: Record<string, unknown>, after?: () => void) => {
     setPending(true);
@@ -128,6 +130,14 @@ export function LobbyPage() {
           </p>
         </div>
       )}
+      <p role="status" className="text-center font-semibold">
+        ผู้เล่นในห้อง {seats.length}/{room.max_players} คน
+        {seats.length < 2
+          ? " · ต้องมีอย่างน้อย 2 คนจึงเริ่มได้"
+          : notReady > 0
+            ? ` · รออีก ${String(notReady)} คนกดพร้อม`
+            : " · พร้อมครบแล้ว"}
+      </p>
       <ul className="flex flex-col gap-2" aria-label="Lobby players">
         {seats.map((s) => (
           <li key={s.seat} className="am-sticker flex items-center justify-between bg-am-card p-3">

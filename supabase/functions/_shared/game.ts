@@ -18,6 +18,7 @@ import { decodeRng, encodeRng, type Tx } from "./store.ts";
 import {
   actingSeat,
   advanceGame,
+  deadlineAfterAct,
   effectiveKinds,
   GRACE_MS,
   type GameRuntime,
@@ -145,10 +146,14 @@ async function saveGame(
   }
   await recordStats(tx, locked, state, events);
   if (finished) {
-    const [room] = await tx<
-      { room_id: string }[]
-    >`select room_id from public.matches where id = ${locked.matchId}`;
-    if (room) await tx`update public.game_rooms set status = 'closed' where id = ${room.room_id}`;
+    if (locked.mode === "online") {
+      // Online (owner 2026-11-22): back to the lobby; everyone except the owner must press ready
+      // again before the owner can start the next round. Players who left stay out.
+      await tx`update public.game_rooms set status = 'lobby', expires_at = now() + interval '30 minutes'
+        where id = ${locked.roomId}`;
+      await tx`update public.room_players set status = case when user_id = ${locked.ownerId} then 'ready' else 'waiting' end
+        where room_id = ${locked.roomId} and status <> 'left'`;
+    } else await tx`update public.game_rooms set status = 'closed' where id = ${locked.roomId}`;
   }
   return version;
 }
@@ -213,6 +218,8 @@ export interface GameResponse {
   autoSeats: number[];
   /** Finished match: the rematch in the same room, once someone started it. */
   nextMatchId: string | null;
+  /** Room of this match (Online: the lobby to go back to for the next round). */
+  roomId: string;
 }
 
 async function respondGame(
@@ -254,6 +261,7 @@ async function respondGame(
     serverNow: Date.now(),
     autoSeats: kinds.flatMap((k, i) => (k === "bot" && kindsOf(locked)[i] === "human" ? [i] : [])),
     nextMatchId: next?.id ?? null,
+    roomId: locked.roomId,
   };
 }
 
@@ -331,7 +339,13 @@ export async function withGame(
       // Acting resets this seat's timeout streak (and ends auto-play).
       const timeouts = rt.timeouts.map((x, i) => (i === seat ? 0 : x));
       const after = advanceGame(
-        { state: t.state, rng: rng.getState(), deadline: rt.deadline, timeouts },
+        {
+          state: t.state,
+          rng: rng.getState(),
+          // Each turn gets its own full timer (owner report: the timer carried over to the next player).
+          deadline: deadlineAfterAct(rt.state, t.state, rt.deadline),
+          timeouts,
+        },
         kinds,
         now,
         locked.mode,
@@ -361,6 +375,12 @@ export async function rematch(userId: string, matchId: string): Promise<{ matchI
   return db().begin(async (tx) => {
     const locked = await lockGame(tx, matchId, userId);
     if (locked.status === "active") throw new HttpError(409, "match_active", "Match still running");
+    if (locked.mode === "online")
+      throw new HttpError(
+        409,
+        "use_lobby",
+        "Online rematch starts from the room after everyone is ready",
+      );
     if (!locked.seats.some((x) => x.user_id === userId))
       throw new HttpError(403, "not_seated", "Only players can start a rematch");
     const [existing] = await tx<{ id: string }[]>`

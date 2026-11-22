@@ -4,6 +4,7 @@ import {
   actingSeat,
   advanceGame,
   BOT_STEP_MS,
+  deadlineAfterAct,
   effectiveKinds,
   type GameRuntime,
   type Kind,
@@ -87,5 +88,26 @@ describe("discard server flow", () => {
       now = rt.deadline ?? now + 1;
     }
     expect(rt.state.status).toBe("finished");
+  });
+
+  it("every new turn gets a fresh timer; the same seat keeps it only while deciding on a drawn card", () => {
+    const rt = runtime(2, 21);
+    const seat = actingSeat(rt.state) ?? 0;
+    const playerId = rt.state.players[seat]?.playerId ?? "";
+    const rng = createSeededRandom(rt.rng);
+    rt.state.drawPile.unshift({ id: "x", cardId: "D11" }); // 1 point: cannot be played
+    const passed = discard.applyCommand(rt.state, { type: "draw", playerId }, rng).state;
+    expect(deadlineAfterAct(rt.state, passed, 5000)).toBeNull();
+    const fresh = advanceGame({ ...rt, state: passed, deadline: null }, ["human", "human"], 4000);
+    expect(fresh.deadline).toBe(4000 + discard.DISCARD_RULES.turnTimeoutMs);
+    const rt2 = runtime(2, 22);
+    rt2.state.drawPile.unshift({ id: "y", cardId: "D03" }); // Eraser: always playable
+    const s2 = actingSeat(rt2.state) ?? 0;
+    const pending = discard.applyCommand(
+      rt2.state,
+      { type: "draw", playerId: rt2.state.players[s2]?.playerId ?? "" },
+      createSeededRandom(rt2.rng),
+    ).state;
+    expect(deadlineAfterAct(rt2.state, pending, 5000)).toBe(5000);
   });
 });

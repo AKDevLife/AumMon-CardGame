@@ -17,4 +17,5 @@ export interface GameResponse {
   serverNow: number;
   autoSeats: number[];
   nextMatchId: string | null;
+  roomId: string;
 }

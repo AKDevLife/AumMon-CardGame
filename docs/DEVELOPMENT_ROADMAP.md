@@ -169,6 +169,7 @@ Owner brief: shedding-type card game for 2–8 players with the 16 Everyday Obje
 - [x] **12.16** Playtest telemetry (Q3): `private.round_stats` (duration, turns, timeouts, decision time, drawn plays, abilities, opening card ids, winner, rematch, leavers) + admin "สถิติเล่นทดสอบ" — deps: 12.14 — PR #99 (2026-11-22)
 - [x] **12.17** Ruleset "10" (owner delegated the decision): Magnifier peek + play 1 more (B4B), Box puts 1 card of 1–3 points (B6C); engine 4.0.0; UI choices — deps: 12.14 — PR #100 (2026-11-22)
 - [x] **12.18** Ruleset "11" (owner): 60 s turns, starting hands 7 / 5 (chosen from simulation); engine 5.0.0 — deps: 12.17 — PR #101 (2026-11-22)
+- [x] **12.19** Online playtest fixes (owner): fresh 60 s timer every turn (bug), Flashlight reveal closes by hand + shows card abilities, Online next round through the room (ready again, player count, owner starts) — deps: 12.18 — PR #102 (2026-11-22)
 - [ ] **12.7** VIP + cosmetic gacha design doc (no payments until legal check + owner approval) — deps: 12.1
 - [ ] **12.8** Owner playtest on Dev; balance pass — deps: 12.6
 

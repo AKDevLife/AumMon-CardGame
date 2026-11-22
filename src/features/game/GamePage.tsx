@@ -83,6 +83,7 @@ export function GamePage() {
   const known = useRef<Set<string> | null>(null);
   const [peek, setPeek] = useState<{ target: number; cards: string[] } | null>(null);
   const [reveal, setReveal] = useState<string[][] | null>(null);
+  const [zoom, setZoom] = useState<string | null>(null);
   const lastEvent = useRef<string | null>(null);
   const idem = useRef<{ key: string; body: string } | null>(null);
   const [offset, setOffset] = useState(0);
@@ -211,16 +212,7 @@ export function GamePage() {
     }, 0);
   }, [handIds]);
 
-  // Flashlight shows every hand for 3 seconds (ruleset 9, Q4).
-  useEffect(() => {
-    if (!reveal) return;
-    const id = setTimeout(() => {
-      setReveal(null);
-    }, 3000);
-    return () => {
-      clearTimeout(id);
-    };
-  }, [reveal]);
+  // Flashlight: the reveal stays open until the player closes it (owner 2026-11-22).
 
   // Bots act one step at a time; timeouts are applied when asked after the deadline.
   const botDeadline = data?.botActing ? data.deadline : null;
@@ -284,6 +276,15 @@ export function GamePage() {
   const finished = view.status === "finished";
   const myTurn = view.canDraw || view.canKeep;
   const drawnCard = view.drawn ? (view.myHand.find((c) => c.id === view.drawn) ?? null) : null;
+  /** Online: leaving after the round frees the seat, so the room shows the real player count. */
+  const leaveRoom = async () => {
+    try {
+      await callFunction(client, "rooms-leave", { roomId: data.roomId });
+    } catch {
+      // the room may already be closed — going home is still right
+    }
+    void navigate("/");
+  };
   const rematch = async () => {
     setPending(true);
     try {
@@ -536,7 +537,11 @@ export function GamePage() {
         <WinOverlay
           title={view.winner === me ? "คุณชนะ! 🎉" : `${name(view.winner ?? 0)} ชนะ 🏆`}
           pending={pending}
-          {...(me !== null && { onRematch: () => void rematch() })}
+          {...(me !== null && data.mode !== "online" && { onRematch: () => void rematch() })}
+          {...(data.mode === "online" && {
+            onLobby: () => void navigate(`/lobby/${data.roomId}`),
+            onHome: () => void leaveRoom(),
+          })}
         />
       )}
 
@@ -715,15 +720,37 @@ export function GamePage() {
         open={reveal !== null}
         onClose={() => {
           setReveal(null);
+          setZoom(null);
         }}
       >
-        <ul className="flex flex-col gap-1 text-sm">
+        <ul aria-label="ไพ่ของทุกคน" className="flex flex-col gap-3 text-sm">
           {reveal?.map((hand, i) => (
             <li key={i}>
-              <b>{name(i)}:</b> {hand.map(cardName).join(", ") || "—"}
+              <b>
+                {name(i)} ({hand.length} ใบ)
+              </b>
+              <div className="am-no-scrollbar mt-1 flex gap-2 overflow-x-auto pb-1">
+                {hand.length === 0
+                  ? "—"
+                  : hand.map((c, k) => (
+                      <CardView
+                        key={k}
+                        cardId={c}
+                        selected={zoom === c}
+                        onSelect={() => {
+                          setZoom(zoom === c ? null : c);
+                        }}
+                      />
+                    ))}
+              </div>
             </li>
           ))}
         </ul>
+        {zoom && (
+          <div className="flex justify-center">
+            <CardView cardId={zoom} size="lg" />
+          </div>
+        )}
       </Popup>
 
       <Popup
