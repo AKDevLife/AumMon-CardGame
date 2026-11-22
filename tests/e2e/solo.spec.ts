@@ -19,7 +19,7 @@ test("sign up → solo vs 2 paced bots → several turns → leave", async ({ pa
   await page.getByLabel("จำนวน Bot").selectOption("2");
   await page.getByRole("button", { name: "เริ่มเกม" }).click();
   await expect(page).toHaveURL(/\/game\//);
-  await expect(page.getByRole("list", { name: "ผู้เล่น" }).getByRole("listitem")).toHaveCount(3);
+  await expect(page.getByRole("list", { name: "ผู้เล่น" }).getByRole("listitem")).toHaveCount(2); // opponents only
 
   let mine = 0;
   let sawBot = false;
@@ -27,7 +27,7 @@ test("sign up → solo vs 2 paced bots → several turns → leave", async ({ pa
     if (await page.getByRole("heading", { name: /ชนะ/ }).isVisible()) break;
     if (
       await page
-        .getByText(/กำลังเล่น…/)
+        .getByRole("img", { name: "กำลังคิด" })
         .isVisible()
         .catch(() => false)
     )

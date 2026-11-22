@@ -134,7 +134,7 @@ export function Opponents({
                 {view.glue === i && <span title="ติดกาว: ลงแต้มต่ำกว่า 4 ไม่ได้">🧴</span>}
                 {view.ruler?.seat === i && <span title="ต้องลงแต้ม 5">📏</span>}
                 {active && thinking && (
-                  <span aria-label="กำลังคิด" className="ml-auto flex gap-0.5">
+                  <span role="img" aria-label="กำลังคิด" className="ml-auto flex gap-0.5">
                     <i className="am-dot h-1 w-1 rounded-full bg-am-text" />
                     <i className="am-dot h-1 w-1 rounded-full bg-am-text [animation-delay:.2s]" />
                     <i className="am-dot h-1 w-1 rounded-full bg-am-text [animation-delay:.4s]" />
@@ -180,7 +180,7 @@ export function CenterTable({
       {lastAction && (
         <p
           key={lastAction}
-          className={`am-deal max-w-full truncate rounded-full bg-am-card/90 px-3 py-1 text-[13px] font-semibold ${dense ? "[@media(max-height:700px)]:hidden" : ""}`}
+          className={`max-w-full truncate rounded-full bg-am-card px-3 py-1 text-[13px] font-semibold ${dense ? "[@media(max-height:700px)]:hidden" : ""}`}
         >
           {lastAction}
         </p>
