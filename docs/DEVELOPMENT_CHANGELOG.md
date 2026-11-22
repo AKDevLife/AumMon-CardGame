@@ -2,6 +2,12 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-22 — 12.13 Quality 9–10 audit (proposals, no rule change)
+
+- Simulation harness: new metrics (cards played, forced draws, skips, hits on one player, "hopeless" losers, win by turn position, ability use and win index per card) and proposal emulation (card points, Trash without redraw). 14,000 baseline rounds + 32,000 ablation + 4 × 14,000 proposal rounds.
+- Docs in `docs/discard/`: Game Quality Audit, Game Design Upgrade (status of every change, phases, owner decisions Q1–Q4), Rule Simplification (4-line rules), Card Balance Review (scorecard, B1–B6 options, ability standard), Player Experience, Tutorial Design, Playtest Protocol, Game Quality Report (no category proven Green — human data needed).
+- Key finding: balance pack (Key 6, Umbrella 7, Trash remove-only) cuts 8-player mean turns 53 → 41 and moves Key / Trash toward fair; Umbrella and Tape stay strongest.
+
 ## 2026-11-22 — 12.12 Quick Match, ruleset "8" (owner approved QM1–QM6)
 
 - Engine 2.0.0 / ruleset "8": deal 5 (2–4) / 4 (5–8); Draw Then Play (`draw` may leave a playable drawn card pending; only that card may be played, or `keep` ends the turn); Alarm Clock = reverse + next player draws 1; bot handles the drawn card. New tests (Draw Then Play, Ruler on drawn card, Alarm).

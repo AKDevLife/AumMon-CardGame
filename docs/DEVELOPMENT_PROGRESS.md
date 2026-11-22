@@ -23,9 +23,9 @@
 | 6 Online Multiplayer    |      7 |       8 |     88% |
 | 7 Public Launch & Scale |      6 |       8 |     75% |
 | 9 Developer Admin       |     17 |      17 |    100% |
-| 12 Discard Edition      |     10 |      12 |     83% |
+| 12 Discard Edition      |     11 |      14 |     79% |
 | 13 AI Art Production    |      1 |       9 |     11% |
-| **Overall**             | **97** | **110** | **88%** |
+| **Overall**             | **98** | **112** | **88%** |
 
 ## Completed (summary)
 
@@ -45,10 +45,11 @@ None
 
 ## Waiting for the owner
 
-| Task | Needs                                                                    |
-| ---- | ------------------------------------------------------------------------ |
-| 12.8 | Playtest Quick Match on Dev; choose best-of-3 for 2–3 players (yes / no) |
-| 13.2 | Choose the Art Direction (`docs/art-production/AumMon_Art_Direction.md`) |
+| Task  | Needs                                                                    |
+| ----- | ------------------------------------------------------------------------ |
+| 12.8  | Playtest Quick Match on Dev; choose best-of-3 for 2–3 players (yes / no) |
+| 12.14 | Decide Q1–Q4 (`docs/discard/AumMon_Game_Design_Upgrade.md` §3)           |
+| 13.2  | Choose the Art Direction (`docs/art-production/AumMon_Art_Direction.md`) |
 
 ## Deferred (production — owner decision)
 

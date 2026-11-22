@@ -1,6 +1,6 @@
 # AumMon — Everyday Objects Battle · Casual Discard Edition — Core Rules
 
-> Status: **Approved — ruleset "8" Quick Match (owner 2026-11-22, DC1–DC9)** · provisional until playtest. Quick Match details (timers, timeouts, rematch): `AumMon_Quick_Match_Rules.md`. Decisions and reasoning: `AumMon_Rule_Clarification.md`. Cards: `AumMon_Card_Library.md`.
+> Status: **Approved — ruleset "8" Quick Match (owner 2026-11-22, DC1–DC9)** · provisional until playtest. Quick Match details (timers, timeouts, rematch): `AumMon_Quick_Match_Rules.md`. Proposed simplifications (not approved): `AumMon_Rule_Simplification.md`. Decisions and reasoning: `AumMon_Rule_Clarification.md`. Cards: `AumMon_Card_Library.md`.
 > Rulings marked _(proposed)_ are small clarifications by Claude — the owner may change them at any time.
 
 ## 1. Goal
