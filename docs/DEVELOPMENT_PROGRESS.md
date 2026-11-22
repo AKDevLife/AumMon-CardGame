@@ -4,10 +4,10 @@
 
 ## Current
 
-- **Status:** 🎮 Casual Discard Edition (ruleset "7", 2–8 players) is the only game; the 1v1 TCG was removed (code, tables, docs).
-- **Phase:** 12 — engine, backend, UI and cleanup done.
+- **Status:** 🎮 Casual Discard Edition (ruleset "13", 2–8 players) is the only game; the 1v1 TCG was removed (code, tables, docs).
+- **Phase:** 12 — engine, backend, UI, cleanup and VIP/gacha design (12.7) done.
 - **Current task:** 12.8 owner playtest (Playtest Protocol; numbers in admin → สถิติเล่นทดสอบ)
-- **Next:** 12.8 playtest + balance → 12.7 VIP/gacha design doc (build later). Art: 13.2 owner chooses Art Direction (`docs/art-production/`).
+- **Next:** 12.8 playtest + balance; VIP/gacha build waits for owner Q1–Q5 + legal check (`docs/discard/AumMon_VIP_Cosmetics_Design.md` §8). Art: 13.2 owner chooses Art Direction (`docs/art-production/`).
 - **Playtest URL (latest `main`):** https://aum-mon-card-game-git-playtest-aum-mon.vercel.app
 - **Dev backend:** Supabase `AumMon-Dev` (ref `yaxtzdhryctfjaspxvix`, ap-northeast-1), email confirmation OFF for playtesting.
 
@@ -23,9 +23,9 @@
 | 6 Online Multiplayer    |       7 |       8 |     88% |
 | 7 Public Launch & Scale |       6 |       8 |     75% |
 | 9 Developer Admin       |      17 |      17 |    100% |
-| 12 Discard Edition      |      19 |      21 |     90% |
+| 12 Discard Edition      |      20 |      21 |     95% |
 | 13 AI Art Production    |       1 |       9 |     11% |
-| **Overall**             | **106** | **119** | **89%** |
+| **Overall**             | **107** | **119** | **90%** |
 
 ## Completed (summary)
 
@@ -49,6 +49,7 @@ None
 | ----- | ------------------------------------------------------------------------ |
 | 12.8  | Playtest Quick Match on Dev; choose best-of-3 for 2–3 players (yes / no) |
 | 12.14 | Decide Q1–Q4 (`docs/discard/AumMon_Game_Design_Upgrade.md` §3)           |
+| 12.7  | VIP/gacha Q1–Q5 + legal check (`AumMon_VIP_Cosmetics_Design.md` §8)      |
 | 13.2  | Choose the Art Direction (`docs/art-production/AumMon_Art_Direction.md`) |
 
 ## Deferred (production — owner decision)
@@ -62,7 +63,7 @@ None
 ## Latest verification (2026-11-22)
 
 - Local: `pnpm check` ✅ (typecheck, lint, format, unit/integration tests, build, secrets)
-- CI on PR #90: see PR
+- Docs-only PR #105 (CI skips docs; local `pnpm check` is the gate)
 
 ## Rule questions
 

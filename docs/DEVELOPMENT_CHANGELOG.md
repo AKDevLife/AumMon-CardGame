@@ -2,6 +2,10 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-22 — 12.7 VIP + cosmetic gacha design doc
+
+- `docs/discard/AumMon_VIP_Cosmetics_Design.md`: cosmetic-only VIP (host 5–8 seat rooms) and items, coins/gems, optional gacha with published odds + pity, minors/legal checklist, `private`-schema data sketch. Nothing built; owner Q1–Q5 + legal check before any build (DC7, F8).
+
 ## 2026-11-22 — 12.21 Ruleset "13": Glue G2 (owner)
 
 - Engine 7.0.0 / ruleset "13": กาวน้ำ gives 1 card from your hand to a chosen player (`card_given` event); play dialog asks for the player and the card; the bot gives its lowest card to the opponent with the fewest cards; the tutorial step uses it. Migration `20261122000900_ruleset13_glue.sql`. DC15.
@@ -70,7 +74,7 @@ Newest first. Significant changes only.
 
 ## 2026-11-22 — 13.1 AI Art Production Pipeline
 
-- `docs/art-production/`: Art Direction (3 directions, recommends A "Candy Vinyl Sticker" — pending owner), Style Bible v0.1 draft with copy-paste Style Block, Character Library (AM001–AM016 ↔ cards D01–D16, proposals), AI Prompt Library (IMG-* image prompts vs CL-* Claude prompts), Art QA Guidelines, Workflow (Thai owner steps, task cards, revision loop, integration path), Asset Catalog + tracker (ID / naming / status conventions), Handoff. Folders `art-production/` and `public/assets/`. New `docs/AumMon_Master_Handoff.md`; Phase 13 in the roadmap. No images produced (no image tool in this environment).
+- `docs/art-production/`: Art Direction (3 directions, recommends A "Candy Vinyl Sticker" — pending owner), Style Bible v0.1 draft with copy-paste Style Block, Character Library (AM001–AM016 ↔ cards D01–D16, proposals), AI Prompt Library (IMG-_ image prompts vs CL-_ Claude prompts), Art QA Guidelines, Workflow (Thai owner steps, task cards, revision loop, integration path), Asset Catalog + tracker (ID / naming / status conventions), Handoff. Folders `art-production/` and `public/assets/`. New `docs/AumMon_Master_Handoff.md`; Phase 13 in the roadmap. No images produced (no image tool in this environment).
 
 ## 2026-11-22 — 12.3–12.6 Discard Edition cutover (1v1 TCG removed)
 

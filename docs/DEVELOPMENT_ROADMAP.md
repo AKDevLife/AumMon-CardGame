@@ -172,7 +172,7 @@ Owner brief: shedding-type card game for 2–8 players with the 16 Everyday Obje
 - [x] **12.19** Online playtest fixes (owner): fresh 60 s timer every turn (bug), Flashlight reveal closes by hand + shows card abilities, Online next round through the room (ready again, player count, owner starts) — deps: 12.18 — PR #102 (2026-11-22)
 - [x] **12.20** Ruleset "12" (owner): Flashlight sees one hand, Magnifier sees the top 2 draw cards, Fan = reverse only, Alarm = fewest-cards player draws 1, Key icon 🔒; spinner on action buttons; Glue proposals G1–G3 — deps: 12.19 — PR #103 (2026-11-22)
 - [x] **12.21** Ruleset "13": กาวน้ำ = give 1 card to a chosen player (owner chose G2); engine 7.0.0; play dialog + bot + tutorial — deps: 12.20 — PR #104 (2026-11-22)
-- [ ] **12.7** VIP + cosmetic gacha design doc (no payments until legal check + owner approval) — deps: 12.1
+- [x] **12.7** VIP + cosmetic gacha design doc (no payments until legal check + owner approval) — deps: 12.1 — `docs/discard/AumMon_VIP_Cosmetics_Design.md`; build waits for owner Q1–Q5 + legal check — PR #105 (2026-11-22)
 - [ ] **12.8** Owner playtest on Dev; balance pass — deps: 12.6
 
 **Acceptance:** all 3 modes play the Discard Edition with 2–8 seats · games always finish in simulation · server-authoritative hidden hands · no pay-to-win
