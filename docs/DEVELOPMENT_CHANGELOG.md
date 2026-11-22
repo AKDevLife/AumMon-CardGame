@@ -2,6 +2,10 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-22 — 11.8 Card counts in rules, sounds everywhere, background music (owner request)
+
+- Rules popup lists card counts. Tap sounds + audio unlock moved to `AppLayout` (every button / link on every page). `music.ts`: synthesized I–vi–IV–V loop via Web Audio (no files), on by default, starts on the first tap; `AudioSettings` (effects + music switches, remembered per browser) in the new home ⚙️ popup and the in-game settings.
+
 ## 2026-11-22 — 11.7 First-player balance (ruleset 6)
 
 - Simulated (8,000 bot games each): today 70 % first-player wins; "no attack on turn 1" alone ≈ 70 % (new Objects sleep anyway); + extra card 67 %; + 1 SPARK 54 %; all together 51 %. Owner chose all three. Engine `rules/v6` (0.6.0), mulligan accepts 6 cards, migration `20261122000000_ruleset6.sql`, spec v7.0, R5 closed. Repo is now public (unlimited CI).

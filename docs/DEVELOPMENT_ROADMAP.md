@@ -184,5 +184,6 @@ Owner-approved direction 2026-11-21 (R3 in `docs/rule-clarifications.md`, rules 
 - [x] **11.5** Balance pass (card data only, ruleset "5"): 8,000-game bot simulation; replaced abilities that do nothing under ruleset 5 (Door, Alarm Clock, Power Strip), toned down / buffed costs and stats; win rate when drawn 38–56 % → 47–54 % — deps: 11.4 — PR #83 (2026-11-21)
 - [x] **11.6** Save GitHub Actions minutes: CI only on pull requests (no duplicate run on main), docs-only changes skip CI — deps: 11.5 — PR #84 (2026-11-21)
 - [x] **11.7** First-player balance (ruleset "6", spec v7.0): first player cannot attack on turn 1; second player opens with 6 cards and +1 SPARK on their first turn — simulated first-player win 70 % → 51 % — deps: 11.6 — PR #85 (2026-11-22)
+- [x] **11.8** Rules state card counts (deck 30, max 3 copies, hand 10, field 3); tap sounds on every button app-wide; synthesized background music (on by default) with a ⚙️ settings popup on the home page and in game (effects + music switches) — deps: 11.7 — PR #86 (2026-11-22)
 
 **Acceptance:** only ruleset 3 playable in all 3 modes · every handoff §10.2 case covered by engine tests · 1,000 simulated bot matches without errors · E2E + a11y pass · spec v4.0 is the single authoritative rule source
