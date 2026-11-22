@@ -2,6 +2,10 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-22 — 12.1 New game direction: Casual Discard Edition (audit + rules)
+
+- Owner brief: shed-your-hand game for 2–8 players with 16 Everyday Objects. Phase 1 audit (`docs/discard/AumMon_Rule_Clarification.md`): the base "≥ top or draw & pass" rule stalls (simulation: 0.1–5 % of games finish); pile reset fixes it (~100 %). Owner decisions DC1–DC7: pile reset, 64-card deck, Umbrella reaction, Magnet / Hourglass redesign, Eraser wild, remove the 1v1 TCG after the switch and keep 3 modes, VIP / gacha designed now and built later. `AumMon_Core_Rules.md`, `AumMon_Card_Library.md`. Phase 12 roadmap.
+
 ## 2026-11-22 — 11.9 Link tap sounds + louder music (owner report)
 
 - React Router links call `preventDefault()`, which the tap-sound listener treated as "cancelled"; it now plays for them too (drags still stop the click first). Music volume 0.05 → 0.1. Verified in a browser: the Solo link plays its tap sound.

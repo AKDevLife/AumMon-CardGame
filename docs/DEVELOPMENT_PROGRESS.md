@@ -4,10 +4,10 @@
 
 ## Current
 
-- **Status:** 🚧 Phase 10 — new direction "Everyday Objects Battle" (owner approved 2026-11-21).
-- **Phase:** 10 — ruleset 3 (Object cards, Passive + Active abilities).
-- **Current task:** 10.6 owner playtest on Dev
-- **Next:** owner feedback → balance pass; production (6.8 → 7.3 → 7.8) later.
+- **Status:** 🚧 Phase 12 — new game "Casual Discard Edition" (owner brief 2026-11-22); the 1v1 TCG (ruleset 6) stays live until the new game is ready.
+- **Phase:** 12 — rules approved (DC1–DC7), engine next.
+- **Current task:** 12.2 engine prototype + simulation 2–8 players
+- **Next:** 12.3 architecture docs → 12.4 backend → 12.5 UI → 12.6 remove 1v1 TCG → 12.8 playtest; 12.7 VIP/gacha design (build later).
 - **Playtest URL (latest `main`):** https://aum-mon-card-game-git-playtest-aum-mon.vercel.app
 - **Dev backend:** Supabase `AumMon-Dev` (ref `yaxtzdhryctfjaspxvix`, ap-northeast-1), email confirmation OFF for playtesting.
 
