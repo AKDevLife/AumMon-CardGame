@@ -159,6 +159,7 @@ Owner brief: shedding-type card game for 2–8 players with the 16 Everyday Obje
 - [x] **12.4** Backend: N-player rooms (2–8), turn direction, reactions, private reveals, bots, timers; cleanup migration drops TCG tables/data — deps: 12.3 — PR #90 (2026-11-22)
 - [x] **12.5** UI: table for 2–8 players, discard pile, hand, reactions, reveals, rules + card gallery, sounds — deps: 12.4 — PR #90 (2026-11-22)
 - [x] **12.6** Remove the 1v1 TCG (ruleset 6) code, tests and docs; all modes play the new game — deps: 12.5 — PR #90 (2026-11-22)
+- [x] **12.9** Gameplay screen redesign (mobile): header, opponents 2–8, center table, card states + preview, thumb-zone actions, animations, responsive tokens — deps: 12.6 — PR #92 (2026-11-22)
 - [ ] **12.7** VIP + cosmetic gacha design doc (no payments until legal check + owner approval) — deps: 12.1
 - [ ] **12.8** Owner playtest on Dev; balance pass — deps: 12.6
 

@@ -67,23 +67,44 @@ Legacy aliases (`--am-*`) still exist and point at these tokens, so older compon
 | Header highlight           | `#FFC83D`                             | "AumMon" title, Play mode buttons |
 | Accent pink / blue / green | `#FF4F9A` / `#55C9F4` / `#65D69A`     | decoration, register (green)      |
 
-## 4. Game table
+## 4. Game table (`src/features/game/GamePage.tsx`, `TableParts.tsx`)
 
-| Element          | HEX       | Usage                                   |
-| ---------------- | --------- | --------------------------------------- |
-| Table background | `#FFFBEB` | play area                               |
-| Current turn     | `#FFC83D` | yellow ring on the acting player        |
-| Playable card    | `#65D69A` | green ring on cards the player may play |
-| Reaction prompt  | `#55C9F4` | Umbrella reaction bar                   |
+Layout top → bottom (full `100dvh`, safe areas respected): header · opponents · table (scrolls only if a very small screen overflows) · hand dock (thumb zone).
 
-## 5. Card frame (`src/features/game/CardView.tsx`)
+| Element      | Style                                                                                                                           | Rule                                                                             |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| Header       | `am-brand` bar; turn pill `am-card`, **`am-title` when it is your turn**; timer chip turns `am-red` ≤ 10 s; icon buttons 40 px  | rules / all cards / settings only                                                |
+| Opponents    | sticker chips, 1 row (≤ 4) or 2 rows of 4 (5–7); avatar shown only for ≤ 3                                                      | active seat: `am-title` + `am-active` glow; bot thinking dots; 🧴 glue, 📏 ruler |
+| Table        | lavender dashed felt; draw pile (2 stacked backs + count badge), discard (top card with `am-title` ring, 2 recent cards fanned) | top card lands with `am-land`                                                    |
+| Status chips | `am-card` rule chip (≥ points), `am-green` new pile, `am-title` ruler, `am-deco-purple` glue, `am-blue` umbrella                | only the ones in effect                                                          |
+| Last action  | cream pill above the piles                                                                                                      | hidden on short screens with 5+ opponents                                        |
+| Banner       | `am-title` sticker over the table, 1.8 s                                                                                        | skip / forced effect on you / your turn / new pile / winner                      |
+| Hand dock    | `am-brand` rounded sheet; hand count badge (glows on your turn) + one-line hint + small "จั่วแล้วผ่าน"                              | no playable card → full-width green `am-active` "จั่วแล้วผ่าน"                       |
+| Win          | confetti + `am-title` card with "กลับหน้าหลัก"                                                                                     |                                                                                  |
 
-| Part             | HEX                           |
-| ---------------- | ----------------------------- |
-| Surface / border | `#FFFBEB` / `#2A1650`         |
-| Title band       | `#E9DFFF` (Thai name)         |
-| Points badge     | `#FFC83D` with `#30205B` text |
-| Ability text     | `#30205B` / `#75658F`         |
+### Gameplay tokens (`src/styles/index.css`)
+
+| Token                                             | Default                        | ≥ 730 px tall  | ≤ 700 px tall  |
+| ------------------------------------------------- | ------------------------------ | -------------- | -------------- |
+| `--am-card-w` / `--am-card-h` (hand)              | 6.75 / 9.25 rem                | 7.5 / 10.5 rem | 6.75 / 8.5 rem |
+| `--am-card-w-sm` / `--am-card-h-sm` (table, pile) | 5 / 7 rem                      | 6.25 / 8.5 rem | 4.5 / 6.25 rem |
+| `--am-card-w-lg` (preview)                        | 11 rem                         |                |                |
+| `--am-dur-fast` / `--am-dur` / `--am-dur-slow`    | 140 / 260 / 520 ms             |                |                |
+| `--am-ease-pop`                                   | `cubic-bezier(.34,1.56,.64,1)` |                |                |
+
+Animations (all transform/opacity, disabled by `prefers-reduced-motion`): `am-land` card onto pile · `am-deal` new card in hand · `am-active` turn glow · `am-banner` event banner · `am-bump` counters · `am-dot` bot thinking · `am-confetti` win. Animations never change game state; the server view is always the source of truth.
+
+## 5. Card (`src/features/game/CardView.tsx`)
+
+| Part                    | Style                                                                                                                           |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| Surface / border        | `#FFFBEB` / `#2A1650`, radius 1rem                                                                                              |
+| Art band                | `#E9DFFF`, emoji art (until approved art from `docs/art-production/`)                                                           |
+| Points badge (top-left) | 1–2 mint · 3–4 sky blue · 5–6 yellow · 7–8 pink, dark text                                                                      |
+| Name                    | Fredoka/Kanit bold, `keep-all` line breaks for Thai                                                                             |
+| Ability                 | "✨ name" in accent purple + text; fades out when long (full text in preview)                                                   |
+| States                  | playable: 3 px mint ring · selected: 4 px yellow ring + lift 12 px · cannot play: 70 % opacity, half saturation (tap shows why) |
+| Sizes                   | `sm` table/pile · `md` hand · `lg` preview popup                                                                                |
 
 ## 6. Buttons (`src/components/StickerButton.tsx`)
 

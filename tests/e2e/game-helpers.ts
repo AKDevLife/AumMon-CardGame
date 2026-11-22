@@ -19,11 +19,7 @@ export async function act(page: Page): Promise<boolean> {
   if (await closePopups(page)) return true;
   const draw = page.getByRole("button", { name: "จั่วแล้วผ่าน" });
   if (!(await draw.isVisible().catch(() => false)) || !(await draw.isEnabled())) return false;
-  const card = page
-    .getByRole("group", { name: "Hand" })
-    .getByRole("button")
-    .and(page.locator(":enabled"))
-    .first();
+  const card = page.getByRole("group", { name: "Hand" }).locator('[data-playable="true"]').first();
   if (await card.isVisible().catch(() => false)) {
     await card.click();
     const ability = page.getByRole("checkbox");

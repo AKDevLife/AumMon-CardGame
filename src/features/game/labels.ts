@@ -91,3 +91,25 @@ export const historyLines = (events: readonly discard.GameEvent[], names: Names)
       return line ? [line] : [];
     })
     .reverse();
+
+/** Short center banner for events that matter to the viewer (skips, forced draws, own turn). */
+export function bannerFor(
+  fresh: readonly discard.GameEvent[],
+  me: number | null,
+  names: Names,
+  myTurnNow: boolean,
+): string | null {
+  const who = (s: number) => names[s] ?? `ผู้เล่น ${String(s + 1)}`;
+  for (const e of [...fresh].reverse()) {
+    if (e.type === "game_over") return `🏆 ${who(e.winner)} ชนะ!`;
+    if (me === null) continue;
+    if (e.type === "skipped" && e.seat === me) return "🔒 คุณถูกข้ามเทิร์น";
+    if (e.type === "umbrella" && e.seat === me) return "☂️ กางร่มกันสำเร็จ!";
+    if (e.type === "card_given" && e.to === me) return `🧲 ${who(e.from)} ส่งไพ่มาติดคุณ`;
+    if (e.type === "ability" && e.target === me && e.seat !== me)
+      return `⚡ ${who(e.seat)}: ${ABILITY_LINE[e.ability] ?? "ใช้ความสามารถ"}`;
+  }
+  if (fresh.some((e) => e.type === "pile_reset")) return "🆕 กองใหม่! ลงแต้มไหนก็ได้";
+  if (myTurnNow && fresh.some((e) => e.type === "passed" || e.type === "played")) return "ตาคุณแล้ว!";
+  return null;
+}
