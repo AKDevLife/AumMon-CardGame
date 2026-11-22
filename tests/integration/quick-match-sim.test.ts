@@ -25,6 +25,10 @@ export interface Config {
   readonly reactionTimer: number;
   /** Abilities that are never used (ablation study). */
   readonly noAbility?: discard.AbilityId;
+  /** PROPOSAL emulation: card points override (restored after each game). */
+  readonly points?: Readonly<Record<string, number>>;
+  /** PROPOSAL emulation: Trash Can removes 1 card without drawing a new one. */
+  readonly trashNoDraw?: boolean;
 }
 
 const quick = (n: number) => (n <= 4 ? 5 : 4);
@@ -34,6 +38,39 @@ export const CONFIGS: readonly Config[] = [
   { name: "R8 without DTP", hand: quick, drawThenPlay: false, turnTimer: 20, reactionTimer: 5 },
   { name: "R8 4/3 cards", hand: small, drawThenPlay: true, turnTimer: 20, reactionTimer: 5 },
   { name: "R8 45 s timer", hand: quick, drawThenPlay: true, turnTimer: 45, reactionTimer: 8 },
+  {
+    name: "R8 + Key 6 pts (proposal)",
+    hand: quick,
+    drawThenPlay: true,
+    turnTimer: 20,
+    reactionTimer: 5,
+    points: { D13: 6 },
+  },
+  {
+    name: "R8 + Umbrella 7 pts (proposal)",
+    hand: quick,
+    drawThenPlay: true,
+    turnTimer: 20,
+    reactionTimer: 5,
+    points: { D16: 7 },
+  },
+  {
+    name: "R8 + Trash no redraw (proposal)",
+    hand: quick,
+    drawThenPlay: true,
+    turnTimer: 20,
+    reactionTimer: 5,
+    trashNoDraw: true,
+  },
+  {
+    name: "R8 + balance pack (Key 6, Umbrella 7, Trash no redraw)",
+    hand: quick,
+    drawThenPlay: true,
+    turnTimer: 20,
+    reactionTimer: 5,
+    points: { D13: 6, D16: 7 },
+    trashNoDraw: true,
+  },
 ];
 
 interface GameResult {
@@ -50,6 +87,17 @@ interface GameResult {
   timeouts: number;
   dtpPlays: number;
   maxWaitSeconds: number;
+  cardsPlayed: number;
+  forcedDraws: number;
+  skips: number;
+  /** Most forced draws / skips received by one player in the game. */
+  maxHitsOnOne: number;
+  abilityUse: Partial<Record<discard.AbilityId, number>>;
+  /** Card ids in each seat's opening hand. */
+  opening: string[][];
+  /** Losers whose final hand is at least twice the starting size ("feels hopeless"). */
+  hopeless: number;
+  players: number;
 }
 
 const ANIMATION_S = 1.0; // server round trip + card animation per action
@@ -137,6 +185,22 @@ function decide(
 }
 
 export function playGame(players: number, seed: number, cfg: Config): GameResult {
+  const patched = Object.entries(cfg.points ?? {}).map(([id, pts]) => {
+    const card = discard.getDiscardCard(id) as { points: number };
+    const old = card.points;
+    card.points = pts;
+    return () => {
+      card.points = old;
+    };
+  });
+  try {
+    return playOne(players, seed, cfg);
+  } finally {
+    for (const restore of patched) restore();
+  }
+}
+
+function playOne(players: number, seed: number, cfg: Config): GameResult {
   const rng = createSeededRandom([seed, players * 7919, 17, 4242]);
   const ids = Array.from({ length: players }, (_, i) => `p${String(i)}`);
   let { state } = discard.startGame(ids, rng);
@@ -173,7 +237,16 @@ export function playGame(players: number, seed: number, cfg: Config): GameResult
     timeouts: 0,
     dtpPlays: 0,
     maxWaitSeconds: 0,
+    cardsPlayed: 0,
+    forcedDraws: 0,
+    skips: 0,
+    maxHitsOnOne: 0,
+    abilityUse: {},
+    opening: state.players.map((p) => p.hand.map((c) => c.cardId)),
+    hopeless: 0,
+    players,
   };
+  const hits = ids.map(() => 0);
   const lastTurnAt = ids.map(() => 0);
   for (let step = 0; step < 3000 && state.status === "active"; step++) {
     const me = discard.actingSeat(state);
@@ -228,14 +301,42 @@ export function playGame(players: number, seed: number, cfg: Config): GameResult
         t = safePlay(state, cmd, rng);
       }
     }
+    if (cfg.trashNoDraw && t.events.some((e) => e.type === "ability" && e.ability === "trash")) {
+      // Emulation: undo Trash's redraw (the card goes back on top of the draw pile).
+      const st = t.state;
+      const drew = t.events.find((e) => e.type === "drew" && e.seat === me && e.count > 0);
+      const back = drew ? st.players[me]?.hand.pop() : undefined;
+      if (back) st.drawPile.unshift(back);
+      if (st.status === "active" && (st.players[me]?.hand.length ?? 1) === 0) {
+        st.status = "finished";
+        st.winner = me;
+      }
+      t = { state: st, events: t.events.filter((e) => e !== drew) };
+    }
     for (const e of t.events) {
-      if (e.type === "ability") r.abilities++;
+      if (e.type === "ability") {
+        r.abilities++;
+        r.abilityUse[e.ability] = (r.abilityUse[e.ability] ?? 0) + 1;
+      }
+      if (e.type === "played") r.cardsPlayed += e.cardIds.length;
+      if (e.type === "drew" && e.seat !== me && e.count > 0) {
+        r.forcedDraws += e.count;
+        hits[e.seat] = (hits[e.seat] ?? 0) + 1;
+      }
+      if (e.type === "skipped") {
+        r.skips++;
+        hits[e.seat] = (hits[e.seat] ?? 0) + 1;
+      }
       if (e.type === "drew") r.cardsDrawn += e.count;
       if (e.type === "pile_reset") r.resets++;
       if (e.type === "umbrella") r.umbrellas++;
     }
     state = t.state;
   }
+  r.maxHitsOnOne = Math.max(0, ...hits);
+  r.hopeless = state.players.filter(
+    (p, i) => i !== state.winner && p.hand.length >= 2 * cfg.hand(players),
+  ).length;
   r.finished = state.status === "finished";
   r.winner = state.winner;
   return r;
@@ -295,6 +396,46 @@ export function summarize(cfg: Config, players: number, games: number) {
     umbrellas: mean(fin.map((r) => r.umbrellas)),
     timeouts: mean(fin.map((r) => r.timeouts)),
     dtp: mean(fin.map((r) => r.dtpPlays)),
+    turnsPerPlayer: mean(fin.map((r) => r.turns)) / players,
+    cardsPlayed: mean(fin.map((r) => r.cardsPlayed)),
+    forcedDraws: mean(fin.map((r) => r.forcedDraws)),
+    skips: mean(fin.map((r) => r.skips)),
+    maxHitsP90: pct(
+      fin.map((r) => r.maxHitsOnOne),
+      90,
+    ),
+    hopelessPct:
+      (fin.reduce((a, r) => a + r.hopeless, 0) / Math.max(fin.length * (players - 1), 1)) * 100,
+    /** Win % by turn position (0 = first player). */
+    seatWin: Array.from(
+      { length: players },
+      (_, k) =>
+        (fin.filter((r) => r.winner !== null && (r.winner - r.first + players) % players === k)
+          .length /
+          Math.max(fin.length, 1)) *
+        100,
+    ),
+    abilityPerGame: Object.fromEntries(
+      discard.DISCARD_CARDS.map((c) => [
+        c.ability,
+        mean(fin.map((r) => r.abilityUse[c.ability] ?? 0)),
+      ]),
+    ),
+    /** Win % of a seat whose opening hand holds the card (fair = 100 / players). */
+    cardWin: Object.fromEntries(
+      discard.DISCARD_CARDS.map((c) => {
+        let had = 0;
+        let won = 0;
+        for (const r of fin)
+          r.opening.forEach((hand, i) => {
+            if (hand.includes(c.cardId)) {
+              had++;
+              if (r.winner === i) won++;
+            }
+          });
+        return [c.cardId, (won / Math.max(had, 1)) * 100];
+      }),
+    ),
     winByProfile: Object.fromEntries(
       PROFILES.map((p) => [p, f1((wins[p][0] / Math.max(wins[p][1], 1)) * 100)]),
     ),
@@ -313,10 +454,13 @@ describe("quick match simulation (task 12.11)", () => {
   const full = Number(process.env["AUMMON_SIM"] ?? 0);
   it.skipIf(!full)("full report", () => {
     const rows = [];
-    for (const cfg of CONFIGS) for (let n = 2; n <= 8; n++) rows.push(summarize(cfg, n, full));
+    const only = process.env["AUMMON_SIM_ONLY"];
+    for (const cfg of CONFIGS)
+      if (!only || cfg.name.includes(only))
+        for (let n = 2; n <= 8; n++) rows.push(summarize(cfg, n, full));
     const ablation = [];
     const base = CONFIGS[0];
-    if (base)
+    if (base && !only)
       for (const n of [4, 8]) {
         const ref = summarize(base, n, full / 2);
         for (const card of discard.DISCARD_CARDS) {

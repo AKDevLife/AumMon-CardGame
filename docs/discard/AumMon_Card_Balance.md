@@ -1,7 +1,7 @@
 # AumMon — Casual Discard Edition · Card Balance (Phase 3)
 
 > Source: engine `packages/game-engine/src/discard` (ruleset "7") with the normal bot, 2,000 games per player count (task 12.2).
-> Status: **measurements + PROPOSED tweaks — nothing changed yet** (card changes need owner approval). Quick Match duration impact per card: `AumMon_Game_Balance_Impact.md`.
+> Status: **measurements + PROPOSED tweaks — nothing changed yet** (card changes need owner approval). Quick Match duration impact per card: `AumMon_Game_Balance_Impact.md`. Latest review (ruleset 8): `AumMon_Card_Balance_Review.md`.
 
 ## Game health
 

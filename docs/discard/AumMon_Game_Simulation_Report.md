@@ -199,3 +199,50 @@ Same harness and time model, 2,000 games per row, run on engine 2.0.0 (the confi
 | R8 45 s timer  |       8 |      100.0 | 47 / 33 / 95 / 371           | 5.2 / 14.5         |         79 |                  203 |                  15 |            0.07 |                     5.2 |
 
 Note: in this model a 45 s timer gives slightly shorter rounds than 20 s, because 20 s causes more timeouts (auto-draws). The 20 s timer (owner decision) mainly limits waiting for slow / away players; playtest data will decide whether to tune it.
+
+## 6. Quality audit metrics (ruleset "8", task 12.13)
+
+2,000 rounds per row on the shipped engine, same profiles and time model (minutes are model estimates). Win index = win rate ÷ fair rate.
+
+### A. Baseline (ruleset "8")
+
+| Players | Mean / median turns | Turns per player | Est. min median / p90 (model) | ≤ 10 min | Cards played / round | Forced draws / round | Skips / round | Most hits on one player (p90) | Losers with ≥ 2× start hand | Win % by turn position (1st → last)   |
+| ------: | ------------------- | ---------------: | ----------------------------- | -------: | -------------------: | -------------------: | ------------: | ----------------------------: | --------------------------: | ------------------------------------- |
+|       2 | 13 / 11             |              6.4 | 1.8 / 3.4                     |    100 % |                 11.7 |                  2.0 |           0.6 |                             4 |                       0.3 % | 55 / 45                               |
+|       3 | 22 / 19             |              7.4 | 3.0 / 5.9                     |     99 % |                 18.8 |                  3.3 |           1.1 |                             5 |                       0.8 % | 36 / 33 / 31                          |
+|       4 | 34 / 28             |              8.6 | 4.3 / 9.8                     |     91 % |                 27.4 |                  4.9 |           1.8 |                             5 |                       0.8 % | 27 / 24 / 27 / 22                     |
+|       5 | 35 / 25             |              7.1 | 3.9 / 10.4                    |     89 % |                 26.0 |                  4.7 |           1.8 |                             5 |                       2.9 % | 24 / 20 / 19 / 19 / 18                |
+|       6 | 43 / 30             |              7.1 | 4.6 / 13.0                    |     83 % |                 30.7 |                  5.4 |           2.2 |                             5 |                       3.8 % | 21 / 18 / 17 / 14 / 15 / 15           |
+|       7 | 51 / 35             |              7.3 | 5.3 / 16.2                    |     76 % |                 35.9 |                  6.3 |           2.8 |                             5 |                       4.2 % | 16 / 15 / 15 / 14 / 14 / 13 / 13      |
+|       8 | 53 / 39             |              6.6 | 5.8 / 16.0                    |     74 % |                 37.2 |                  6.3 |           3.0 |                             5 |                       3.6 % | 15 / 12 / 13 / 11 / 12 / 13 / 12 / 12 |
+
+### B. Per card
+
+See `AumMon_Card_Balance_Review.md` §1.
+
+### C. Balance proposals (emulated in the harness; not approved)
+
+| Config                                                 | Players | Mean turns | Est. min median / p90 | ≤ 10 min | Win index range (min–max) | กุญแจ |   ร่ม | ถังขยะ | เทปกาว | Losers ≥ 2× start |
+| ------------------------------------------------------ | ------: | ---------: | --------------------- | -------: | ------------------------- | ---: | ---: | ----: | -----: | ----------------: |
+| R8 shipped                                             |       2 |         13 | 1.8 / 3.4             |    100 % | 0.84–1.15                 | 1.13 | 1.08 |  0.87 |   1.10 |             0.3 % |
+| R8 shipped                                             |       4 |         34 | 4.3 / 9.8             |     91 % | 0.76–1.37                 | 1.22 | 1.37 |  0.76 |   1.29 |             0.8 % |
+| R8 shipped                                             |       6 |         43 | 4.6 / 13.0            |     83 % | 0.70–1.48                 | 1.35 | 1.48 |  0.75 |   1.35 |             3.8 % |
+| R8 shipped                                             |       8 |         53 | 5.8 / 16.0            |     74 % | 0.63–1.58                 | 1.29 | 1.58 |  0.63 |   1.45 |             3.6 % |
+| R8 + Key 6 pts (proposal)                              |       2 |         12 | 1.8 / 3.4             |    100 % | 0.84–1.16                 | 1.14 | 1.08 |  0.87 |   1.10 |             0.4 % |
+| R8 + Key 6 pts (proposal)                              |       4 |         33 | 4.2 / 9.4             |     92 % | 0.75–1.35                 | 1.12 | 1.30 |  0.75 |   1.35 |             0.8 % |
+| R8 + Key 6 pts (proposal)                              |       6 |         39 | 4.2 / 12.6            |     85 % | 0.64–1.52                 | 1.18 | 1.52 |  0.71 |   1.45 |             2.7 % |
+| R8 + Key 6 pts (proposal)                              |       8 |         45 | 5.2 / 13.4            |     80 % | 0.65–1.60                 | 1.18 | 1.45 |  0.65 |   1.60 |             2.2 % |
+| R8 + Umbrella 7 pts (proposal)                         |       2 |         12 | 1.7 / 3.4             |    100 % | 0.85–1.21                 | 1.21 | 1.07 |  0.89 |   1.07 |             0.3 % |
+| R8 + Umbrella 7 pts (proposal)                         |       4 |         33 | 4.2 / 9.5             |     92 % | 0.76–1.32                 | 1.29 | 1.28 |  0.76 |   1.32 |             0.7 % |
+| R8 + Umbrella 7 pts (proposal)                         |       6 |         42 | 4.5 / 13.0            |     83 % | 0.68–1.50                 | 1.50 | 1.34 |  0.70 |   1.40 |             3.2 % |
+| R8 + Umbrella 7 pts (proposal)                         |       8 |         49 | 5.5 / 14.7            |     77 % | 0.64–1.48                 | 1.47 | 1.43 |  0.64 |   1.48 |             2.4 % |
+| R8 + Trash no redraw (proposal)                        |       2 |         12 | 1.7 / 3.3             |    100 % | 0.84–1.13                 | 1.13 | 1.07 |  0.92 |   1.11 |             0.2 % |
+| R8 + Trash no redraw (proposal)                        |       4 |         32 | 4.1 / 9.0             |     93 % | 0.78–1.33                 | 1.24 | 1.33 |  0.87 |   1.31 |             0.9 % |
+| R8 + Trash no redraw (proposal)                        |       6 |         39 | 4.2 / 11.6            |     86 % | 0.70–1.51                 | 1.34 | 1.51 |  0.87 |   1.31 |             3.4 % |
+| R8 + Trash no redraw (proposal)                        |       8 |         47 | 5.3 / 14.1            |     78 % | 0.65–1.54                 | 1.33 | 1.54 |  0.85 |   1.41 |             3.1 % |
+| R8 + balance pack (Key 6, Umbrella 7, Trash no redraw) |       2 |         12 | 1.7 / 3.2             |    100 % | 0.85–1.15                 | 1.12 | 1.07 |  0.93 |   1.12 |             0.2 % |
+| R8 + balance pack (Key 6, Umbrella 7, Trash no redraw) |       4 |         31 | 3.9 / 8.6             |     94 % | 0.75–1.38                 | 1.11 | 1.33 |  0.87 |   1.38 |             0.7 % |
+| R8 + balance pack (Key 6, Umbrella 7, Trash no redraw) |       6 |         36 | 3.9 / 11.5            |     87 % | 0.65–1.54                 | 1.13 | 1.54 |  0.80 |   1.41 |             2.3 % |
+| R8 + balance pack (Key 6, Umbrella 7, Trash no redraw) |       8 |         41 | 4.8 / 12.7            |     83 % | 0.67–1.56                 | 1.18 | 1.44 |  0.85 |   1.56 |             2.1 % |
+
+Emulation: points changes patch the card data for the run only; "Trash no redraw" returns the redrawn card to the top of the draw pile. Reproduce one group with `AUMMON_SIM_ONLY="(proposal)"` or `AUMMON_SIM_ONLY="balance pack"`.
