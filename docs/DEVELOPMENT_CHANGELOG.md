@@ -2,6 +2,10 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-22 — 13.1 AI Art Production Pipeline
+
+- `docs/art-production/`: Art Direction (3 directions, recommends A "Candy Vinyl Sticker" — pending owner), Style Bible v0.1 draft with copy-paste Style Block, Character Library (AM001–AM016 ↔ cards D01–D16, proposals), AI Prompt Library (IMG-* image prompts vs CL-* Claude prompts), Art QA Guidelines, Workflow (Thai owner steps, task cards, revision loop, integration path), Asset Catalog + tracker (ID / naming / status conventions), Handoff. Folders `art-production/` and `public/assets/`. New `docs/AumMon_Master_Handoff.md`; Phase 13 in the roadmap. No images produced (no image tool in this environment).
+
 ## 2026-11-22 — 12.3–12.6 Discard Edition cutover (1v1 TCG removed)
 
 - Backend: `game-create`, `game-start`, `game-view`, `game-command`, `game-leave` + `_shared/game.ts`, `game-flow.ts` (paced bots, 45 s turn → auto-draw, 8 s reaction → decline, online leaver → bot, peeks only to the peeking seat). `tcg-*` functions removed; admin, account deletion and lobby (2–8 seats) updated.

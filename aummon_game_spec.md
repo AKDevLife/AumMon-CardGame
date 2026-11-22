@@ -22,3 +22,7 @@
 
 Card data in code: `packages/game-engine/src/discard/cards.ts` (must match the Card Library).
 Any change that affects game results needs owner approval and a new `ruleset_version`.
+
+## 3. Art
+
+Visual direction, style, characters and the AI art pipeline: [`docs/art-production/`](./docs/art-production/) (owner approves direction, Style Bible and each character).

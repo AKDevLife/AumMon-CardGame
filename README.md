@@ -5,12 +5,14 @@ Server-authoritative · `ruleset_version = "7"` · engine 1.0.0
 
 ## เอกสารหลัก
 
-| เอกสาร                                                         | ขอบเขต                                                              |
-| -------------------------------------------------------------- | ------------------------------------------------------------------- |
-| [`aummon_game_spec.md`](./aummon_game_spec.md)                 | ภาพรวมผลิตภัณฑ์ + ดัชนีกติกา                                              |
-| [`docs/discard/`](./docs/discard/)                             | กติกา (Core Rules), การ์ด (Card Library), Balance, Rule Clarification |
-| [`aummon_project_blueprint.md`](./aummon_project_blueprint.md) | Architecture, Database, Security, Stack                             |
-| [`docs/DEVELOPMENT_ROADMAP.md`](./docs/DEVELOPMENT_ROADMAP.md) | Roadmap และสถานะงาน                                                 |
+| เอกสาร                                                             | ขอบเขต                                                                 |
+| ------------------------------------------------------------------ | ---------------------------------------------------------------------- |
+| [`aummon_game_spec.md`](./aummon_game_spec.md)                     | ภาพรวมผลิตภัณฑ์ + ดัชนีกติกา                                                 |
+| [`docs/discard/`](./docs/discard/)                                 | กติกา (Core Rules), การ์ด (Card Library), Balance, Rule Clarification    |
+| [`aummon_project_blueprint.md`](./aummon_project_blueprint.md)     | Architecture, Database, Security, Stack                                |
+| [`docs/art-production/`](./docs/art-production/)                   | AI Art Production Pipeline (style, characters, prompts, asset tracker) |
+| [`docs/AumMon_Master_Handoff.md`](./docs/AumMon_Master_Handoff.md) | สถานะรวมของโปรเจกต์                                                     |
+| [`docs/DEVELOPMENT_ROADMAP.md`](./docs/DEVELOPMENT_ROADMAP.md)     | Roadmap และสถานะงาน                                                    |
 
 ## Tech stack
 

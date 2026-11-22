@@ -163,3 +163,19 @@ Owner brief: shedding-type card game for 2–8 players with the 16 Everyday Obje
 - [ ] **12.8** Owner playtest on Dev; balance pass — deps: 12.6
 
 **Acceptance:** all 3 modes play the Discard Edition with 2–8 seats · games always finish in simulation · server-authoritative hidden hands · no pay-to-win
+
+## Phase 13 — AI Art Production (owner 2026-11-22)
+
+Pipeline in `docs/art-production/`; images are made by the owner in an external AI image tool with prompts from the Prompt Library; Claude does QA, tracking and integration. Owner approves direction, Style Bible and every character.
+
+- [x] **13.1** Art pipeline: Art Direction proposals, Style Bible draft, 16 character proposals, Prompt Library, QA guidelines, workflow, Asset Catalog + tracker, folders, Master Handoff — deps: 12.6 — PR #91 (2026-11-22)
+- [ ] **13.2** Owner chooses the Art Direction (IMG-DIR-01 tests) — deps: 13.1
+- [ ] **13.3** Style Bible v1.0 locked with approved sample sheet — deps: 13.2
+- [ ] **13.4** 16 character concepts approved (pilot AM013 first) — deps: 13.3
+- [ ] **13.5** 16 reference sheets approved + lineup consistency check — deps: 13.4
+- [ ] **13.6** 16 card artworks + card back approved — deps: 13.5
+- [ ] **13.7** Integrate card art + card back into the game (emoji fallback) — deps: 13.6
+- [ ] **13.8** Core UI art + menu / lobby / room / table backgrounds — deps: 13.6
+- [ ] **13.9** Basic emotes (Priority 4; emote feature needs its own task) — deps: 13.7
+
+**Acceptance:** every Integrated asset traces to an Approved master, prompt version and catalog row · all 16 characters pass the lineup check · art readable at in-game sizes · no text baked into art
