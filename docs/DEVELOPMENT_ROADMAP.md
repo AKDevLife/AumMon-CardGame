@@ -161,6 +161,8 @@ Owner brief: shedding-type card game for 2–8 players with the 16 Everyday Obje
 - [x] **12.6** Remove the 1v1 TCG (ruleset 6) code, tests and docs; all modes play the new game — deps: 12.5 — PR #90 (2026-11-22)
 - [x] **12.9** Gameplay screen redesign (mobile): header, opponents 2–8, center table, card states + preview, thumb-zone actions, animations, responsive tokens — deps: 12.6 — PR #92 (2026-11-22)
 - [x] **12.10** Remove Pass & Play (owner 2026-11-22, DC8): UI, `game-create` pass_play, hand-off reveal, local seats; DB checks tightened — deps: 12.9 — PR #93 (2026-11-22)
+- [x] **12.11** Quick Match analysis: duration analysis, 144k-game simulation on the real engine, balance impact, proposed rules (ruleset "8"), test plan — deps: 12.10 — PR #94 (2026-11-22)
+- [!] **12.12** Implement Quick Match ruleset "8" — blocked: owner approval of QM1–QM6 (`docs/discard/AumMon_Quick_Match_Proposal.md`) — deps: 12.11
 - [ ] **12.7** VIP + cosmetic gacha design doc (no payments until legal check + owner approval) — deps: 12.1
 - [ ] **12.8** Owner playtest on Dev; balance pass — deps: 12.6
 

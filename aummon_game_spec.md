@@ -18,6 +18,7 @@
 | Core rules (turns, pile, reset, reactions, winning) | [`docs/discard/AumMon_Core_Rules.md`](./docs/discard/AumMon_Core_Rules.md) |
 | 16 cards × 4 copies = 64 | [`docs/discard/AumMon_Card_Library.md`](./docs/discard/AumMon_Card_Library.md) |
 | Owner decisions DC1–DC7, open questions | [`docs/discard/AumMon_Rule_Clarification.md`](./docs/discard/AumMon_Rule_Clarification.md) |
+| Quick Match proposal (ruleset "8", not approved) | [`docs/discard/AumMon_Quick_Match_Proposal.md`](./docs/discard/AumMon_Quick_Match_Proposal.md) |
 | Simulation and balance | [`docs/discard/AumMon_Card_Balance.md`](./docs/discard/AumMon_Card_Balance.md) |
 
 Card data in code: `packages/game-engine/src/discard/cards.ts` (must match the Card Library).

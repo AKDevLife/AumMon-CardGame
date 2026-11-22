@@ -23,9 +23,9 @@
 | 6 Online Multiplayer    |      7 |       8 |     88% |
 | 7 Public Launch & Scale |      6 |       8 |     75% |
 | 9 Developer Admin       |     17 |      17 |    100% |
-| 12 Discard Edition      |      8 |      10 |     80% |
+| 12 Discard Edition      |      9 |      12 |     75% |
 | 13 AI Art Production    |      1 |       9 |     11% |
-| **Overall**             | **95** | **108** | **88%** |
+| **Overall**             | **96** | **110** | **87%** |
 
 ## Completed (summary)
 
@@ -42,6 +42,13 @@
 ## In progress
 
 None
+
+## Waiting for the owner
+
+| Task  | Needs                                                                                 |
+| ----- | ------------------------------------------------------------------------------------- |
+| 12.12 | Approve Quick Match decisions QM1–QM6 (`docs/discard/AumMon_Quick_Match_Proposal.md`) |
+| 13.2  | Choose the Art Direction (`docs/art-production/AumMon_Art_Direction.md`)              |
 
 ## Deferred (production — owner decision)
 
