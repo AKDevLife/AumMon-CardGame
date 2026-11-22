@@ -42,6 +42,6 @@ Not a problem: pile reset (DC1) — it is what makes games finish; first-player 
 
 ## 4. Interpretation of the 5–10 minute target
 
-- The model has no talking, reactions to events, or network delay. Real rounds will be longer; a common rule of thumb for casual party play is +30–60 %. With that, E lands around **2.5–4 min (2–3 players), 5–7 min (4–5 players), 6–9 min (6–8 players)** for a typical round — inside or close to the target. **This must be confirmed by playtest (Test Plan §4).**
+- The model has no talking, reactions to events, or network delay. Real rounds will be longer; this report **assumes** +30–60 % (not measured — to be replaced by playtest data). With that assumption, E lands around **2.5–4 min (2–3 players), 5–7 min (4–5 players), 6–9 min (6–8 players)** for a typical round — inside or close to the target. **This must be confirmed by playtest (Test Plan §4).**
 - 2–3 player rounds are naturally shorter than 5 minutes. Quick Match makes that a feature: "เล่นอีกรอบ" (rematch) in one tap. Owner option: a 2–3 player match = best of 3 rounds.
 - The remaining risk is the 6–8 player **tail** (p90 14–17 min): about 1 game in 5 still goes over 10 minutes in the model. Mitigations in the proposal: AFK auto-play, 20 s timer, Alarm change. If playtest still shows long tails: fallback X3 (4 / 3 cards).
