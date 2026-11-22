@@ -6,7 +6,7 @@
 
 - **Status:** 🚧 Phase 12 — new game "Casual Discard Edition" (owner brief 2026-11-22); the 1v1 TCG (ruleset 6) stays live until the new game is ready.
 - **Phase:** 12 — rules approved (DC1–DC7), engine next.
-- **Current task:** 12.2 engine prototype + simulation 2–8 players
+- **Current task:** 12.3 architecture / database / test plan for 2–8 player rooms
 - **Next:** 12.3 architecture docs → 12.4 backend → 12.5 UI → 12.6 remove 1v1 TCG → 12.8 playtest; 12.7 VIP/gacha design (build later).
 - **Playtest URL (latest `main`):** https://aum-mon-card-game-git-playtest-aum-mon.vercel.app
 - **Dev backend:** Supabase `AumMon-Dev` (ref `yaxtzdhryctfjaspxvix`, ap-northeast-1), email confirmation OFF for playtesting.

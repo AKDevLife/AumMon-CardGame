@@ -2,6 +2,11 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-22 — 12.2 Discard Edition engine + simulation
+
+- `packages/game-engine/src/discard` (exported as `discard`, ruleset "7"): 16 data-driven cards × 4, deal 7 / 5, ≥-top play rule, Eraser wild, pile reset after everyone passes, Glue / Ruler restrictions, Umbrella reactions queued per target, Hourglass loop guard, private Magnifier peek event, seat views, normal bot. 12 tests incl. 280 bot games over 2–8 players with card conservation.
+- Simulation (2,000 games × 7 sizes): 100 % of games finish; first player +3–5 points; card win rates 21–32 % (fair 25 %) — `docs/discard/AumMon_Card_Balance.md` (tweaks proposed, not applied).
+
 ## 2026-11-22 — 12.1 New game direction: Casual Discard Edition (audit + rules)
 
 - Owner brief: shed-your-hand game for 2–8 players with 16 Everyday Objects. Phase 1 audit (`docs/discard/AumMon_Rule_Clarification.md`): the base "≥ top or draw & pass" rule stalls (simulation: 0.1–5 % of games finish); pile reset fixes it (~100 %). Owner decisions DC1–DC7: pile reset, 64-card deck, Umbrella reaction, Magnet / Hourglass redesign, Eraser wild, remove the 1v1 TCG after the switch and keep 3 modes, VIP / gacha designed now and built later. `AumMon_Core_Rules.md`, `AumMon_Card_Library.md`. Phase 12 roadmap.
