@@ -6,9 +6,9 @@
 delete from public.matches;      -- cascades to match_players, match_events, private runtime rows
 delete from public.game_rooms;   -- cascades to room_players
 
-drop table if exists private.match_cards;
-drop table if exists private.match_player_runtime;
 drop table if exists private.round_submissions;
+drop table if exists private.match_player_runtime;
+drop table if exists private.match_cards;
 
 alter table public.matches drop column deck_template_id, drop column deck_template_version;
 alter table public.matches drop constraint matches_phase_check;
