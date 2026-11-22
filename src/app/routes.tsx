@@ -8,7 +8,7 @@ import { LobbyPage } from "../features/online/LobbyPage.tsx";
 import { OnlinePage } from "../features/online/OnlinePage.tsx";
 import { PassPlaySetupPage } from "../features/passplay/PassPlaySetupPage.tsx";
 import { SoloSetupPage } from "../features/solo/SoloSetupPage.tsx";
-import { TcgMatchPage } from "../features/tcg/TcgMatchPage.tsx";
+import { GamePage } from "../features/game/GamePage.tsx";
 import { AppLayout } from "./AppLayout.tsx";
 import { HomePage } from "./HomePage.tsx";
 import { NotFoundPage } from "./NotFoundPage.tsx";
@@ -27,7 +27,7 @@ export const routes: RouteObject[] = [
       { path: "play/pass", element: <PassPlaySetupPage /> },
       { path: "play/online", element: <OnlinePage /> },
       { path: "lobby/:roomId", element: <LobbyPage /> },
-      { path: "game/:matchId", element: <TcgMatchPage /> },
+      { path: "game/:matchId", element: <GamePage /> },
       { path: "admin", element: <AdminPage /> },
       { path: "admin/:section", element: <AdminPage /> },
       { path: "*", element: <NotFoundPage /> },

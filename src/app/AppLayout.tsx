@@ -1,11 +1,11 @@
-import { ENGINE_VERSION, v6 } from "@aummon/game-engine";
+import { ENGINE_VERSION } from "@aummon/game-engine";
 import { useEffect } from "react";
 import { Link, Outlet } from "react-router";
 import { PreviewBanner } from "../components/PreviewBanner.tsx";
 import { AccountNav } from "../features/auth/AccountNav.tsx";
 import { useAuth } from "../features/auth/auth-context.ts";
-import { installMusic } from "../features/tcg/music.ts";
-import { installAudioUnlock, installTapSounds } from "../features/tcg/sound.ts";
+import { installMusic } from "../features/game/music.ts";
+import { installAudioUnlock, installTapSounds } from "../features/game/sound.ts";
 
 export function AppLayout() {
   const auth = useAuth();
@@ -27,7 +27,7 @@ export function AppLayout() {
       </main>
       <footer className="px-4 py-4 text-center text-xs text-am-muted">
         <span className="rounded-full bg-am-round px-3 py-1 font-semibold text-am-ink">
-          Ruleset {v6.RULESET_V6.version} · 1v1
+          Discard Edition · 2–8 คน
         </span>{" "}
         · engine {ENGINE_VERSION} ·{" "}
         <Link to="/privacy" className="underline">

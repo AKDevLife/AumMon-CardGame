@@ -9,6 +9,7 @@ export function SoloSetupPage() {
   const navigate = useNavigate();
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [bots, setBots] = useState(3);
   const signedIn = auth.mode === "live" && auth.session !== null;
 
   if (auth.mode !== "live")
@@ -29,8 +30,9 @@ export function SoloSetupPage() {
     setPending(true);
     setError(null);
     try {
-      const { matchId } = await callFunction<{ matchId: string }>(auth.client, "tcg-create", {
+      const { matchId } = await callFunction<{ matchId: string }>(auth.client, "game-create", {
         mode: "solo",
+        bots,
       });
       void navigate(`/game/${matchId}`);
     } catch (e) {
@@ -43,12 +45,26 @@ export function SoloSetupPage() {
     <section className="flex flex-col gap-5">
       <h1 className="font-display text-3xl font-bold">Solo vs Bot</h1>
       <div className="am-sticker flex flex-col gap-2 bg-am-card p-4">
-        <p>ดวล 1 ต่อ 1 กับ Bot ด้วยชุดการ์ดเริ่มต้น 30 ใบ</p>
-        <ul className="list-disc pl-5 text-sm text-am-muted">
-          <li>พลังชีวิตเริ่มต้น 20 · พลังงานเพิ่มทุกเทิร์น (สูงสุด 8)</li>
-          <li>ลงตัวละคร ติดอุปกรณ์ พัฒนาร่าง และรวมร่าง แล้วค่อยโจมตี</li>
-          <li>มีเวลา 90 วินาทีต่อเทิร์น</li>
-        </ul>
+        <p>เล่นกับ Bot — ทิ้งไพ่ในมือให้หมดก่อนเป็นผู้ชนะ</p>
+        <label className="flex items-center gap-2 font-semibold">
+          จำนวน Bot
+          <select
+            value={bots}
+            onChange={(e) => {
+              setBots(Number(e.target.value));
+            }}
+            className="am-sticker bg-am-card px-2 py-1"
+          >
+            {[1, 2, 3, 4, 5, 6, 7].map((n) => (
+              <option key={n} value={n}>
+                {n} ตัว (รวมคุณ {n + 1} คน)
+              </option>
+            ))}
+          </select>
+        </label>
+        <p className="text-sm text-am-muted">
+          เทิร์นละ 45 วินาที · 2–4 คนได้ไพ่คนละ 7 ใบ · 5–8 คนได้คนละ 5 ใบ
+        </p>
       </div>
       {error && (
         <p

@@ -1,10 +1,11 @@
-/** Allowed sound settings (mirrors src/features/tcg/sound.ts; drift test: tests/integration/sound-schema.test.ts). */
+/** Allowed sound settings (mirrors src/features/game/sound.ts; drift test: tests/integration/sound-schema.test.ts). */
 export const SOUND_EVENT_IDS = [
-  "summon",
-  "attack",
-  "destroyed",
+  "play",
+  "draw",
   "ability",
-  "passive",
+  "umbrella",
+  "skip",
+  "reset",
   "turn",
   "win",
   "lose",

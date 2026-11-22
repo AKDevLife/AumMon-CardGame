@@ -1,4 +1,5 @@
 import { expect, test, type Browser, type Page } from "@playwright/test";
+import { act, leave } from "./game-helpers.ts";
 
 test.skip(!process.env["VITE_SUPABASE_URL"], "Supabase backend not configured");
 
@@ -13,46 +14,9 @@ async function player(browser: Browser, name: string): Promise<Page> {
   return page;
 }
 
-/** One step for this page if it can act now: mulligan, summon/attack, or end turn. */
-async function act(page: Page): Promise<boolean> {
-  const idle = page.getByRole("button", { name: "กำลังส่ง…" });
-  const keep = page.getByRole("button", { name: "เก็บมือนี้" });
-  if ((await keep.isVisible()) && (await keep.isEnabled())) {
-    await keep.click();
-    await expect(idle).toHaveCount(0);
-    return true;
-  }
-  const endTurn = page.getByRole("button", { name: "จบเทิร์น", exact: true });
-  if (!(await endTurn.isVisible()) || !(await endTurn.isEnabled())) return false;
-  const hand = await page
-    .getByRole("group", { name: "Hand" })
-    .getByRole("button")
-    .and(page.locator(":enabled"))
-    .all();
-  for (const card of hand) {
-    await card.click();
-    const summon = page
-      .getByRole("group", { name: "Actions" })
-      .getByRole("button", { name: "ลงสนาม" });
-    if (await summon.isVisible().catch(() => false)) {
-      await summon.click();
-      await expect(idle).toHaveCount(0);
-      return true;
-    }
-    if (
-      await page
-        .getByRole("dialog")
-        .isVisible()
-        .catch(() => false)
-    )
-      await page.keyboard.press("Escape");
-  }
-  await endTurn.click();
-  await expect(idle).toHaveCount(0);
-  return true;
-}
-
-test("two browsers 1v1: lobby → ready → start → turns → forfeit", async ({ browser }) => {
+test("two browsers: lobby → ready → start → turns → one leaves, a bot takes the seat", async ({
+  browser,
+}) => {
   test.setTimeout(240_000);
   const [ann, ben] = await Promise.all([player(browser, "Ann"), player(browser, "Ben")]);
 
@@ -71,22 +35,18 @@ test("two browsers 1v1: lobby → ready → start → turns → forfeit", async 
   await expect(ann).toHaveURL(/\/game\//);
   await expect(ben).toHaveURL(/\/game\//, { timeout: 15_000 });
 
-  // Each browser sees only its own hand; play until a few turns have passed.
-  const turn = (p: Page) => p.getByText(/^เทิร์น \d+$/);
-  for (let i = 0; i < 120; i++) {
-    const text =
-      (await turn(ann)
-        .textContent()
-        .catch(() => "")) ?? "";
-    if (Number(/\d+/.exec(text)?.[0] ?? 0) >= 5) break;
+  // Each browser sees only its own hand; play a few actions each.
+  let actions = 0;
+  for (let i = 0; i < 120 && actions < 6; i++) {
+    if (await ann.getByRole("heading", { name: /ชนะ/ }).isVisible()) break;
     const acted = (await act(ann)) || (await act(ben));
-    if (!acted) await ann.waitForTimeout(400);
+    if (acted) actions++;
+    else await ann.waitForTimeout(400);
   }
-  await expect(turn(ann)).toHaveText(/เทิร์น ([5-9]|\d{2,})/);
-
-  await ben.getByRole("button", { name: "ตั้งค่า" }).click();
-  await ben.getByRole("button", { name: "ยอมแพ้" }).click();
-  await ben.getByRole("button", { name: "ยืนยันยอมแพ้" }).click();
-  await expect(ben.getByRole("heading", { name: "Ann ชนะ" })).toBeVisible();
-  await expect(ann.getByRole("heading", { name: "คุณชนะ! 🎉" })).toBeVisible({ timeout: 15_000 });
+  expect(actions).toBeGreaterThan(0);
+  if (!(await ann.getByRole("heading", { name: /ชนะ/ }).isVisible())) {
+    await leave(ben);
+    await expect(ben).toHaveURL(/\/$/);
+    await expect(ann.getByRole("region", { name: "โต๊ะ" })).toBeVisible();
+  }
 });

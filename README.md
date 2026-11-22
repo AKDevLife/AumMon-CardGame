@@ -1,15 +1,16 @@
 # AumMon
 
-Digital TCG แบบ **1v1** ธีมสิ่งของในชีวิตประจำวัน — Solo vs Server Bot, Pass & Play และ Online
-Server-authoritative · Spec v7.0 Everyday Objects Battle (`ruleset_version = "6"`)
+เกมไพ่ทิ้งให้หมดมือ 2–8 คน ธีมสิ่งของในชีวิตประจำวัน (Casual Discard Edition) — Solo vs Bot, Pass & Play และ Online
+Server-authoritative · `ruleset_version = "7"` · engine 1.0.0
 
 ## เอกสารหลัก
 
-| เอกสาร                                                         | ขอบเขต                                           |
-| -------------------------------------------------------------- | ------------------------------------------------ |
-| [`aummon_game_spec.md`](./aummon_game_spec.md)                 | กติกาเกม การ์ด และข้อกำหนดผลิตภัณฑ์ (ไฟล์เดียว)          |
-| [`aummon_project_blueprint.md`](./aummon_project_blueprint.md) | Architecture, Database, Security, Stack, Roadmap |
-| [`docs/rule-clarifications.md`](./docs/rule-clarifications.md) | ประเด็นกติกาที่รอคำตอบ (ไม่ใช่กติกา)                    |
+| เอกสาร                                                         | ขอบเขต                                                              |
+| -------------------------------------------------------------- | ------------------------------------------------------------------- |
+| [`aummon_game_spec.md`](./aummon_game_spec.md)                 | ภาพรวมผลิตภัณฑ์ + ดัชนีกติกา                                              |
+| [`docs/discard/`](./docs/discard/)                             | กติกา (Core Rules), การ์ด (Card Library), Balance, Rule Clarification |
+| [`aummon_project_blueprint.md`](./aummon_project_blueprint.md) | Architecture, Database, Security, Stack                             |
+| [`docs/DEVELOPMENT_ROADMAP.md`](./docs/DEVELOPMENT_ROADMAP.md) | Roadmap และสถานะงาน                                                 |
 
 ## Tech stack
 
@@ -20,7 +21,7 @@ React 19 + Vite + TypeScript (strict) · Tailwind CSS v4 · Supabase (Auth, Post
 ```text
 src/                     # Frontend (React)
 packages/game-engine/    # Pure TypeScript game engine — ZERO framework/Supabase deps
-supabase/                # Supabase CLI config (migrations / functions เริ่มใน Phase 2+)
+supabase/                # migrations, Edge Functions (game-*, rooms-*, admin-api), pgTAP tests
 tests/architecture/      # Guard tests (engine isolation)
 tests/e2e/               # Playwright
 scripts/check-secrets.mjs
@@ -63,7 +64,7 @@ Supabase local (ต้องมี Docker): `pnpm exec supabase start`
 
 ## Roadmap
 
-Phase 1 Foundation → 2 Auth & DB → 3 Pure Engine → 4 Solo slice → 5 Pass & Play → 6 Online → 7 Launch & Scale (รายละเอียดใน Blueprint §9)
+ดู `docs/DEVELOPMENT_ROADMAP.md` (Phase 12 = Casual Discard Edition)
 
 ## Supabase Dev project (`AumMon-Dev`)
 

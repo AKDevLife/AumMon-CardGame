@@ -3,17 +3,7 @@ import { Link, NavLink, useParams } from "react-router";
 import { StickerButton } from "../../components/StickerButton.tsx";
 import { ApiError, callFunction } from "../../lib/api.ts";
 import { useAuth } from "../auth/auth-context.ts";
-import {
-  abilities,
-  ago,
-  card,
-  dateTime,
-  eventText,
-  keywords,
-  label,
-  seats,
-  shortId,
-} from "./format.ts";
+import { ago, dateTime, eventText, label, seats, shortId } from "./format.ts";
 import { gateFromError, gateFromMe, SECTIONS, type AdminGate, type SectionId } from "./guard.ts";
 import { MfaPanel } from "./MfaPanel.tsx";
 import { SoundSettings } from "./SoundSettings.tsx";
@@ -105,7 +95,6 @@ const ACTION: Record<SectionId, string> = {
   overview: "overview",
   players: "players",
   cards: "cards",
-  decks: "decks",
   rooms: "rooms",
   matches: "matches",
   bots: "settings",
@@ -340,37 +329,21 @@ export function AdminPage() {
       case "cards":
         return (
           <>
-            <Section title="การ์ดทั้งหมด (สิ่งของมีชีวิต)">
+            <Section title={`การ์ดทั้งหมด (แบบละ ${text(field(data, "copies"))} ใบ)`}>
               <RowList
                 rows={asRows(field(data, "cards"))}
                 title={(r) => text(r["name"])}
                 columns={[
-                  { label: "ค่าพลังงาน", value: (r) => `${text(r["cost"])} พลังงาน` },
+                  { label: "แต้ม", value: (r) => text(r["points"]) },
                   {
-                    label: "พลัง",
-                    value: (r) => `โจมตี ${text(r["atk"])} · พลังชีวิต ${text(r["hp"])}`,
+                    label: "ความสามารถ",
+                    value: (r) => `${text(r["abilityName"])}: ${text(r["text"])}`,
                   },
-                  { label: "คำสำคัญ", value: (r) => keywords(r["keywords"]) },
-                  { label: "ความสามารถ", value: (r) => abilities(r["effect_spec"]) },
-                  { label: "ความหายาก", value: (r) => label("rarity", r["rarity"]) },
                 ]}
               />
             </Section>
           </>
         );
-      case "decks": {
-        const rows = asRows(data);
-        const total = rows.reduce((n, r) => n + Number(r["quantity"] ?? 0), 0);
-        return (
-          <Section title={`ชุดการ์ดเริ่มต้น (${total.toLocaleString("th-TH")} ใบ)`}>
-            <RowList
-              rows={rows}
-              title={(r) => card(r["card_definition_id"])}
-              columns={[{ label: "จำนวน", value: (r) => `${text(r["quantity"])} ใบ` }]}
-            />
-          </Section>
-        );
-      }
       case "rooms": {
         const rows = asRows(data);
         const stale = rows.filter(

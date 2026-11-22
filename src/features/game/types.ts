@@ -1,0 +1,17 @@
+import type { discard } from "@aummon/game-engine";
+
+/** Response of the game-* Edge Functions (supabase/functions/_shared/game.ts). */
+export interface GameResponse {
+  matchId: string;
+  rulesetVersion: "7";
+  mode: "solo" | "pass_play" | "online";
+  version: number;
+  deadline: string | null;
+  seat: number | null;
+  acting: number | null;
+  botActing: boolean;
+  names: string[];
+  view: discard.SeatView;
+  events: discard.GameEvent[];
+  peeks: { target: number; cards: string[] }[];
+}

@@ -2,6 +2,14 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-22 — 12.3–12.6 Discard Edition cutover (1v1 TCG removed)
+
+- Backend: `game-create`, `game-start`, `game-view`, `game-command`, `game-leave` + `_shared/game.ts`, `game-flow.ts` (paced bots, 45 s turn → auto-draw, 8 s reaction → decline, online leaver → bot, peeks only to the peeking seat). `tcg-*` functions removed; admin, account deletion and lobby (2–8 seats) updated.
+- Migration `20261122000100_discard_cutover.sql`: deletes old rooms/matches, drops characters / cards / decks / per-card runtime tables and TCG columns, adds `hand_count`, seats 1–8, ruleset "7". Seed emptied.
+- UI `src/features/game`: table for 2–8 players, pile, hand, ability choices, Umbrella reaction, peeks, rules + card gallery, sounds; Solo (1–7 bots), Pass & Play (2–8 names), Online room size. `src/features/tcg` removed.
+- Docs: spec v8.0 (index → `docs/discard/`), blueprint rewritten (architecture, DB, security, test plan), old rule clarifications and retired roadmap phases condensed. Version 1.0.0 / ruleset 7.
+- Tests: engine, integration game flow, backend game/online/admin/account, pgTAP rewritten for the new schema, E2E solo/pass-play/online/a11y.
+
 ## 2026-11-22 — 12.2 Discard Edition engine + simulation
 
 - `packages/game-engine/src/discard` (exported as `discard`, ruleset "7"): 16 data-driven cards × 4, deal 7 / 5, ≥-top play rule, Eraser wild, pile reset after everyone passes, Glue / Ruler restrictions, Umbrella reactions queued per target, Hourglass loop guard, private Magnifier peek event, seat views, normal bot. 12 tests incl. 280 bot games over 2–8 players with card conservation.

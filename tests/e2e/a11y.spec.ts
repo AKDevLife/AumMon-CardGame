@@ -43,9 +43,7 @@ test("signed-in screens (setup, lobby, match, profile) have no WCAG 2.1 AA viola
   }
   await page.goto("/play/solo");
   await page.getByRole("button", { name: "เริ่มเกม" }).click();
-  await expect(page.getByRole("button", { name: "เก็บมือนี้" })).toBeVisible();
-  await scan("match (mulligan)");
-  await page.getByRole("button", { name: "เก็บมือนี้" }).click();
-  await expect(page.getByText(/เทิร์น \d+/)).toBeVisible();
+  await expect(page.getByRole("region", { name: "โต๊ะ" })).toBeVisible();
+  await page.waitForTimeout(800);
   await scan("match");
 });

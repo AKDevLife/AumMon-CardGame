@@ -456,19 +456,23 @@ import_map = "./functions/deno.json"
 verify_jwt = false
 import_map = "./functions/deno.json"
 
-[functions.tcg-create]
+[functions.game-create]
 verify_jwt = false
 import_map = "./functions/deno.json"
 
-[functions.tcg-start]
+[functions.game-start]
 verify_jwt = false
 import_map = "./functions/deno.json"
 
-[functions.tcg-command]
+[functions.game-command]
 verify_jwt = false
 import_map = "./functions/deno.json"
 
-[functions.tcg-view]
+[functions.game-view]
+verify_jwt = false
+import_map = "./functions/deno.json"
+
+[functions.game-leave]
 verify_jwt = false
 import_map = "./functions/deno.json"
 

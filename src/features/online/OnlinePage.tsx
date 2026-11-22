@@ -10,6 +10,7 @@ export function OnlinePage() {
   const auth = useAuth();
   const navigate = useNavigate();
   const [code, setCode] = useState("");
+  const [size, setSize] = useState(4);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const signedIn = auth.mode === "live" && auth.session !== null;
@@ -45,6 +46,7 @@ export function OnlinePage() {
         "rooms-create",
         {
           mode: "online",
+          maxPlayers: size,
         },
       );
       rememberJoinCode(r.roomId, r.joinCode);
@@ -65,7 +67,24 @@ export function OnlinePage() {
       <h1 className="font-display text-3xl font-bold">Online</h1>
       <div className="am-sticker flex flex-col gap-3 bg-am-card p-4">
         <h2 className="font-display text-lg font-bold">สร้างห้อง</h2>
-        <p className="text-sm text-am-muted">ดวล 1 ต่อ 1 กับเพื่อน — ส่งรหัสห้องให้อีกคน</p>
+        <p className="text-sm text-am-muted">เล่นกับเพื่อน 2–8 คน — ส่งรหัสห้องให้เพื่อน</p>
+        <label className="flex items-center gap-2 font-semibold">
+          ขนาดห้อง
+          <select
+            value={size}
+            onChange={(e) => {
+              setSize(Number(e.target.value));
+            }}
+            className="am-sticker bg-am-card px-2 py-1"
+          >
+            {[2, 3, 4, 5, 6, 7, 8].map((n) => (
+              <option key={n} value={n}>
+                {n} คน
+              </option>
+            ))}
+          </select>
+        </label>
+        <p className="text-xs text-am-muted">ห้อง 5–8 คนจะเป็นสิทธิ์ VIP ในอนาคต (ตอนทดสอบเปิดให้ทุกคน)</p>
         <StickerButton variant="confirm" disabled={pending} onClick={() => void create()}>
           สร้างห้อง
         </StickerButton>

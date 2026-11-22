@@ -2,28 +2,24 @@
 -- — RLS: User A, User B, non-member, anonymous (blueprint §4.3, Phase 2 acceptance).
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(22);
+select plan(20);
 
 -- Fixtures: A owns room/match 1 with bot; B owns room/match 2; C is a non-member.
 insert into auth.users (id, email) values
   ('00000000-0000-0000-0000-0000000000aa', 'a@test.local'),
   ('00000000-0000-0000-0000-0000000000bb', 'b@test.local'),
   ('00000000-0000-0000-0000-0000000000cc', 'c@test.local');
-insert into public.characters (id, name, element, base_hp, speed, hook, effect_key, description, is_enabled)
-  values ('c1','C1','fire',3,70,'onAttack','K1','d', true), ('cx','CX','wind',3,90,'onBeforeDamaged','K2','d', false);
-insert into public.card_definitions (id, name, card_type, description) values ('card1','Card','attack','d');
-insert into public.deck_templates (id, version, is_active) values ('std', 1, true);
 insert into public.game_rooms (id, owner_id, mode) values
   ('10000000-0000-0000-0000-0000000000a1', '00000000-0000-0000-0000-0000000000aa', 'solo'),
   ('10000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000bb', 'online');
-insert into public.room_players (room_id, user_id, seat, player_type, character_id, display_name_snapshot) values
-  ('10000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000bb', 1, 'human', 'c1', 'B');
-insert into public.matches (id, room_id, deck_template_id, deck_template_version, engine_version, ruleset_version) values
-  ('20000000-0000-0000-0000-0000000000a1', '10000000-0000-0000-0000-0000000000a1', 'std', 1, '0.1.0', '1'),
-  ('20000000-0000-0000-0000-0000000000b1', '10000000-0000-0000-0000-0000000000b1', 'std', 1, '0.1.0', '1');
-insert into public.match_players (match_id, user_id, seat, player_type, character_id, character_snapshot, hp, max_hp, speed) values
-  ('20000000-0000-0000-0000-0000000000a1', '00000000-0000-0000-0000-0000000000aa', 1, 'human', 'c1', '{}', 3, 3, 70),
-  ('20000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000bb', 1, 'human', 'c1', '{}', 3, 3, 70);
+insert into public.room_players (room_id, user_id, seat, player_type, display_name_snapshot) values
+  ('10000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000bb', 1, 'human', 'B');
+insert into public.matches (id, room_id, engine_version, ruleset_version) values
+  ('20000000-0000-0000-0000-0000000000a1', '10000000-0000-0000-0000-0000000000a1', '1.0.0', '7'),
+  ('20000000-0000-0000-0000-0000000000b1', '10000000-0000-0000-0000-0000000000b1', '1.0.0', '7');
+insert into public.match_players (match_id, user_id, seat, player_type) values
+  ('20000000-0000-0000-0000-0000000000a1', '00000000-0000-0000-0000-0000000000aa', 1, 'human'),
+  ('20000000-0000-0000-0000-0000000000b1', '00000000-0000-0000-0000-0000000000bb', 1, 'human');
 insert into public.match_events (match_id, event_seq, round_number, event_type) values
   ('20000000-0000-0000-0000-0000000000a1', 1, 1, 'round.started'),
   ('20000000-0000-0000-0000-0000000000b1', 1, 1, 'round.started');
@@ -50,8 +46,6 @@ select is((select count(*)::int from public.match_events), 1, 'A sees only own m
 select is((select count(*)::int from public.game_rooms), 1, 'A sees only own room');
 select ok(public.is_match_member('20000000-0000-0000-0000-0000000000a1'), 'A is member of match A');
 select ok(not public.is_match_member('20000000-0000-0000-0000-0000000000b1'), 'A is not member of match B');
-select is((select count(*)::int from public.characters where id in ('c1','cx')), 1, 'disabled characters hidden');
-select is((select count(*)::int from public.deck_templates where id = 'std'), 1, 'deck templates readable');
 reset role;
 
 select is((select display_name from public.profiles where id = '00000000-0000-0000-0000-0000000000bb'),

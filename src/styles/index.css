@@ -57,13 +57,8 @@
   --color-fusion: var(--color-purple);
 
   /* Resources */
-  --color-player-hp: var(--color-pink);
-  --color-player-hp-bg: #ffe0ef;
   --color-hp-damage: var(--color-red);
   --color-hp-heal: var(--color-green);
-  --color-spark: var(--color-blue);
-  --color-spark-bg: #ddf5ff;
-  --color-spark-inactive: #c7d8e5;
 
   /* Keywords */
   --color-haste: var(--color-orange);
@@ -143,9 +138,6 @@
   --color-am-opponent: var(--color-opponent-area);
   --color-am-slot: var(--color-slot);
   --color-am-stat: var(--color-card-stat-bg);
-  --color-am-hp-bg: var(--color-player-hp-bg);
-  --color-am-spark-bg: var(--color-spark-bg);
-  --color-am-spark-off: var(--color-spark-inactive);
   --color-am-exhausted: var(--color-exhausted);
   --color-am-error-bg: var(--color-error-bg);
   --color-am-disabled: var(--color-disabled);

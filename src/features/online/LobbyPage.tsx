@@ -156,7 +156,7 @@ export function LobbyPage() {
         <StickerButton
           variant="confirm"
           disabled={!canStart || pending}
-          onClick={() => void act("tcg-start", { roomId })}
+          onClick={() => void act("game-start", { roomId })}
         >
           เริ่มเกม
         </StickerButton>

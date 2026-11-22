@@ -1,7 +1,7 @@
 // POST { action, ...params } → admin data. Every call: session + super_admin role + MFA (aal2),
 // checked server-side in requireAdmin. Mutations are audited. Catalog data is read-only
 // (owner decision 2026-11-20: rule changes go through the spec + PR, not the dashboard).
-import { createSeededRandom, ENGINE_VERSION, RULESET_VERSION, v6 } from "@aummon/game-engine";
+import { createSeededRandom, discard, ENGINE_VERSION, RULESET_VERSION } from "@aummon/game-engine";
 import { appEnv, audit, authAdmin, requireAdmin, type AdminContext } from "../_shared/admin.ts";
 import { db } from "../_shared/db.ts";
 import { handler, HttpError, readJson } from "../_shared/http.ts";
@@ -114,18 +114,9 @@ const actions: Record<string, Action> = {
     return { ok: true };
   },
 
-  cards: async () => ({
-    cards: await db()`
-      select id, name, description, effect_spec, rarity, cost, atk, hp, traits, keywords, is_enabled
-      from public.card_definitions where ruleset_version = '6' order by id`,
-  }),
-
-  decks: async () =>
-    db()`
-      select t.id, t.version, t.is_active, t.ruleset_version, c.card_definition_id, c.quantity
-      from public.deck_templates t join public.deck_template_cards c
-        on c.deck_template_id = t.id and c.deck_template_version = t.version
-      where t.ruleset_version = '6' order by t.id, c.card_definition_id`,
+  /** Card list from the engine data (cards are no longer stored in the database). */
+  cards: () =>
+    Promise.resolve({ cards: discard.DISCARD_CARDS, copies: discard.DISCARD_RULES.copies }),
 
   /** Open rooms with a server-computed `stale_reason` (null = healthy). */
   rooms: async (_a, body) =>
@@ -156,7 +147,7 @@ const actions: Record<string, Action> = {
     const status = body["status"] === "finished" ? "finished" : "active";
     return db()`
       select m.id, m.status, m.phase, m.round_number as turn, m.ruleset_version, m.started_at, m.finished_at, r.mode,
-             (select json_agg(json_build_object('seat', mp.seat, 'type', mp.player_type, 'hp', mp.hp) order by mp.seat)
+             (select json_agg(json_build_object('seat', mp.seat, 'type', mp.player_type, 'cards', mp.hand_count) order by mp.seat)
                 from public.match_players mp where mp.match_id = m.id) as players
       from public.matches m join public.game_rooms r on r.id = m.room_id
       where m.status = ${status} order by m.created_at desc limit ${limit(body)}`;
@@ -169,7 +160,7 @@ const actions: Record<string, Action> = {
       await db()`select id, status, phase, round_number, ruleset_version, started_at from public.matches where id = ${matchId}`;
     if (!match) throw new HttpError(404, "not_found", "Match not found");
     const players =
-      await db()`select seat, player_type, hp, status from public.match_players where match_id = ${matchId} order by seat`;
+      await db()`select seat, player_type, hand_count, status from public.match_players where match_id = ${matchId} order by seat`;
     const events =
       await db()`select event_seq, round_number, event_type, public_payload from public.match_events where match_id = ${matchId} order by event_seq desc limit 100`;
     return { match, players, events };
@@ -194,7 +185,8 @@ const actions: Record<string, Action> = {
     if (appEnv() !== "development")
       throw new HttpError(403, "dev_only", "Development tools are disabled here");
     const games = Math.min(Math.max(Number(body["games"] ?? 10) || 10, 1), 50);
-    const result = { seat0: 0, seat1: 0, draw: 0, avgTurns: 0 };
+    const players = Math.min(Math.max(Number(body["players"] ?? 4) || 4, 2), 8);
+    const wins: number[] = Array.from({ length: players }, () => 0);
     let turns = 0;
     for (let g = 0; g < games; g++) {
       const seed = crypto.getRandomValues(new Uint32Array(4));
@@ -204,35 +196,19 @@ const actions: Record<string, Action> = {
         seed[2] ?? 0,
         seed[3] ?? 0,
       ]);
-      let s = v6.initializeMatch(
-        { playerIds: ["a", "b"], decks: [v6.STARTER_DECK_V6, v6.STARTER_DECK_V6] },
+      let { state: s } = discard.startGame(
+        Array.from({ length: players }, (_, i) => `p${String(i)}`),
         rng,
       );
-      for (let n = 0; n < 3000 && s.status !== "finished"; n++) {
-        const seat: v6.Seat =
-          s.status === "mulligan" ? (s.players[0].mulliganDone ? 1 : 0) : s.activeSeat;
-        const pick = v6.chooseBotCommand(
-          v6.getPlayerView(s, seat),
-          v6.getLegalCommands(s, seat),
-          rng,
-        );
-        const playerId = s.players[seat].playerId;
-        s = v6.applyCommand(
-          s,
-          pick.type === "mulligan"
-            ? { type: "mulligan", playerId, instanceIds: [] }
-            : { ...pick, playerId },
-          rng,
-        ).state;
+      for (let n = 0; n < 3000 && s.status === "active"; n++) {
+        const seat = discard.actingSeat(s) ?? 0;
+        s = discard.applyCommand(s, discard.chooseBotCommand(s, seat, rng), rng).state;
       }
-      turns += s.turn;
-      if (!s.result || "draw" in s.result) result.draw++;
-      else if (s.result.winner === 0) result.seat0++;
-      else result.seat1++;
+      turns += s.turnNumber;
+      if (s.winner !== null) wins[s.winner] = (wins[s.winner] ?? 0) + 1;
     }
-    result.avgTurns = Math.round(turns / games);
-    await db().begin((tx) => audit(tx, admin, "bots.simulated", null, null, { games }));
-    return { games, ...result };
+    await db().begin((tx) => audit(tx, admin, "bots.simulated", null, null, { games, players }));
+    return { games, players, winsBySeat: wins, avgTurns: Math.round(turns / games) };
   },
 
   "sounds.get": async () => {
@@ -279,7 +255,7 @@ const actions: Record<string, Action> = {
       env: appEnv(),
       engineVersion: ENGINE_VERSION,
       rulesetVersion: RULESET_VERSION,
-      turnTimeoutMs: v6.RULESET_V6.turnTimeoutMs,
+      turnTimeoutMs: discard.DISCARD_RULES.turnTimeoutMs,
       devToolsEnabled: appEnv() === "development",
       mfaRequired: true,
     }),
