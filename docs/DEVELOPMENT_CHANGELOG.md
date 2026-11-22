@@ -2,6 +2,11 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-22 — 12.16 Playtest telemetry (owner Q3)
+
+- Migration `20261122000500_round_stats.sql`: `private.round_stats` (one row per match; never exposed; card ids only, no names / user ids). Server writes it at match start, on each human action (decision time, drawn-card plays), on every save (turns, timeouts, abilities, winner), on rematch and on leaving.
+- admin-api `stats` + admin section "สถิติเล่นทดสอบ": rounds per player count, median minutes, % over 15 min, timeouts per player per round, rematch %, average decision time, leavers, card win index — the Playtest Protocol §4 measures. Tests: admin backend, pgTAP access matrix.
+
 ## 2026-11-22 — 12.15 Quality UI (owner Q3)
 
 - Interactive tutorial `/tutorial` (`src/features/tutorial/TutorialPage.tsx`): 7 scripted situations on the real engine run locally (play, draw, Draw Then Play, ability, target, pile reset, win); home "ฝึกเล่น (1 นาที)" glows until finished once. E2E `tests/e2e/tutorial.spec.ts` + a11y.

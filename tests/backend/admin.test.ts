@@ -182,6 +182,12 @@ describe.runIf(run)("admin RBAC via Edge Functions", () => {
     );
     expect((await admin.call({ action: "rooms.close_stale" })).status).toBe(200);
     expect((await player.call({ action: "rooms.close_stale" })).status).toBe(403);
+    // Playtest stats: admin-only aggregates, never names or hands.
+    const stats = await admin.call({ action: "stats" });
+    expect(stats.status).toBe(200);
+    expect(stats.body["byPlayers"]).toHaveLength(7);
+    expect(JSON.stringify(stats.body)).not.toMatch(/opening|user_id|email/);
+    expect((await player.call({ action: "stats" })).status).toBe(403);
     // Global sound settings: validated, admin-only, audited, readable by players.
     const sounds = Object.fromEntries(
       SOUND_EVENT_IDS.map((k) => [k, { preset: "pop", volume: 1, enabled: true }]),

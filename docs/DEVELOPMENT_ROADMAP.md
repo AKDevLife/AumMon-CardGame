@@ -166,7 +166,7 @@ Owner brief: shedding-type card game for 2–8 players with the 16 Everyday Obje
 - [x] **12.13** Quality 9–10 audit: 8 docs (audit, design upgrade, rule simplification, card balance review, player experience, tutorial design, playtest protocol, quality report) + simulation metrics and balance proposals — deps: 12.12 — PR #96 (2026-11-22)
 - [x] **12.14** Ruleset "9" (owner approved Q1–Q4): Key 6, Umbrella 7, Trash no redraw, Flashlight 3 s; engine 3.0.0; Q2 simulation (B4B / B6B) — deps: 12.13 — PR #97 (2026-11-22)
 - [x] **12.15** UI for quality (Q3): interactive tutorial (`/tutorial`, 7 steps, local engine), 4-line rules, short card text, Glue "1–3" text, Hourglass hint, "เหลือ 1 ใบ!" badge — deps: 12.14 — PR #98 (2026-11-22)
-- [ ] **12.16** Playtest telemetry (Q3): private round/action stats + admin summary — deps: 12.14
+- [x] **12.16** Playtest telemetry (Q3): `private.round_stats` (duration, turns, timeouts, decision time, drawn plays, abilities, opening card ids, winner, rematch, leavers) + admin "สถิติเล่นทดสอบ" — deps: 12.14 — PR #99 (2026-11-22)
 - [!] **12.17** Decide B4B Magnifier / B6B Box (simulated, `docs/discard/AumMon_Game_Design_Upgrade.md` §4) — blocked: owner decision — deps: 12.14
 - [ ] **12.7** VIP + cosmetic gacha design doc (no payments until legal check + owner approval) — deps: 12.1
 - [ ] **12.8** Owner playtest on Dev; balance pass — deps: 12.6

@@ -48,7 +48,7 @@ Category score = mean over all players, **plus** the objective checks in §4. A 
 | Balance       | no card with win index > 1.35 or < 0.75 over ≥ 200 human rounds (otherwise use simulation) | —                  |
 | Fun           | early quits (leave before round end)                                                       | ≤ 5 %              |
 
-## 5. Telemetry needed (to build, privacy-safe, no hands stored)
+## 5. Telemetry (built in task 12.16: `private.round_stats`, admin → "สถิติเล่นทดสอบ")
 
 Per round: player count, duration, turns, timeouts, rematch yes/no, leaver yes/no, ruleset. Per action: decision time and command type. Per card: plays with / without ability, and the winner's opening cards (server-side, aggregated). Stored in a private table; an admin page shows the summary.
 

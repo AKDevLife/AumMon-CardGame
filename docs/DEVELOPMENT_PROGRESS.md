@@ -6,7 +6,7 @@
 
 - **Status:** 🎮 Casual Discard Edition (ruleset "7", 2–8 players) is the only game; the 1v1 TCG was removed (code, tables, docs).
 - **Phase:** 12 — engine, backend, UI and cleanup done.
-- **Current task:** 12.16 playtest telemetry → 12.8 playtest
+- **Current task:** 12.8 owner playtest (Playtest Protocol; numbers in admin → สถิติเล่นทดสอบ)
 - **Next:** 12.8 playtest + balance → 12.7 VIP/gacha design doc (build later). Art: 13.2 owner chooses Art Direction (`docs/art-production/`).
 - **Playtest URL (latest `main`):** https://aum-mon-card-game-git-playtest-aum-mon.vercel.app
 - **Dev backend:** Supabase `AumMon-Dev` (ref `yaxtzdhryctfjaspxvix`, ap-northeast-1), email confirmation OFF for playtesting.
@@ -23,9 +23,9 @@
 | 6 Online Multiplayer    |       7 |       8 |     88% |
 | 7 Public Launch & Scale |       6 |       8 |     75% |
 | 9 Developer Admin       |      17 |      17 |    100% |
-| 12 Discard Edition      |      13 |      17 |     76% |
+| 12 Discard Edition      |      14 |      17 |     82% |
 | 13 AI Art Production    |       1 |       9 |     11% |
-| **Overall**             | **100** | **115** | **87%** |
+| **Overall**             | **101** | **115** | **88%** |
 
 ## Completed (summary)
 
