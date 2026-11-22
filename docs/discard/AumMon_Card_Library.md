@@ -21,4 +21,6 @@
 | D15 | นาฬิกาทราย  |   3 | **ย้อนเวลา:** ใช้ความสามารถของไพ่ใบก่อนหน้า (ใบใต้นาฬิกาทราย) ซ้ำอีกครั้ง                      | pile                   | instant         | Redesigned (DC4); no effect if that card has none | yes        |
 | D16 | ร่ม         |   8 | **กางกัน:** ลงสวนนอกเทิร์นได้ เมื่อถูกบังคับจั่วหรือข้ามเทิร์น ยกเลิกผลนั้นกับเรา                      | self                   | instant         | Reaction (DC3); normal 8 on your turn             | yes        |
 
+Character art: card `Dnn` ↔ character `AM0nn` (same number) in `docs/art-production/AumMon_Character_Library.md`; art status in `AumMon_Asset_Catalog.md`.
+
 Data fields for the engine (brief §4.2): id, name, points, category, ability name / text, trigger (on play / reaction), target, effect, duration, restrictions, canActivate, canBeFinalCard, balanceRating — stored as data so new cards need no engine rewrite.

@@ -7,24 +7,25 @@
 - **Status:** 🎮 Casual Discard Edition (ruleset "7", 2–8 players) is the only game; the 1v1 TCG was removed (code, tables, docs).
 - **Phase:** 12 — engine, backend, UI and cleanup done.
 - **Current task:** 12.8 owner playtest on Dev
-- **Next:** 12.8 playtest + balance → 12.7 VIP/gacha design doc (build later).
+- **Next:** 12.8 playtest + balance → 12.7 VIP/gacha design doc (build later). Art: 13.2 owner chooses Art Direction (`docs/art-production/`).
 - **Playtest URL (latest `main`):** https://aum-mon-card-game-git-playtest-aum-mon.vercel.app
 - **Dev backend:** Supabase `AumMon-Dev` (ref `yaxtzdhryctfjaspxvix`, ap-northeast-1), email confirmation OFF for playtesting.
 
 ## Completion
 
-| Phase                   |   Done |  Total |       % |
-| ----------------------- | -----: | -----: | ------: |
-| 1 Project Foundation    |     16 |     16 |    100% |
-| 2 Auth & Database       |     10 |     10 |    100% |
-| 3 Pure Game Engine      |     13 |     13 |    100% |
-| 4 Solo Vertical Slice   |     12 |     12 |    100% |
-| 5 Pass & Play           |      5 |      5 |    100% |
-| 6 Online Multiplayer    |      7 |      8 |     88% |
-| 7 Public Launch & Scale |      6 |      8 |     75% |
-| 9 Developer Admin       |     17 |     17 |    100% |
-| 12 Discard Edition      |      6 |      8 |     75% |
-| **Overall**             | **92** | **97** | **95%** |
+| Phase                   |   Done |   Total |       % |
+| ----------------------- | -----: | ------: | ------: |
+| 1 Project Foundation    |     16 |      16 |    100% |
+| 2 Auth & Database       |     10 |      10 |    100% |
+| 3 Pure Game Engine      |     13 |      13 |    100% |
+| 4 Solo Vertical Slice   |     12 |      12 |    100% |
+| 5 Pass & Play           |      5 |       5 |    100% |
+| 6 Online Multiplayer    |      7 |       8 |     88% |
+| 7 Public Launch & Scale |      6 |       8 |     75% |
+| 9 Developer Admin       |     17 |      17 |    100% |
+| 12 Discard Edition      |      6 |       8 |     75% |
+| 13 AI Art Production    |      1 |       9 |     11% |
+| **Overall**             | **93** | **106** | **88%** |
 
 ## Completed (summary)
 
