@@ -2,6 +2,11 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-22 — 12.9 Gameplay screen redesign (mobile)
+
+- `GamePage.tsx` + new `TableParts.tsx` (header, opponents, center table, win overlay), `CardView.tsx` (points colors, sizes sm/md/lg, playable/selected/disabled states), `labels.ts` `bannerFor`, `index.css` gameplay tokens + animations (reduced-motion safe). Opponents fit 1–7 in max 2 rows; table shows rule/effect chips and last action; tapping any card opens an enlarged preview (play controls only when playable, otherwise the reason); draw button moves to the thumb zone and becomes the main action when nothing is playable; banners for skips / effects on you / your turn; landing, deal, turn-glow and win animations. UI only — no rule, engine or backend change.
+- E2E helper picks playable cards by `data-playable`. Docs: `docs/color_design_system.md` §4–§5.
+
 ## 2026-11-22 — 13.1 AI Art Production Pipeline
 
 - `docs/art-production/`: Art Direction (3 directions, recommends A "Candy Vinyl Sticker" — pending owner), Style Bible v0.1 draft with copy-paste Style Block, Character Library (AM001–AM016 ↔ cards D01–D16, proposals), AI Prompt Library (IMG-* image prompts vs CL-* Claude prompts), Art QA Guidelines, Workflow (Thai owner steps, task cards, revision loop, integration path), Asset Catalog + tracker (ID / naming / status conventions), Handoff. Folders `art-production/` and `public/assets/`. New `docs/AumMon_Master_Handoff.md`; Phase 13 in the roadmap. No images produced (no image tool in this environment).

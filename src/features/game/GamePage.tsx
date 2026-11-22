@@ -1,7 +1,7 @@
 import { discard } from "@aummon/game-engine";
 import { REALTIME_SUBSCRIBE_STATES } from "@supabase/supabase-js";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { StickerButton } from "../../components/StickerButton.tsx";
 import { ApiError, callFunction } from "../../lib/api.ts";
 import { useAuth } from "../auth/auth-context.ts";
@@ -9,10 +9,10 @@ import { HandoffScreen } from "../passplay/HandoffScreen.tsx";
 import { AudioSettings } from "./AudioSettings.tsx";
 import { CardGallery } from "./CardGallery.tsx";
 import { CardView } from "./CardView.tsx";
-import { CardBack, DeckPile } from "./GameIcons.tsx";
-import { cardName, historyLines } from "./labels.ts";
+import { bannerFor, cardName, historyLines } from "./labels.ts";
 import { Popup } from "./Popup.tsx";
 import { RulesText } from "./RulesText.tsx";
+import { CenterTable, GameHeader, Opponents, WinOverlay } from "./TableParts.tsx";
 import { normalizeSoundConfig, playSound, setSoundConfig, soundFor } from "./sound.ts";
 import type { GameResponse } from "./types.ts";
 
@@ -75,6 +75,11 @@ export function GamePage() {
   const [popup, setPopup] = useState<"rules" | "cards" | "settings" | "history" | "leave" | null>(
     null,
   );
+  const [inspect, setInspect] = useState<{ card: { id: string; cardId: string } } | null>(null);
+  const [landKey, setLandKey] = useState(0);
+  const [banner, setBanner] = useState<{ text: string; key: number } | null>(null);
+  const [dealt, setDealt] = useState<Set<string>>(() => new Set());
+  const known = useRef<Set<string> | null>(null);
   const [peek, setPeek] = useState<{ target: number; cards: string[] } | null>(null);
   const [reveal, setReveal] = useState<string[][] | null>(null);
   const lastEvent = useRef<string | null>(null);
@@ -145,7 +150,7 @@ export function GamePage() {
       });
   }, [client]);
 
-  // Sounds, Flashlight reveals and Magnifier peeks for events since the last response.
+  // Sounds, Flashlight reveals, Magnifier peeks, landing animation and banners for new events.
   useEffect(() => {
     if (!data) return;
     const keys = data.events.map((e) => JSON.stringify(e));
@@ -160,11 +165,14 @@ export function GamePage() {
         }, i * 180);
       });
       const shown = [...fresh].reverse().find((e) => e.type === "reveal_all");
-      if (shown?.type === "reveal_all")
-        setTimeout(() => {
-          setReveal(shown.hands);
-        }, 0);
       const became = data.view.acting === data.seat && data.seat !== null;
+      const text = bannerFor(fresh, data.seat, data.names, became);
+      setTimeout(() => {
+        if (shown?.type === "reveal_all") setReveal(shown.hands);
+        if (fresh.some((e) => e.type === "played" || e.type === "pile_reset"))
+          setLandKey((k) => k + 1);
+        if (text) setBanner({ text, key: Date.now() });
+      }, 0);
       if (
         became &&
         fresh.some((e) => e.type === "game_started" || e.type === "passed" || e.type === "played")
@@ -178,6 +186,29 @@ export function GamePage() {
         setPeek(mine);
       }, 0);
   }, [data]);
+
+  // Banners disappear by themselves.
+  useEffect(() => {
+    if (!banner) return;
+    const id = setTimeout(() => {
+      setBanner(null);
+    }, 1800);
+    return () => {
+      clearTimeout(id);
+    };
+  }, [banner]);
+
+  // Cards that arrived since the last view get a short deal animation.
+  const handIds = (data?.view.myHand ?? []).map((c) => c.id).join(",");
+  useEffect(() => {
+    const ids = handIds ? handIds.split(",") : [];
+    const prev = known.current;
+    const fresh = prev ? ids.filter((id) => !prev.has(id)) : [];
+    known.current = new Set(ids);
+    setTimeout(() => {
+      setDealt(new Set(fresh));
+    }, 0);
+  }, [handIds]);
 
   // Flashlight shows every hand for 5 seconds.
   useEffect(() => {
@@ -233,6 +264,7 @@ export function GamePage() {
       });
       setData(next);
       setPlan(null);
+      setInspect(null);
       idem.current = null;
       setError(null);
     } catch (e) {
@@ -285,120 +317,58 @@ export function GamePage() {
     );
   };
 
-  const status = finished
+  const me = data.seat;
+  const isBot = (i: number) => /^bot\b|^🤖/i.test(name(i));
+  const seats = view.players.map((_, i) => i).filter((i) => i !== me);
+  const turnLabel = finished
     ? `จบเกม — ${name(view.winner ?? 0)} ชนะ!`
     : view.reaction
-      ? `${name(view.reaction.target)} กำลังตัดสินใจใช้ร่ม…`
-      : data.botActing
-        ? `🤖 ${name(view.acting ?? 0)} กำลังเล่น…`
-        : `เทิร์นของ ${name(view.current)}`;
+      ? `☂️ ${name(view.reaction.target)} ตัดสินใจใช้ร่ม…`
+      : view.acting !== null && view.acting === me
+        ? "ตาคุณ!"
+        : `ตาของ ${name(view.acting ?? view.current)}`;
+  const lastAction = historyLines(data.events, data.names)[0] ?? null;
+  const hand = [...view.myHand].sort(
+    (a, b) => discard.getDiscardCard(a.cardId).points - discard.getDiscardCard(b.cardId).points,
+  );
+  const playableCount = view.playable.length;
+  const preview = plan ?? inspect;
+  const previewOk = preview !== null && myTurn && view.playable.includes(preview.card.id);
+  const why = (cardId: string): string => {
+    if (finished) return "เกมจบแล้ว";
+    if (!myTurn) return "ยังไม่ถึงตาคุณ — อ่านความสามารถไว้ก่อนได้";
+    const pts = discard.getDiscardCard(cardId).points;
+    if (view.ruler?.seat === me) return "ไม้บรรทัด: ต้องลงแต้ม 5 เท่านั้น (หรือยางลบ)";
+    if (view.glue === me && pts < 4) return "ติดกาว: เทิร์นนี้ลงแต้มต่ำกว่า 4 ไม่ได้";
+    return top
+      ? `ต้องลงแต้มตั้งแต่ ${String(discard.getDiscardCard(top).points)} ขึ้นไป (หรือยางลบ)`
+      : "ลงไพ่ใบนี้ไม่ได้ตอนนี้";
+  };
+  const hint = finished
+    ? null
+    : !myTurn
+      ? view.canReact
+        ? "☂️ เลือกว่าจะใช้ร่มไหม"
+        : `รอ ${name(view.acting ?? view.current)}…`
+      : playableCount > 0
+        ? `ตาคุณ! แตะไพ่ขอบเขียวเพื่อลง (ลงได้ ${String(playableCount)} ใบ)`
+        : "ไม่มีไพ่ที่ลงได้ — จั่ว 1 ใบแล้วผ่านเทิร์น";
 
   return (
     <section
       aria-label="กระดานเกม"
-      className="fixed inset-0 z-20 flex flex-col bg-am-bg pb-[env(safe-area-inset-bottom)] pt-[env(safe-area-inset-top)]"
+      className="fixed inset-0 z-20 flex h-[100dvh] flex-col overflow-hidden bg-am-field pt-[env(safe-area-inset-top)]"
     >
-      <div className="flex shrink-0 items-center gap-2 border-b-[3px] border-am-ink bg-am-card px-3 py-2">
-        <span className="min-w-0 flex-1 truncate text-sm font-semibold">
-          {status}
-          {seconds !== null && !finished && ` · ⏱ ${String(seconds)}s`}
-        </span>
-        <button
-          type="button"
-          aria-label="กติกา"
-          onClick={() => {
-            setPopup("rules");
-          }}
-          className="am-sticker am-pressable h-11 w-11 !rounded-xl bg-am-deco-purple text-lg"
-        >
-          📖
-        </button>
-        <button
-          type="button"
-          aria-label="การ์ดทั้งหมด"
-          onClick={() => {
-            setPopup("cards");
-          }}
-          className="am-sticker am-pressable h-11 w-11 !rounded-xl bg-am-deco-purple text-lg"
-        >
-          🗂️
-        </button>
-        <button
-          type="button"
-          aria-label="ตั้งค่า"
-          onClick={() => {
-            setPopup("settings");
-          }}
-          className="am-sticker am-pressable h-11 w-11 !rounded-xl bg-am-deco-purple text-lg"
-        >
-          ⚙️
-        </button>
-      </div>
+      <GameHeader
+        turnLabel={turnLabel}
+        mine={myTurn}
+        seconds={finished ? null : seconds}
+        direction={view.direction}
+        onOpen={setPopup}
+      />
 
-      <div
-        role="region"
-        aria-label="โต๊ะ"
-        tabIndex={0}
-        className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto bg-am-field p-3"
-      >
-        <ul aria-label="ผู้เล่น" className="flex flex-wrap justify-center gap-2">
-          {view.players.map((p, i) => (
-            <li
-              key={p.playerId}
-              className={`am-sticker flex items-center gap-1.5 px-2 py-1 text-sm ${i === view.current && !finished ? "bg-am-title" : i === data.seat ? "bg-am-player" : "bg-am-opponent"}`}
-            >
-              <span className="max-w-24 truncate font-display font-bold">
-                {name(i)}
-                {i === data.seat ? " (คุณ)" : ""}
-              </span>
-              <CardBack small />
-              <span
-                aria-label={`ไพ่ในมือ ${String(p.handCount)} ใบ`}
-                className="font-display font-bold"
-              >
-                {p.handCount}
-              </span>
-              {view.glue === i && <span title="ติดกาว: ลงแต้มต่ำกว่า 4 ไม่ได้">🧴</span>}
-              {view.ruler?.seat === i && <span title="ต้องลงแต้ม 5">📏</span>}
-            </li>
-          ))}
-        </ul>
-
-        <div className="flex flex-1 items-center justify-center gap-4">
-          <div className="flex flex-col items-center gap-1">
-            <DeckPile count={view.drawCount} />
-            <span className="text-xs font-bold">กองจั่ว</span>
-          </div>
-          <div className="flex flex-col items-center gap-1">
-            {top ? <CardView cardId={top} compact /> : <span className="text-am-muted">ว่าง</span>}
-            <span className="text-xs font-semibold">
-              {view.open ? "เริ่มกองใหม่ — ลงแต้มไหนก็ได้" : "กองกลาง"} ·{" "}
-              {view.direction === 1 ? "↻" : "↺"}
-            </span>
-          </div>
-        </div>
-
-        {finished && (
-          <div role="status" className="am-sticker bg-am-title p-3 text-center">
-            <h1 className="font-display text-2xl font-bold">
-              {view.winner === data.seat && data.mode !== "pass_play"
-                ? "คุณชนะ! 🎉"
-                : `${name(view.winner ?? 0)} ชนะ`}
-            </h1>
-            <Link to="/" className="mt-1 inline-block font-semibold text-am-accent underline">
-              กลับหน้าหลัก
-            </Link>
-          </div>
-        )}
-        {error && (
-          <p
-            role="alert"
-            className="rounded-lg border-l-4 border-am-red bg-am-error-bg px-2 py-1 font-semibold text-am-danger-text"
-          >
-            {error}
-          </p>
-        )}
-        {handoff && (
+      {handoff ? (
+        <div className="flex min-h-0 flex-1 flex-col justify-center overflow-y-auto p-3">
           <HandoffScreen
             name={name(view.acting)}
             pending={pending}
@@ -409,69 +379,166 @@ export function GamePage() {
               });
             }}
           />
-        )}
-      </div>
-
-      {!handoff && (
-        <div className="shrink-0 rounded-t-3xl border-t-[3px] border-am-ink bg-am-brand p-2 pb-3">
-          <div className="mb-2 flex items-center justify-between px-1 text-am-inverse">
-            <span className="text-xs font-semibold">ไพ่ในมือ {view.myHand.length} ใบ</span>
-            {myTurn && (
-              <button
-                type="button"
-                disabled={pending}
-                onClick={() => void send({ type: "draw" })}
-                className="am-sticker am-pressable min-h-10 !rounded-full bg-am-green px-4 font-display text-sm font-bold text-am-success-text"
+        </div>
+      ) : (
+        <>
+          <Opponents
+            view={view}
+            seats={seats}
+            name={name}
+            isBot={isBot}
+            thinking={data.botActing}
+          />
+          <div
+            role="region"
+            aria-label="โต๊ะ"
+            tabIndex={0}
+            className="relative flex min-h-0 flex-1 flex-col overflow-y-auto"
+          >
+            <CenterTable
+              view={view}
+              name={name}
+              landKey={landKey}
+              lastAction={lastAction}
+              dense={seats.length > 4}
+            />
+            {banner && (
+              <p
+                key={banner.key}
+                role="status"
+                className="am-banner am-sticker absolute inset-x-6 top-2 z-10 mx-auto max-w-xs bg-am-title px-3 py-2 text-center font-display text-lg font-bold"
               >
-                จั่วแล้วผ่าน
-              </button>
+                {banner.text}
+              </p>
+            )}
+            {error && (
+              <p
+                role="alert"
+                className="mx-3 mb-2 rounded-lg border-l-4 border-am-red bg-am-error-bg px-2 py-1 font-semibold text-am-danger-text"
+              >
+                {error}
+              </p>
             )}
           </div>
-          <div role="group" aria-label="Hand" className="flex gap-2 overflow-x-auto pb-1">
-            {[...view.myHand]
-              .sort(
-                (a, b) =>
-                  discard.getDiscardCard(a.cardId).points - discard.getDiscardCard(b.cardId).points,
-              )
-              .map((c) => {
-                const ok = view.playable.includes(c.id);
+
+          <div className="shrink-0 rounded-t-[1.75rem] border-t-[3px] border-am-ink bg-am-brand pb-[max(0.5rem,env(safe-area-inset-bottom))] text-am-inverse">
+            <div className="flex items-center gap-2 px-3 pt-2">
+              <span
+                className={`grid h-7 min-w-7 place-items-center rounded-full border-2 border-am-ink px-1 font-display text-sm font-bold text-am-text ${myTurn ? "am-active bg-am-title" : "bg-am-card"}`}
+                aria-label={`ไพ่ในมือ ${String(view.myHand.length)} ใบ`}
+              >
+                {view.myHand.length}
+              </span>
+              <span className="min-w-0 flex-1 text-[13px] font-semibold leading-tight">
+                {me !== null && data.mode === "pass_play" ? `${name(me)} · ` : ""}
+                {hint ?? `ไพ่ในมือ ${String(view.myHand.length)} ใบ`}
+              </span>
+              {myTurn && playableCount > 0 && (
+                <button
+                  type="button"
+                  disabled={pending}
+                  onClick={() => void send({ type: "draw" })}
+                  className="am-sticker am-pressable min-h-10 shrink-0 !rounded-full bg-am-card px-3 font-display text-sm font-bold text-am-text disabled:opacity-60"
+                >
+                  จั่วแล้วผ่าน
+                </button>
+              )}
+            </div>
+            <div
+              role="group"
+              aria-label="Hand"
+              className="am-no-scrollbar flex snap-x gap-2 overflow-x-auto scroll-px-3 px-3 pb-2 pt-3.5"
+            >
+              {hand.length === 0 && (
+                <p className="py-6 text-center text-sm opacity-80">ไม่มีไพ่ในมือ</p>
+              )}
+              {hand.map((c) => {
+                const ok = myTurn && view.playable.includes(c.id);
                 return (
-                  <CardView
-                    key={c.id}
-                    cardId={c.cardId}
-                    dimmed={!ok}
-                    {...(ok && {
-                      onSelect: () => {
-                        setPlan({ card: c, useAbility: true, pair: [] });
-                      },
-                    })}
-                  />
+                  <span key={c.id} className={`snap-start ${dealt.has(c.id) ? "am-deal" : ""}`}>
+                    <CardView
+                      cardId={c.cardId}
+                      playable={ok}
+                      dimmed={myTurn && !ok}
+                      selected={preview?.card.id === c.id}
+                      onSelect={() => {
+                        if (ok) setPlan({ card: c, useAbility: true, pair: [] });
+                        else setInspect({ card: c });
+                      }}
+                    />
+                  </span>
                 );
               })}
+            </div>
+            {myTurn && playableCount === 0 && (
+              <div className="px-3 pt-1">
+                <button
+                  type="button"
+                  disabled={pending}
+                  onClick={() => void send({ type: "draw" })}
+                  className="am-sticker am-pressable am-active min-h-12 w-full !rounded-full bg-am-green font-display text-lg font-bold text-am-success-text disabled:opacity-60"
+                >
+                  จั่วแล้วผ่าน
+                </button>
+              </div>
+            )}
           </div>
-        </div>
+        </>
+      )}
+
+      {finished && (
+        <WinOverlay
+          title={
+            view.winner === me && data.mode !== "pass_play"
+              ? "คุณชนะ! 🎉"
+              : `${name(view.winner ?? 0)} ชนะ 🏆`
+          }
+        />
       )}
 
       <Popup
-        title={plan ? `ลง ${cardName(plan.card.cardId)}` : "ลงไพ่"}
-        open={plan !== null}
+        title={
+          preview
+            ? previewOk
+              ? `ลง ${cardName(preview.card.cardId)}`
+              : cardName(preview.card.cardId)
+            : "ลงไพ่"
+        }
+        open={preview !== null}
         onClose={() => {
           setPlan(null);
+          setInspect(null);
         }}
       >
+        {preview && !plan && (
+          <div className="flex flex-col items-center gap-3">
+            <CardView cardId={preview.card.cardId} size="lg" />
+            <p className="rounded-xl bg-am-deco-purple px-3 py-2 text-center text-sm font-semibold">
+              {why(preview.card.cardId)}
+            </p>
+          </div>
+        )}
         {plan && planDef && (
-          <div className="flex flex-col gap-2">
-            <CardView cardId={plan.card.cardId} />
+          <div className="flex flex-col gap-3">
+            <div className="flex justify-center">
+              <CardView cardId={plan.card.cardId} size="lg" />
+            </div>
             {planDef.ability !== "umbrella" && (
-              <label className="flex items-center gap-2 font-semibold">
+              <label className="am-sticker flex cursor-pointer items-center gap-3 !rounded-xl bg-am-deco-purple px-3 py-2 font-semibold">
                 <input
                   type="checkbox"
                   checked={plan.useAbility}
                   onChange={(e) => {
                     setPlan({ ...plan, useAbility: e.target.checked });
                   }}
+                  className="h-6 w-6 accent-[var(--color-green)]"
                 />
-                ใช้ความสามารถ “{planDef.abilityName}”
+                <span>
+                  ใช้ความสามารถ “{planDef.abilityName}”
+                  <span className="block text-xs font-normal text-am-muted">
+                    ไม่ติ๊ก = ลงเป็นไพ่แต้มธรรมดา
+                  </span>
+                </span>
               </label>
             )}
             {need === "target" && (
@@ -527,9 +594,18 @@ export function GamePage() {
               <p className="text-xs text-am-muted">เลือกไพ่ที่จะลงเพิ่มได้ 1 ใบ (ไม่เลือกก็ได้)</p>
             )}
             {need === "pair" && <p className="text-xs text-am-muted">เลือกไพ่ 2 ใบที่แต้มเท่ากัน</p>}
-            <StickerButton variant="confirm" disabled={pending || !ready} onClick={submitPlan}>
-              ลงไพ่
-            </StickerButton>
+            <div className="grid grid-cols-[1fr_2fr] gap-2">
+              <StickerButton
+                onClick={() => {
+                  setPlan(null);
+                }}
+              >
+                ยกเลิก
+              </StickerButton>
+              <StickerButton variant="confirm" disabled={pending || !ready} onClick={submitPlan}>
+                ลงไพ่
+              </StickerButton>
+            </div>
           </div>
         )}
       </Popup>
