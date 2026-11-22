@@ -1,4 +1,4 @@
-import type { v5 } from "@aummon/game-engine";
+import type { v6 } from "@aummon/game-engine";
 import { describe, expect, it } from "vitest";
 import {
   CARD_ART,
@@ -37,7 +37,7 @@ describe("ruleset 4 labels", () => {
         { units: [{ instanceId: "s", cardId: "O05" }] },
         { units: [{ instanceId: "t", cardId: "O09" }] },
       ],
-    } as unknown as v5.PlayerView;
+    } as unknown as v6.PlayerView;
     expect(commandLabel({ type: "attack", attackerId: "s", target: "player" }, view)).toBe(
       "⚔️ โจมตีผู้เล่น",
     );

@@ -2,18 +2,18 @@ import { describe, expect, it } from "vitest";
 import { createSeededRandom } from "../src/rng/seeded-random.ts";
 import {
   applyCommand,
-  CARD_DEFINITIONS_V5,
+  CARD_DEFINITIONS_V6,
   chooseBotCommand,
   getLegalCommands,
   getPlayerView,
   initializeMatch,
-  STARTER_DECK_V5,
+  STARTER_DECK_V6,
   validateCardData,
   type Command,
   type LegalCommand,
   type MatchState,
   type Seat,
-} from "../src/rules/v5/index.ts";
+} from "../src/rules/v6/index.ts";
 
 function toCommand(s: MatchState, seat: Seat, legal: LegalCommand): Command {
   const playerId = s.players[seat].playerId;
@@ -32,7 +32,7 @@ function playMatch(seed: number, bots: readonly [boolean, boolean]): MatchState 
   const rng = createSeededRandom([seed, 17, 29, 31]);
   const pick = createSeededRandom([seed, 3, 5, 7]);
   let s = initializeMatch(
-    { playerIds: ["a", "b"], decks: [STARTER_DECK_V5, STARTER_DECK_V5] },
+    { playerIds: ["a", "b"], decks: [STARTER_DECK_V6, STARTER_DECK_V6] },
     rng,
   );
   for (let n = 0; s.status !== "finished"; n++) {
@@ -68,17 +68,17 @@ const winner = (s: MatchState): Seat | "draw" => {
 
 describe("ruleset 3 card data", () => {
   it("24 Objects: 8 Passive-only, 8 Active-only, 8 Dual; 6 per archetype", () => {
-    const kind = (c: (typeof CARD_DEFINITIONS_V5)[number]) =>
+    const kind = (c: (typeof CARD_DEFINITIONS_V6)[number]) =>
       c.passive && c.active ? "dual" : c.passive ? "passive" : "active";
-    const count = (k: string) => CARD_DEFINITIONS_V5.filter((c) => kind(c) === k).length;
-    expect(CARD_DEFINITIONS_V5).toHaveLength(24);
+    const count = (k: string) => CARD_DEFINITIONS_V6.filter((c) => kind(c) === k).length;
+    expect(CARD_DEFINITIONS_V6).toHaveLength(24);
     expect([count("passive"), count("active"), count("dual")]).toEqual([8, 8, 8]);
     for (const a of ["aggro", "defensive", "control", "synergy"])
-      expect(CARD_DEFINITIONS_V5.filter((c) => c.archetype === a)).toHaveLength(6);
+      expect(CARD_DEFINITIONS_V6.filter((c) => c.archetype === a)).toHaveLength(6);
   });
 
   it("validates with no errors and inside the power budget", () => {
-    const r = validateCardData(CARD_DEFINITIONS_V5, STARTER_DECK_V5);
+    const r = validateCardData(CARD_DEFINITIONS_V6, STARTER_DECK_V6);
     expect(r.errors).toEqual([]);
     expect(r.budgetFlags).toEqual([]);
   });

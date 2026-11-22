@@ -1,7 +1,7 @@
 # AumMon
 
 Digital TCG แบบ **1v1** ธีมสิ่งของในชีวิตประจำวัน — Solo vs Server Bot, Pass & Play และ Online
-Server-authoritative · Spec v6.0 Everyday Objects Battle (`ruleset_version = "5"`)
+Server-authoritative · Spec v7.0 Everyday Objects Battle (`ruleset_version = "6"`)
 
 ## เอกสารหลัก
 

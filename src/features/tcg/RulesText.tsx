@@ -1,11 +1,15 @@
 import { KEYWORD_HELP, KEYWORD_LABEL } from "./labels.ts";
 
-/** Short rule summary (aummon_game_spec.md v6.0, ruleset 5 — owner wording 2026-11-21). */
+/** Short rule summary (aummon_game_spec.md v7.0, ruleset 6 — owner wording 2026-11-21). */
 export function RulesText() {
   return (
     <div className="flex flex-col gap-2 text-sm">
       <p>
         <b>เป้าหมาย:</b> ทำให้พลังชีวิตของคู่ต่อสู้ (เริ่ม 20) ลดเหลือ 0
+      </p>
+      <p>
+        <b>เริ่มเกม:</b> สุ่มคนเริ่มก่อน · คนเริ่มก่อนโจมตีไม่ได้ในเทิร์นแรก · คนเริ่มทีหลังได้การ์ดในมือ 6 ใบ (คนเริ่มก่อน 5
+        ใบ) และพลังงาน +1 ในเทิร์นแรกของตัวเอง
       </p>
       <p>
         <b>การ์ด:</b> ทุกใบเป็นสิ่งของมีชีวิต ลงสนามได้ฝั่งละ 3 ตัว ตัวที่ลงใหม่จะหลับ (โจมตีไม่ได้) จนถึงเทิร์นหน้า

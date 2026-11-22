@@ -3,12 +3,12 @@ import {
   applyCommand,
   CommandError,
   initializeMatch,
-  STARTER_DECK_V5,
+  STARTER_DECK_V6,
   type Command,
   type MatchState,
   type Transition,
   type UnitInstance,
-} from "../src/rules/v5/index.ts";
+} from "../src/rules/v6/index.ts";
 
 export const rng = () => createSeededRandom([5, 6, 7, 8]);
 
@@ -27,7 +27,7 @@ export const obj = (instanceId: string, cardId: string, exhausted = false): Unit
 export function board(mine: UnitInstance[], theirs: UnitInstance[]): MatchState {
   const r = rng();
   let s = initializeMatch(
-    { playerIds: ["me", "foe"], decks: [STARTER_DECK_V5, STARTER_DECK_V5] },
+    { playerIds: ["me", "foe"], decks: [STARTER_DECK_V6, STARTER_DECK_V6] },
     r,
   );
   s = applyCommand(s, { type: "mulligan", playerId: "me", instanceIds: [] }, r).state;

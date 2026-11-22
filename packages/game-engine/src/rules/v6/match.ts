@@ -1,6 +1,6 @@
 import type { RandomSource } from "../../rng/seeded-random.ts";
 import { getCardDefinition } from "./cards.ts";
-import { RULESET_V5 } from "./constants.ts";
+import { RULESET_V6 } from "./constants.ts";
 import { unitAtk, unitHp, unitKeywords } from "./stats.ts";
 import {
   cloneState,
@@ -17,7 +17,7 @@ import {
 import type { Active, AutoTarget, Duration, Effect, Trigger, TriggeredPassive } from "./types.ts";
 
 /**
- * Ruleset 4 flow: core rules of spec v5.0 §4 (1v1, SPARK, Ready/Exhausted, combat,
+ * Ruleset 4 flow: core rules of spec v6.0 §4 (1v1, SPARK, Ready/Exhausted, combat,
  * Guard/Flying/Piercing/Haste) + Object abilities (aummon_game_spec.md §5).
  */
 export type CommandErrorCode =
@@ -34,6 +34,7 @@ export type CommandErrorCode =
   | "unit_exhausted"
   | "flying_target"
   | "guard_blocks"
+  | "first_turn_no_attack"
   | "no_active"
   | "active_used"
   | "invalid_target";
@@ -123,8 +124,8 @@ function buildDeck(seat: Seat, list: Readonly<Record<string, number>>): CardInst
     getCardDefinition(cardId);
     for (let i = 0; i < copies; i++) cards.push({ instanceId: `p${seat}-${cards.length}`, cardId });
   }
-  if (cards.length !== RULESET_V5.deckSize)
-    throw new Error(`deck must have ${RULESET_V5.deckSize} cards`);
+  if (cards.length !== RULESET_V6.deckSize)
+    throw new Error(`deck must have ${RULESET_V6.deckSize} cards`);
   return cards;
 }
 
@@ -134,10 +135,10 @@ export function initializeMatch(input: MatchInput, rng: RandomSource): MatchStat
     const deck = shuffle(buildDeck(seat, input.decks[seat]), rng);
     return {
       playerId: input.playerIds[seat],
-      hp: RULESET_V5.playerHp,
+      hp: RULESET_V6.playerHp,
       spark: 0,
       maxSpark: 0,
-      hand: deck.splice(0, RULESET_V5.initialHand),
+      hand: deck.splice(0, RULESET_V6.initialHand),
       deck,
       units: [],
       discard: [],
@@ -146,8 +147,12 @@ export function initializeMatch(input: MatchInput, rng: RandomSource): MatchStat
     };
   }) as [PlayerState, PlayerState];
   const firstSeat: Seat = rng.nextInt(2) === 0 ? 0 : 1;
+  // Second-player compensation (owner 2026-11-22): one extra card in the opening hand.
+  const second = players[firstSeat === 0 ? 1 : 0];
+  const extra = second.deck.shift();
+  if (extra) second.hand.push(extra);
   return {
-    rulesetVersion: "5",
+    rulesetVersion: "6",
     status: "mulligan",
     firstSeat,
     activeSeat: firstSeat,
@@ -178,7 +183,7 @@ const someoneDead = (s: MatchState) => s.players.some((p) => p.hp <= 0);
 
 function addToHand(ctx: Ctx, seat: Seat, card: CardInstance): boolean {
   const p = ctx.state.players[seat];
-  if (p.hand.length >= RULESET_V5.maxHand) {
+  if (p.hand.length >= RULESET_V6.maxHand) {
     p.discard.push(card);
     ctx.events.push({
       type: "card_burned",
@@ -294,7 +299,7 @@ function applyEffect(
   targets: readonly Target[],
 ): void {
   ctx.resolved += 1;
-  if (ctx.resolved > RULESET_V5.maxEffectsPerCommand)
+  if (ctx.resolved > RULESET_V6.maxEffectsPerCommand)
     throw new Error("effect limit exceeded (loop protection)");
   const { state, events } = ctx;
   const log = (target: EffectTarget, amount: number) => {
@@ -328,7 +333,7 @@ function applyEffect(
     if ("player" in t) {
       const p = state.players[t.player];
       if (effect.type === "damage") p.hp -= effect.amount;
-      else if (effect.type === "heal") p.hp = Math.min(RULESET_V5.playerHp, p.hp + effect.amount);
+      else if (effect.type === "heal") p.hp = Math.min(RULESET_V6.playerHp, p.hp + effect.amount);
       else continue;
       log({ player: t.player }, effect.amount);
       continue;
@@ -474,8 +479,10 @@ function startTurn(ctx: Ctx, seat: Seat): void {
   expire(state, seat === 0 ? "start_of_0" : "start_of_1");
   const p = state.players[seat];
   for (const u of p.units) u.exhausted = false;
-  p.maxSpark = Math.min(RULESET_V5.maxSpark, p.maxSpark + 1);
+  p.maxSpark = Math.min(RULESET_V6.maxSpark, p.maxSpark + 1);
   p.spark = p.maxSpark;
+  // Second-player compensation: +1 SPARK on their first turn only (turn 2 of the game).
+  if (state.turn === 2) p.spark += 1;
   ctx.events.push({ type: "turn_started", seat, turn: state.turn, spark: p.spark });
   if (state.turn > 1) draw(ctx, seat);
   for (const u of p.units) enqueue(ctx, seat, u, "on_turn_start");
@@ -504,7 +511,7 @@ function summon(ctx: Ctx, seat: Seat, instanceId: string): void {
   const card = me.hand.find((c) => c.instanceId === instanceId);
   if (!card) throw new CommandError("card_not_in_hand");
   const def = getCardDefinition(card.cardId);
-  if (me.units.length >= RULESET_V5.maxUnits) throw new CommandError("unit_zone_full");
+  if (me.units.length >= RULESET_V6.maxUnits) throw new CommandError("unit_zone_full");
   if (me.spark < def.cost) throw new CommandError("not_enough_spark");
   me.spark -= def.cost;
   me.hand = me.hand.filter((c) => c !== card);
@@ -623,6 +630,8 @@ function resolveAttack(ctx: Ctx, seat: Seat, attackerId: string, target: string)
   const foe = state.players[foeSeat];
   const attacker = findUnit(me.units, attackerId);
   if (attacker.exhausted) throw new CommandError("unit_exhausted");
+  // The first player cannot attack on the first turn of the game (owner 2026-11-22).
+  if (state.turn === 1) throw new CommandError("first_turn_no_attack");
   const error = canTarget(attacker, foe.units, target);
   if (error) throw new CommandError(error);
 
@@ -680,7 +689,7 @@ export function getLegalCommands(state: MatchState, seat: Seat): LegalCommand[] 
   const foe = state.players[other(seat)];
   const out: LegalCommand[] = [];
   {
-    if (me.units.length < RULESET_V5.maxUnits)
+    if (me.units.length < RULESET_V6.maxUnits)
       for (const c of me.hand)
         if (getCardDefinition(c.cardId).cost <= me.spark)
           out.push({ type: "summon", instanceId: c.instanceId });
@@ -699,7 +708,7 @@ export function getLegalCommands(state: MatchState, seat: Seat): LegalCommand[] 
     }
   }
   for (const u of me.units) {
-    if (u.exhausted) continue;
+    if (u.exhausted || state.turn === 1) continue;
     for (const target of ["player", ...foe.units.map((d) => d.instanceId)])
       if (!canTarget(u, foe.units, target))
         out.push({ type: "attack", attackerId: u.instanceId, target });

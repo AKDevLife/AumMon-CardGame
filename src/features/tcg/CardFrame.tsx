@@ -1,4 +1,4 @@
-import { v5 } from "@aummon/game-engine";
+import { v6 } from "@aummon/game-engine";
 import {
   CARD_ART,
   cardName,
@@ -9,7 +9,7 @@ import {
 } from "./labels.ts";
 
 /** Keyword badge: icon + Thai text + color stripe (never color alone). */
-export function KeywordBadge({ k }: { k: v5.Keyword }) {
+export function KeywordBadge({ k }: { k: v6.Keyword }) {
   const s = KEYWORD_STYLE[k];
   return (
     <abbr
@@ -67,8 +67,8 @@ const Stat = ({
 export interface CardFrameProps {
   cardId: string;
   /** On-board unit (effective stats, exhaustion) and its side (static Passives). */
-  unit?: v5.UnitInstance;
-  side?: readonly v5.UnitInstance[];
+  unit?: v6.UnitInstance;
+  side?: readonly v6.UnitInstance[];
   selected?: boolean;
   /** This unit can be attacked by the selected attacker. */
   validTarget?: boolean;
@@ -93,8 +93,8 @@ export function CardFrame({
   compact,
   onSelect,
 }: CardFrameProps) {
-  const def = v5.getCardDefinition(cardId);
-  const keywords = unit ? [...v5.unitKeywords(unit)] : def.keywords;
+  const def = v6.getCardDefinition(cardId);
+  const keywords = unit ? [...v6.unitKeywords(unit)] : def.keywords;
   const units = unit && !side.includes(unit) ? [...side, unit] : side;
   const ring =
     selected === true || marked === true
@@ -135,7 +135,7 @@ export function CardFrame({
           <Stat
             icon="⚔️"
             label="พลังโจมตี"
-            value={String(unit ? v5.unitAtk(units, unit) : def.atk)}
+            value={String(unit ? v6.unitAtk(units, unit) : def.atk)}
             color="var(--color-atk)"
           />
           <Stat
@@ -143,7 +143,7 @@ export function CardFrame({
             label="พลังชีวิต"
             value={
               unit
-                ? `${String(v5.unitHp(units, unit))}/${String(v5.unitMaxHp(units, unit))}`
+                ? `${String(v6.unitHp(units, unit))}/${String(v6.unitMaxHp(units, unit))}`
                 : String(def.hp)
             }
             color="var(--color-hp)"
