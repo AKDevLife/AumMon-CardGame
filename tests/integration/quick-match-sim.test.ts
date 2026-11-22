@@ -38,10 +38,10 @@ export interface Config {
 const quick = (n: number) => (n <= 4 ? 5 : 4);
 const h75 = (n: number) => (n <= 4 ? 7 : 5);
 export const CONFIGS: readonly Config[] = [
-  { name: "R12 shipped", hand: h75, drawThenPlay: true, turnTimer: 60, reactionTimer: 5 },
-  { name: "R12 without DTP", hand: h75, drawThenPlay: false, turnTimer: 60, reactionTimer: 5 },
-  { name: "R12 5/4 cards", hand: quick, drawThenPlay: true, turnTimer: 60, reactionTimer: 5 },
-  { name: "R12 20 s timer", hand: h75, drawThenPlay: true, turnTimer: 20, reactionTimer: 5 },
+  { name: "R13 shipped", hand: h75, drawThenPlay: true, turnTimer: 60, reactionTimer: 5 },
+  { name: "R13 without DTP", hand: h75, drawThenPlay: false, turnTimer: 60, reactionTimer: 5 },
+  { name: "R13 5/4 cards", hand: quick, drawThenPlay: true, turnTimer: 60, reactionTimer: 5 },
+  { name: "R13 20 s timer", hand: h75, drawThenPlay: true, turnTimer: 20, reactionTimer: 5 },
 ];
 
 interface GameResult {

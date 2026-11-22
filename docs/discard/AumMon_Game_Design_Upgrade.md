@@ -96,6 +96,8 @@ Nothing in this plan changes the win condition or the turn structure.
 
 ## 6. Glue proposals (owner principle: low-point cards should have stronger abilities)
 
+**Decision: the owner chose G2 → ruleset "13" (task 12.21).** Shipped engine: Glue 0.90–1.02; 8 players 90 % of rounds ≤ 10 min (model).
+
 Ruleset "12" baseline (1,500 rounds per size): กาวน้ำ (3 points) has a win index of 0.77–0.81 — one of the weakest cards.
 
 | ID                   | New กาวน้ำ ability                                                                          | Simulated      | Effect                                                                                       | Pros / cons                                                                                                                              |

@@ -1,6 +1,6 @@
 # AumMon — Game Spec (Casual Discard Edition)
 
-> Version 13.0 · `ruleset_version = "12"` (Quick Match, 7 / 5 cards, 60 s turns, card changes DC14, 2026-11-22) · approved by owner 2026-11-22 (DC1–DC7). Replaces the retired 1v1 TCG (rulesets 1–6).
+> Version 14.0 · `ruleset_version = "13"` (Quick Match, 7 / 5 cards, 60 s turns, card changes DC14–DC15, 2026-11-22) · approved by owner 2026-11-22 (DC1–DC7). Replaces the retired 1v1 TCG (rulesets 1–6).
 > Architecture, database and security: `aummon_project_blueprint.md`.
 
 ## 1. Platform decisions (LOCKED)

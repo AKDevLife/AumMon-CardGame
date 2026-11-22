@@ -35,9 +35,10 @@ function choiceFor(
   const rest = (s.players[me]?.hand ?? []).filter((c) => c.id !== played.id);
   const lowest = [...rest].sort((a, b) => pts(a) - pts(b))[0];
   switch (ability) {
-    case "glue":
     case "flashlight":
       return { target: fewestOpponent(s, me) };
+    case "glue":
+      return lowest ? { target: fewestOpponent(s, me), card: lowest.id } : null;
     case "box": {
       const low = [...rest].filter((c) => pts(c) <= 3).sort((a, b) => pts(a) - pts(b))[0];
       return low ? { card: low.id } : {};

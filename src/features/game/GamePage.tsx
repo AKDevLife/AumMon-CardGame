@@ -17,12 +17,13 @@ import { normalizeSoundConfig, playSound, setSoundConfig, soundFor } from "./sou
 import type { GameResponse } from "./types.ts";
 
 const POLL_MS = 2000;
-type Need = "target" | "targetOptional" | "card" | "optionalCard" | "pair" | null;
+type Need = "target" | "targetCard" | "card" | "optionalCard" | "pair" | null;
 
 /** What the player must choose before using an ability (Card Library). */
 function needOf(ability: discard.AbilityId, underTop: string | null): Need {
   switch (ability) {
     case "glue":
+      return "targetCard";
     case "flashlight":
       return "target";
 
@@ -345,7 +346,8 @@ export function GamePage() {
     plan !== null &&
     (need === null ||
       need === "optionalCard" ||
-      ((need === "target" || need === "targetOptional") && plan.target !== undefined) ||
+      (need === "target" && plan.target !== undefined) ||
+      (need === "targetCard" && plan.target !== undefined && plan.extra !== undefined) ||
       (need === "card" && plan.extra !== undefined) ||
       (need === "pair" && plan.pair.length === 2));
   const submitPlan = () => {
@@ -598,7 +600,7 @@ export function GamePage() {
                 </span>
               </label>
             )}
-            {(need === "target" || need === "targetOptional") && (
+            {(need === "target" || need === "targetCard") && (
               <div role="group" aria-label="เลือกผู้เล่น" className="flex flex-wrap gap-2">
                 {opponents.map((i) => (
                   <StickerButton
@@ -616,7 +618,7 @@ export function GamePage() {
             )}
             {(need === "card" ||
               need === "optionalCard" ||
-              need === "targetOptional" ||
+              need === "targetCard" ||
               need === "pair") && (
               <div role="group" aria-label="เลือกไพ่" className="flex gap-2 overflow-x-auto pb-1">
                 {rest.map((c) => {
@@ -624,7 +626,7 @@ export function GamePage() {
                   const allowed =
                     need === "pair"
                       ? pairOk(c.id)
-                      : need === "optionalCard" || need === "targetOptional"
+                      : need === "optionalCard"
                         ? effective === "box"
                           ? discard.getDiscardCard(c.cardId).points <= discard.BOX_MAX_POINTS
                           : discard.getDiscardCard(c.cardId).points >= planDef.points ||
@@ -652,7 +654,10 @@ export function GamePage() {
                 })}
               </div>
             )}
-            {(need === "optionalCard" || need === "targetOptional") && (
+            {need === "targetCard" && (
+              <p className="text-xs text-am-muted">เลือกผู้เล่น แล้วเลือกไพ่ 1 ใบที่จะส่งไปติดเขา</p>
+            )}
+            {need === "optionalCard" && (
               <p className="text-xs text-am-muted">
                 {effective === "box"
                   ? "เลือกไพ่แต้ม 1–3 ที่จะวางเพิ่มได้ 1 ใบ (ไม่เลือกก็ได้)"
