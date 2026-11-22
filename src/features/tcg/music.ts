@@ -6,7 +6,8 @@ import { audioContext } from "./sound.ts";
  * Notes are scheduled slightly ahead of time so playback stays steady.
  */
 const MUSIC_KEY = "aummon.music";
-const VOLUME = 0.05;
+/** Owner 2026-11-22: louder (was 0.05). */
+const VOLUME = 0.1;
 const BEAT = 0.42; // seconds per beat (~143 BPM, two notes per bar chord)
 
 // Cheerful I–vi–IV–V loop in C major: [bass, chord tones…] per bar, and a melody line.

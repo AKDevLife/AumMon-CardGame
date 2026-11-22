@@ -290,7 +290,7 @@ export function soundFor(e: v6.GameEvent, mySeat: v6.Seat | null): SoundEvent | 
 /**
  * Tap sound for any button on the game screen: `data-sound` picks a special one, else "tap".
  * The sound is chosen in the capture phase (before React re-renders the button, e.g. the
- * drawer's open/close label) and played in the bubble phase unless a drag cancelled the click.
+ * drawer's open/close label) and played in the bubble phase (a drag stops the click first).
  */
 export function installTapSounds(): () => void {
   if (typeof document === "undefined") return () => undefined;
@@ -303,8 +303,10 @@ export function installTapSounds(): () => void {
     const special = el.closest("[data-sound]")?.getAttribute("data-sound");
     chosen = special && special in SOUND_EVENTS ? (special as SoundEvent) : "tap";
   };
-  const fire = (e: MouseEvent): void => {
-    if (chosen && !e.defaultPrevented) playSound(chosen);
+  // Router links call preventDefault() to navigate in-app, so it cannot mean "no sound";
+  // a drag that cancels a click stops propagation instead, so this never runs then.
+  const fire = (): void => {
+    if (chosen) playSound(chosen);
     chosen = null;
   };
   document.addEventListener("click", pick, true);
