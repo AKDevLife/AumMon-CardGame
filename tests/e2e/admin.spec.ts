@@ -10,7 +10,7 @@ test("a normal player cannot use the admin dashboard", async ({ page }) => {
   await page.getByLabel("อีเมล").fill(`na${Date.now()}@test.local`);
   await page.getByLabel("รหัสผ่าน").fill("secret123");
   await page.getByRole("button", { name: "สร้างบัญชี" }).click();
-  await expect(page.getByRole("link", { name: "โปรไฟล์" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Solo vs Bot" })).toBeVisible();
   await page.goto("/admin/players");
   await expect(page.getByRole("alert")).toHaveText("บัญชีนี้ไม่มีสิทธิ์ Admin");
   await expect(page.getByRole("navigation", { name: "Admin sections" })).toHaveCount(0);

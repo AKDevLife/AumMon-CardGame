@@ -5,6 +5,7 @@ import { useAuth } from "../features/auth/auth-context.ts";
 import { CardGallery } from "../features/game/CardGallery.tsx";
 import { Popup } from "../features/game/Popup.tsx";
 import { RulesText } from "../features/game/RulesText.tsx";
+import { GameRulesButton } from "../games/GameRules.tsx";
 import { GAMES } from "../platform/games.ts";
 import { useEnabledGames } from "../platform/useEnabledGames.ts";
 
@@ -142,6 +143,7 @@ export function HomePage() {
                     {enabled.has(g.id) ? "ต้องเข้าสู่ระบบก่อนเล่น" : "เร็ว ๆ นี้"}
                   </p>
                 )}
+                <GameRulesButton gameId={g.id} gameName={g.name} />
               </li>
             );
           })}

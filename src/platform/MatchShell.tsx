@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { Link, useNavigate } from "react-router";
 import { StickerButton } from "../components/StickerButton.tsx";
+import { GameRulesButton } from "../games/GameRules.tsx";
 import type { ClientGame } from "./games.ts";
 import type { MatchResponse } from "./useMatch.ts";
 
@@ -34,10 +35,11 @@ export function MatchShell<V>({
       : null;
   return (
     <section className="flex flex-col gap-4" aria-label={game.name}>
-      <header className="flex items-center justify-between gap-2">
+      <header className="flex flex-wrap items-center justify-between gap-2">
         <h1 className="font-display text-2xl font-bold">
           <span aria-hidden="true">{game.icon}</span> {game.name}
         </h1>
+        <GameRulesButton gameId={game.id} gameName={game.name} />
         <p role="timer" aria-live="off" className="font-display text-lg font-semibold">
           {turn}
           {seconds !== null && ` · ${String(seconds)} วิ`}

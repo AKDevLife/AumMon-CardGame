@@ -2,6 +2,13 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-23 — Settings menu, Dummy/Poker rules, back button (owner)
+
+- Home ⚙️ ตั้งค่า now holds โปรไฟล์ + ออกจากระบบ (removed from the header).
+- 📖 กติกา popup for Dummy and Poker on the home cards and on their tables (`src/games/GameRules.tsx`, from `docs/games/*/…_RULES.md` ruleset "1").
+- ← ย้อนกลับ in the header on every page except home and running tables (they keep ออกจากเกม).
+- Tests: route tests for rules/back; jsdom `<dialog>` stub in test setup; E2E signed-in check uses "Solo vs Bot".
+
 ## 2026-11-23 — Token-efficiency tooling
 
 - `pnpm check:quiet` (failures only), changelog archived to `docs/archive/`, rules trimmed; replies end with a suggested next command.

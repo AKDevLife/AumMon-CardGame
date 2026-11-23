@@ -9,7 +9,7 @@ async function signUp(page: Page) {
   await page.getByLabel("อีเมล").fill(`solo${Date.now()}@test.local`);
   await page.getByLabel("รหัสผ่าน").fill("secret123");
   await page.getByRole("button", { name: "สร้างบัญชี" }).click();
-  await expect(page.getByRole("link", { name: "โปรไฟล์" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Solo vs Bot" })).toBeVisible();
 }
 
 test("sign up → solo vs 2 paced bots → several turns → leave", async ({ page }) => {
