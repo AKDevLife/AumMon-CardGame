@@ -6,7 +6,7 @@
 
 - **Status:** 🎮 AumMon Game Center in progress (Phase 14): EDO Battle (= Casual Discard Edition, ruleset "13") + Dummy + Poker. Plan: `docs/roadmap/GAME_CENTER_ROADMAP.md`.
 - **Phase:** 12 — engine, backend, UI, cleanup and VIP/gacha design (12.7) done.
-- **Current task:** Game Center GC0–GC8 done and on Dev; owner review of Dummy / Poker rules (⚑ items) + playtest; 12.8 EDO playtest still open
+- **Current task:** Game Center GC0–GC8 done and on Dev; Dummy / Poker basic rules approved; owner playtest; 12.8 EDO playtest still open
 - **Next:** 12.8 playtest + balance; VIP/gacha build waits for owner Q1–Q5 + legal check (`docs/discard/AumMon_VIP_Cosmetics_Design.md` §8). Art: 13.2 owner chooses Art Direction (`docs/art-production/`).
 - **Playtest URL (latest `main`):** https://aum-mon-card-game-git-playtest-aum-mon.vercel.app
 - **Dev backend:** Supabase `AumMon-Dev` (ref `yaxtzdhryctfjaspxvix`, ap-northeast-1), email confirmation OFF for playtesting.
@@ -46,13 +46,12 @@ None
 
 ## Waiting for the owner
 
-| Task      | Needs                                                                                                                                 |
-| --------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| 14.3/14.5 | Review Dummy ⚑ rules (`docs/games/dummy/DUMMY_RULES.md`) and Poker defaults (`docs/games/poker/POKER_RULES.md`); playtest both on Dev |
-| GC7.3     | Decide whether to add scoped admin roles (who gets them)                                                                              |
-| 12.8      | Playtest Quick Match on Dev; choose best-of-3 for 2–3 players (yes / no)                                                              |
-| 12.7      | VIP/gacha Q1–Q5 + legal check (`AumMon_VIP_Cosmetics_Design.md` §8)                                                                   |
-| 13.2      | Choose the Art Direction (`docs/art-production/AumMon_Art_Direction.md`)                                                              |
+| Task  | Needs                                                                    |
+| ----- | ------------------------------------------------------------------------ |
+| GC7.3 | Decide whether to add scoped admin roles (who gets them)                 |
+| 12.8  | Playtest Quick Match on Dev (best-of-3: no — owner 2026-11-23)           |
+| 12.7  | VIP/gacha Q1–Q5 + legal check (`AumMon_VIP_Cosmetics_Design.md` §8)      |
+| 13.2  | Choose the Art Direction (`docs/art-production/AumMon_Art_Direction.md`) |
 
 ## Deferred (production — owner decision)
 

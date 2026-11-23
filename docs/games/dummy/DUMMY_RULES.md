@@ -1,6 +1,6 @@
 # Dummy (ดัมมี่) — Rules (ruleset "1")
 
-> Status: implemented in `packages/game-engine/src/dummy/` (GC3). Built from common Thai Dummy rules with simple choices for a first version. **Owner review items** are marked ⚑ — changing one means a new ruleset version.
+> Status: implemented in `packages/game-engine/src/dummy/` (GC3). Built from common Thai Dummy rules with simple choices for a first version. Items marked ⚑ were reviewed: the owner approved these basic defaults on 2026-11-23 ("use basic rules for now"); changing one means a new ruleset version.
 
 ## 1. Setup
 

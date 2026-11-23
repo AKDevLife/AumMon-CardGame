@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Link, NavLink, useLocation } from "react-router";
 import { AudioSettings } from "../game/AudioSettings.tsx";
 import { Popup } from "../game/Popup.tsx";
+import { BackButton } from "../../components/BackButton.tsx";
+import { isTablePath } from "../../components/table-path.ts";
 import { useAuth } from "./auth-context.ts";
 
 const navClass = ({ isActive }: { isActive: boolean }) =>
@@ -39,11 +41,11 @@ function AccountActions({ onDone }: { onDone: () => void }) {
   );
 }
 
-/** Settings on the home page header: sound / music + profile and sign out (tables have their own). */
+/** Header settings (every page except running tables, which have their own): sound, home, profile, sign out. */
 function SettingsButton() {
   const { pathname } = useLocation();
   const [open, setOpen] = useState(false);
-  if (pathname !== "/") return null;
+  if (isTablePath(pathname)) return null;
   const close = () => {
     setOpen(false);
   };
@@ -60,6 +62,9 @@ function SettingsButton() {
       </button>
       <Popup title="ตั้งค่า" open={open} onClose={close}>
         <AudioSettings />
+        <Link to="/" onClick={close} className={`${menuItem} mt-2`}>
+          <span aria-hidden="true">🏠</span> หน้าหลัก
+        </Link>
         <AccountActions onDone={close} />
       </Popup>
     </>
@@ -71,6 +76,7 @@ export function AccountNav() {
   const signedIn = auth.mode === "live" && auth.session !== null;
   return (
     <nav aria-label="Account" className="flex flex-wrap items-center justify-end gap-2">
+      <BackButton />
       <SettingsButton />
       {!signedIn && (
         <>
