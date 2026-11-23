@@ -94,13 +94,12 @@ export function GameRulesButton({ gameId, gameName }: { gameId: GameId; gameName
     <>
       <button
         type="button"
-        aria-label={`กติกา${gameName}`}
         onClick={() => {
           setOpen(true);
         }}
         className="am-pressable flex min-h-11 items-center justify-center gap-1 rounded-full border-[3px] border-am-ink bg-am-deco-purple px-4 font-display font-semibold"
       >
-        <span aria-hidden="true">📖</span> กติกา
+        <span aria-hidden="true">📖</span> กติกา<span className="sr-only"> {gameName}</span>
       </button>
       <Popup
         title={`กติกา${gameName}`}

@@ -42,7 +42,7 @@ describe("app routes", () => {
       ["ดัมมี่", /สเปโต/],
       ["โป๊กเกอร์", /ไม่ใช่เงินจริง/],
     ] as const) {
-      fireEvent.click(screen.getByRole("button", { name: `กติกา${name}` }));
+      fireEvent.click(screen.getByRole("button", { name: new RegExp(`กติกา\\s*${name}`) }));
       const dialog = await screen.findByRole("dialog", { name: `กติกา${name}` });
       expect(within(dialog).getByText(text)).toBeInTheDocument();
     }
