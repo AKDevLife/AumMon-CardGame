@@ -16,7 +16,10 @@ describe("app routes", () => {
   it("home shows title, ruleset and disabled modes", () => {
     renderAt("/");
     expect(screen.getByRole("heading", { level: 1, name: "AumMon" })).toBeInTheDocument();
-    expect(screen.getByText("Discard Edition · 2–8 คน")).toBeInTheDocument();
+    expect(screen.getByText("Game Center")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 2, name: /EDO Battle/ })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 3, name: /ดัมมี่/ })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 3, name: /โป๊กเกอร์/ })).toBeInTheDocument();
     for (const name of ["Solo vs Bot", "Online"]) {
       expect(screen.getByRole("button", { name })).toBeDisabled();
     }

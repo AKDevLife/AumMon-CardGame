@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
+import { discard } from "@aummon/game-engine";
 import { StickerButton } from "../../components/StickerButton.tsx";
 import { ApiError, callFunction } from "../../lib/api.ts";
 import { useAuth } from "../auth/auth-context.ts";
@@ -44,6 +45,7 @@ export function SoloSetupPage() {
   return (
     <section className="flex flex-col gap-5">
       <h1 className="font-display text-3xl font-bold">Solo vs Bot</h1>
+      <p className="-mt-4 font-semibold text-am-muted">EDO Battle</p>
       <div className="am-sticker flex flex-col gap-2 bg-am-card p-4">
         <p>เล่นกับ Bot — ทิ้งไพ่ในมือให้หมดก่อนเป็นผู้ชนะ</p>
         <label className="flex items-center gap-2 font-semibold">
@@ -63,7 +65,8 @@ export function SoloSetupPage() {
           </select>
         </label>
         <p className="text-sm text-am-muted">
-          เทิร์นละ 45 วินาที · 2–4 คนได้ไพ่คนละ 7 ใบ · 5–8 คนได้คนละ 5 ใบ
+          เทิร์นละ {discard.DISCARD_RULES.turnTimeoutMs / 1000} วินาที · 2–4 คนได้ไพ่คนละ 7 ใบ · 5–8
+          คนได้คนละ 5 ใบ
         </p>
       </div>
       {error && (

@@ -1,6 +1,6 @@
 # AumMon — Game Center Master Architecture
 
-> Status: **PROPOSAL — awaiting owner approval** (Phase 0). Nothing here is implemented. Changing the stack/architecture needs owner approval (CLAUDE.md); this design keeps the approved stack unchanged.
+> Status: **APPROVED 2026-11-23** — implementation in progress (`docs/roadmap/GAME_CENTER_ROADMAP.md`). Deviation from §11: game modules are folders in `packages/game-engine/src` (see GAME_MIGRATION_PLAN owner decisions). Changing the stack/architecture needs owner approval (CLAUDE.md); this design keeps the approved stack unchanged.
 > Inputs: `FULL_TECHNICAL_AUDIT.md`, `REUSABLE_SYSTEM_INVENTORY.md`.
 
 ## 1. Vision

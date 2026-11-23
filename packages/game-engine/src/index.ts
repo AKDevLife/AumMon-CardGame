@@ -13,3 +13,6 @@ export {
   type SeededRandom,
 } from "./rng/seeded-random.ts";
 export * as discard from "./discard/index.ts";
+export * as sdk from "./sdk/index.ts";
+export { edoBattle, parseEdoCommand, type EdoCommand } from "./edo-battle/module.ts";
+export { GAME_MODULES, getGameModule, isGameId } from "./registry.ts";

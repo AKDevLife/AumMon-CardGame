@@ -1,6 +1,6 @@
 # AumMon — Game Center Roadmap
 
-> Status: **PROPOSAL — awaiting owner approval.** Separate from the existing `docs/DEVELOPMENT_ROADMAP.md` (phases 1–13, unchanged). Task IDs here use prefix `GC`.
+> Status: **APPROVED 2026-11-23** (owner authorised GC0–GC8; GC9 stays owner-gated). Phase totals are mirrored in `docs/DEVELOPMENT_ROADMAP.md` Phase 14 for `pnpm progress`.
 > Status markers: `[ ]` not started · `[~]` in progress · `[x]` done (verified) · `[!]` blocked. Complexity S/M/L. Priority P0 (must) / P1 / P2.
 > Every implementation task: `pnpm check` + CI green + EDO regression (unit, backend, E2E, golden replay) green.
 
@@ -9,31 +9,31 @@
 | ID    | Task                                               | Pri | Deps  | Cx  | Acceptance                                                                  | Tests | Status                                 |
 | ----- | -------------------------------------------------- | --- | ----- | --- | --------------------------------------------------------------------------- | ----- | -------------------------------------- |
 | GC0.1 | Technical audit + 7 architecture docs              | P0  | —     | M   | Docs exist, evidence-based                                                  | —     | [x] (2026-11-23; owner review pending) |
-| GC0.2 | Owner decisions G1–G3 + Dummy/Poker rule questions | P0  | GC0.1 | S   | Answers recorded in `docs/discard/AumMon_Rule_Clarification.md` / game docs | —     | [!] owner                              |
+| GC0.2 | Owner decisions G1–G3 + Dummy/Poker rule questions | P0  | GC0.1 | S   | Answers recorded in `docs/discard/AumMon_Rule_Clarification.md` / game docs | —     | [x] G1–G3 approved 2026-11-23          |
 
 ## Phase 1 — Platform Foundation & Game Registry
 
-| ID    | Task                                                                                                 | Pri | Deps  | Cx  | Acceptance                                     | Tests                     | Status |
-| ----- | ---------------------------------------------------------------------------------------------------- | --- | ----- | --- | ---------------------------------------------- | ------------------------- | ------ |
-| GC1.1 | Golden replay + EDO regression baseline                                                              | P0  | GC0.2 | S   | Seeded command script produces stored snapshot | Vitest snapshot           | [ ]    |
-| GC1.2 | `packages/game-sdk` (interfaces, RNG re-export) + architecture tests (purity, no cross-game imports) | P0  | GC1.1 | M   | Package builds; tests fail on forbidden import | Architecture tests        | [ ]    |
-| GC1.3 | Migration M1 `games` + M2 `game_id` on rooms/matches                                                 | P0  | GC1.2 | S   | Existing rows = `edo_battle`; RLS on `games`   | pgTAP                     | [ ]    |
-| GC1.4 | Server game registry + `games-list` function                                                         | P0  | GC1.3 | S   | Returns enabled games only                     | Backend test              | [ ]    |
-| GC1.5 | Client registry + Game Center hub page (EDO only card)                                               | P0  | GC1.4 | M   | Home shows hub; old routes still work          | Vitest + Playwright + axe | [ ]    |
-| GC1.6 | Architecture test: every function calls `requireUser` or is allow-listed                             | P1  | —     | S   | Test fails on a function without auth          | Architecture test         | [ ]    |
+| ID    | Task                                                                                                                           | Pri | Deps  | Cx  | Acceptance                                     | Tests                     | Status            |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------ | --- | ----- | --- | ---------------------------------------------- | ------------------------- | ----------------- |
+| GC1.1 | Golden replay + EDO regression baseline                                                                                        | P0  | GC0.2 | S   | Seeded command script produces stored snapshot | Vitest snapshot           | [~] PR pending CI |
+| GC1.2 | `sdk/` Game Module Interface + generic flow in `packages/game-engine/src` + architecture tests (purity, no cross-game imports) | P0  | GC1.1 | M   | Package builds; tests fail on forbidden import | Architecture tests        | [~] PR pending CI |
+| GC1.3 | Migration M1 `games` + M2 `game_id` on rooms/matches                                                                           | P0  | GC1.2 | S   | Existing rows = `edo_battle`; RLS on `games`   | pgTAP                     | [~] PR pending CI |
+| GC1.4 | Server game registry; clients read `public.games` via RLS (no extra function)                                                  | P0  | GC1.3 | S   | Returns enabled games only                     | Backend test              | [~] PR pending CI |
+| GC1.5 | Client registry + Game Center hub page (EDO only card)                                                                         | P0  | GC1.4 | M   | Home shows hub; old routes still work          | Vitest + Playwright + axe | [~] PR pending CI |
+| GC1.6 | Architecture test: every function calls `requireUser` or is allow-listed                                                       | P1  | —     | S   | Test fails on a function without auth          | Architecture test         | [~] PR pending CI |
 
 ## Phase 2 — EDO Battle Preservation & Integration
 
-| ID    | Task                                                                                      | Pri | Deps         | Cx  | Acceptance                               | Tests                | Status |
-| ----- | ----------------------------------------------------------------------------------------- | --- | ------------ | --- | ---------------------------------------- | -------------------- | ------ |
-| GC2.1 | EDO adapter implementing `GameEngine` (wraps `discard`, no engine edits)                  | P0  | GC1.2        | M   | Adapter passes golden replay             | Unit + golden        | [ ]    |
-| GC2.2 | Extract platform match orchestrator from `_shared/game.ts`; dispatch by `matches.game_id` | P0  | GC2.1, GC1.3 | L   | All backend + E2E tests green, unchanged | Backend, E2E, golden | [ ]    |
-| GC2.3 | Remove hard-coded `'13'` (lobby/game) via registry; M3/M4 per-game CHECKs                 | P0  | GC2.2        | M   | Same behaviour                           | pgTAP + backend      | [ ]    |
-| GC2.4 | Public rename to "EDO Battle" (UI copy only)                                              | P0  | GC0.2        | S   | No identifier changes; copy updated      | Vitest + E2E text    | [ ]    |
-| GC2.5 | Generic GamePage shell selecting table by `game_id`                                       | P1  | GC2.2        | M   | EDO UI unchanged visually                | E2E + axe            | [ ]    |
-| GC2.6 | M6 match results + M8 player stats (backfill EDO)                                         | P1  | GC2.2        | M   | Profile shows per-game played/won        | pgTAP + backend      | [ ]    |
-| GC2.7 | Private `room:{id}` realtime topic (M14)                                                  | P2  | GC1.3        | S   | Lobby uses private channel               | pgTAP + E2E online   | [ ]    |
-| GC2.8 | `match-tick` sweeper for overdue deadlines (verify cost = free)                           | P1  | GC2.2        | M   | Bot/timeouts advance with no client      | Integration          | [ ]    |
+| ID    | Task                                                                                      | Pri | Deps         | Cx  | Acceptance                               | Tests                | Status            |
+| ----- | ----------------------------------------------------------------------------------------- | --- | ------------ | --- | ---------------------------------------- | -------------------- | ----------------- |
+| GC2.1 | EDO adapter implementing `GameEngine` (wraps `discard`, no engine edits)                  | P0  | GC1.2        | M   | Adapter passes golden replay             | Unit + golden        | [~] PR pending CI |
+| GC2.2 | Extract platform match orchestrator from `_shared/game.ts`; dispatch by `matches.game_id` | P0  | GC2.1, GC1.3 | L   | All backend + E2E tests green, unchanged | Backend, E2E, golden | [~] PR pending CI |
+| GC2.3 | Remove hard-coded `'13'` (lobby/game) via registry; M3/M4 per-game CHECKs                 | P0  | GC2.2        | M   | Same behaviour                           | pgTAP + backend      | [~] PR pending CI |
+| GC2.4 | Public rename to "EDO Battle" (UI copy only)                                              | P0  | GC0.2        | S   | No identifier changes; copy updated      | Vitest + E2E text    | [~] PR pending CI |
+| GC2.5 | Generic GamePage shell selecting table by `game_id`                                       | P1  | GC2.2        | M   | EDO UI unchanged visually                | E2E + axe            | [ ]               |
+| GC2.6 | M6 match results + M8 player stats (backfill EDO)                                         | P1  | GC2.2        | M   | Profile shows per-game played/won        | pgTAP + backend      | [ ]               |
+| GC2.7 | Private `room:{id}` realtime topic (M14)                                                  | P2  | GC1.3        | S   | Lobby uses private channel               | pgTAP + E2E online   | [ ]               |
+| GC2.8 | `match-tick` sweeper for overdue deadlines (verify cost = free)                           | P1  | GC2.2        | M   | Bot/timeouts advance with no client      | Integration          | [ ]               |
 
 ## Phase 3 — Dummy Game Engine
 

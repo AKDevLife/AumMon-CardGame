@@ -29,7 +29,11 @@ function mockClient({
       .mockResolvedValue({ data: { session: signUpSession ? {} : null }, error: null }),
     signOut: vi.fn().mockResolvedValue({ error: null }),
   };
-  return { client: { auth } as unknown as SupabaseClient, auth };
+  // Game Center hub reads public.games (enabled games only).
+  const from = () => ({
+    select: () => Promise.resolve({ data: [{ id: "edo_battle" }], error: null }),
+  });
+  return { client: { auth, from } as unknown as SupabaseClient, auth };
 }
 
 function renderAt(path: string, client: SupabaseClient) {

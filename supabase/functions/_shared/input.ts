@@ -56,3 +56,12 @@ export function rejectServerFields(body: Record<string, unknown>): void {
     if (k in body) throw new HttpError(400, "forbidden_field", `Field ${k} is not accepted`);
   }
 }
+
+/** Optional game id (default: EDO Battle); availability is checked against public.games. */
+export function gameId(body: Record<string, unknown>): string {
+  const v = body["gameId"];
+  if (v === undefined || v === null) return "edo_battle";
+  if (typeof v !== "string" || !/^[a-z_]{2,32}$/.test(v))
+    throw new HttpError(400, "invalid_input", "gameId invalid");
+  return v;
+}

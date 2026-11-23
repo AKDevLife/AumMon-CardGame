@@ -1,6 +1,16 @@
 # AumMon — Game Migration & Integration Plan
 
-> Status: **PLAN ONLY — awaiting owner approval.**
+> Status: **APPROVED by the owner 2026-11-23** (G1–G3 accepted as proposed; GC0–GC8 authorised).
+
+## Owner decisions (2026-11-23)
+
+| ID  | Decision                                                                                                                                                              |
+| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| G1  | EDO Battle = the current Casual Discard Edition (ruleset "13").                                                                                                       |
+| G2  | Public name "EDO Battle" in Thai and English UI; platform brand "AumMon — Game Center".                                                                               |
+| G3  | "Quick Match" in the UI now means platform matchmaking only; the EDO ruleset's old "Quick Match" label is not shown to players (internal docs keep the history name). |
+
+Implementation note: game modules live as folders inside `packages/game-engine/src` (`sdk/`, `edo-battle/`, `dummy/`, `poker/`) instead of separate packages, so the Deno engine sync, purity lint and architecture tests keep working unchanged; isolation between folders is enforced by `tests/architecture/game-modules.test.ts`.
 
 ## 1. EDO Battle = Casual Discard Edition (confirmation needed)
 

@@ -2,6 +2,18 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-23 — 14.1 / 14.2 Game Center foundation (GC1.1–GC2.4)
+
+- Engine: `sdk/` Game Module Interface + generic bot/timer flow (`sdk.advance`, moved from `_shared/game-flow.ts` without behaviour change), `edo-battle/` adapter over `discard` (rules untouched), `registry.ts`. Golden replay test (21 seeded games) locks EDO Battle behaviour.
+- Server: `_shared/game.ts` is a game-agnostic orchestrator choosing the module from `matches.game_id`; EDO telemetry moved to `_shared/games/edo-battle.ts`; `game-create` / `rooms-create` accept optional `gameId`; game commands parsed by the game module.
+- DB `20261123000000_game_center_registry.sql`: `public.games` (RLS: enabled rows), `game_id` on rooms/matches (default `edo_battle`), per-game ruleset/phase checks, room mode `quick_match`. pgTAP `013_games`.
+- UI: Game Center hub (EDO Battle + Dummy/Poker "เร็ว ๆ นี้"), public name "EDO Battle" (G1–G3), solo page shows the real 60 s turn (was "45").
+- Architecture tests: no cross-game imports; every Edge Function authenticates.
+
+## 2026-11-23 — 14.0 Game Center audit + architecture
+
+- `docs/architecture/*` (audit, inventory, master architecture, DB plan, migration plan, risks) and `docs/roadmap/GAME_CENTER_ROADMAP.md`. Owner approved G1–G3 and GC0–GC8.
+
 ## 2026-11-22 — 12.7 VIP + cosmetic gacha design doc
 
 - `docs/discard/AumMon_VIP_Cosmetics_Design.md`: cosmetic-only VIP (host 5–8 seat rooms) and items, coins/gems, optional gacha with published odds + pity, minors/legal checklist, `private`-schema data sketch. Nothing built; owner Q1–Q5 + legal check before any build (DC7, F8).

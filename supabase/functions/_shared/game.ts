@@ -1,30 +1,30 @@
 /**
- * Casual Discard Edition server adapter (2–8 seats): create/start, lock → advance (bots,
- * timers) → command → advance → save, and per-seat views. Clients send intent only;
- * hands stay private (Magnifier peeks reach only the peeking seat).
+ * Platform match orchestrator (Game Center, docs/architecture/MASTER_ARCHITECTURE.md §5–6):
+ * create/start, lock → advance (bots, timers) → command → advance → save, and per-seat views.
+ * The game module is always chosen from matches.game_id (never from client input).
+ * Clients send intent only; hidden information stays in private.match_runtime.
  */
 import {
   createSeededRandom,
-  discard,
   ENGINE_VERSION,
-  RULESET_VERSION,
+  getGameModule,
+  sdk,
   type RngState,
 } from "@aummon/game-engine";
 import { db } from "./db.ts";
+import { edoHooks } from "./games/edo-battle.ts";
 import { HttpError } from "./http.ts";
 import { rateLimit } from "./ratelimit.ts";
 import { findReceipt, storeReceipt } from "./receipts.ts";
 import { decodeRng, encodeRng, type Tx } from "./store.ts";
-import {
-  actingSeat,
-  advanceGame,
-  deadlineAfterAct,
-  effectiveKinds,
-  GRACE_MS,
-  type GameRuntime,
-  type Kind,
-  type Mode,
-} from "./game-flow.ts";
+
+type Kind = sdk.Kind;
+export type Mode = sdk.Mode;
+type Game = sdk.AnyGameModule;
+interface GameEvent {
+  readonly type: string;
+}
+type Runtime = sdk.Runtime<unknown>;
 
 interface SeatRow {
   id: string;
@@ -35,9 +35,12 @@ interface SeatRow {
   display_name: string;
 }
 
-interface Locked extends GameRuntime {
+export interface Locked extends Runtime {
   matchId: string;
   roomId: string;
+  gameId: string;
+  game: Game;
+  rulesetVersion: string;
   status: string;
   userId: string;
   ownerId: string;
@@ -48,6 +51,29 @@ interface Locked extends GameRuntime {
   dirty?: boolean;
 }
 
+/** Game-specific server hooks (telemetry); optional per game. */
+export interface GameHooks {
+  onStart?(
+    tx: Tx,
+    matchId: string,
+    state: unknown,
+    mode: Mode,
+    seats: { player_type: Kind }[],
+  ): Promise<void>;
+  onSave?(tx: Tx, locked: Locked, state: unknown, events: readonly GameEvent[]): Promise<void>;
+  onHumanAction?(
+    tx: Tx,
+    locked: Locked,
+    before: Runtime,
+    seat: number,
+    events: readonly GameEvent[],
+    now: number,
+  ): Promise<void>;
+}
+
+const HOOKS: Record<string, GameHooks | undefined> = { edo_battle: edoHooks };
+const hooksOf = (gameId: string): GameHooks => HOOKS[gameId] ?? {};
+
 /** DB seats are 1-based; engine seats are 0-based. */
 const toEngine = (seat: number) => seat - 1;
 
@@ -57,31 +83,54 @@ function cryptoSeed(): RngState {
   return [s[0] ?? 1, s[1] ?? 0, s[2] ?? 0, s[3] ?? 0];
 }
 
+/** Loads an enabled game's module (404 for unknown / disabled games). */
+export async function enabledGame(tx: Tx, gameId: string): Promise<Game> {
+  const [row] = await tx<{ id: string }[]>`
+    select id from public.games where id = ${gameId} and is_enabled`;
+  if (!row) throw new HttpError(404, "game_not_found", "Game not available");
+  try {
+    return getGameModule(gameId);
+  } catch {
+    throw new HttpError(404, "game_not_found", "Game not available");
+  }
+}
+
 // ---------------------------------------------------------------- persistence
 
 async function lockGame(tx: Tx, matchId: string, userId: string): Promise<Locked> {
-  const lock =
-    await tx`select id from public.matches where id = ${matchId} and ruleset_version = '13' for update`;
+  const lock = await tx`select id from public.matches where id = ${matchId} for update`;
   if (lock.length === 0) throw new HttpError(404, "not_found", "Match not found");
   const [row] = await tx<
     {
       owner_id: string;
       room_id: string;
+      game_id: string;
+      ruleset_version: string;
       status: string;
       seat_timeouts: number[];
       mode: Mode;
       version: string;
-      internal_state: discard.GameState;
+      internal_state: unknown;
       rng_state: Uint8Array;
       phase_deadline: Date | null;
     }[]
   >`
-    select r.owner_id, m.room_id, m.status, rt.seat_timeouts, r.mode, m.version, rt.internal_state, rt.rng_state, rt.phase_deadline
+    select r.owner_id, m.room_id, m.game_id, m.ruleset_version, m.status, rt.seat_timeouts, r.mode,
+           m.version, rt.internal_state, rt.rng_state, rt.phase_deadline
     from public.matches m
     join public.game_rooms r on r.id = m.room_id
     join private.match_runtime rt on rt.match_id = m.id
     where m.id = ${matchId}`;
   if (!row) throw new HttpError(404, "not_found", "Match not found");
+  let game: Game;
+  try {
+    game = getGameModule(row.game_id);
+  } catch {
+    throw new HttpError(404, "not_found", "Match not found");
+  }
+  // Only the game's current ruleset is playable (retired rulesets stay as history).
+  if (row.ruleset_version !== game.rulesetVersion)
+    throw new HttpError(404, "not_found", "Match not found");
   const seats = await tx<SeatRow[]>`
     select mp.id, mp.seat, mp.player_type, mp.user_id, mp.room_player_id,
            coalesce(rp.display_name_snapshot, 'Player') as display_name
@@ -94,6 +143,9 @@ async function lockGame(tx: Tx, matchId: string, userId: string): Promise<Locked
     userId,
     ownerId: row.owner_id,
     roomId: row.room_id,
+    gameId: row.game_id,
+    game,
+    rulesetVersion: row.ruleset_version,
     status: row.status,
     timeouts: row.seat_timeouts,
     mode: row.mode,
@@ -105,26 +157,46 @@ async function lockGame(tx: Tx, matchId: string, userId: string): Promise<Locked
   };
 }
 
-async function saveGame(
-  tx: Tx,
-  locked: Locked,
-  rt: GameRuntime,
-  events: discard.GameEvent[],
-): Promise<number> {
+function eventRows(
+  game: Game,
+  matchId: string,
+  firstSeq: number,
+  round: number,
+  events: readonly GameEvent[],
+) {
+  return events
+    .flatMap((e) => {
+      const payload = game.publicEvent(e);
+      return payload === null
+        ? []
+        : [{ match_id: matchId, event_type: e.type, round_number: round, payload }];
+    })
+    .map((r, i) => ({
+      match_id: r.match_id,
+      event_seq: firstSeq + i,
+      round_number: r.round_number,
+      event_type: r.event_type,
+      public_payload: r.payload,
+    }));
+}
+
+async function saveGame(tx: Tx, locked: Locked, rt: Runtime, events: GameEvent[]): Promise<number> {
+  const { game } = locked;
   const { state } = rt;
-  const finished = state.status === "finished";
+  const finished = game.isFinished(state);
+  const winners = game.result(state)?.winners ?? [];
+  const counts = game.handCounts(state);
   const version = locked.version + 1;
-  const phase = finished ? "finished" : state.reactions.length > 0 ? "reaction" : "play";
   await tx`
     update public.matches set
-      phase = ${phase}, round_number = ${state.turnNumber}, version = ${version},
+      phase = ${game.phase(state)}, round_number = ${game.round(state)}, version = ${version},
       status = ${finished ? "finished" : "active"}, finished_at = ${finished ? tx`now()` : null}
     where id = ${locked.matchId}`;
   for (const s of locked.seats) {
     const seat = toEngine(s.seat);
-    const status = state.winner === seat ? "won" : "playing";
+    const status = winners.includes(seat) ? "won" : "playing";
     await tx`update public.match_players
-      set hand_count = ${state.players[seat]?.hand.length ?? 0}, status = ${status}, player_type = ${s.player_type}
+      set hand_count = ${counts[seat] ?? 0}, status = ${status}, player_type = ${s.player_type}
       where id = ${s.id} and match_id = ${locked.matchId}`;
   }
   await tx`
@@ -134,19 +206,12 @@ async function saveGame(
   if (events.length > 0) {
     const [seq] = await tx<{ next: string }[]>`
       select coalesce(max(event_seq), 0) + 1 as next from public.match_events where match_id = ${locked.matchId}`;
-    const rows = events.map((e, i) => ({
-      match_id: locked.matchId,
-      event_seq: Number(seq?.next ?? 1) + i,
-      round_number: state.turnNumber,
-      event_type: e.type,
-      // Private peeks are stored without the cards; the peeking seat gets them in its response only.
-      public_payload: e.type === "peek" ? { type: "peek", seat: e.seat, target: e.target } : e,
-    }));
-    await tx`insert into public.match_events ${tx(rows as never)}`;
+    const rows = eventRows(game, locked.matchId, Number(seq?.next ?? 1), game.round(state), events);
+    if (rows.length > 0) await tx`insert into public.match_events ${tx(rows as never)}`;
   }
-  await recordStats(tx, locked, state, events);
+  await hooksOf(locked.gameId).onSave?.(tx, locked, state, events);
   if (finished) {
-    if (locked.mode === "online") {
+    if (locked.mode !== "solo") {
       // Online (owner 2026-11-22): back to the lobby; everyone except the owner must press ready
       // again before the owner can start the next round. Players who left stay out.
       await tx`update public.game_rooms set status = 'lobby', expires_at = now() + interval '30 minutes'
@@ -156,37 +221,6 @@ async function saveGame(
     } else await tx`update public.game_rooms set status = 'closed' where id = ${locked.roomId}`;
   }
   return version;
-}
-
-// ---------------------------------------------------------------- telemetry (private, aggregate only)
-
-/** Adds this save's events to private.round_stats (task 12.16). */
-async function recordStats(
-  tx: Tx,
-  locked: Locked,
-  state: discard.GameState,
-  events: readonly discard.GameEvent[],
-): Promise<void> {
-  const abilities: Record<string, number> = {};
-  for (const e of events)
-    if (e.type === "ability") abilities[e.ability] = (abilities[e.ability] ?? 0) + 1;
-  const timeouts = events.filter((e) => e.type === "timeout").length;
-  const finished = state.status === "finished";
-  const winnerKind =
-    state.winner === null
-      ? null
-      : (locked.seats.find((x) => toEngine(x.seat) === state.winner)?.player_type ?? null);
-  await tx`
-    update private.round_stats set
-      turns = ${state.turnNumber},
-      timeouts = timeouts + ${timeouts},
-      abilities = abilities || coalesce((
-        select jsonb_object_agg(n.key, n.value::int + coalesce((round_stats.abilities ->> n.key)::int, 0))
-        from jsonb_each_text(${tx.json(abilities)}::jsonb) n), '{}'::jsonb),
-      finished_at = ${finished ? tx`now()` : null},
-      winner_seat = ${state.winner},
-      winner_kind = ${winnerKind}
-    where match_id = ${locked.matchId}`;
 }
 
 // ---------------------------------------------------------------- views
@@ -199,7 +233,8 @@ function actorSeat(locked: Locked): number | null {
 
 export interface GameResponse {
   matchId: string;
-  rulesetVersion: "13";
+  gameId: string;
+  rulesetVersion: string;
   mode: Mode;
   version: number;
   deadline: string | null;
@@ -208,10 +243,10 @@ export interface GameResponse {
   acting: number | null;
   botActing: boolean;
   names: string[];
-  view: discard.SeatView;
+  view: unknown;
   events: unknown[];
-  /** Cards the caller saw with Magnifier during this request (private). */
-  peeks: { target: number | null; cards: string[] }[];
+  /** Private payloads only the caller may see from this request (e.g. EDO Magnifier peeks). */
+  peeks: unknown[];
   /** Server clock (ms) so the client can correct its countdown; the client never decides time. */
   serverNow: number;
   /** Seats the server is playing because of repeated timeouts (Online). */
@@ -222,30 +257,37 @@ export interface GameResponse {
   roomId: string;
 }
 
+const kindsOf = (locked: Locked): Kind[] =>
+  [...locked.seats].sort((a, b) => a.seat - b.seat).map((s) => s.player_type);
+
+const effective = (locked: Locked, timeouts: readonly number[]) =>
+  sdk.effectiveKinds(kindsOf(locked), timeouts, locked.mode, locked.game.afkTimeouts);
+
 async function respondGame(
   tx: Tx,
   locked: Locked,
-  rt: GameRuntime,
+  rt: Runtime,
   version: number,
-  fresh: readonly discard.GameEvent[],
+  fresh: readonly GameEvent[],
 ): Promise<GameResponse> {
+  const { game } = locked;
   const { state } = rt;
-  const acting = actingSeat(state);
+  const acting = game.actingSeat(state);
   const seat = actorSeat(locked);
   const events = await tx<{ public_payload: unknown }[]>`
     select public_payload from public.match_events where match_id = ${locked.matchId}
     order by event_seq desc limit 60`;
-  const kinds = effectiveKinds(kindsOf(locked), rt.timeouts, locked.mode);
-  const [next] =
-    state.status === "finished"
-      ? await tx<{ id: string }[]>`
+  const kinds = effective(locked, rt.timeouts);
+  const [next] = game.isFinished(state)
+    ? await tx<{ id: string }[]>`
           select id from public.matches where room_id = ${locked.roomId} and id <> ${locked.matchId}
             and created_at > (select created_at from public.matches where id = ${locked.matchId})
           order by created_at desc limit 1`
-      : [];
+    : [];
   return {
     matchId: locked.matchId,
-    rulesetVersion: "13",
+    gameId: locked.gameId,
+    rulesetVersion: locked.rulesetVersion,
     mode: locked.mode,
     version,
     deadline: rt.deadline === null ? null : new Date(rt.deadline).toISOString(),
@@ -253,11 +295,9 @@ async function respondGame(
     acting,
     botActing: acting !== null && kinds[acting] === "bot",
     names: [...locked.seats].sort((a, b) => a.seat - b.seat).map((s) => s.display_name),
-    view: discard.getView(state, seat),
+    view: game.view(state, seat),
     events: events.map((e) => e.public_payload).reverse(),
-    peeks: fresh.flatMap((e) =>
-      e.type === "peek" && e.seat === seat ? [{ target: e.target, cards: e.cards }] : [],
-    ),
+    peeks: game.privateEvents(fresh, seat),
     serverNow: Date.now(),
     autoSeats: kinds.flatMap((k, i) => (k === "bot" && kindsOf(locked)[i] === "human" ? [i] : [])),
     nextMatchId: next?.id ?? null,
@@ -267,19 +307,13 @@ async function respondGame(
 
 // ---------------------------------------------------------------- use cases
 
-const kindsOf = (locked: Locked): Kind[] =>
-  [...locked.seats].sort((a, b) => a.seat - b.seat).map((s) => s.player_type);
-
-/** Load, apply due bots/timeouts, optionally run `act`, save, respond. */
+/** Load, apply due bots/timeouts, optionally run the caller's command, save, respond. */
 export async function withGame(
   userId: string,
   matchId: string,
   options: {
-    act?: (
-      state: discard.GameState,
-      seat: number,
-      rng: ReturnType<typeof createSeededRandom>,
-    ) => discard.Transition;
+    /** Raw client intent; parsed by the match's game module. */
+    command?: unknown;
     expectedVersion?: number;
     receipt?: { key: string; hash: string };
     /** Online auto-play: the player is back — clear their timeout streak. */
@@ -289,6 +323,7 @@ export async function withGame(
   await rateLimit(userId, "match.read", 240, 60);
   return db().begin(async (tx) => {
     const locked = await lockGame(tx, matchId, userId);
+    const { game } = locked;
     if (options.receipt) {
       const previous = await findReceipt(
         tx,
@@ -299,51 +334,61 @@ export async function withGame(
       );
       if (previous !== undefined) return previous;
     }
+    let command: unknown;
+    if (options.command !== undefined) {
+      try {
+        command = game.parseCommand(options.command);
+      } catch (e) {
+        if (e instanceof sdk.InvalidCommandError)
+          throw new HttpError(400, "invalid_input", e.message);
+        throw e;
+      }
+    }
     const now = Date.now();
     const kinds = kindsOf(locked);
     const own = actorSeat(locked);
     if (options.resume && own !== null && (locked.timeouts[own] ?? 0) > 0) {
-      locked.timeouts = locked.state.players.map((_, i) =>
-        i === own ? 0 : (locked.timeouts[i] ?? 0),
-      );
+      locked.timeouts = game
+        .handCounts(locked.state)
+        .map((_, i) => (i === own ? 0 : (locked.timeouts[i] ?? 0)));
       locked.dirty = true;
     }
+    const acts = options.command !== undefined;
     // A command that reached the server within the grace window still beats the timeout.
-    let rt = advanceGame(locked, kinds, options.act ? now - GRACE_MS : now, locked.mode);
-    const events = [...rt.events];
-    if (options.act) {
-      if (options.expectedVersion !== undefined && options.expectedVersion !== locked.version)
+    let rt: Runtime & { events: GameEvent[] } = sdk.advance(
+      game,
+      locked,
+      kinds,
+      acts ? now - sdk.GRACE_MS : now,
+      locked.mode,
+    );
+    const events: GameEvent[] = [...rt.events];
+    if (acts) {
+      const stale =
+        options.expectedVersion !== undefined && options.expectedVersion !== locked.version;
+      if (stale && game.allowsStaleVersion?.(command) !== true)
         throw new HttpError(409, "stale_version", "State changed; refresh and retry");
       const seat = actorSeat(locked);
       if (seat === null) throw new HttpError(403, "not_your_turn", "You cannot act now");
       const rng = createSeededRandom(rt.rng);
-      let t: discard.Transition;
+      let t: sdk.Transition<unknown, GameEvent>;
       try {
-        t = options.act(rt.state, seat, rng);
+        t = game.apply(rt.state, seat, command, rng);
       } catch (e) {
-        if (e instanceof discard.CommandError) throw new HttpError(409, e.code, e.code);
+        if (e instanceof sdk.GameRuleError) throw new HttpError(409, e.code, e.code);
         throw e;
       }
       events.push(...t.events);
-      // Telemetry: decision time of this human action (from the start of the turn timer).
-      const startedAt =
-        rt.deadline === null ? null : rt.deadline - discard.DISCARD_RULES.turnTimeoutMs;
-      const drawnPlay =
-        rt.state.drawn?.seat === seat &&
-        t.events.some((e) => e.type === "played" && e.seat === seat);
-      await tx`
-        update private.round_stats set decisions = decisions + 1,
-          decision_ms = decision_ms + ${startedAt === null ? 0 : Math.max(0, Math.min(now - startedAt, 60_000))},
-          drawn_plays = drawn_plays + ${drawnPlay ? 1 : 0}
-        where match_id = ${locked.matchId}`;
+      await hooksOf(locked.gameId).onHumanAction?.(tx, locked, rt, seat, t.events, now);
       // Acting resets this seat's timeout streak (and ends auto-play).
       const timeouts = rt.timeouts.map((x, i) => (i === seat ? 0 : x));
-      const after = advanceGame(
+      const after = sdk.advance(
+        game,
         {
           state: t.state,
           rng: rng.getState(),
           // Each turn gets its own full timer (owner report: the timer carried over to the next player).
-          deadline: deadlineAfterAct(rt.state, t.state, rt.deadline),
+          deadline: sdk.deadlineAfterAct(game, rt.state, t.state, rt.deadline),
           timeouts,
         },
         kinds,
@@ -375,7 +420,7 @@ export async function rematch(userId: string, matchId: string): Promise<{ matchI
   return db().begin(async (tx) => {
     const locked = await lockGame(tx, matchId, userId);
     if (locked.status === "active") throw new HttpError(409, "match_active", "Match still running");
-    if (locked.mode === "online")
+    if (locked.mode !== "solo")
       throw new HttpError(
         409,
         "use_lobby",
@@ -395,7 +440,7 @@ export async function rematch(userId: string, matchId: string): Promise<{ matchI
 export async function leaveGame(userId: string, matchId: string): Promise<{ ok: true }> {
   return db().begin(async (tx) => {
     const locked = await lockGame(tx, matchId, userId);
-    if (locked.mode !== "online") {
+    if (locked.mode === "solo") {
       await tx`update private.round_stats set left_early = left_early + 1 where match_id = ${matchId}`;
       await tx`update public.matches set status = 'abandoned', finished_at = now() where id = ${matchId} and status = 'active'`;
       await tx`update public.game_rooms set status = 'closed' where id = (select room_id from public.matches where id = ${matchId})`;
@@ -416,48 +461,41 @@ export async function leaveGame(userId: string, matchId: string): Promise<{ ok: 
   });
 }
 
-/** Builds the engine state for a room and stores it (room → playing). */
-async function startMatch(tx: Tx, roomId: string): Promise<string> {
+/** Builds the game state for a room and stores it (room → playing). */
+export async function startMatch(tx: Tx, roomId: string): Promise<string> {
+  const [room] = await tx<{ mode: Mode; game_id: string }[]>`
+    select mode, game_id from public.game_rooms where id = ${roomId}`;
+  if (!room) throw new HttpError(404, "not_found", "Room not found");
+  const game = await enabledGame(tx, room.game_id);
   const seats = await tx<{ id: string; seat: number; player_type: Kind; user_id: string | null }[]>`
     select id, seat, player_type, user_id from public.room_players
     where room_id = ${roomId} and status <> 'left' order by seat`;
-  if (
-    seats.length < discard.DISCARD_RULES.minPlayers ||
-    seats.length > discard.DISCARD_RULES.maxPlayers
-  )
-    throw new HttpError(409, "not_enough_players", "2–8 players needed");
-  const [match] = await tx<{ id: string }[]>`
-    insert into public.matches (room_id, status, phase, engine_version, ruleset_version, started_at)
-    values (${roomId}, 'active', 'play', ${ENGINE_VERSION}, '13', now()) returning id`;
-  if (!match) throw new Error("match insert failed");
+  if (seats.length < game.minPlayers || seats.length > game.maxPlayers)
+    throw new HttpError(
+      409,
+      "not_enough_players",
+      `${String(game.minPlayers)}–${String(game.maxPlayers)} players needed`,
+    );
   const playerIds = seats.map(() => crypto.randomUUID());
   const rng = createSeededRandom(cryptoSeed());
-  const { state, events } = discard.startGame(playerIds, rng);
+  const { state, events } = game.start(playerIds, rng);
+  const [match] = await tx<{ id: string }[]>`
+    insert into public.matches (room_id, game_id, status, phase, engine_version, ruleset_version, started_at)
+    values (${roomId}, ${game.id}, 'active', ${game.phase(state)}, ${ENGINE_VERSION}, ${game.rulesetVersion}, now()) returning id`;
+  if (!match) throw new Error("match insert failed");
+  const counts = game.handCounts(state);
   for (const [i, s] of seats.entries()) {
     await tx`
       insert into public.match_players (id, match_id, room_player_id, user_id, seat, player_type, hand_count)
       values (${playerIds[i] ?? ""}, ${match.id}, ${s.id}, ${s.user_id}, ${i + 1}, ${s.player_type},
-              ${state.players[i]?.hand.length ?? 0})`;
+              ${counts[i] ?? 0})`;
   }
   await tx`
     insert into private.match_runtime (match_id, rng_state, internal_state)
     values (${match.id}, ${encodeRng(rng.getState())}, ${tx.json(state as never)})`;
-  const rows = events.map((e, i) => ({
-    match_id: match.id,
-    event_seq: i + 1,
-    round_number: 1,
-    event_type: e.type,
-    public_payload: e,
-  }));
+  const rows = eventRows(game, match.id, 1, game.round(state), events);
   if (rows.length > 0) await tx`insert into public.match_events ${tx(rows as never)}`;
-  const [room] = await tx<
-    { mode: Mode }[]
-  >`select mode from public.game_rooms where id = ${roomId}`;
-  await tx`
-    insert into private.round_stats (match_id, ruleset_version, mode, players, humans, opening)
-    values (${match.id}, ${RULESET_VERSION}, ${room?.mode ?? "solo"}, ${seats.length},
-            ${seats.filter((x) => x.player_type === "human").length},
-            ${tx.json(state.players.map((p) => p.hand.map((c) => c.cardId)))})`;
+  await hooksOf(game.id).onStart?.(tx, match.id, state, room.mode, seats);
   await tx`update public.game_rooms set status = 'playing' where id = ${roomId}`;
   return match.id;
 }
@@ -469,14 +507,21 @@ async function displayName(tx: Tx, userId: string): Promise<string> {
   return p?.display_name ?? "Player";
 }
 
-/** Solo: you + 1–7 server bots; room + match in one step. */
-export async function createGame(userId: string, bots: number): Promise<string> {
+/** Solo: you + server bots (game's seat limits); room + match in one step. */
+export async function createGame(
+  userId: string,
+  bots: number,
+  gameId = "edo_battle",
+): Promise<string> {
   await rateLimit(userId, "room.create", 20, 60);
   return db().begin(async (tx) => {
+    const game = await enabledGame(tx, gameId);
     const size = bots + 1;
+    if (size < game.minPlayers || size > game.maxPlayers)
+      throw new HttpError(400, "invalid_input", "bots out of range");
     const [room] = await tx<{ id: string }[]>`
-      insert into public.game_rooms (owner_id, mode, status, max_players)
-      values (${userId}, 'solo', 'lobby', ${size}) returning id`;
+      insert into public.game_rooms (owner_id, game_id, mode, status, max_players, ruleset_version)
+      values (${userId}, ${game.id}, 'solo', 'lobby', ${size}, ${game.rulesetVersion}) returning id`;
     if (!room) throw new Error("room insert failed");
     await tx`insert into public.room_players (room_id, user_id, seat, player_type, display_name_snapshot, status)
         values (${room.id}, ${userId}, 1, 'human', ${await displayName(tx, userId)}, 'ready')`;
@@ -487,7 +532,7 @@ export async function createGame(userId: string, bots: number): Promise<string> 
   });
 }
 
-/** Online: the owner starts a lobby room once everyone is ready (2–8 players). */
+/** Online: the owner starts a lobby room once everyone is ready. */
 export async function startOnlineGame(userId: string, roomId: string): Promise<string> {
   return db().begin(async (tx) => {
     const [room] = await tx<{ owner_id: string; status: string; mode: Mode }[]>`

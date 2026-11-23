@@ -605,7 +605,7 @@ export function AdminPage() {
               title="สภาพแวดล้อม"
               value={<span className="text-xl">{label("env", field(data, "env"))}</span>}
             />
-            <Stat title="กติกาชุดที่" value={text(field(data, "rulesetVersion"))} note="Quick Match" />
+            <Stat title="กติกาชุดที่" value={text(field(data, "rulesetVersion"))} note="EDO Battle" />
             <Stat
               title="เวอร์ชันระบบเกม"
               value={<span className="text-xl">{text(field(data, "engineVersion"))}</span>}
