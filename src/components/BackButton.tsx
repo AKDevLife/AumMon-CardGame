@@ -1,13 +1,11 @@
 import { useLocation, useNavigate } from "react-router";
-
-/** Pages with their own leave flow (running tables) or no "back" (home). */
-const HIDDEN = [/^\/$/, /^\/game\//, /^\/games\/[^/]+\/match\//];
+import { isTablePath } from "./table-path.ts";
 
 /** Header "back" button: previous page in this tab, else home. */
 export function BackButton() {
   const { pathname, key } = useLocation();
   const navigate = useNavigate();
-  if (HIDDEN.some((r) => r.test(pathname))) return null;
+  if (pathname === "/" || isTablePath(pathname)) return null;
   return (
     <button
       type="button"

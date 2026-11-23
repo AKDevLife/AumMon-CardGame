@@ -1,6 +1,6 @@
 # Poker — Texas Hold'em Rules (ruleset "1")
 
-> Status: implemented in `packages/game-engine/src/poker/` (GC5). **Play-money only**: chips have no monetary value; no purchase, deposit, withdrawal, cash-out or transfer between players. Values in §4 are defaults chosen for short matches — owner may change them (new ruleset version).
+> Status: implemented in `packages/game-engine/src/poker/` (GC5). **Play-money only**: chips have no monetary value; no purchase, deposit, withdrawal, cash-out or transfer between players. Values in §4 are defaults chosen for short matches — approved by the owner on 2026-11-23 (basic rules for now); a change means a new ruleset version.
 
 ## 1. Format
 

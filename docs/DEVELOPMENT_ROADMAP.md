@@ -200,9 +200,9 @@ Multi-game platform: EDO Battle (= Discard Edition) + Dummy + Texas Hold'em (pla
 - [x] **14.0** GC0 Audit + architecture docs + owner decisions G1–G3 — deps: — — (2026-11-23)
 - [x] **14.1** GC1 Platform foundation: Game Module Interface, registry, `public.games` + `game_id`, hub — deps: 14.0 — PR #106 (2026-11-23)
 - [x] **14.2** GC2 EDO Battle behind the platform orchestrator, rename, results/stats, sweeper — deps: 14.1 — PR #106 (2026-11-23)
-- [x] **14.3** GC3 Dummy engine — deps: 14.1 — PR #106 (2026-11-23); rules defaults await owner review
+- [x] **14.3** GC3 Dummy engine — deps: 14.1 — PR #106 (2026-11-23); basic defaults approved by owner (2026-11-23)
 - [x] **14.4** GC4 Dummy bots, server, UI, matchmaking — deps: 14.2, 14.3 — PR #106 (2026-11-23)
-- [x] **14.5** GC5 Poker engine — deps: 14.1 — PR #106 (2026-11-23); rules defaults await owner review
+- [x] **14.5** GC5 Poker engine — deps: 14.1 — PR #106 (2026-11-23); basic defaults approved by owner (2026-11-23)
 - [x] **14.6** GC6 Poker bots, server, UI (no ledger needed: chips live in a match) — deps: 14.2, 14.5 — PR #106 (2026-11-23)
 - [x] **14.7** GC7 Central admin game management — deps: 14.2 — PR #106 (2026-11-23); scoped roles (GC7.3) wait for the owner
 - [x] **14.8** GC8 Full integration testing — deps: 14.4, 14.6, 14.7 — PR #106 + Dev load/smoke (2026-11-23)

@@ -2,6 +2,11 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-23 — Owner decisions + settings home button
+
+- 12.8: best-of-3 for 2–3 players = no (single round + rematch). 14.3/14.5: Dummy / Poker basic defaults (ruleset "1") approved as-is.
+- ⚙️ ตั้งค่า now on every page except running tables, with 🏠 หน้าหลัก; ← ย้อนกลับ moved to the right side of the header.
+
 ## 2026-11-23 — Settings menu, Dummy/Poker rules, back button (owner)
 
 - Home ⚙️ ตั้งค่า now holds โปรไฟล์ + ออกจากระบบ (removed from the header).

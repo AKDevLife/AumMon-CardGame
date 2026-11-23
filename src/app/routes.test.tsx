@@ -53,6 +53,13 @@ describe("app routes", () => {
     expect(screen.getByRole("button", { name: /ย้อนกลับ/ })).toBeEnabled();
   });
 
+  it("settings on inner pages offers a home link", async () => {
+    renderAt("/login");
+    fireEvent.click(screen.getByRole("button", { name: /ตั้งค่า/ }));
+    const dialog = await screen.findByRole("dialog", { name: "ตั้งค่า" });
+    expect(within(dialog).getByRole("link", { name: /หน้าหลัก/ })).toHaveAttribute("href", "/");
+  });
+
   it("home has no back button", () => {
     renderAt("/");
     expect(screen.queryByRole("button", { name: /ย้อนกลับ/ })).toBeNull();
