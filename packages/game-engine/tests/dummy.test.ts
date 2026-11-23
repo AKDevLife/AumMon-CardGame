@@ -94,38 +94,36 @@ describe("turns", () => {
     expect(t.events.find((e) => e.type === "picked")).toMatchObject({ head: true });
   });
 
-  it.each([
-    ["5s", 50],
-    ["2s", 50],
-  ])("ทิ้งโง่: another player melds my discard %s within the lap → −%i", (card, penalty) => {
+  /** p0 discards `card`; p1 (next) picks only it, melds with 3s 4s, then discards Jc. */
+  function feedThenKnock(card: string, p1Hand: string[]) {
     let s = table(
       [
         [card, "Kd", "8h"],
-        ["3s", "4s", "Jc"],
+        ["3s", "4s", ...p1Hand],
       ],
       ["9d"],
       ["2d", "Td"],
     );
     s = applyCommand(s, 0, { type: "draw" }).state;
     s = applyCommand(s, 0, { type: "discard", card }).state;
-    const t = applyCommand(s, 1, { type: "pick", index: 1, meld: [card, "3s", "4s"] });
-    expect(t.state.players[0]?.points).toBe(-penalty);
+    s = applyCommand(s, 1, { type: "pick", index: 1, meld: [card, "3s", "4s"] }).state;
+    return applyCommand(s, 1, { type: "discard", card: "Jc" });
+  }
+
+  it.each([
+    ["5s", 50],
+    ["2s", 50],
+  ])("ทิ้งโง่: next player melds my discard %s alone and knocks → −%i", (card, penalty) => {
+    const t = feedThenKnock(card, ["Jc"]);
+    expect(t.state.knocker).toBe(1);
     expect(t.events).toContainEqual({ type: "fed", seat: 0, card, penalty });
   });
 
-  it("ทิ้งโง่: speto costs 100", () => {
-    let s = table(
-      [
-        ["Qs", "Kd", "8h"],
-        ["Js", "Ks", "4c"],
-      ],
-      ["9d"],
-      ["2d", "Td"],
-    );
-    s = applyCommand(s, 0, { type: "draw" }).state;
-    s = applyCommand(s, 0, { type: "discard", card: "Qs" }).state;
-    const t = applyCommand(s, 1, { type: "pick", index: 1, meld: ["Qs", "Js", "Ks"] });
-    expect(t.state.players[0]?.points).toBe(-100);
+  it("ทิ้งโง่: no penalty when the picker does not knock", () => {
+    const t = feedThenKnock("5s", ["Jc", "Qd"]);
+    expect(t.state.status).toBe("active");
+    expect(t.state.players[0]?.points).toBe(0);
+    expect(t.events.some((e) => e.type === "fed")).toBe(false);
   });
 
   it.each([
@@ -148,26 +146,6 @@ describe("turns", () => {
     const t = applyCommand(s, 0, { type: "discard", card });
     expect(t.state.players[0]?.points).toBe(full ? -50 : 0);
     expect(t.events.some((e) => e.type === "full_discard")).toBe(full);
-  });
-
-  it("ทิ้งโง่: no penalty once the discarder has played again", () => {
-    let s = table(
-      [
-        ["5s", "Kd", "8h", "9h"],
-        ["3s", "4s", "Jc", "Qc"],
-      ],
-      ["9d"],
-      ["2d", "Td", "6d", "7d"],
-    );
-    s = applyCommand(s, 0, { type: "draw" }).state;
-    s = applyCommand(s, 0, { type: "discard", card: "5s" }).state;
-    s = applyCommand(s, 1, { type: "draw" }).state;
-    s = applyCommand(s, 1, { type: "discard", card: "Jc" }).state;
-    s = applyCommand(s, 0, { type: "draw" }).state;
-    s = applyCommand(s, 0, { type: "discard", card: "Kd" }).state;
-    const t = applyCommand(s, 1, { type: "pick", index: 1, meld: ["5s", "3s", "4s"] });
-    expect(t.state.players[0]?.points).toBe(0);
-    expect(t.events.some((e) => e.type === "fed")).toBe(false);
   });
 
   it("knock: discarding the last card ends the round with the knock bonus", () => {
