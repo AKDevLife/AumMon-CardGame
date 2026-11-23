@@ -28,8 +28,10 @@ test("hub → Dummy solo → draw + discard → leave", async ({ page }) => {
   });
   await myTurn(page);
   await page.getByRole("button", { name: "จั่วไพ่" }).click();
+  // Play phase: meld / lay off / discard buttons replace draw / pick.
+  await expect(page.getByRole("button", { name: "เกิด", exact: true })).toBeVisible();
   await page.getByRole("group", { name: "Hand" }).getByRole("button").first().click();
-  await page.getByRole("button", { name: "ทิ้ง" }).click();
+  await page.getByRole("button", { name: "ทิ้ง", exact: true }).click();
   await expect(page.getByRole("alert")).toHaveCount(0);
   const axe = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa"]).analyze();
   expect(axe.violations.filter((v) => v.impact === "critical")).toEqual([]);
