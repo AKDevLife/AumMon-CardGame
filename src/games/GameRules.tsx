@@ -3,7 +3,7 @@ import { StickerButton } from "../components/StickerButton.tsx";
 import { Popup } from "../features/game/Popup.tsx";
 import type { GameId } from "../platform/games.ts";
 
-/** Dummy rules in plain Thai (docs/games/dummy/DUMMY_RULES.md, ruleset "3"). */
+/** Dummy rules in plain Thai (docs/games/dummy/DUMMY_RULES.md, ruleset "4"). */
 export function DummyRulesText() {
   return (
     <div className="flex flex-col gap-2 text-sm">
@@ -38,7 +38,8 @@ export function DummyRulesText() {
         = 50 · เก็บหัว +50 · น็อค +50 · คะแนนรวมสูงสุดชนะ
       </p>
       <p>
-        <b>ทิ้งโง่:</b> ถ้าไพ่ที่คุณทิ้งถูกคนอื่นเก็บไปใช้ก่อนถึงตาคุณอีกครั้ง คุณถูกหัก 50 แต้ม (สเปโตหัก 100)
+        <b>ทิ้งโง่:</b> ถ้าคนถัดไปเก็บไพ่ใบที่คุณเพิ่งทิ้ง (ใบเดียว) ไปเกิดแล้วน็อคได้ในตานั้น คุณถูกหัก 50 แต้ม (สเปโตหัก
+        100) · คนอื่นเก็บไปเกิดเฉย ๆ ไม่เสียแต้ม
       </p>
       <p>
         <b>ทิ้งเต็ม:</b> ทิ้งไพ่ที่ครบชุดกับไพ่ใบไหนก็ได้ในกองทิ้ง (เช่น มี 2♠ 2♥ แล้วทิ้ง 2 อีกใบ หรือมี 3♠ 4♠ แล้วทิ้ง 2♠ /

@@ -2,6 +2,12 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-23 — 14.12 Dummy ruleset "4" + pick fix (owner)
+
+- ทิ้งโง่ now only when the next player picks just the previous discard, melds it and knocks in that turn (−50 / speto −100). Engine 10.0.0; migration `20261123000400`.
+- Pick-from-pile bug: hand cards selected for sorting stayed in the selection and broke the meld (`invalid_meld`); selections are now filtered to usable cards, and cards above the chosen pile card can join the meld.
+- Hand: press-and-hold then slide to reorder (◀ ▶ removed).
+
 ## 2026-11-23 — 14.11 Dummy ruleset "3" (owner)
 
 - ทิ้งเต็ม: a discard completing a set/run with any two pile cards costs 50 (speto 100); skipped on the knock card. Engine 9.0.0; migration `20261123000300` ends active ruleset "2" games, `current_ruleset = '3'`.

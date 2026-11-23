@@ -2,7 +2,7 @@ import type { RandomSource } from "../rng/seeded-random.ts";
 import { GameRuleError } from "../sdk/module.ts";
 
 /**
- * Thai Dummy (ดัมมี่), ruleset "3" — docs/games/dummy/DUMMY_RULES.md. One round per match.
+ * Thai Dummy (ดัมมี่), ruleset "4" — docs/games/dummy/DUMMY_RULES.md. One round per match.
  * Pure and deterministic. Cards: rank + suit ("As", "Td", "2c").
  */
 export type Card = string;
@@ -17,7 +17,7 @@ export const DUMMY_RULES = {
   spetoPoints: 50,
   headBonus: 50,
   knockBonus: 50,
-  /** ทิ้งโง่: a discard picked up by another player before the discarder's next turn. */
+  /** ทิ้งโง่: the next player picks only my last discard, melds it and knocks in that turn. */
   feedPenalty: 50,
   feedPenaltySpeto: 100,
   /** ทิ้งเต็ม: a discard that completes a meld with any 2 cards already in the pile. */
@@ -52,7 +52,7 @@ export interface DummyPlayer {
 }
 
 export interface DummyState {
-  readonly rulesetVersion: "3";
+  readonly rulesetVersion: "4";
   status: "active" | "finished";
   players: DummyPlayer[];
   stock: Card[];
@@ -67,6 +67,8 @@ export interface DummyState {
   phase: "draw" | "play";
   turnNumber: number;
   knocker: number | null;
+  /** ทิ้งโง่ candidate this turn: the previous player's discard was picked alone. */
+  feed: { from: number; card: Card } | null;
   /** Final scores (set when finished). */
   scores: number[] | null;
   winners: number[];
@@ -150,7 +152,7 @@ export function startGame(
   const head = deck.splice(0, 1)[0] ?? "";
   const first = rng.nextInt(n);
   const state: DummyState = {
-    rulesetVersion: "3",
+    rulesetVersion: "4",
     status: "active",
     players,
     stock: deck,
@@ -162,6 +164,7 @@ export function startGame(
     phase: "draw",
     turnNumber: 1,
     knocker: null,
+    feed: null,
     scores: null,
     winners: [],
   };
@@ -179,6 +182,7 @@ function clone(s: DummyState): DummyState {
     discardFrom: s.discardFrom.map(([a, b]) => [a, b]),
     melds: s.melds.map((m) => ({ ...m, cards: [...m.cards] })),
     winners: [...s.winners],
+    feed: s.feed ? { ...s.feed } : null,
     scores: s.scores ? [...s.scores] : null,
   };
 }
@@ -214,6 +218,14 @@ function checkKnock(s: DummyState, seat: number, ev: DummyEvent[]): boolean {
   if (me(s, seat).hand.length > 0) return false;
   s.knocker = seat;
   ev.push({ type: "knock", seat });
+  const feeder = s.feed ? s.players[s.feed.from] : undefined;
+  if (s.feed && feeder) {
+    const penalty = DUMMY_RULES.speto.includes(s.feed.card)
+      ? DUMMY_RULES.feedPenaltySpeto
+      : DUMMY_RULES.feedPenalty;
+    feeder.points -= penalty;
+    ev.push({ type: "fed", seat: s.feed.from, card: s.feed.card, penalty });
+  }
   finish(s, ev);
   return true;
 }
@@ -222,6 +234,7 @@ function nextTurn(s: DummyState, ev: DummyEvent[]): void {
   s.current = (s.current + 1) % s.players.length;
   s.phase = "draw";
   s.turnNumber += 1;
+  s.feed = null;
   // No stock and nothing useful to pick: the round ends when the next player cannot draw.
   if (s.stock.length === 0) {
     ev.push({ type: "stock_out" });
@@ -291,15 +304,10 @@ export function applyCommand(
         ev.push({ type: "picked", seat, cards: taken, head: isHead });
         ev.push({ type: "laid_off", seat, cards: [target], meld: command.layoff });
       } else throw new GameRuleError("pick_needs_meld");
-      // ทิ้งโง่: picked before the discarder played again (within one lap of turns).
-      const feeder = s.players[from];
-      if (feeder && from !== seat && s.turnNumber - turn < s.players.length) {
-        const penalty = DUMMY_RULES.speto.includes(target)
-          ? DUMMY_RULES.feedPenaltySpeto
-          : DUMMY_RULES.feedPenalty;
-        feeder.points -= penalty;
-        ev.push({ type: "fed", seat: from, card: target, penalty });
-      }
+      // ทิ้งโง่ candidate: only the previous player's last discard was taken (penalty if we knock now).
+      const prev = (seat - 1 + s.players.length) % s.players.length;
+      if (taken.length === 1 && from === prev && from !== seat && turn === s.turnNumber - 1)
+        s.feed = { from, card: target };
       if (isHead) {
         p.tookHead = true;
         p.points += DUMMY_RULES.headBonus;

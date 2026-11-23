@@ -7,6 +7,7 @@ import { StickerButton } from "../../components/StickerButton.tsx";
 import { gameById } from "../../platform/games.ts";
 import { MatchShell } from "../../platform/MatchShell.tsx";
 import { useMatch } from "../../platform/useMatch.ts";
+import { useHandDrag } from "./useHandDrag.ts";
 
 type View = dummyGame.DummyView;
 const game = gameById("dummy");
@@ -40,7 +41,6 @@ export function DummyPage() {
   const [target, setTarget] = useState<number | null>(null);
   const [sortMode, setSortMode] = useState<SortMode>("suit");
   const [order, setOrder] = useState<string[]>([]);
-  if (!game) return null;
   const v = m.data?.view;
   const myTurn = v !== undefined && v.acting === v.seat && v.status === "active";
   const toggle = (c: string) => {
@@ -57,18 +57,15 @@ export function DummyPage() {
     sortMode === "own"
       ? ownOrder(order, hand)
       : [...hand].sort(sortMode === "rank" ? byRank : bySuit);
-  /** Move the one selected card left / right; switches to the player's own order. */
-  const move = (dir: -1 | 1) => {
-    const card = picked[0];
-    if (picked.length !== 1 || card === undefined) return;
-    const next = [...sorted];
-    const i = next.indexOf(card);
-    const j = i + dir;
-    if (i < 0 || j < 0 || j >= next.length) return;
-    [next[i], next[j]] = [next[j] ?? card, card];
+  const drag = useHandDrag(sorted, (next) => {
     setOrder(next);
     setSortMode("own");
-  };
+  });
+  if (!game) return null;
+  /** Cards above the chosen pile card (they come to the hand and may join the meld). */
+  const above = v && pile !== null ? v.discard.slice(pile + 1) : [];
+  /** Only cards that are really available now (drops stale selections). */
+  const usable = picked.filter((c) => hand.includes(c) || above.includes(c));
   const fed = (m.data?.events ?? []).filter(isFed);
   const lastCard = hand.length === 1;
 
@@ -136,18 +133,20 @@ export function DummyPage() {
           </section>
 
           <section aria-label="กองทิ้ง" className="flex flex-col gap-1">
-            <h2 className="font-semibold">กองทิ้ง (เลือกใบที่จะเก็บ)</h2>
+            <h2 className="font-semibold">กองทิ้ง (เลือกใบที่จะเก็บ แล้วเลือกไพ่ในมือหรือใบที่อยู่ทับเพื่อเกิด)</h2>
             <div className="flex flex-wrap gap-1">
               {v.discard.map((c, i) => (
                 <PlayingCard
                   key={c}
                   code={c}
                   small
-                  selected={pile !== null && i >= pile}
+                  selected={pile !== null && (i === pile || usable.includes(c))}
                   {...(myTurn &&
                     v.phase === "draw" && {
                       onClick: () => {
-                        setPile(pile === i ? null : i);
+                        // Above the chosen card: use it in the meld; otherwise choose / clear the pile card.
+                        if (pile !== null && i > pile) toggle(c);
+                        else setPile(pile === i ? null : i);
                       },
                     })}
                 />
@@ -178,7 +177,10 @@ export function DummyPage() {
 
           <section aria-label="ไพ่ในมือ" className="flex flex-col gap-2">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <h2 className="font-semibold">ไพ่ในมือ ({v.myHand.length})</h2>
+              <h2 className="font-semibold">
+                ไพ่ในมือ ({v.myHand.length}){" "}
+                <span className="text-xs font-normal text-am-muted">กดค้างแล้วลากเพื่อจัดเรียง</span>
+              </h2>
               <div role="group" aria-label="เรียงไพ่" className="flex flex-wrap gap-1 text-sm">
                 {(
                   [
@@ -198,40 +200,25 @@ export function DummyPage() {
                     {label}
                   </button>
                 ))}
-                <button
-                  type="button"
-                  aria-label="ย้ายไพ่ที่เลือกไปซ้าย"
-                  disabled={picked.length !== 1}
-                  onClick={() => {
-                    move(-1);
-                  }}
-                  className="am-pressable rounded-full border-2 border-am-ink bg-am-card px-3 py-1 font-semibold disabled:opacity-40"
-                >
-                  ◀
-                </button>
-                <button
-                  type="button"
-                  aria-label="ย้ายไพ่ที่เลือกไปขวา"
-                  disabled={picked.length !== 1}
-                  onClick={() => {
-                    move(1);
-                  }}
-                  className="am-pressable rounded-full border-2 border-am-ink bg-am-card px-3 py-1 font-semibold disabled:opacity-40"
-                >
-                  ▶
-                </button>
               </div>
             </div>
             <div role="group" aria-label="Hand" className="flex flex-wrap gap-1 pt-2">
               {sorted.map((c) => (
-                <PlayingCard
+                <span
                   key={c}
-                  code={c}
-                  selected={picked.includes(c)}
-                  onClick={() => {
-                    toggle(c);
-                  }}
-                />
+                  {...drag.handlers(c)}
+                  className={`touch-none select-none [-webkit-touch-callout:none] ${drag.dragging === c ? "scale-110 opacity-70" : ""}`}
+                >
+                  <PlayingCard
+                    code={c}
+                    selected={picked.includes(c)}
+                    {...(myTurn && {
+                      onClick: () => {
+                        if (!drag.consumeDrag()) toggle(c);
+                      },
+                    })}
+                  />
+                </span>
               ))}
             </div>
           </section>
@@ -240,14 +227,14 @@ export function DummyPage() {
             <div className="flex flex-wrap gap-2">
               <StickerButton
                 variant="confirm"
-                disabled={m.busy || pile === null || (picked.length < 2 && target === null)}
+                disabled={m.busy || pile === null || (usable.length < 2 && target === null)}
                 onClick={() => {
                   if (pile === null) return;
                   const card = v.discard[pile] ?? "";
                   send(
-                    target !== null && picked.length === 0
+                    target !== null && usable.length === 0
                       ? { type: "pick", index: pile, layoff: target }
-                      : { type: "pick", index: pile, meld: [card, ...picked] },
+                      : { type: "pick", index: pile, meld: [card, ...usable] },
                   );
                 }}
               >
@@ -259,17 +246,17 @@ export function DummyPage() {
             <div className="flex flex-wrap gap-2">
               <StickerButton
                 variant="confirm"
-                disabled={m.busy || picked.length < 3}
+                disabled={m.busy || usable.length < 3}
                 onClick={() => {
-                  send({ type: "meld", cards: picked });
+                  send({ type: "meld", cards: usable });
                 }}
               >
                 เกิด
               </StickerButton>
               <StickerButton
-                disabled={m.busy || picked.length === 0 || target === null}
+                disabled={m.busy || usable.length === 0 || target === null}
                 onClick={() => {
-                  send({ type: "layoff", meld: target, cards: picked });
+                  send({ type: "layoff", meld: target, cards: usable });
                 }}
               >
                 ฝาก
@@ -287,9 +274,9 @@ export function DummyPage() {
               ) : (
                 <StickerButton
                   variant="danger"
-                  disabled={m.busy || picked.length !== 1}
+                  disabled={m.busy || usable.length !== 1}
                   onClick={() => {
-                    send({ type: "discard", card: picked[0] });
+                    send({ type: "discard", card: usable[0] });
                   }}
                 >
                   ทิ้ง
