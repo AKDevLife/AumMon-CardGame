@@ -57,7 +57,7 @@ await check("engine-health", async () => {
   assert(
     body.rulesetVersion === "13" &&
       body.games?.edo_battle === "13" &&
-      body.games?.dummy === "2" &&
+      body.games?.dummy === "3" &&
       body.games?.poker === "1",
     JSON.stringify(body),
   );

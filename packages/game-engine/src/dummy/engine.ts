@@ -2,7 +2,7 @@ import type { RandomSource } from "../rng/seeded-random.ts";
 import { GameRuleError } from "../sdk/module.ts";
 
 /**
- * Thai Dummy (ดัมมี่), ruleset "2" — docs/games/dummy/DUMMY_RULES.md. One round per match.
+ * Thai Dummy (ดัมมี่), ruleset "3" — docs/games/dummy/DUMMY_RULES.md. One round per match.
  * Pure and deterministic. Cards: rank + suit ("As", "Td", "2c").
  */
 export type Card = string;
@@ -20,6 +20,9 @@ export const DUMMY_RULES = {
   /** ทิ้งโง่: a discard picked up by another player before the discarder's next turn. */
   feedPenalty: 50,
   feedPenaltySpeto: 100,
+  /** ทิ้งเต็ม: a discard that completes a meld with any 2 cards already in the pile. */
+  fullPenalty: 50,
+  fullPenaltySpeto: 100,
   turnTimeoutMs: 45_000,
   afkTimeouts: 2,
 } as const;
@@ -49,7 +52,7 @@ export interface DummyPlayer {
 }
 
 export interface DummyState {
-  readonly rulesetVersion: "2";
+  readonly rulesetVersion: "3";
   status: "active" | "finished";
   players: DummyPlayer[];
   stock: Card[];
@@ -90,6 +93,7 @@ export type DummyEvent =
   | { type: "laid_off"; seat: number; cards: Card[]; meld: number }
   | { type: "discarded"; seat: number; card: Card }
   | { type: "fed"; seat: number; card: Card; penalty: number }
+  | { type: "full_discard"; seat: number; card: Card; penalty: number }
   | { type: "knock"; seat: number }
   | { type: "stock_out" }
   | { type: "game_over"; scores: number[]; winners: number[] }
@@ -146,7 +150,7 @@ export function startGame(
   const head = deck.splice(0, 1)[0] ?? "";
   const first = rng.nextInt(n);
   const state: DummyState = {
-    rulesetVersion: "2",
+    rulesetVersion: "3",
     status: "active",
     players,
     stock: deck,
@@ -223,6 +227,14 @@ function nextTurn(s: DummyState, ev: DummyEvent[]): void {
     ev.push({ type: "stock_out" });
     finish(s, ev);
   }
+}
+
+/** True when `card` forms a set or run with any two cards of `pile`. */
+export function completesPileMeld(card: Card, pile: readonly Card[]): boolean {
+  for (let i = 0; i < pile.length; i++)
+    for (let j = i + 1; j < pile.length; j++)
+      if (isValidMeld([card, pile[i] ?? "", pile[j] ?? ""])) return true;
+  return false;
 }
 
 // ---------------------------------------------------------------- commands
@@ -321,6 +333,14 @@ export function applyCommand(
     case "discard": {
       if (s.phase !== "play") throw new GameRuleError("draw_first");
       takeFromHand(p, [command.card]);
+      // ทิ้งเต็ม (not on the knock card: the round ends with it).
+      if (p.hand.length > 0 && completesPileMeld(command.card, s.discard)) {
+        const penalty = DUMMY_RULES.speto.includes(command.card)
+          ? DUMMY_RULES.fullPenaltySpeto
+          : DUMMY_RULES.fullPenalty;
+        p.points -= penalty;
+        ev.push({ type: "full_discard", seat, card: command.card, penalty });
+      }
       s.discard.push(command.card);
       s.discardFrom.push([seat, s.turnNumber]);
       ev.push({ type: "discarded", seat, card: command.card });

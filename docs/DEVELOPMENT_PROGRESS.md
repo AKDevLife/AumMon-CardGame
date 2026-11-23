@@ -25,8 +25,8 @@
 | 9 Developer Admin       |      17 |      17 |    100% |
 | 12 Discard Edition      |      20 |      21 |     95% |
 | 13 AI Art Production    |       1 |       9 |     11% |
-| 14 Game Center          |      10 |      11 |     91% |
-| **Overall**             | **117** | **130** | **90%** |
+| 14 Game Center          |      11 |      12 |     92% |
+| **Overall**             | **118** | **131** | **90%** |
 
 ## Completed (summary)
 

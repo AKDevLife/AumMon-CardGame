@@ -128,6 +128,28 @@ describe("turns", () => {
     expect(t.state.players[0]?.points).toBe(-100);
   });
 
+  it.each([
+    ["2h", ["2s", "9d", "2d"], true],
+    ["2s", ["3s", "Kh", "4s"], true],
+    ["5s", ["3s", "4s"], true],
+    ["5s", ["3s", "4h"], false],
+    ["Ks", ["Qs", "As"], true],
+    ["Ks", ["As", "2s"], false],
+  ])("ทิ้งเต็ม: %s with pile %j → %s", (card, pile, full) => {
+    let s = table(
+      [
+        [card, "8h", "Jc"],
+        ["Td", "Tc"],
+      ],
+      pile,
+      ["6d", "7d"],
+    );
+    s = applyCommand(s, 0, { type: "draw" }).state;
+    const t = applyCommand(s, 0, { type: "discard", card });
+    expect(t.state.players[0]?.points).toBe(full ? -50 : 0);
+    expect(t.events.some((e) => e.type === "full_discard")).toBe(full);
+  });
+
   it("ทิ้งโง่: no penalty once the discarder has played again", () => {
     let s = table(
       [
