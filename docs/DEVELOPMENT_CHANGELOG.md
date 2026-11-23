@@ -2,6 +2,10 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-23 — Home settings button in the header (owner)
+
+- ⚙️ ตั้งค่า (sound / music) moved from the home page buttons to the top bar next to โปรไฟล์ / ออกจากระบบ (home page only; game tables keep their own settings button).
+
 ## 2026-11-23 — Game Center deployed to Dev
 
 - PR #106 merged (CI green: unit, pgTAP, backend, E2E). Migrations `20261123000000` + `20261123000100` applied to AumMon-Dev with history (existing 16 EDO matches kept as `edo_battle`); 14 Edge Functions deployed; playtest URL shows the Game Center.
