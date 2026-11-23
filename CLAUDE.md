@@ -33,4 +33,4 @@ Detailed rules live in `.claude/rules/` (auto-loaded). Each rule is stated once,
 ## Quick reference
 
 - Stack: pnpm workspaces · React + Vite + TS strict · Tailwind · Supabase · Vercel · Vitest · Playwright
-- Full local gate: `pnpm check`; E2E: `pnpm test:e2e`; progress numbers: `pnpm progress`
+- Full local gate: `pnpm check` (`pnpm check:quiet` = failures only); E2E: `pnpm test:e2e`; progress numbers: `pnpm progress`
