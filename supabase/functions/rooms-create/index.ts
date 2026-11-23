@@ -1,7 +1,7 @@
-// POST { mode: "online", maxPlayers?: 2–8 } → { roomId, joinCode }   (solo / pass & play use game-create)
+// POST { mode: "online", maxPlayers?: 2–8, gameId?: "edo_battle" } → { roomId, joinCode }
 import { requireUser } from "../_shared/auth.ts";
 import { handler, readJson } from "../_shared/http.ts";
-import { int, oneOf } from "../_shared/input.ts";
+import { gameId, int, oneOf } from "../_shared/input.ts";
 import { createOnlineRoom } from "../_shared/lobby.ts";
 
 Deno.serve(
@@ -11,7 +11,8 @@ Deno.serve(
     oneOf(body, "mode", ["online"] as const);
     return createOnlineRoom(
       userId,
-      body["maxPlayers"] === undefined ? 4 : int(body, "maxPlayers", 2, 8),
+      body["maxPlayers"] === undefined ? undefined : int(body, "maxPlayers", 2, 8),
+      gameId(body),
     );
   }),
 );

@@ -213,6 +213,26 @@ describe.runIf(run)("admin RBAC via Edge Functions", () => {
     ).toBe("pop");
     const sim = await admin.call({ action: "bots.simulate", games: 3 });
     expect(sim.body["games"]).toBe(3);
+    const pokerSim = await admin.call({ action: "bots.simulate", games: 2, gameId: "poker" });
+    expect(pokerSim.body["gameId"]).toBe("poker");
+    // Game Center: admin lists all games and turns one off; players then cannot start it.
+    const games = await admin.call({ action: "games" });
+    expect((games.body as unknown as { id: string }[]).map((g) => g.id)).toEqual([
+      "edo_battle",
+      "dummy",
+      "poker",
+    ]);
+    expect(
+      (await player.call({ action: "game.set_enabled", gameId: "dummy", enabled: false })).status,
+    ).toBe(403);
+    expect(
+      (await admin.call({ action: "game.set_enabled", gameId: "dummy", enabled: false })).status,
+    ).toBe(200);
+    const listed = await player.client.from("games").select("id");
+    expect((listed.data ?? []).map((g: { id: string }) => g.id)).not.toContain("dummy");
+    expect(
+      (await admin.call({ action: "game.set_enabled", gameId: "dummy", enabled: true })).status,
+    ).toBe(200);
   }, 60_000);
 
   it("logout ends admin access", async () => {

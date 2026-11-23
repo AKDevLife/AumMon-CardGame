@@ -23,8 +23,18 @@ export function ago(v: unknown): string {
 const MAPS: Record<string, Record<string, string>> = {
   roomStatus: { lobby: "รอผู้เล่น", playing: "กำลังเล่น", closed: "ปิดแล้ว" },
   matchStatus: { active: "กำลังเล่น", finished: "จบแล้ว", abandoned: "ถูกยุติ", created: "กำลังเริ่ม" },
-  mode: { solo: "เล่นกับ Bot", online: "ออนไลน์" },
-  phase: { mulligan: "เลือกเปลี่ยนการ์ด", main: "เทิร์นของผู้เล่น", battle: "ช่วงต่อสู้" },
+  mode: { solo: "เล่นกับ Bot", online: "ห้องส่วนตัว", quick_match: "Quick Match" },
+  game: { edo_battle: "EDO Battle", dummy: "ดัมมี่", poker: "โป๊กเกอร์" },
+  phase: {
+    play: "เทิร์นของผู้เล่น",
+    reaction: "รอกางร่ม",
+    finished: "จบแล้ว",
+    draw: "รอจั่ว",
+    preflop: "ก่อนเปิดไพ่กลาง",
+    flop: "Flop",
+    turn: "Turn",
+    river: "River",
+  },
   seatType: { human: "ผู้เล่น", bot: "Bot", local: "ผู้เล่นในเครื่อง" },
   cardType: {
     unit: "Unit (ตัวละคร)",
@@ -48,6 +58,8 @@ const MAPS: Record<string, Record<string, string>> = {
     "match.abandoned": "ยุติแมตช์",
     "bots.simulated": "ทดสอบ Bot",
     "settings.sounds_updated": "แก้ไขการตั้งค่าเสียง",
+    "game.enabled": "เปิดเกม",
+    "game.disabled": "ปิดเกม",
   },
   stale: {
     empty: "ไม่มีผู้เล่นในห้องแล้ว",

@@ -15,6 +15,7 @@ import { RulesText } from "./RulesText.tsx";
 import { CenterTable, GameHeader, Opponents, WinOverlay } from "./TableParts.tsx";
 import { normalizeSoundConfig, playSound, setSoundConfig, soundFor } from "./sound.ts";
 import type { GameResponse } from "./types.ts";
+import { gameById } from "../../platform/games.ts";
 
 const POLL_MS = 2000;
 type Need = "target" | "targetCard" | "card" | "optionalCard" | "pair" | null;
@@ -99,6 +100,13 @@ export function GamePage() {
           matchId,
           ...(resume && { resume: true }),
         });
+        // Another Game Center game's match: open its own table.
+        const other = (next as { gameId?: string }).gameId;
+        if (other && other !== "edo_battle") {
+          const g = gameById(other);
+          if (g) void navigate(g.matchPath(matchId), { replace: true });
+          return;
+        }
         setOffset(next.serverNow - Date.now());
         setData(next);
         setError(null);
@@ -106,7 +114,7 @@ export function GamePage() {
         setError(e instanceof ApiError ? e.message : "โหลดเกมไม่สำเร็จ");
       }
     },
-    [client, matchId],
+    [client, matchId, navigate],
   );
 
   useEffect(() => {

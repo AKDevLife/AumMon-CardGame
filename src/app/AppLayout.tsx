@@ -27,7 +27,7 @@ export function AppLayout() {
       </main>
       <footer className="px-4 py-4 text-center text-xs text-am-muted">
         <span className="rounded-full bg-am-round px-3 py-1 font-semibold text-am-ink">
-          Discard Edition · 2–8 คน
+          Game Center
         </span>{" "}
         · engine {ENGINE_VERSION} ·{" "}
         <Link to="/privacy" className="underline">

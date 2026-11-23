@@ -1,0 +1,204 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`EDO Battle golden replay (ruleset 13) > 2 players 1`] = `
+[
+  {
+    "events": "68162a4e",
+    "players": 2,
+    "state": "c22be6b7",
+    "steps": 15,
+    "turns": 14,
+    "winner": 0,
+  },
+  {
+    "events": "a733ec5f",
+    "players": 2,
+    "state": "0ce3ca70",
+    "steps": 8,
+    "turns": 8,
+    "winner": 0,
+  },
+  {
+    "events": "3ef0f894",
+    "players": 2,
+    "state": "95df4c09",
+    "steps": 15,
+    "turns": 15,
+    "winner": 0,
+  },
+]
+`;
+
+exports[`EDO Battle golden replay (ruleset 13) > 3 players 1`] = `
+[
+  {
+    "events": "5e842291",
+    "players": 3,
+    "state": "3d34705c",
+    "steps": 11,
+    "turns": 11,
+    "winner": 0,
+  },
+  {
+    "events": "9ec9d39f",
+    "players": 3,
+    "state": "480ba72e",
+    "steps": 19,
+    "turns": 17,
+    "winner": 2,
+  },
+  {
+    "events": "e439d4fb",
+    "players": 3,
+    "state": "5ae05be7",
+    "steps": 19,
+    "turns": 19,
+    "winner": 0,
+  },
+]
+`;
+
+exports[`EDO Battle golden replay (ruleset 13) > 4 players 1`] = `
+[
+  {
+    "events": "dba1444b",
+    "players": 4,
+    "state": "8f629219",
+    "steps": 27,
+    "turns": 26,
+    "winner": 3,
+  },
+  {
+    "events": "b9e648aa",
+    "players": 4,
+    "state": "d9b7517e",
+    "steps": 17,
+    "turns": 16,
+    "winner": 0,
+  },
+  {
+    "events": "aecd9048",
+    "players": 4,
+    "state": "f340ced0",
+    "steps": 29,
+    "turns": 28,
+    "winner": 3,
+  },
+]
+`;
+
+exports[`EDO Battle golden replay (ruleset 13) > 5 players 1`] = `
+[
+  {
+    "events": "4f99f02d",
+    "players": 5,
+    "state": "5ae181b6",
+    "steps": 8,
+    "turns": 8,
+    "winner": 4,
+  },
+  {
+    "events": "9a964b27",
+    "players": 5,
+    "state": "e573f475",
+    "steps": 23,
+    "turns": 22,
+    "winner": 2,
+  },
+  {
+    "events": "2b2677ae",
+    "players": 5,
+    "state": "1c6b786c",
+    "steps": 22,
+    "turns": 21,
+    "winner": 3,
+  },
+]
+`;
+
+exports[`EDO Battle golden replay (ruleset 13) > 6 players 1`] = `
+[
+  {
+    "events": "cad1919a",
+    "players": 6,
+    "state": "1a9ecbb4",
+    "steps": 7,
+    "turns": 7,
+    "winner": 4,
+  },
+  {
+    "events": "1a1ab9db",
+    "players": 6,
+    "state": "3ae7195d",
+    "steps": 21,
+    "turns": 20,
+    "winner": 3,
+  },
+  {
+    "events": "79f3658f",
+    "players": 6,
+    "state": "5d336d26",
+    "steps": 31,
+    "turns": 30,
+    "winner": 0,
+  },
+]
+`;
+
+exports[`EDO Battle golden replay (ruleset 13) > 7 players 1`] = `
+[
+  {
+    "events": "f5f8ed5a",
+    "players": 7,
+    "state": "268f99aa",
+    "steps": 56,
+    "turns": 49,
+    "winner": 6,
+  },
+  {
+    "events": "3dc62ae9",
+    "players": 7,
+    "state": "d46e8a63",
+    "steps": 23,
+    "turns": 21,
+    "winner": 0,
+  },
+  {
+    "events": "238404c7",
+    "players": 7,
+    "state": "c5178865",
+    "steps": 10,
+    "turns": 10,
+    "winner": 4,
+  },
+]
+`;
+
+exports[`EDO Battle golden replay (ruleset 13) > 8 players 1`] = `
+[
+  {
+    "events": "ef122637",
+    "players": 8,
+    "state": "fea0e19b",
+    "steps": 6,
+    "turns": 6,
+    "winner": 4,
+  },
+  {
+    "events": "c818997b",
+    "players": 8,
+    "state": "d636fe8a",
+    "steps": 45,
+    "turns": 40,
+    "winner": 3,
+  },
+  {
+    "events": "9518f990",
+    "players": 8,
+    "state": "0d3d540f",
+    "steps": 14,
+    "turns": 12,
+    "winner": 6,
+  },
+]
+`;

@@ -2,6 +2,31 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-23 — 14.7 / 14.8 Central admin + security review
+
+- Admin: new section **เกม** (list games with live counts, enable / disable — audited), game shown in rooms and matches lists (`gameId` filter), bot simulation for any game (shows wins per seat), phase / mode labels updated for all games.
+- `docs/SECURITY_REVIEW.md` Game Center update (no new high / medium findings). Scoped admin roles (GC7.3) wait for an owner decision; load test per game (GC8.2) runs against Dev after deployment.
+
+## 2026-11-23 — 14.3–14.6 Dummy + Poker + Quick Match
+
+- Engines (pure, seeded): `dummy/` (Thai Dummy ruleset "1": melds, discard pickup with immediate meld, head card, speto, knock, scoring; greedy bot from its own view) and `poker/` (No-Limit Hold'em ruleset "1": 7-card evaluator, blinds, min-raise / incomplete all-in rule, side pots, showdown, sit-and-go; bot from its own view). Rules: `docs/games/{dummy,poker}/`.
+- Server: both games run through the platform orchestrator unchanged; `matchmaking` function + `private.matchmaking_queue` (Quick Match, bot fill after 30 s); per-game `player_game_stats` (EDO history backfilled); lobby uses private `room:{id}` channel. Migration `20261123000100_game_center_play.sql`.
+- UI: shared `useMatch` / `MatchShell` / `PlayingCard`, Dummy and Poker tables, Quick Match on every game's Online page, generic solo / online pages, profile stats.
+- Decisions: GC2.8 sweeper not needed (client polling drives timers); GC6.2 wallet not needed (chips live only inside a match).
+- Tests: poker (27) + dummy (19) engine incl. chip / 52-card conservation simulations, backend `game-center.test.ts`, E2E `game-center.spec.ts`, pgTAP `014`.
+
+## 2026-11-23 — 14.1 / 14.2 Game Center foundation (GC1.1–GC2.4)
+
+- Engine: `sdk/` Game Module Interface + generic bot/timer flow (`sdk.advance`, moved from `_shared/game-flow.ts` without behaviour change), `edo-battle/` adapter over `discard` (rules untouched), `registry.ts`. Golden replay test (21 seeded games) locks EDO Battle behaviour.
+- Server: `_shared/game.ts` is a game-agnostic orchestrator choosing the module from `matches.game_id`; EDO telemetry moved to `_shared/games/edo-battle.ts`; `game-create` / `rooms-create` accept optional `gameId`; game commands parsed by the game module.
+- DB `20261123000000_game_center_registry.sql`: `public.games` (RLS: enabled rows), `game_id` on rooms/matches (default `edo_battle`), per-game ruleset/phase checks, room mode `quick_match`. pgTAP `013_games`.
+- UI: Game Center hub (EDO Battle + Dummy/Poker "เร็ว ๆ นี้"), public name "EDO Battle" (G1–G3), solo page shows the real 60 s turn (was "45").
+- Architecture tests: no cross-game imports; every Edge Function authenticates.
+
+## 2026-11-23 — 14.0 Game Center audit + architecture
+
+- `docs/architecture/*` (audit, inventory, master architecture, DB plan, migration plan, risks) and `docs/roadmap/GAME_CENTER_ROADMAP.md`. Owner approved G1–G3 and GC0–GC8.
+
 ## 2026-11-22 — 12.7 VIP + cosmetic gacha design doc
 
 - `docs/discard/AumMon_VIP_Cosmetics_Design.md`: cosmetic-only VIP (host 5–8 seat rooms) and items, coins/gems, optional gacha with published odds + pity, minors/legal checklist, `private`-schema data sketch. Nothing built; owner Q1–Q5 + legal check before any build (DC7, F8).

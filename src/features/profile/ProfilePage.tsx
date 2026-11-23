@@ -5,6 +5,7 @@ import { AuthCard } from "../auth/AuthCard.tsx";
 import { useAuth } from "../auth/auth-context.ts";
 import { formText, validateDisplayName } from "../auth/validation.ts";
 import { DeleteAccount } from "./DeleteAccount.tsx";
+import { GameStats } from "./GameStats.tsx";
 
 type LoadState =
   { status: "loading" } | { status: "ready"; displayName: string } | { status: "error" };
@@ -105,6 +106,7 @@ export function ProfilePage() {
           hint="2–24 ตัวอักษร"
         />
       </AuthCard>
+      <GameStats />
       <DeleteAccount />
     </div>
   );

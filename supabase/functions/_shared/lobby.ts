@@ -1,5 +1,6 @@
 /** Online lobby (blueprint §6.3): join codes are random, stored only as SHA-256, expire, and are rate-limited. */
 import { db } from "./db.ts";
+import { enabledGame } from "./game.ts";
 import { HttpError } from "./http.ts";
 import { rateLimit } from "./ratelimit.ts";
 import { hashRequest } from "./receipts.ts";
@@ -23,14 +24,18 @@ async function displayName(tx: Tx, userId: string) {
   return p?.display_name ?? "Player";
 }
 
-/** Online room for 2–8 players (Discard Edition). Sizes 5–8 become VIP-host rooms later (DC7). */
-export async function createOnlineRoom(userId: string, maxPlayers = 4) {
+/** Private online room (join code) for any enabled game, within the game's seat limits. */
+export async function createOnlineRoom(userId: string, maxPlayers?: number, gameId = "edo_battle") {
   await rateLimit(userId, "room.create", 10, 60); // outside the transaction (own connection)
   return db().begin(async (tx) => {
+    const game = await enabledGame(tx, gameId);
+    const size = maxPlayers ?? Math.min(4, game.maxPlayers);
+    if (size < game.minPlayers || size > game.maxPlayers)
+      throw new HttpError(400, "invalid_input", "maxPlayers out of range for this game");
     const code = newCode();
     const [room] = await tx<{ id: string }[]>`
-      insert into public.game_rooms (owner_id, join_code_hash, mode, status, max_players, ruleset_version, expires_at)
-      values (${userId}, ${await hashRequest(code)}, 'online', 'lobby', ${maxPlayers}, '13', now() + ${`${LOBBY_TTL_MINUTES} minutes`}::interval)
+      insert into public.game_rooms (owner_id, game_id, join_code_hash, mode, status, max_players, ruleset_version, expires_at)
+      values (${userId}, ${game.id}, ${await hashRequest(code)}, 'online', 'lobby', ${size}, ${game.rulesetVersion}, now() + ${`${LOBBY_TTL_MINUTES} minutes`}::interval)
       returning id`;
     if (!room) throw new Error("room insert failed");
     await tx`
@@ -49,8 +54,9 @@ export async function joinRoom(userId: string, rawCode: string) {
       throw new HttpError(404, "room_not_found", "Room not found or expired");
     const [room] = await tx<{ id: string; max_players: number }[]>`
       select id, max_players from public.game_rooms
-      where join_code_hash = ${await hashRequest(code)} and mode = 'online' and ruleset_version = '13'
+      where join_code_hash = ${await hashRequest(code)} and mode = 'online'
         and status = 'lobby' and expires_at > now()
+        and exists (select 1 from public.games g where g.id = public.game_rooms.game_id and g.is_enabled and g.current_ruleset = public.game_rooms.ruleset_version)
       for update`;
     if (!room) throw new HttpError(404, "room_not_found", "Room not found or expired");
     const seats = await tx<{ seat: number; user_id: string | null }[]>`

@@ -192,3 +192,20 @@ Pipeline in `docs/art-production/`; images are made by the owner in an external 
 - [ ] **13.9** Basic emotes (Priority 4; emote feature needs its own task) — deps: 13.7
 
 **Acceptance:** every Integrated asset traces to an Approved master, prompt version and catalog row · all 16 characters pass the lineup check · art readable at in-game sizes · no text baked into art
+
+## Phase 14 — AumMon Game Center (owner 2026-11-23)
+
+Multi-game platform: EDO Battle (= Discard Edition) + Dummy + Texas Hold'em (play-money). Task detail, acceptance criteria and tests: `docs/roadmap/GAME_CENTER_ROADMAP.md`; architecture: `docs/architecture/`.
+
+- [x] **14.0** GC0 Audit + architecture docs + owner decisions G1–G3 — deps: — — (2026-11-23)
+- [~] **14.1** GC1 Platform foundation: Game Module Interface, registry, `public.games` + `game_id`, hub — deps: 14.0
+- [~] **14.2** GC2 EDO Battle behind the platform orchestrator, rename, results/stats, sweeper — deps: 14.1
+- [~] **14.3** GC3 Dummy engine — deps: 14.1
+- [~] **14.4** GC4 Dummy bots, server, UI, matchmaking — deps: 14.2, 14.3
+- [~] **14.5** GC5 Poker engine — deps: 14.1
+- [~] **14.6** GC6 Poker bots, chips ledger, server, UI — deps: 14.2, 14.5
+- [~] **14.7** GC7 Central admin game management — deps: 14.2
+- [~] **14.8** GC8 Full integration testing — deps: 14.4, 14.6, 14.7
+- [!] **14.9** GC9 Production readiness — owner-gated (6.8, 7.3, 7.8, legal check for play-money poker)
+
+**Acceptance:** EDO Battle unchanged (golden replay + existing suites) · each game isolated with its own rules/bots · solo, private room and quick match per game · server-authoritative hidden information · central admin for all games

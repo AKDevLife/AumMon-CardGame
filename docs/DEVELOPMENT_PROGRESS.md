@@ -1,12 +1,12 @@
 # AumMon — Development Progress
 
-> Updated: 2026-11-22 · Numbers from `pnpm progress` (top-level roadmap tasks; verified tasks only)
+> Updated: 2026-11-23 · Numbers from `pnpm progress` (top-level roadmap tasks; verified tasks only)
 
 ## Current
 
-- **Status:** 🎮 Casual Discard Edition (ruleset "13", 2–8 players) is the only game; the 1v1 TCG was removed (code, tables, docs).
+- **Status:** 🎮 AumMon Game Center in progress (Phase 14): EDO Battle (= Casual Discard Edition, ruleset "13") + Dummy + Poker. Plan: `docs/roadmap/GAME_CENTER_ROADMAP.md`.
 - **Phase:** 12 — engine, backend, UI, cleanup and VIP/gacha design (12.7) done.
-- **Current task:** 12.8 owner playtest (Playtest Protocol; numbers in admin → สถิติเล่นทดสอบ)
+- **Current task:** 14.1/14.2 Game Center foundation (GC1.1–GC2.4 in review); 12.8 owner playtest still open
 - **Next:** 12.8 playtest + balance; VIP/gacha build waits for owner Q1–Q5 + legal check (`docs/discard/AumMon_VIP_Cosmetics_Design.md` §8). Art: 13.2 owner chooses Art Direction (`docs/art-production/`).
 - **Playtest URL (latest `main`):** https://aum-mon-card-game-git-playtest-aum-mon.vercel.app
 - **Dev backend:** Supabase `AumMon-Dev` (ref `yaxtzdhryctfjaspxvix`, ap-northeast-1), email confirmation OFF for playtesting.
@@ -25,7 +25,8 @@
 | 9 Developer Admin       |      17 |      17 |    100% |
 | 12 Discard Edition      |      20 |      21 |     95% |
 | 13 AI Art Production    |       1 |       9 |     11% |
-| **Overall**             | **107** | **119** | **90%** |
+| 14 Game Center          |       1 |      10 |     10% |
+| **Overall**             | **108** | **129** | **84%** |
 
 ## Completed (summary)
 
@@ -41,7 +42,7 @@
 
 ## In progress
 
-None
+- 14.1 / 14.2 Game Center foundation (GC1.1–GC2.4)
 
 ## Waiting for the owner
 
