@@ -29,6 +29,7 @@ function table(
   const { state } = startGame(["a", "b"], rng());
   state.players.forEach((p, i) => (p.hand = [...(hands[i] ?? [])]));
   state.discard = [...discard];
+  state.discardFrom = discard.map(() => [-1, 0]);
   state.head = discard[0] ?? "";
   state.stock = [...stock];
   state.current = 0;
@@ -91,6 +92,60 @@ describe("turns", () => {
     // Head card bonus (50) + meld points 15.
     expect(t.state.players[0]?.points).toBe(65);
     expect(t.events.find((e) => e.type === "picked")).toMatchObject({ head: true });
+  });
+
+  it.each([
+    ["5s", 50],
+    ["2s", 50],
+  ])("ทิ้งโง่: another player melds my discard %s within the lap → −%i", (card, penalty) => {
+    let s = table(
+      [
+        [card, "Kd", "8h"],
+        ["3s", "4s", "Jc"],
+      ],
+      ["9d"],
+      ["2d", "Td"],
+    );
+    s = applyCommand(s, 0, { type: "draw" }).state;
+    s = applyCommand(s, 0, { type: "discard", card }).state;
+    const t = applyCommand(s, 1, { type: "pick", index: 1, meld: [card, "3s", "4s"] });
+    expect(t.state.players[0]?.points).toBe(-penalty);
+    expect(t.events).toContainEqual({ type: "fed", seat: 0, card, penalty });
+  });
+
+  it("ทิ้งโง่: speto costs 100", () => {
+    let s = table(
+      [
+        ["Qs", "Kd", "8h"],
+        ["Js", "Ks", "4c"],
+      ],
+      ["9d"],
+      ["2d", "Td"],
+    );
+    s = applyCommand(s, 0, { type: "draw" }).state;
+    s = applyCommand(s, 0, { type: "discard", card: "Qs" }).state;
+    const t = applyCommand(s, 1, { type: "pick", index: 1, meld: ["Qs", "Js", "Ks"] });
+    expect(t.state.players[0]?.points).toBe(-100);
+  });
+
+  it("ทิ้งโง่: no penalty once the discarder has played again", () => {
+    let s = table(
+      [
+        ["5s", "Kd", "8h", "9h"],
+        ["3s", "4s", "Jc", "Qc"],
+      ],
+      ["9d"],
+      ["2d", "Td", "6d", "7d"],
+    );
+    s = applyCommand(s, 0, { type: "draw" }).state;
+    s = applyCommand(s, 0, { type: "discard", card: "5s" }).state;
+    s = applyCommand(s, 1, { type: "draw" }).state;
+    s = applyCommand(s, 1, { type: "discard", card: "Jc" }).state;
+    s = applyCommand(s, 0, { type: "draw" }).state;
+    s = applyCommand(s, 0, { type: "discard", card: "Kd" }).state;
+    const t = applyCommand(s, 1, { type: "pick", index: 1, meld: ["5s", "3s", "4s"] });
+    expect(t.state.players[0]?.points).toBe(0);
+    expect(t.events.some((e) => e.type === "fed")).toBe(false);
   });
 
   it("knock: discarding the last card ends the round with the knock bonus", () => {

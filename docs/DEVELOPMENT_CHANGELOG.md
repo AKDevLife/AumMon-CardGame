@@ -2,6 +2,11 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-23 — 14.10 Dummy ruleset "2" (owner)
+
+- ทิ้งโง่: a discard picked by another player before the discarder's next turn costs 50 (speto 100); state tracks who discarded each pile card and when. Engine 8.0.0; migration `20261123000200` ends active ruleset "1" Dummy games and sets `games.current_ruleset = '2'`.
+- UI: "น็อค!" button when one card is left; hand sorting (ตามดอก / ตามแต้ม / move ◀ ▶); ทิ้งโง่ notice; rules text updated.
+
 ## 2026-11-23 — Owner decisions + settings home button
 
 - 12.8: best-of-3 for 2–3 players = no (single round + rematch). 14.3/14.5: Dummy / Poker basic defaults (ruleset "1") approved as-is.
