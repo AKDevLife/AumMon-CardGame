@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { createMemoryRouter, RouterProvider } from "react-router";
 import { describe, expect, it } from "vitest";
 import { routes } from "./routes.tsx";
@@ -23,6 +23,12 @@ describe("app routes", () => {
     for (const name of ["Solo vs Bot", "Online"]) {
       expect(screen.getByRole("button", { name })).toBeDisabled();
     }
+  });
+
+  it("home header holds the settings button next to the account links", () => {
+    renderAt("/");
+    const nav = screen.getByRole("navigation", { name: "Account" });
+    expect(within(nav).getByRole("button", { name: /ตั้งค่า/ })).toBeEnabled();
   });
 
   it("home offers the rules button", () => {
