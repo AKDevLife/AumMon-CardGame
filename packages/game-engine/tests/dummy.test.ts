@@ -42,7 +42,7 @@ describe("melds", () => {
     [["7c", "7d", "7h"], true],
     [["7c", "7d", "7h", "7s"], true],
     [["3h", "4h", "5h"], true],
-    [["Ah", "2h", "3h"], true],
+    [["Ah", "2h", "3h"], false],
     [["Qh", "Kh", "Ah"], true],
     [["Kh", "Ah", "2h"], false],
     [["3h", "4h", "6h"], false],
@@ -129,6 +129,7 @@ describe("turns", () => {
   it.each([
     ["2h", ["2s", "9d", "2d"], true],
     ["2s", ["3s", "Kh", "4s"], true],
+    ["3s", ["As", "2s"], false],
     ["5s", ["3s", "4s"], true],
     ["5s", ["3s", "4h"], false],
     ["Ks", ["Qs", "As"], true],

@@ -2,6 +2,12 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-23 — 14.13 Dummy ruleset "5" (owner)
+
+- Runs: ace only high (Q-K-A); A-2-3 is no longer a run (melds and ทิ้งเต็ม). Engine 11.0.0; migration `20261123000500`.
+- Head card (หัว) has a yellow background in the pile and in melds.
+- Note: `tests/backend/game.test.ts` "solo with 3 bots" can fail when a bot moves first and makes seat 0 draw (hand 8 ≠ 7); passed on re-run — pre-existing, to fix separately.
+
 ## 2026-11-23 — Dummy: meld owner label
 
 - Each meld on the table shows whose it is ("ของ …").

@@ -209,6 +209,7 @@ Multi-game platform: EDO Battle (= Discard Edition) + Dummy + Texas Hold'em (pla
 - [x] **14.10** Dummy ruleset "2" (ทิ้งโง่ −50 / speto −100), knock button, hand sorting; engine 8.0.0 — deps: 14.4 — PR #113 (2026-11-23)
 - [x] **14.11** Dummy ruleset "3" (ทิ้งเต็ม −50 / speto −100), tap the stock pile to draw; engine 9.0.0 — deps: 14.10 — PR #114 (2026-11-23)
 - [x] **14.12** Dummy ruleset "4" (ทิ้งโง่ = next player picks my discard alone and knocks), hold-drag hand reorder, pick-from-pile fix; engine 10.0.0 — deps: 14.11 — PR #115 (2026-11-23)
+- [x] **14.13** Dummy ruleset "5" (ace only high: Q-K-A, no A-2-3), meld owner label, yellow head card; engine 11.0.0 — deps: 14.12 — PR #116, #117 (2026-11-23)
 - [!] **14.9** GC9 Production readiness — owner-gated (6.8, 7.3, 7.8, legal check for play-money poker)
 
 **Acceptance:** EDO Battle unchanged (golden replay + existing suites) · each game isolated with its own rules/bots · solo, private room and quick match per game · server-authoritative hidden information · central admin for all games

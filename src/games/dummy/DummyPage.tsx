@@ -133,13 +133,16 @@ export function DummyPage() {
           </section>
 
           <section aria-label="กองทิ้ง" className="flex flex-col gap-1">
-            <h2 className="font-semibold">กองทิ้ง (เลือกใบที่จะเก็บ แล้วเลือกไพ่ในมือหรือใบที่อยู่ทับเพื่อเกิด)</h2>
+            <h2 className="font-semibold">
+              กองทิ้ง (เลือกใบที่จะเก็บ แล้วเลือกไพ่ในมือหรือใบที่อยู่ทับเพื่อเกิด) · พื้นเหลือง = หัว
+            </h2>
             <div className="flex flex-wrap gap-1">
               {v.discard.map((c, i) => (
                 <PlayingCard
                   key={c}
                   code={c}
                   small
+                  head={c === v.head}
                   selected={pile !== null && (i === pile || usable.includes(c))}
                   {...(myTurn &&
                     v.phase === "draw" && {
@@ -173,7 +176,7 @@ export function DummyPage() {
                 </span>
                 <span className="flex flex-wrap gap-1">
                   {meld.cards.map((c) => (
-                    <PlayingCard key={c} code={c} small />
+                    <PlayingCard key={c} code={c} small head={c === v.head} />
                   ))}
                 </span>
               </button>

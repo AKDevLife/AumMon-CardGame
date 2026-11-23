@@ -2,7 +2,7 @@ import type { RandomSource } from "../rng/seeded-random.ts";
 import { GameRuleError } from "../sdk/module.ts";
 
 /**
- * Thai Dummy (ดัมมี่), ruleset "4" — docs/games/dummy/DUMMY_RULES.md. One round per match.
+ * Thai Dummy (ดัมมี่), ruleset "5" — docs/games/dummy/DUMMY_RULES.md. One round per match.
  * Pure and deterministic. Cards: rank + suit ("As", "Td", "2c").
  */
 export type Card = string;
@@ -52,7 +52,7 @@ export interface DummyPlayer {
 }
 
 export interface DummyState {
-  readonly rulesetVersion: "4";
+  readonly rulesetVersion: "5";
   status: "active" | "finished";
   players: DummyPlayer[];
   stock: Card[];
@@ -103,7 +103,7 @@ export type DummyEvent =
 
 // ---------------------------------------------------------------- melds
 
-/** Valid set (3–4 of a rank) or run (3+ same suit in sequence; A low or high, no wrap). */
+/** Valid set (3–4 of a rank) or run (3+ same suit in sequence; 2 is lowest, A only high: Q-K-A). */
 export function isValidMeld(cards: readonly Card[]): boolean {
   if (cards.length < 3 || new Set(cards).size !== cards.length) return false;
   const ranks = cards.map(rankNo);
@@ -113,7 +113,7 @@ export function isValidMeld(cards: readonly Card[]): boolean {
     const s = [...rs].sort((a, b) => a - b);
     return s.every((r, i) => i === 0 || r === (s[i - 1] ?? 0) + 1);
   };
-  return consecutive(ranks) || consecutive(ranks.map((r) => (r === 1 ? 14 : r)));
+  return consecutive(ranks.map((r) => (r === 1 ? 14 : r)));
 }
 
 // ---------------------------------------------------------------- setup
@@ -152,7 +152,7 @@ export function startGame(
   const head = deck.splice(0, 1)[0] ?? "";
   const first = rng.nextInt(n);
   const state: DummyState = {
-    rulesetVersion: "4",
+    rulesetVersion: "5",
     status: "active",
     players,
     stock: deck,

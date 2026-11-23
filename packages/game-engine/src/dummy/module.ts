@@ -12,7 +12,7 @@ import {
 } from "./engine.ts";
 import { getDummyView, type DummyView } from "./view.ts";
 
-export const DUMMY_RULESET_VERSION = "4";
+export const DUMMY_RULESET_VERSION = "5";
 const CARD_RE = /^[A2-9TJQK][cdhs]$/;
 
 function card(v: unknown): Card {
