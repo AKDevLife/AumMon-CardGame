@@ -19,7 +19,8 @@ async function myTurn(page: Page) {
 test("hub → Dummy solo → draw + discard → leave", async ({ page }) => {
   test.setTimeout(120_000);
   await signUp(page);
-  await page.getByRole("link", { name: "ดัมมี่ Solo vs Bot" }).click();
+  await page.getByRole("link", { name: "เล่นดัมมี่กับ Bot" }).click();
+  await page.getByLabel("จำนวน Bot").selectOption("1");
   await page.getByRole("button", { name: "เริ่มเกม" }).click();
   await expect(page).toHaveURL(/\/games\/dummy\/match\//);
   await expect(page.getByRole("group", { name: "Hand" }).locator(":scope > *")).toHaveCount(11, {
@@ -40,7 +41,7 @@ test("hub → Dummy solo → draw + discard → leave", async ({ page }) => {
 test("hub → Poker solo → act → leave", async ({ page }) => {
   test.setTimeout(120_000);
   await signUp(page);
-  await page.getByRole("link", { name: "โป๊กเกอร์ Solo vs Bot" }).click();
+  await page.getByRole("link", { name: "เล่นโป๊กเกอร์กับ Bot" }).click();
   await page.getByRole("button", { name: "เริ่มเกม" }).click();
   await expect(page).toHaveURL(/\/games\/poker\/match\//);
   await expect(page.getByRole("group", { name: "Hand" }).getByRole("img")).toHaveCount(2, {

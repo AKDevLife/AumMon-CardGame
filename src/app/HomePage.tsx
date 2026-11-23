@@ -135,14 +135,14 @@ export function HomePage() {
                   <div className="flex gap-2">
                     <Link
                       to={g.soloPath}
-                      aria-label={`${g.name} Solo vs Bot`}
+                      aria-label={`เล่น${g.name}กับ Bot`}
                       className="am-pressable flex min-h-11 flex-1 items-center justify-center rounded-full border-[3px] border-am-ink bg-am-title px-3 font-display font-semibold"
                     >
                       Solo
                     </Link>
                     <Link
                       to={g.onlinePath}
-                      aria-label={`${g.name} Online`}
+                      aria-label={`เล่น${g.name}กับเพื่อน`}
                       className="am-pressable flex min-h-11 flex-1 items-center justify-center rounded-full border-[3px] border-am-ink bg-am-title px-3 font-display font-semibold"
                     >
                       Online
