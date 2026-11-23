@@ -17,8 +17,8 @@ create table public.games (
 insert into public.games (id, display_name_th, display_name_en, is_enabled, min_players, max_players, current_ruleset, sort_order)
 values
   ('edo_battle', 'EDO Battle', 'EDO Battle', true, 2, 8, '13', 1),
-  ('dummy', 'ดัมมี่', 'Dummy', false, 2, 4, '1', 2),
-  ('poker', 'โป๊กเกอร์', 'Poker', false, 2, 8, '1', 3);
+  ('dummy', 'ดัมมี่', 'Dummy', true, 2, 4, '1', 2),
+  ('poker', 'โป๊กเกอร์', 'Poker', true, 2, 8, '1', 3);
 
 alter table public.games enable row level security;
 grant select on public.games to authenticated;

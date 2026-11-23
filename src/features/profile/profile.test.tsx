@@ -18,10 +18,18 @@ function mockClient({ signedIn = true, loadError = false, saveError = false } = 
         ? { data: null, error: new Error("x") }
         : { data: { display_name: "Aum" }, error: null },
     );
-  const from = vi.fn().mockReturnValue({
-    select: vi.fn().mockReturnValue({ eq: vi.fn().mockReturnValue({ single }) }),
-    update,
+  const stats = Promise.resolve({
+    data: [{ game_id: "edo_battle", played: 3, won: 1 }],
+    error: null,
   });
+  const from = vi.fn((table: string) =>
+    table === "player_game_stats"
+      ? { select: vi.fn().mockReturnValue({ overrideTypes: () => stats }) }
+      : {
+          select: vi.fn().mockReturnValue({ eq: vi.fn().mockReturnValue({ single }) }),
+          update,
+        },
+  );
   const auth = {
     getSession: vi.fn().mockResolvedValue({ data: { session: signedIn ? session : null } }),
     onAuthStateChange: vi
@@ -51,6 +59,7 @@ describe("profile page", () => {
     renderProfile(client);
     expect(await screen.findByDisplayValue("Aum")).toBeInTheDocument();
     expect(from).toHaveBeenCalledWith("profiles");
+    expect(await screen.findByText(/EDO Battle: เล่น 3 · ชนะ 1/)).toBeInTheDocument();
   });
 
   it("updates display_name only, scoped to own id", async () => {

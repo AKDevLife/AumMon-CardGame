@@ -1,20 +1,25 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useParams } from "react-router";
 import { StickerButton } from "../../components/StickerButton.tsx";
 import { TextField } from "../../components/TextField.tsx";
 import { ApiError, callFunction } from "../../lib/api.ts";
 import { useAuth } from "../auth/auth-context.ts";
+import { gameById } from "../../platform/games.ts";
+import { QuickMatch } from "../../platform/QuickMatch.tsx";
 import { rememberJoinCode } from "./join-code-store.ts";
 
 export function OnlinePage() {
   const auth = useAuth();
   const navigate = useNavigate();
+  const { gameId = "edo_battle" } = useParams();
+  const game = gameById(gameId);
   const [code, setCode] = useState("");
-  const [size, setSize] = useState(4);
+  const [size, setSize] = useState(Math.min(4, game?.maxPlayers ?? 4));
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const signedIn = auth.mode === "live" && auth.session !== null;
 
+  if (!game) return <p className="text-center">ไม่พบเกมนี้</p>;
   if (auth.mode !== "live")
     return <p className="text-center text-am-muted">ต้องเชื่อมระบบก่อนเล่น (Preview)</p>;
   if (!signedIn) {
@@ -47,6 +52,7 @@ export function OnlinePage() {
         {
           mode: "online",
           maxPlayers: size,
+          gameId: game.id,
         },
       );
       rememberJoinCode(r.roomId, r.joinCode);
@@ -65,9 +71,13 @@ export function OnlinePage() {
   return (
     <section className="flex flex-col gap-5">
       <h1 className="font-display text-3xl font-bold">Online</h1>
+      <p className="-mt-4 font-semibold text-am-muted">{game.name}</p>
+      <QuickMatch game={game} />
       <div className="am-sticker flex flex-col gap-3 bg-am-card p-4">
         <h2 className="font-display text-lg font-bold">สร้างห้อง</h2>
-        <p className="text-sm text-am-muted">เล่นกับเพื่อน 2–8 คน — ส่งรหัสห้องให้เพื่อน</p>
+        <p className="text-sm text-am-muted">
+          เล่นกับเพื่อน {game.minPlayers}–{game.maxPlayers} คน — ส่งรหัสห้องให้เพื่อน
+        </p>
         <label className="flex items-center gap-2 font-semibold">
           ขนาดห้อง
           <select
@@ -77,14 +87,21 @@ export function OnlinePage() {
             }}
             className="am-sticker bg-am-card px-2 py-1"
           >
-            {[2, 3, 4, 5, 6, 7, 8].map((n) => (
+            {Array.from(
+              { length: game.maxPlayers - game.minPlayers + 1 },
+              (_, i) => game.minPlayers + i,
+            ).map((n) => (
               <option key={n} value={n}>
                 {n} คน
               </option>
             ))}
           </select>
         </label>
-        <p className="text-xs text-am-muted">ห้อง 5–8 คนจะเป็นสิทธิ์ VIP ในอนาคต (ตอนทดสอบเปิดให้ทุกคน)</p>
+        {game.maxPlayers > 4 && (
+          <p className="text-xs text-am-muted">
+            ห้อง 5–8 คนจะเป็นสิทธิ์ VIP ในอนาคต (ตอนทดสอบเปิดให้ทุกคน)
+          </p>
+        )}
         <StickerButton variant="confirm" disabled={pending} onClick={() => void create()}>
           สร้างห้อง
         </StickerButton>

@@ -1,18 +1,22 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate, useParams } from "react-router";
 import { discard } from "@aummon/game-engine";
 import { StickerButton } from "../../components/StickerButton.tsx";
 import { ApiError, callFunction } from "../../lib/api.ts";
+import { gameById } from "../../platform/games.ts";
 import { useAuth } from "../auth/auth-context.ts";
 
 export function SoloSetupPage() {
   const auth = useAuth();
   const navigate = useNavigate();
+  const { gameId = "edo_battle" } = useParams();
+  const game = gameById(gameId);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [bots, setBots] = useState(3);
+  const [bots, setBots] = useState(Math.min(3, (game?.maxPlayers ?? 4) - 1));
   const signedIn = auth.mode === "live" && auth.session !== null;
 
+  if (!game) return <p className="text-center">ไม่พบเกมนี้</p>;
   if (auth.mode !== "live")
     return <p className="text-center text-am-muted">ต้องเชื่อมระบบก่อนเล่น (Preview)</p>;
   if (!signedIn) {
@@ -34,8 +38,9 @@ export function SoloSetupPage() {
       const { matchId } = await callFunction<{ matchId: string }>(auth.client, "game-create", {
         mode: "solo",
         bots,
+        gameId: game.id,
       });
-      void navigate(`/game/${matchId}`);
+      void navigate(game.matchPath(matchId));
     } catch (e) {
       setError(e instanceof ApiError ? e.message : "เริ่มเกมไม่สำเร็จ");
       setPending(false);
@@ -45,9 +50,13 @@ export function SoloSetupPage() {
   return (
     <section className="flex flex-col gap-5">
       <h1 className="font-display text-3xl font-bold">Solo vs Bot</h1>
-      <p className="-mt-4 font-semibold text-am-muted">EDO Battle</p>
+      <p className="-mt-4 font-semibold text-am-muted">{game.name}</p>
       <div className="am-sticker flex flex-col gap-2 bg-am-card p-4">
-        <p>เล่นกับ Bot — ทิ้งไพ่ในมือให้หมดก่อนเป็นผู้ชนะ</p>
+        <p>
+          {game.id === "edo_battle"
+            ? "เล่นกับ Bot — ทิ้งไพ่ในมือให้หมดก่อนเป็นผู้ชนะ"
+            : `เล่น${game.name}กับ Bot`}
+        </p>
         <label className="flex items-center gap-2 font-semibold">
           จำนวน Bot
           <select
@@ -57,17 +66,21 @@ export function SoloSetupPage() {
             }}
             className="am-sticker bg-am-card px-2 py-1"
           >
-            {[1, 2, 3, 4, 5, 6, 7].map((n) => (
-              <option key={n} value={n}>
-                {n} ตัว (รวมคุณ {n + 1} คน)
-              </option>
-            ))}
+            {Array.from({ length: game.maxPlayers - 1 }, (_, i) => i + 1)
+              .filter((n) => n + 1 >= game.minPlayers)
+              .map((n) => (
+                <option key={n} value={n}>
+                  {n} ตัว (รวมคุณ {n + 1} คน)
+                </option>
+              ))}
           </select>
         </label>
-        <p className="text-sm text-am-muted">
-          เทิร์นละ {discard.DISCARD_RULES.turnTimeoutMs / 1000} วินาที · 2–4 คนได้ไพ่คนละ 7 ใบ · 5–8
-          คนได้คนละ 5 ใบ
-        </p>
+        {game.id === "edo_battle" && (
+          <p className="text-sm text-am-muted">
+            เทิร์นละ {discard.DISCARD_RULES.turnTimeoutMs / 1000} วินาที · 2–4 คนได้ไพ่คนละ 7 ใบ · 5–8
+            คนได้คนละ 5 ใบ
+          </p>
+        )}
       </div>
       {error && (
         <p

@@ -4,6 +4,7 @@ import { StickerButton } from "../../components/StickerButton.tsx";
 import { ApiError, callFunction } from "../../lib/api.ts";
 import { useAuth } from "../auth/auth-context.ts";
 import { recallJoinCode } from "./join-code-store.ts";
+import { GAMES, gameById } from "../../platform/games.ts";
 
 interface Seat {
   seat: number;
@@ -16,6 +17,7 @@ interface Room {
   owner_id: string;
   status: string;
   max_players: number;
+  game_id: string;
 }
 
 const POLL_MS = 3000;
@@ -37,7 +39,7 @@ export function LobbyPage() {
     const [r, s, m] = await Promise.all([
       client
         .from("game_rooms")
-        .select("owner_id, status, max_players")
+        .select("owner_id, status, max_players, game_id")
         .eq("id", roomId)
         .maybeSingle<Room>(),
       client
@@ -59,8 +61,9 @@ export function LobbyPage() {
       return;
     }
     const matchId = m.data?.[0]?.id;
-    if (matchId) {
-      void navigate(`/game/${matchId}`);
+    const game = gameById(r.data?.game_id ?? "edo_battle") ?? GAMES[0];
+    if (matchId && game) {
+      void navigate(game.matchPath(matchId));
       return;
     }
     setRoom(r.data);
@@ -73,7 +76,7 @@ export function LobbyPage() {
     const poll = setInterval(() => void load(), POLL_MS);
     // Realtime (RLS-filtered): refresh when seats or room status change.
     const channel = client
-      .channel(`lobby-${roomId}`)
+      .channel(`room:${roomId}`, { config: { private: true } })
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "room_players", filter: `room_id=eq.${roomId}` },
@@ -176,7 +179,7 @@ export function LobbyPage() {
         disabled={pending}
         onClick={() =>
           void act("rooms-leave", { roomId }, () => {
-            void navigate("/play/online");
+            void navigate(gameById(room.game_id)?.onlinePath ?? "/play/online");
           })
         }
       >

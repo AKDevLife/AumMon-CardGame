@@ -211,7 +211,18 @@ async function saveGame(tx: Tx, locked: Locked, rt: Runtime, events: GameEvent[]
   }
   await hooksOf(locked.gameId).onSave?.(tx, locked, state, events);
   if (finished) {
-    if (locked.mode !== "solo") {
+    // Per-game player stats (humans only).
+    for (const s of locked.seats)
+      if (s.user_id !== null && s.player_type === "human")
+        await tx`
+          insert into public.player_game_stats (user_id, game_id, played, won)
+          values (${s.user_id}, ${locked.gameId}, 1, ${winners.includes(toEngine(s.seat)) ? 1 : 0})
+          on conflict (user_id, game_id) do update set played = player_game_stats.played + 1,
+            won = player_game_stats.won + excluded.won, updated_at = now()`;
+    if (locked.mode === "quick_match") {
+      // Quick Match tables close; players queue again for the next game.
+      await tx`update public.game_rooms set status = 'closed' where id = ${locked.roomId}`;
+    } else if (locked.mode === "online") {
       // Online (owner 2026-11-22): back to the lobby; everyone except the owner must press ready
       // again before the owner can start the next round. Players who left stay out.
       await tx`update public.game_rooms set status = 'lobby', expires_at = now() + interval '30 minutes'

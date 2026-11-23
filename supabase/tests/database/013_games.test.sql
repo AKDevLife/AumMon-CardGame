@@ -8,8 +8,9 @@ select has_column('public', 'game_rooms', 'game_id', 'game_id column exists on r
 select col_default_is('public', 'game_rooms', 'game_id', 'edo_battle'::text, 'rooms default to EDO Battle');
 select col_default_is('public', 'matches', 'game_id', 'edo_battle'::text, 'matches default to EDO Battle');
 
+update public.games set is_enabled = false where id = 'poker';
 set local role authenticated;
-select is((select count(*)::int from public.games), 1, 'players see enabled games only');
+select is((select count(*)::int from public.games), 2, 'players see enabled games only');
 select throws_ok($$update public.games set is_enabled = true$$, '42501', null, 'players cannot change games');
 reset role;
 set local role anon;

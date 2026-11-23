@@ -483,3 +483,7 @@ import_map = "./functions/deno.json"
 [functions.admin-api]
 verify_jwt = false
 import_map = "./functions/deno.json"
+
+[functions.matchmaking]
+verify_jwt = false
+import_map = "./functions/deno.json"

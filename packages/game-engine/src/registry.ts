@@ -1,9 +1,13 @@
+import { dummy } from "./dummy/module.ts";
 import { edoBattle } from "./edo-battle/module.ts";
+import { poker } from "./poker/module.ts";
 import type { AnyGameModule, GameId } from "./sdk/module.ts";
 
 /** Server game registry: game_id → module. A game is playable only if listed here AND enabled in public.games. */
 export const GAME_MODULES: Partial<Record<GameId, AnyGameModule>> = {
   edo_battle: edoBattle,
+  dummy,
+  poker,
 };
 
 export const isGameId = (v: unknown): v is GameId =>
