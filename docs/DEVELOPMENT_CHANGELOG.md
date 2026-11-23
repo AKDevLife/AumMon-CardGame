@@ -2,6 +2,12 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-23 — Game Center deployed to Dev
+
+- PR #106 merged (CI green: unit, pgTAP, backend, E2E). Migrations `20261123000000` + `20261123000100` applied to AumMon-Dev with history (existing 16 EDO matches kept as `edo_battle`); 14 Edge Functions deployed; playtest URL shows the Game Center.
+- `engine-health` reports every game's ruleset; `scripts/smoke.mjs` fixed (expected the retired ruleset "2") — 8/8 checks pass on Dev.
+- Load test (GC8.2) on Dev, 20 solo players: 20/20 finished, 0 errors; client-side p50 / p95 — create 3.7 / 3.8 s, view 2.5 / 3.2 s, command 0.63 / 3.4 s (with `FUNCTION_REGION=ap-northeast-1`; without it functions run far from the Tokyo DB, as found in 7.6).
+
 ## 2026-11-23 — 14.7 / 14.8 Central admin + security review
 
 - Admin: new section **เกม** (list games with live counts, enable / disable — audited), game shown in rooms and matches lists (`gameId` filter), bot simulation for any game (shows wins per seat), phase / mode labels updated for all games.

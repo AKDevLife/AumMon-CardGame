@@ -6,7 +6,7 @@
 
 - **Status:** 🎮 AumMon Game Center in progress (Phase 14): EDO Battle (= Casual Discard Edition, ruleset "13") + Dummy + Poker. Plan: `docs/roadmap/GAME_CENTER_ROADMAP.md`.
 - **Phase:** 12 — engine, backend, UI, cleanup and VIP/gacha design (12.7) done.
-- **Current task:** 14.1/14.2 Game Center foundation (GC1.1–GC2.4 in review); 12.8 owner playtest still open
+- **Current task:** Game Center GC0–GC8 done and on Dev; owner review of Dummy / Poker rules (⚑ items) + playtest; 12.8 EDO playtest still open
 - **Next:** 12.8 playtest + balance; VIP/gacha build waits for owner Q1–Q5 + legal check (`docs/discard/AumMon_VIP_Cosmetics_Design.md` §8). Art: 13.2 owner chooses Art Direction (`docs/art-production/`).
 - **Playtest URL (latest `main`):** https://aum-mon-card-game-git-playtest-aum-mon.vercel.app
 - **Dev backend:** Supabase `AumMon-Dev` (ref `yaxtzdhryctfjaspxvix`, ap-northeast-1), email confirmation OFF for playtesting.
@@ -42,12 +42,14 @@
 
 ## In progress
 
-- 14.1 / 14.2 Game Center foundation (GC1.1–GC2.4)
+None
 
 ## Waiting for the owner
 
 | Task  | Needs                                                                    |
 | ----- | ------------------------------------------------------------------------ |
+| 14.3/14.5 | Review Dummy ⚑ rules (`docs/games/dummy/DUMMY_RULES.md`) and Poker defaults (`docs/games/poker/POKER_RULES.md`); playtest both on Dev |
+| GC7.3 | Decide whether to add scoped admin roles (who gets them) |
 | 12.8  | Playtest Quick Match on Dev; choose best-of-3 for 2–3 players (yes / no) |
 | 12.14 | Decide Q1–Q4 (`docs/discard/AumMon_Game_Design_Upgrade.md` §3)           |
 | 12.7  | VIP/gacha Q1–Q5 + legal check (`AumMon_VIP_Cosmetics_Design.md` §8)      |
@@ -61,7 +63,11 @@
 | 7.3  | Backup/restore test — needs 6.8 / Pro plan                                                          |
 | 7.8  | Owner approval; final legal texts; email confirmation ON + SMTP; domain; Vercel protection decision |
 
-## Latest verification (2026-11-22)
+## Latest verification (2026-11-23)
+
+- PR #106: CI green (typecheck/lint/unit, pgTAP, backend + E2E on local Supabase); Dev smoke 8/8; Dev load test 20/20.
+
+## Previous verification (2026-11-22)
 
 - Local: `pnpm check` ✅ (typecheck, lint, format, unit/integration tests, build, secrets)
 - Docs-only PR #105 (CI skips docs; local `pnpm check` is the gate)
