@@ -72,20 +72,20 @@
 
 ## Phase 7 — Centralized Admin & Game Management
 
-| ID    | Task                                                                         | Pri | Deps  | Cx  | Acceptance                              | Tests               | Status |
-| ----- | ---------------------------------------------------------------------------- | --- | ----- | --- | --------------------------------------- | ------------------- | ------ |
-| GC7.1 | Admin: games on/off, per-game settings (M9)                                  | P0  | GC1.3 | M   | Disabled game hidden + creation refused | Backend + E2E admin | [ ]    |
-| GC7.2 | Room/match monitoring filtered by game                                       | P1  | GC2.2 | S   | Filters work                            | Backend             | [ ]    |
-| GC7.3 | Scoped roles `game_admin`/`viewer` (M10)                                     | P1  | GC7.1 | M   | Scoped access enforced server-side      | Backend + pgTAP     | [ ]    |
-| GC7.4 | Game-specific admin sections via registry (EDO stats/sim, Poker chip grants) | P1  | GC7.1 | M   | Audit-logged                            | Backend             | [ ]    |
+| ID    | Task                                                                         | Pri | Deps  | Cx  | Acceptance                              | Tests               | Status                                                                                                               |
+| ----- | ---------------------------------------------------------------------------- | --- | ----- | --- | --------------------------------------- | ------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| GC7.1 | Admin: games on/off, per-game settings (M9)                                  | P0  | GC1.3 | M   | Disabled game hidden + creation refused | Backend + E2E admin | [~] PR pending CI (admin section เกม + `game.set_enabled`, audited)                                                  |
+| GC7.2 | Room/match monitoring filtered by game                                       | P1  | GC2.2 | S   | Filters work                            | Backend             | [~] PR pending CI (game shown in rooms / matches; `gameId` filter)                                                   |
+| GC7.3 | Scoped roles `game_admin`/`viewer` (M10)                                     | P1  | GC7.1 | M   | Scoped access enforced server-side      | Backend + pgTAP     | [!] Owner decision: who should get scoped roles (only one admin exists today); design in DATABASE_EVOLUTION_PLAN M10 |
+| GC7.4 | Game-specific admin sections via registry (EDO stats/sim, Poker chip grants) | P1  | GC7.1 | M   | Audit-logged                            | Backend             | [~] PR pending CI (bot simulation for any game; EDO cards / stats unchanged)                                         |
 
 ## Phase 8 — Full Integration Testing
 
-| ID    | Task                                                      | Pri | Deps         | Cx  | Acceptance                | Tests          | Status |
-| ----- | --------------------------------------------------------- | --- | ------------ | --- | ------------------------- | -------------- | ------ |
-| GC8.1 | Cross-game E2E matrix (3 games × 4 modes where supported) | P0  | GC4.4, GC6.4 | M   | All green                 | Playwright     | [ ]    |
-| GC8.2 | Load test per game (extend `tests/load/solo-load.mjs`)    | P1  | GC8.1        | M   | p95 within targets on Dev | Load           | [ ]    |
-| GC8.3 | Security review update (hidden info, RLS, admin scopes)   | P0  | GC8.1        | M   | No high findings          | Review + pgTAP | [ ]    |
+| ID    | Task                                                      | Pri | Deps         | Cx  | Acceptance                | Tests          | Status                                                                                        |
+| ----- | --------------------------------------------------------- | --- | ------------ | --- | ------------------------- | -------------- | --------------------------------------------------------------------------------------------- |
+| GC8.1 | Cross-game E2E matrix (3 games × 4 modes where supported) | P0  | GC4.4, GC6.4 | M   | All green                 | Playwright     | [~] PR pending CI (E2E Dummy + Poker solo; backend Quick Match pairing; EDO suites unchanged) |
+| GC8.2 | Load test per game (extend `tests/load/solo-load.mjs`)    | P1  | GC8.1        | M   | p95 within targets on Dev | Load           | [ ] Needs the Dev deployment (run `tests/load` against Dev after merge)                       |
+| GC8.3 | Security review update (hidden info, RLS, admin scopes)   | P0  | GC8.1        | M   | No high findings          | Review + pgTAP | [~] Done in `docs/SECURITY_REVIEW.md` (Game Center update); closes with this PR               |
 
 ## Phase 9 — Production Readiness
 

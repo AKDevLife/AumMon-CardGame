@@ -93,6 +93,7 @@ const Section = ({
 
 const ACTION: Record<SectionId, string> = {
   overview: "overview",
+  games: "games",
   players: "players",
   cards: "cards",
   rooms: "rooms",
@@ -132,6 +133,7 @@ export function AdminPage() {
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [query, setQuery] = useState("");
+  const [simGame, setSimGame] = useState("edo_battle");
 
   const api = useCallback(
     async <T,>(action: string, params: Row = {}): Promise<T> => {
@@ -267,6 +269,43 @@ export function AdminPage() {
           </>
         );
       }
+      case "games":
+        return (
+          <RowList
+            rows={asRows(data)}
+            empty="ยังไม่มีเกม"
+            title={(r) =>
+              `${label("game", r["id"])} · ${r["is_enabled"] === true ? "เปิดอยู่" : "ปิดอยู่"}`
+            }
+            columns={[
+              {
+                label: "ผู้เล่นต่อโต๊ะ",
+                value: (r) => `${text(r["min_players"])}–${text(r["max_players"])} คน`,
+              },
+              { label: "กติกาชุดที่", value: (r) => text(r["current_ruleset"]) },
+              { label: "กำลังเล่น", value: (r) => `${text(r["active_matches"])} เกม` },
+              { label: "จบใน 24 ชม.", value: (r) => `${text(r["finished_24h"])} เกม` },
+              { label: "ผู้เคยเล่น", value: (r) => `${text(r["players"])} คน` },
+            ]}
+            actions={(r) => (
+              <SmallButton
+                danger={r["is_enabled"] === true}
+                disabled={pending}
+                onClick={() =>
+                  void run(
+                    r["is_enabled"] === true
+                      ? `ปิดเกม ${label("game", r["id"])}? ผู้เล่นจะเริ่มเกมใหม่ไม่ได้ (เกมที่เล่นอยู่เล่นต่อจนจบ)`
+                      : `เปิดเกม ${label("game", r["id"])} ให้ผู้เล่น?`,
+                    "game.set_enabled",
+                    { gameId: r["id"], enabled: r["is_enabled"] !== true },
+                  )
+                }
+              >
+                {r["is_enabled"] === true ? "ปิดเกม" : "เปิดเกม"}
+              </SmallButton>
+            )}
+          />
+        );
       case "players":
         return (
           <>
@@ -405,7 +444,9 @@ export function AdminPage() {
             <RowList
               rows={rows}
               empty="ไม่มีห้องที่เปิดอยู่"
-              title={(r) => `ห้อง ${shortId(r["id"])} · ${label("mode", r["mode"])}`}
+              title={(r) =>
+                `${label("game", r["game_id"])} · ห้อง ${shortId(r["id"])} · ${label("mode", r["mode"])}`
+              }
               columns={[
                 { label: "สถานะ", value: (r) => label("roomStatus", r["status"]) },
                 {
@@ -450,7 +491,9 @@ export function AdminPage() {
           <RowList
             rows={asRows(data)}
             empty="ไม่มีเกมที่กำลังเล่น"
-            title={(r) => `เกม ${shortId(r["id"])} · ${label("mode", r["mode"])}`}
+            title={(r) =>
+              `${label("game", r["game_id"])} · ${shortId(r["id"])} · ${label("mode", r["mode"])}`
+            }
             columns={[
               { label: "สถานะ", value: (r) => label("matchStatus", r["status"]) },
               {
@@ -481,21 +524,42 @@ export function AdminPage() {
             <StickerButton
               disabled={pending || env !== "development"}
               onClick={() =>
-                void run("ให้ Bot แข่งกันเอง 20 เกม?", "bots.simulate", { games: 20 }, true)
+                void run(
+                  `ให้ Bot แข่งกันเอง 20 เกม (${label("game", simGame)})?`,
+                  "bots.simulate",
+                  { games: 20, gameId: simGame },
+                  true,
+                )
               }
             >
               {pending ? "กำลังจำลอง…" : "เริ่มจำลอง 20 เกม"}
             </StickerButton>
+            <label className="flex items-center gap-2 font-semibold">
+              เกม
+              <select
+                value={simGame}
+                onChange={(e) => {
+                  setSimGame(e.target.value);
+                }}
+                className="am-sticker bg-am-card px-2 py-1"
+              >
+                <option value="edo_battle">EDO Battle</option>
+                <option value="dummy">ดัมมี่</option>
+                <option value="poker">โป๊กเกอร์</option>
+              </select>
+            </label>
             {sim !== null && (
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                 <Stat title="จำนวนเกม" value={text(field(sim, "games"))} />
-                <Stat title="ฝั่งที่ 1 ชนะ" value={text(field(sim, "seat0"))} />
-                <Stat title="ฝั่งที่ 2 ชนะ" value={text(field(sim, "seat1"))} />
+                <Stat title="ผู้เล่นต่อเกม" value={text(field(sim, "players"))} />
                 <Stat
-                  title="เฉลี่ยกี่เทิร์นต่อเกม"
-                  value={text(field(sim, "avgTurns"))}
-                  note={`เสมอ ${text(field(sim, "draw"))} เกม`}
+                  title="ชนะตามที่นั่ง"
+                  value={(() => {
+                    const w = field(sim, "winsBySeat");
+                    return Array.isArray(w) ? w.map((x) => text(x)).join(" / ") : "—";
+                  })()}
                 />
+                <Stat title="เฉลี่ยเทิร์น/มือต่อเกม" value={text(field(sim, "avgTurns"))} />
               </div>
             )}
           </>

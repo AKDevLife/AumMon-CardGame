@@ -4,7 +4,11 @@ import { card, eventText, label, seats, shortId, yesNo } from "./format.ts";
 describe("admin readable formatting", () => {
   it("translates codes into Thai", () => {
     expect(label("roomStatus", "lobby")).toBe("รอผู้เล่น");
-    expect(label("mode", "online")).toBe("ออนไลน์");
+    expect(label("mode", "online")).toBe("ห้องส่วนตัว");
+    expect(label("mode", "quick_match")).toBe("Quick Match");
+    expect(label("game", "dummy")).toBe("ดัมมี่");
+    expect(label("phase", "flop")).toBe("Flop");
+    expect(label("action", "game.disabled")).toBe("ปิดเกม");
     expect(label("action", "player.disabled")).toBe("ระงับบัญชีผู้เล่น");
     expect(label("httpStatus", 429)).toBe("ส่งคำขอถี่เกินไป");
     expect(label("mode", "unknown")).toBe("unknown");

@@ -204,8 +204,8 @@ Multi-game platform: EDO Battle (= Discard Edition) + Dummy + Texas Hold'em (pla
 - [~] **14.4** GC4 Dummy bots, server, UI, matchmaking — deps: 14.2, 14.3
 - [~] **14.5** GC5 Poker engine — deps: 14.1
 - [~] **14.6** GC6 Poker bots, chips ledger, server, UI — deps: 14.2, 14.5
-- [ ] **14.7** GC7 Central admin game management — deps: 14.2
-- [ ] **14.8** GC8 Full integration testing — deps: 14.4, 14.6, 14.7
+- [~] **14.7** GC7 Central admin game management — deps: 14.2
+- [~] **14.8** GC8 Full integration testing — deps: 14.4, 14.6, 14.7
 - [!] **14.9** GC9 Production readiness — owner-gated (6.8, 7.3, 7.8, legal check for play-money poker)
 
 **Acceptance:** EDO Battle unchanged (golden replay + existing suites) · each game isolated with its own rules/bots · solo, private room and quick match per game · server-authoritative hidden information · central admin for all games

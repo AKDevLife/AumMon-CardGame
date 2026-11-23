@@ -2,6 +2,11 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-23 — 14.7 / 14.8 Central admin + security review
+
+- Admin: new section **เกม** (list games with live counts, enable / disable — audited), game shown in rooms and matches lists (`gameId` filter), bot simulation for any game (shows wins per seat), phase / mode labels updated for all games.
+- `docs/SECURITY_REVIEW.md` Game Center update (no new high / medium findings). Scoped admin roles (GC7.3) wait for an owner decision; load test per game (GC8.2) runs against Dev after deployment.
+
 ## 2026-11-23 — 14.3–14.6 Dummy + Poker + Quick Match
 
 - Engines (pure, seeded): `dummy/` (Thai Dummy ruleset "1": melds, discard pickup with immediate meld, head card, speto, knock, scoring; greedy bot from its own view) and `poker/` (No-Limit Hold'em ruleset "1": 7-card evaluator, blinds, min-raise / incomplete all-in rule, side pots, showdown, sit-and-go; bot from its own view). Rules: `docs/games/{dummy,poker}/`.

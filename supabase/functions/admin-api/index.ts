@@ -1,7 +1,14 @@
 // POST { action, ...params } → admin data. Every call: session + super_admin role + MFA (aal2),
 // checked server-side in requireAdmin. Mutations are audited. Catalog data is read-only
 // (owner decision 2026-11-20: rule changes go through the spec + PR, not the dashboard).
-import { createSeededRandom, discard, ENGINE_VERSION, RULESET_VERSION } from "@aummon/game-engine";
+import {
+  createSeededRandom,
+  discard,
+  ENGINE_VERSION,
+  getGameModule,
+  isGameId,
+  RULESET_VERSION,
+} from "@aummon/game-engine";
 import { appEnv, audit, authAdmin, requireAdmin, type AdminContext } from "../_shared/admin.ts";
 import { db } from "../_shared/db.ts";
 import { handler, HttpError, readJson } from "../_shared/http.ts";
@@ -16,7 +23,7 @@ type Body = Record<string, unknown>;
 function roomsQuery(sql: Tx | ReturnType<typeof db> = db()) {
   return sql`
     select * from (
-      select r.id, r.mode, r.status, r.created_at, r.expires_at, players, m.id as match_id, m.status as match_status, last_activity,
+      select r.id, r.game_id, r.mode, r.status, r.created_at, r.expires_at, players, m.id as match_id, m.status as match_status, last_activity,
         case
           when players = 0 then 'empty'
           when r.status = 'lobby' and r.expires_at is not null and r.expires_at < now() then 'expired'
@@ -51,7 +58,36 @@ const limit = (body: Body, max = 100) => {
   return Number.isInteger(n) && n > 0 ? Math.min(n, max) : 50;
 };
 
+/** Optional game filter for listings (null = all games). */
+const gameFilter = (body: Body): string | null =>
+  isGameId(body["gameId"]) ? body["gameId"] : null;
+
 const actions: Record<string, Action> = {
+  /** Game Center registry with live counts per game (GC7.1). */
+  games: async () =>
+    db()`
+      select g.id, g.display_name_th, g.display_name_en, g.is_enabled, g.min_players, g.max_players,
+             g.current_ruleset, g.sort_order,
+             (select count(*)::int from public.matches m where m.game_id = g.id and m.status = 'active') as active_matches,
+             (select count(*)::int from public.matches m where m.game_id = g.id and m.status = 'finished'
+                and m.finished_at > now() - interval '24 hours') as finished_24h,
+             (select count(*)::int from public.player_game_stats s where s.game_id = g.id) as players
+      from public.games g order by g.sort_order`,
+
+  /** Turn a game on/off for players (running matches finish normally; new ones are refused). */
+  "game.set_enabled": async (admin, body) => {
+    const gameId = body["gameId"];
+    if (!isGameId(gameId)) throw new HttpError(400, "invalid_input", "gameId invalid");
+    const enabled = body["enabled"] === true;
+    return db().begin(async (tx) => {
+      const rows = await tx`update public.games set is_enabled = ${enabled}, updated_at = now()
+        where id = ${gameId} returning id`;
+      if (rows.length === 0) throw new HttpError(404, "not_found", "Game not found");
+      await audit(tx, admin, enabled ? "game.enabled" : "game.disabled", "game", gameId);
+      return { ok: true };
+    });
+  },
+
   me: (admin) =>
     Promise.resolve({ userId: admin.userId, role: admin.role, aal: admin.aal, env: appEnv() }),
 
@@ -223,11 +259,12 @@ const actions: Record<string, Action> = {
   matches: async (_a, body) => {
     const status = body["status"] === "finished" ? "finished" : "active";
     return db()`
-      select m.id, m.status, m.phase, m.round_number as turn, m.ruleset_version, m.started_at, m.finished_at, r.mode,
+      select m.id, m.game_id, m.status, m.phase, m.round_number as turn, m.ruleset_version, m.started_at, m.finished_at, r.mode,
              (select json_agg(json_build_object('seat', mp.seat, 'type', mp.player_type, 'cards', mp.hand_count) order by mp.seat)
                 from public.match_players mp where mp.match_id = m.id) as players
       from public.matches m join public.game_rooms r on r.id = m.room_id
-      where m.status = ${status} order by m.created_at desc limit ${limit(body)}`;
+      where m.status = ${status} and (${gameFilter(body)}::text is null or m.game_id = ${gameFilter(body)})
+      order by m.created_at desc limit ${limit(body)}`;
   },
 
   /** Public information only (no hands, deck order or RNG) — no impersonation of players. */
@@ -257,14 +294,19 @@ const actions: Record<string, Action> = {
     });
   },
 
-  /** Bot-vs-bot simulation in memory (no data written). Development only. */
+  /** Bot-vs-bot simulation in memory for any game (no data written). Development only. */
   "bots.simulate": async (admin, body) => {
     if (appEnv() !== "development")
       throw new HttpError(403, "dev_only", "Development tools are disabled here");
+    const gameId = isGameId(body["gameId"]) ? body["gameId"] : "edo_battle";
+    const game = getGameModule(gameId);
     const games = Math.min(Math.max(Number(body["games"] ?? 10) || 10, 1), 50);
-    const players = Math.min(Math.max(Number(body["players"] ?? 4) || 4, 2), 8);
+    const players = Math.min(
+      Math.max(Number(body["players"] ?? 4) || 4, game.minPlayers),
+      game.maxPlayers,
+    );
     const wins: number[] = Array.from({ length: players }, () => 0);
-    let turns = 0;
+    let rounds = 0;
     for (let g = 0; g < games; g++) {
       const seed = crypto.getRandomValues(new Uint32Array(4));
       const rng = createSeededRandom([
@@ -273,19 +315,21 @@ const actions: Record<string, Action> = {
         seed[2] ?? 0,
         seed[3] ?? 0,
       ]);
-      let { state: s } = discard.startGame(
+      let { state: s } = game.start(
         Array.from({ length: players }, (_, i) => `p${String(i)}`),
         rng,
       );
-      for (let n = 0; n < 3000 && s.status === "active"; n++) {
-        const seat = discard.actingSeat(s) ?? 0;
-        s = discard.applyCommand(s, discard.chooseBotCommand(s, seat, rng), rng).state;
+      for (let n = 0; n < 20_000 && !game.isFinished(s); n++) {
+        const seat = game.actingSeat(s) ?? 0;
+        s = game.apply(s, seat, game.bot(s, seat, rng), rng).state;
       }
-      turns += s.turnNumber;
-      if (s.winner !== null) wins[s.winner] = (wins[s.winner] ?? 0) + 1;
+      rounds += game.round(s);
+      for (const w of game.result(s)?.winners ?? []) wins[w] = (wins[w] ?? 0) + 1;
     }
-    await db().begin((tx) => audit(tx, admin, "bots.simulated", null, null, { games, players }));
-    return { games, players, winsBySeat: wins, avgTurns: Math.round(turns / games) };
+    await db().begin((tx) =>
+      audit(tx, admin, "bots.simulated", "game", gameId, { games, players }),
+    );
+    return { gameId, games, players, winsBySeat: wins, avgTurns: Math.round(rounds / games) };
   },
 
   "sounds.get": async () => {
