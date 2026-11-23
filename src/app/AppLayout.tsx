@@ -1,6 +1,7 @@
 import { ENGINE_VERSION } from "@aummon/game-engine";
 import { useEffect } from "react";
 import { Link, Outlet } from "react-router";
+import { BackButton } from "../components/BackButton.tsx";
 import { PreviewBanner } from "../components/PreviewBanner.tsx";
 import { AccountNav } from "../features/auth/AccountNav.tsx";
 import { useAuth } from "../features/auth/auth-context.ts";
@@ -17,9 +18,12 @@ export function AppLayout() {
     <div className="flex min-h-dvh flex-col pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
       {auth.mode === "preview" && <PreviewBanner />}
       <header className="flex items-center justify-between gap-3 py-3 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))]">
-        <Link to="/" className="font-display text-2xl font-bold">
-          AumMon
-        </Link>
+        <div className="flex items-center gap-2">
+          <BackButton />
+          <Link to="/" className="font-display text-2xl font-bold">
+            AumMon
+          </Link>
+        </div>
         <AccountNav />
       </header>
       <main className="mx-auto flex w-full max-w-xl flex-1 flex-col px-4 py-6">

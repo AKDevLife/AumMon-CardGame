@@ -14,6 +14,7 @@ test("sign up → profile → logout → login", async ({ page }) => {
   await expect(page).toHaveURL("/");
   await expect(page.getByRole("status")).toHaveCount(0); // no preview banner
 
+  await page.getByRole("button", { name: "ตั้งค่า" }).click();
   await page.getByRole("link", { name: "โปรไฟล์" }).click();
   const name = page.getByLabel("ชื่อที่แสดง");
   await expect(name).toHaveValue("E2E Player");
@@ -23,6 +24,9 @@ test("sign up → profile → logout → login", async ({ page }) => {
   await page.reload();
   await expect(page.getByLabel("ชื่อที่แสดง")).toHaveValue("Renamed");
 
+  await page.getByRole("button", { name: "ย้อนกลับ" }).click();
+  await expect(page).toHaveURL("/");
+  await page.getByRole("button", { name: "ตั้งค่า" }).click();
   await page.getByRole("button", { name: "ออกจากระบบ" }).click();
   await expect(
     page.getByRole("navigation", { name: "Account" }).getByRole("link", { name: "เข้าสู่ระบบ" }),
@@ -36,5 +40,5 @@ test("sign up → profile → logout → login", async ({ page }) => {
 
   await page.getByLabel("รหัสผ่าน").fill("secret123");
   await page.getByRole("button", { name: "เข้าสู่ระบบ" }).click();
-  await expect(page.getByRole("link", { name: "โปรไฟล์" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Solo vs Bot" })).toBeVisible();
 });

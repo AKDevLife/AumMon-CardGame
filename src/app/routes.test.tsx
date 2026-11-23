@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { createMemoryRouter, RouterProvider } from "react-router";
 import { describe, expect, it } from "vitest";
 import { routes } from "./routes.tsx";
@@ -34,6 +34,28 @@ describe("app routes", () => {
   it("home offers the rules button", () => {
     renderAt("/");
     expect(screen.getByRole("button", { name: /วิธีเล่น & กติกา/ })).toBeEnabled();
+  });
+
+  it("home offers Dummy and Poker rules", async () => {
+    renderAt("/");
+    for (const [name, text] of [
+      ["ดัมมี่", /สเปโต/],
+      ["โป๊กเกอร์", /ไม่ใช่เงินจริง/],
+    ] as const) {
+      fireEvent.click(screen.getByRole("button", { name: `กติกา${name}` }));
+      const dialog = await screen.findByRole("dialog", { name: `กติกา${name}` });
+      expect(within(dialog).getByText(text)).toBeInTheDocument();
+    }
+  });
+
+  it("back button shows on inner pages, not on home", () => {
+    renderAt("/login");
+    expect(screen.getByRole("button", { name: /ย้อนกลับ/ })).toBeEnabled();
+  });
+
+  it("home has no back button", () => {
+    renderAt("/");
+    expect(screen.queryByRole("button", { name: /ย้อนกลับ/ })).toBeNull();
   });
 
   it("login form cannot be submitted in preview", () => {
