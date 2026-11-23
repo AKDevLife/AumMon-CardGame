@@ -39,7 +39,7 @@ describe("app routes", () => {
   it("home offers Dummy and Poker rules", async () => {
     renderAt("/");
     for (const [name, text] of [
-      ["ดัมมี่", /สเปโต/],
+      ["ดัมมี่", /ทิ้งโง่/],
       ["โป๊กเกอร์", /ไม่ใช่เงินจริง/],
     ] as const) {
       fireEvent.click(screen.getByRole("button", { name: new RegExp(`กติกา\\s*${name}`) }));

@@ -3,7 +3,7 @@ import { StickerButton } from "../components/StickerButton.tsx";
 import { Popup } from "../features/game/Popup.tsx";
 import type { GameId } from "../platform/games.ts";
 
-/** Dummy rules in plain Thai (docs/games/dummy/DUMMY_RULES.md, ruleset "1"). */
+/** Dummy rules in plain Thai (docs/games/dummy/DUMMY_RULES.md, ruleset "2"). */
 export function DummyRulesText() {
   return (
     <div className="flex flex-col gap-2 text-sm">
@@ -23,7 +23,7 @@ export function DummyRulesText() {
           <b>เกิด / ฝาก (ไม่บังคับ):</b> วางชุดไพ่ใหม่ หรือฝากไพ่ต่อชุดบนโต๊ะได้ไม่จำกัด
         </li>
         <li>
-          <b>ทิ้ง:</b> ทิ้งไพ่ 1 ใบเพื่อจบเทิร์น
+          <b>ทิ้ง:</b> ทิ้งไพ่ 1 ใบเพื่อจบเทิร์น · เหลือใบสุดท้ายกด <b>น็อค!</b>
         </li>
       </ol>
       <p>
@@ -36,6 +36,9 @@ export function DummyRulesText() {
       <p>
         <b>คะแนน:</b> ไพ่บนโต๊ะ = บวก · ไพ่ค้างมือ = ลบ · A = 15, 10/J/Q/K = 10, 2–9 = 5 · สเปโต (2♣, Q♠)
         = 50 · เก็บหัว +50 · น็อค +50 · คะแนนรวมสูงสุดชนะ
+      </p>
+      <p>
+        <b>ทิ้งโง่:</b> ถ้าไพ่ที่คุณทิ้งถูกคนอื่นเก็บไปใช้ก่อนถึงตาคุณอีกครั้ง คุณถูกหัก 50 แต้ม (สเปโตหัก 100)
       </p>
       <p>
         <b>เวลา:</b> เทิร์นละ 45 วินาที (หมดเวลา ระบบจั่ว/ทิ้งให้)

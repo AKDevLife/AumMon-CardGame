@@ -2,7 +2,7 @@ import type { RandomSource } from "../rng/seeded-random.ts";
 import { GameRuleError } from "../sdk/module.ts";
 
 /**
- * Thai Dummy (ดัมมี่), ruleset "1" — docs/games/dummy/DUMMY_RULES.md. One round per match.
+ * Thai Dummy (ดัมมี่), ruleset "2" — docs/games/dummy/DUMMY_RULES.md. One round per match.
  * Pure and deterministic. Cards: rank + suit ("As", "Td", "2c").
  */
 export type Card = string;
@@ -17,6 +17,9 @@ export const DUMMY_RULES = {
   spetoPoints: 50,
   headBonus: 50,
   knockBonus: 50,
+  /** ทิ้งโง่: a discard picked up by another player before the discarder's next turn. */
+  feedPenalty: 50,
+  feedPenaltySpeto: 100,
   turnTimeoutMs: 45_000,
   afkTimeouts: 2,
 } as const;
@@ -46,12 +49,14 @@ export interface DummyPlayer {
 }
 
 export interface DummyState {
-  readonly rulesetVersion: "1";
+  readonly rulesetVersion: "2";
   status: "active" | "finished";
   players: DummyPlayer[];
   stock: Card[];
   /** Discard pile, bottom → top (public). */
   discard: Card[];
+  /** Per discard card: [seat that discarded it (-1 = head), turnNumber of the discard]. */
+  discardFrom: [number, number][];
   /** The first face-up card (หัว); bonus for whoever melds it. */
   head: Card;
   melds: Meld[];
@@ -84,6 +89,7 @@ export type DummyEvent =
   | { type: "melded"; seat: number; cards: Card[]; meld: number }
   | { type: "laid_off"; seat: number; cards: Card[]; meld: number }
   | { type: "discarded"; seat: number; card: Card }
+  | { type: "fed"; seat: number; card: Card; penalty: number }
   | { type: "knock"; seat: number }
   | { type: "stock_out" }
   | { type: "game_over"; scores: number[]; winners: number[] }
@@ -140,11 +146,12 @@ export function startGame(
   const head = deck.splice(0, 1)[0] ?? "";
   const first = rng.nextInt(n);
   const state: DummyState = {
-    rulesetVersion: "1",
+    rulesetVersion: "2",
     status: "active",
     players,
     stock: deck,
     discard: [head],
+    discardFrom: [[-1, 0]],
     head,
     melds: [],
     current: first,
@@ -165,6 +172,7 @@ function clone(s: DummyState): DummyState {
     players: s.players.map((p) => ({ ...p, hand: [...p.hand] })),
     stock: [...s.stock],
     discard: [...s.discard],
+    discardFrom: s.discardFrom.map(([a, b]) => [a, b]),
     melds: s.melds.map((m) => ({ ...m, cards: [...m.cards] })),
     winners: [...s.winners],
     scores: s.scores ? [...s.scores] : null,
@@ -247,6 +255,7 @@ export function applyCommand(
         throw new GameRuleError("invalid_pick");
       const target = s.discard[index] ?? "";
       const taken = s.discard.splice(index);
+      const [from, turn] = s.discardFrom.splice(index)[0] ?? [-1, 0];
       const rest = taken.slice(1);
       const isHead = target === s.head && index === 0 && !s.players.some((x) => x.tookHead);
       if (command.meld) {
@@ -270,6 +279,15 @@ export function applyCommand(
         ev.push({ type: "picked", seat, cards: taken, head: isHead });
         ev.push({ type: "laid_off", seat, cards: [target], meld: command.layoff });
       } else throw new GameRuleError("pick_needs_meld");
+      // ทิ้งโง่: picked before the discarder played again (within one lap of turns).
+      const feeder = s.players[from];
+      if (feeder && from !== seat && s.turnNumber - turn < s.players.length) {
+        const penalty = DUMMY_RULES.speto.includes(target)
+          ? DUMMY_RULES.feedPenaltySpeto
+          : DUMMY_RULES.feedPenalty;
+        feeder.points -= penalty;
+        ev.push({ type: "fed", seat: from, card: target, penalty });
+      }
       if (isHead) {
         p.tookHead = true;
         p.points += DUMMY_RULES.headBonus;
@@ -304,6 +322,7 @@ export function applyCommand(
       if (s.phase !== "play") throw new GameRuleError("draw_first");
       takeFromHand(p, [command.card]);
       s.discard.push(command.card);
+      s.discardFrom.push([seat, s.turnNumber]);
       ev.push({ type: "discarded", seat, card: command.card });
       if (!checkKnock(s, seat, ev)) nextTurn(s, ev);
       break;
