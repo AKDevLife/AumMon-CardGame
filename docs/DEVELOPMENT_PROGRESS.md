@@ -51,7 +51,6 @@ None
 | 14.3/14.5 | Review Dummy ⚑ rules (`docs/games/dummy/DUMMY_RULES.md`) and Poker defaults (`docs/games/poker/POKER_RULES.md`); playtest both on Dev |
 | GC7.3     | Decide whether to add scoped admin roles (who gets them)                                                                              |
 | 12.8      | Playtest Quick Match on Dev; choose best-of-3 for 2–3 players (yes / no)                                                              |
-| 12.14     | Decide Q1–Q4 (`docs/discard/AumMon_Game_Design_Upgrade.md` §3)                                                                        |
 | 12.7      | VIP/gacha Q1–Q5 + legal check (`AumMon_VIP_Cosmetics_Design.md` §8)                                                                   |
 | 13.2      | Choose the Art Direction (`docs/art-production/AumMon_Art_Direction.md`)                                                              |
 
