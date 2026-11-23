@@ -1,4 +1,4 @@
-# Dummy (ดัมมี่) — Rules (ruleset "4")
+# Dummy (ดัมมี่) — Rules (ruleset "5")
 
 > Status: implemented in `packages/game-engine/src/dummy/` (GC3). Built from common Thai Dummy rules with simple choices for a first version. Items marked ⚑ were reviewed: the owner approved these basic defaults on 2026-11-23 ("use basic rules for now"); changing one means a new ruleset version.
 
@@ -16,7 +16,7 @@
 2. **Play** (optional, any number): put down new melds (เกิด) and lay off (ฝาก) cards onto any meld on the table.
 3. **Discard** one card. If your hand is empty after any action, you **knock (น็อค)** and the round ends at once.
 
-Melds: a **set** of 3–4 cards of one rank, or a **run** of 3+ consecutive cards of one suit. The ace is low (A-2-3) or high (Q-K-A), never both (no K-A-2).
+Melds: a **set** of 3–4 cards of one rank, or a **run** of 3+ consecutive cards of one suit. 2 is the lowest card and the ace only high: Q-K-A is a run, A-2-3 and K-A-2 are not (ruleset "5", owner 2026-11-23).
 
 ## 3. End of round
 

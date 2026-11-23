@@ -3,7 +3,7 @@ import { StickerButton } from "../components/StickerButton.tsx";
 import { Popup } from "../features/game/Popup.tsx";
 import type { GameId } from "../platform/games.ts";
 
-/** Dummy rules in plain Thai (docs/games/dummy/DUMMY_RULES.md, ruleset "4"). */
+/** Dummy rules in plain Thai (docs/games/dummy/DUMMY_RULES.md, ruleset "5"). */
 export function DummyRulesText() {
   return (
     <div className="flex flex-col gap-2 text-sm">
@@ -27,8 +27,8 @@ export function DummyRulesText() {
         </li>
       </ol>
       <p>
-        <b>ชุดไพ่:</b> ตอง 3–4 ใบเลขเดียวกัน หรือเรียง 3 ใบขึ้นไปดอกเดียวกัน (A ใช้ต่ำ A-2-3 หรือสูง Q-K-A ไม่วนรอบ
-        K-A-2)
+        <b>ชุดไพ่:</b> ตอง 3–4 ใบเลขเดียวกัน หรือเรียง 3 ใบขึ้นไปดอกเดียวกัน (2 ต่ำสุด A สูงสุด ต่อได้แค่ Q-K-A ห้าม
+        A-2-3 หรือ K-A-2)
       </p>
       <p>
         <b>จบรอบ:</b> มีคนน็อค (ไพ่หมดมือ) หรือกองจั่วหมด
