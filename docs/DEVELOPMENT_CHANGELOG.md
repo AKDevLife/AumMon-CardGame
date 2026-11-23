@@ -2,6 +2,10 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-23 — Dummy: meld owner label
+
+- Each meld on the table shows whose it is ("ของ …").
+
 ## 2026-11-23 — 14.12 Dummy ruleset "4" + pick fix (owner)
 
 - ทิ้งโง่ now only when the next player picks just the previous discard, melds it and knocks in that turn (−50 / speto −100). Engine 10.0.0; migration `20261123000400`.

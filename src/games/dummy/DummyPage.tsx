@@ -162,15 +162,20 @@ export function DummyPage() {
                 type="button"
                 key={`${String(i)}-${meld.cards.join()}`}
                 aria-pressed={target === i}
-                aria-label={`ชุดที่ ${String(i + 1)} ของ ${m.data?.names[meld.owner] ?? ""}`}
                 onClick={() => {
                   setTarget(target === i ? null : i);
                 }}
-                className={`flex flex-wrap gap-1 rounded-lg p-1 ${target === i ? "ring-4 ring-am-blue" : ""}`}
+                className={`flex flex-col items-start gap-1 rounded-lg p-1 text-left ${target === i ? "ring-4 ring-am-blue" : ""}`}
               >
-                {meld.cards.map((c) => (
-                  <PlayingCard key={c} code={c} small />
-                ))}
+                <span className="text-xs font-semibold text-am-muted">
+                  ของ {m.data?.names[meld.owner] ?? `ผู้เล่น ${String(meld.owner + 1)}`}
+                  {meld.owner === v.seat && " (คุณ)"}
+                </span>
+                <span className="flex flex-wrap gap-1">
+                  {meld.cards.map((c) => (
+                    <PlayingCard key={c} code={c} small />
+                  ))}
+                </span>
               </button>
             ))}
           </section>
