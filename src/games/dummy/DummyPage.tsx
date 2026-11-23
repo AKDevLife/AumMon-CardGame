@@ -24,12 +24,12 @@ function ownOrder(order: readonly string[], hand: readonly string[]): string[] {
 }
 
 interface FedEvent {
-  type: "fed";
+  type: "fed" | "full_discard";
   seat: number;
   card: string;
   penalty: number;
 }
-const isFed = (e: { type: string }): e is FedEvent => e.type === "fed";
+const isFed = (e: { type: string }): e is FedEvent => e.type === "fed" || e.type === "full_discard";
 
 /** Dummy table: the server validates every meld, pick and discard; the UI only builds intents. */
 export function DummyPage() {
@@ -99,17 +99,44 @@ export function DummyPage() {
 
           {fed.map((e) => (
             <p
-              key={`${String(e.seat)}-${e.card}`}
+              key={`${e.type}-${String(e.seat)}-${e.card}`}
               role="status"
               className="rounded-lg border-l-4 border-am-red bg-am-error-bg px-2 py-1 text-sm font-semibold text-am-danger-text"
             >
-              ทิ้งโง่! {m.data?.names[e.seat] ?? "ผู้เล่น"} ทิ้ง {cardLabel(e.card)} ให้คนอื่นเก็บ −{e.penalty}{" "}
-              แต้ม
+              {e.type === "fed" ? "ทิ้งโง่!" : "ทิ้งเต็ม!"} {m.data?.names[e.seat] ?? "ผู้เล่น"} ทิ้ง{" "}
+              {cardLabel(e.card)}
+              {e.type === "fed" ? " ให้คนอื่นเก็บ" : " ครบชุดกับกองทิ้ง"} −{e.penalty} แต้ม
             </p>
           ))}
 
+          <section aria-label="กองจั่ว" className="flex items-center gap-3">
+            {(() => {
+              const canDraw = myTurn && v.phase === "draw" && !m.busy && v.stockCount > 0;
+              const pileCls = `relative flex h-20 w-14 shrink-0 items-center justify-center rounded-lg border-[3px] border-am-ink bg-am-brand font-display text-2xl text-am-inverse shadow-[3px_3px_0_var(--am-ink)] ${canDraw ? "am-pressable am-active ring-4 ring-am-blue" : "opacity-70"}`;
+              return (
+                <button
+                  type="button"
+                  disabled={!canDraw}
+                  aria-label={`จั่วไพ่ (กองจั่วเหลือ ${String(v.stockCount)} ใบ)`}
+                  onClick={() => {
+                    send({ type: "draw" });
+                  }}
+                  className={pileCls}
+                >
+                  <span aria-hidden="true">🂠</span>
+                </button>
+              );
+            })()}
+            <p className="text-sm">
+              <b>กองจั่ว</b> เหลือ {v.stockCount} ใบ
+              {myTurn && v.phase === "draw" && (
+                <span className="block font-semibold">แตะกองจั่วเพื่อจั่ว หรือเลือกเก็บจากกองทิ้ง</span>
+              )}
+            </p>
+          </section>
+
           <section aria-label="กองทิ้ง" className="flex flex-col gap-1">
-            <h2 className="font-semibold">กองทิ้ง (เลือกใบที่จะเก็บ) · กองจั่วเหลือ {v.stockCount} ใบ</h2>
+            <h2 className="font-semibold">กองทิ้ง (เลือกใบที่จะเก็บ)</h2>
             <div className="flex flex-wrap gap-1">
               {v.discard.map((c, i) => (
                 <PlayingCard
@@ -211,14 +238,6 @@ export function DummyPage() {
 
           {myTurn && v.phase === "draw" && (
             <div className="flex flex-wrap gap-2">
-              <StickerButton
-                disabled={m.busy}
-                onClick={() => {
-                  send({ type: "draw" });
-                }}
-              >
-                จั่วไพ่
-              </StickerButton>
               <StickerButton
                 variant="confirm"
                 disabled={m.busy || pile === null || (picked.length < 2 && target === null)}

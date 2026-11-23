@@ -1,4 +1,4 @@
-# Dummy (ดัมมี่) — Rules (ruleset "2")
+# Dummy (ดัมมี่) — Rules (ruleset "3")
 
 > Status: implemented in `packages/game-engine/src/dummy/` (GC3). Built from common Thai Dummy rules with simple choices for a first version. Items marked ⚑ were reviewed: the owner approved these basic defaults on 2026-11-23 ("use basic rules for now"); changing one means a new ruleset version.
 
@@ -24,19 +24,20 @@ Melds: a **set** of 3–4 cards of one rank, or a **run** of 3+ consecutive card
 
 ## 4. Scoring
 
-| Item                                                                      | Points                              |
-| ------------------------------------------------------------------------- | ----------------------------------- |
-| Card on the table (own melds and lay-offs, credited to whoever placed it) | + card value                        |
-| Card left in hand                                                         | − card value                        |
-| Card values                                                               | ⚑ A = 15; 10, J, Q, K = 10; 2–9 = 5 |
-| Speto (สเปโต) 2♣ and Q♠                                                   | ⚑ 50 each (plus or minus)           |
-| Picking up the head card from the bottom of the pile                      | ⚑ +50                               |
-| Knock                                                                     | ⚑ +50                               |
-| ทิ้งโง่: your discard is picked by another player before your next turn      | −50 (speto −100)                    |
+| Item                                                                                  | Points                              |
+| ------------------------------------------------------------------------------------- | ----------------------------------- |
+| Card on the table (own melds and lay-offs, credited to whoever placed it)             | + card value                        |
+| Card left in hand                                                                     | − card value                        |
+| Card values                                                                           | ⚑ A = 15; 10, J, Q, K = 10; 2–9 = 5 |
+| Speto (สเปโต) 2♣ and Q♠                                                               | ⚑ 50 each (plus or minus)           |
+| Picking up the head card from the bottom of the pile                                  | ⚑ +50                               |
+| Knock                                                                                 | ⚑ +50                               |
+| ทิ้งโง่: your discard is picked by another player before your next turn                  | −50 (speto −100)                    |
+| ทิ้งเต็ม: your discard forms a set/run with any 2 cards in the pile (not the knock card) | −50 (speto −100)                    |
 
 Highest total wins; equal totals share the win.
 
-Ruleset "2" (owner 2026-11-23) added ทิ้งโง่: any other player (not only the next one) who picks your discard before your next turn costs you 50, a speto 100. ⚑ Not in ruleset "2": "dummy"/"เต็ม" knocks for extra points, melding requirement before laying off, multi-round matches to a target score.
+Ruleset "2" (owner 2026-11-23) added ทิ้งโง่: any other player (not only the next one) who picks your discard before your next turn costs you 50, a speto 100. Ruleset "3" (owner 2026-11-23) added ทิ้งเต็ม (above); drawing is done by tapping the stock pile. ⚑ Not in ruleset "3": "dummy"/"เต็ม" knocks for extra points, melding requirement before laying off, multi-round matches to a target score.
 
 ## 5. Timers and privacy
 

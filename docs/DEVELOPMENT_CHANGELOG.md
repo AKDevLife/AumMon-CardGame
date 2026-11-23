@@ -2,6 +2,11 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-23 — 14.11 Dummy ruleset "3" (owner)
+
+- ทิ้งเต็ม: a discard completing a set/run with any two pile cards costs 50 (speto 100); skipped on the knock card. Engine 9.0.0; migration `20261123000300` ends active ruleset "2" games, `current_ruleset = '3'`.
+- Draw by tapping the stock pile (button removed); ทิ้งเต็ม notice and rules text.
+
 ## 2026-11-23 — 14.10 Dummy ruleset "2" (owner)
 
 - ทิ้งโง่: a discard picked by another player before the discarder's next turn costs 50 (speto 100); state tracks who discarded each pile card and when. Engine 8.0.0; migration `20261123000200` ends active ruleset "1" Dummy games and sets `games.current_ruleset = '2'`.

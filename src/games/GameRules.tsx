@@ -3,7 +3,7 @@ import { StickerButton } from "../components/StickerButton.tsx";
 import { Popup } from "../features/game/Popup.tsx";
 import type { GameId } from "../platform/games.ts";
 
-/** Dummy rules in plain Thai (docs/games/dummy/DUMMY_RULES.md, ruleset "2"). */
+/** Dummy rules in plain Thai (docs/games/dummy/DUMMY_RULES.md, ruleset "3"). */
 export function DummyRulesText() {
   return (
     <div className="flex flex-col gap-2 text-sm">
@@ -16,7 +16,7 @@ export function DummyRulesText() {
       </p>
       <ol className="list-decimal pl-5">
         <li>
-          <b>เก็บไพ่:</b> จั่ว 1 ใบจากกองจั่ว หรือเลือกเก็บไพ่จากกองทิ้ง (ได้ใบนั้นและทุกใบที่อยู่ทับ) —
+          <b>เก็บไพ่:</b> แตะกองจั่วเพื่อจั่ว 1 ใบ หรือเลือกเก็บไพ่จากกองทิ้ง (ได้ใบนั้นและทุกใบที่อยู่ทับ) —
           ใบที่เลือกต้องเกิดทันทีกับไพ่ในมือ หรือฝากลงไพ่บนโต๊ะ
         </li>
         <li>
@@ -39,6 +39,10 @@ export function DummyRulesText() {
       </p>
       <p>
         <b>ทิ้งโง่:</b> ถ้าไพ่ที่คุณทิ้งถูกคนอื่นเก็บไปใช้ก่อนถึงตาคุณอีกครั้ง คุณถูกหัก 50 แต้ม (สเปโตหัก 100)
+      </p>
+      <p>
+        <b>ทิ้งเต็ม:</b> ทิ้งไพ่ที่ครบชุดกับไพ่ใบไหนก็ได้ในกองทิ้ง (เช่น มี 2♠ 2♥ แล้วทิ้ง 2 อีกใบ หรือมี 3♠ 4♠ แล้วทิ้ง 2♠ /
+        5♠) ถูกหัก 50 แต้ม (สเปโตหัก 100)
       </p>
       <p>
         <b>เวลา:</b> เทิร์นละ 45 วินาที (หมดเวลา ระบบจั่ว/ทิ้งให้)
