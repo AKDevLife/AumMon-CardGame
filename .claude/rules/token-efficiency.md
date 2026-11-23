@@ -9,3 +9,5 @@
 - No unnecessary docs, duplicate code/docs, alternative solutions or long rationale.
 - Do not rerun checks that already passed on unchanged code.
 - Token savings never justify lower quality, security, testing or correctness.
+- Prefer `pnpm check:quiet` (prints only failing steps) over `pnpm check`.
+- Read only the top of `docs/DEVELOPMENT_CHANGELOG.md`; keep about 15 entries there and move older ones to `docs/archive/DEVELOPMENT_CHANGELOG_ARCHIVE.md` (never read the archive unless needed).

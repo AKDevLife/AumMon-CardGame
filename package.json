@@ -20,6 +20,7 @@
     "test:e2e": "playwright test",
     "check:secrets": "node scripts/check-secrets.mjs",
     "check": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm test && pnpm build && pnpm check:secrets",
+    "check:quiet": "node scripts/check-quiet.mjs",
     "progress": "node scripts/progress.mjs",
     "db:test": "bash scripts/db-test.sh",
     "sync:engine": "node scripts/sync-engine.mjs",

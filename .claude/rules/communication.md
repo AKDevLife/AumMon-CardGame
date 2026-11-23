@@ -17,3 +17,7 @@ Verification:
 Next:
 - next task
 ```
+
+## Next-command suggestion
+
+End every reply with a `Suggested next command:` line: one short, token-efficient prompt the owner can copy (task ID, scope, file hints; prefer a fresh session or `/clear` after a merged task).
