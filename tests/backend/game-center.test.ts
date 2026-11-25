@@ -1,5 +1,6 @@
 /**
- * Game Center backend (GC4/GC6/GC4.4): Dummy, Poker and Quick Match through the real Edge Functions.
+ * Game Center backend (GC4.4): Quick Match and game availability through the real Edge Functions.
+ * Dummy and Poker were retired (Product Direction v2, 2026-11-25).
  * Skipped unless VITE_SUPABASE_URL/KEY point to a running local stack.
  */
 import { createClient } from "@supabase/supabase-js";
@@ -37,14 +38,6 @@ async function newUser() {
 type Call = Awaited<ReturnType<typeof newUser>>;
 
 const view = async (call: Call, matchId: string) => (await call("game-view", { matchId })).body;
-const command = (call: Call, g: Body, cmd: Body) =>
-  call("game-command", {
-    matchId: g["matchId"],
-    expectedVersion: g["version"],
-    idempotencyKey: randomUUID(),
-    command: cmd,
-  });
-
 describe.runIf(run)("Game Center games via Edge Functions", () => {
   let a: Call;
   let b: Call;
@@ -53,62 +46,24 @@ describe.runIf(run)("Game Center games via Edge Functions", () => {
     b = await newUser();
   });
 
-  it("solo Dummy: hidden hands, draw + discard, invalid meld rejected", async () => {
-    const created = await a("game-create", { mode: "solo", bots: 1, gameId: "dummy" });
-    expect(created.status).toBe(200);
-    const matchId = created.body["matchId"] as string;
-    let g = await view(a, matchId);
-    expect(g["gameId"]).toBe("dummy");
-    const v = g["view"] as { myHand: string[]; players: { handCount: number }[]; seat: number };
-    expect(v.myHand).toHaveLength(11);
-    expect(JSON.stringify(g)).not.toContain('"hand"');
-    // Wait for our turn (bot may start).
-    for (let i = 0; i < 20 && g["acting"] !== g["seat"]; i++) {
-      await new Promise((r) => setTimeout(r, 800));
-      g = await view(a, matchId);
-    }
-    expect(g["acting"]).toBe(g["seat"]);
-    const bad = await command(a, g, { type: "meld", cards: ["As", "Kd", "2h"] });
-    expect(bad.status).toBe(409);
-    const drew = await command(a, g, { type: "draw" });
-    expect(drew.status).toBe(200);
-    const hand = (drew.body["view"] as { myHand: string[] }).myHand;
-    const out = await command(a, drew.body, { type: "discard", card: hand[0] });
-    expect(out.status).toBe(200);
-    expect(b).toBeDefined();
-    const stranger = await b("game-view", { matchId });
-    expect(stranger.status).toBe(404);
-  });
-
-  it("solo Poker: own hole cards only, illegal raise rejected, fold accepted", async () => {
-    const created = await a("game-create", { mode: "solo", bots: 2, gameId: "poker" });
-    expect(created.status).toBe(200);
-    const matchId = created.body["matchId"] as string;
-    let g = await view(a, matchId);
-    for (let i = 0; i < 20 && g["acting"] !== g["seat"]; i++) {
-      await new Promise((r) => setTimeout(r, 800));
-      g = await view(a, matchId);
-    }
-    const v = g["view"] as { myCards: string[]; legal: { minTo: number } | null };
-    expect(v.myCards).toHaveLength(2);
-    expect(JSON.stringify(g)).not.toContain('"hole"');
-    if (v.legal) {
-      const bad = await command(a, g, { type: "raise", to: v.legal.minTo - 1 });
-      expect(bad.status).toBe(409);
-      const fold = await command(a, g, { type: "fold" });
-      expect(fold.status).toBe(200);
-    }
-  });
-
   it("rejects unknown games and out-of-range seats", async () => {
     expect((await a("game-create", { mode: "solo", bots: 1, gameId: "chess" })).status).toBe(404);
-    expect((await a("game-create", { mode: "solo", bots: 5, gameId: "dummy" })).status).toBe(400);
+    // Retired games are disabled in public.games: not playable any more.
+    expect((await a("game-create", { mode: "solo", bots: 1, gameId: "dummy" })).status).not.toBe(
+      200,
+    );
+    expect((await a("game-create", { mode: "solo", bots: 1, gameId: "poker" })).status).not.toBe(
+      200,
+    );
+    expect((await a("game-create", { mode: "solo", bots: 8, gameId: "edo_battle" })).status).toBe(
+      400,
+    );
   });
 
   it("Quick Match pairs two players into one match", async () => {
-    const one = await a("matchmaking", { action: "join", gameId: "dummy", players: 2 });
+    const one = await a("matchmaking", { action: "join", gameId: "edo_battle", players: 2 });
     expect(one.body["status"]).toBe("waiting");
-    const two = await b("matchmaking", { action: "join", gameId: "dummy", players: 2 });
+    const two = await b("matchmaking", { action: "join", gameId: "edo_battle", players: 2 });
     expect(two.body["status"]).toBe("matched");
     const again = await a("matchmaking", { action: "status" });
     expect(again.body["status"]).toBe("matched");

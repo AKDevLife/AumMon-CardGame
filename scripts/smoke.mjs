@@ -54,13 +54,7 @@ await check("SPA deep link works", async () => {
 await check("engine-health", async () => {
   const body = await (await fetch(`${supabase}/functions/v1/engine-health`)).json();
   // EDO Battle ruleset "13" + every Game Center engine loaded.
-  assert(
-    body.rulesetVersion === "13" &&
-      body.games?.edo_battle === "13" &&
-      body.games?.dummy === "5" &&
-      body.games?.poker === "1",
-    JSON.stringify(body),
-  );
+  assert(body.rulesetVersion === "13" && body.games?.edo_battle === "13", JSON.stringify(body));
 });
 await check("API rejects unauthenticated commands", async () => {
   const res = await fetch(`${supabase}/functions/v1/game-view`, { method: "POST", body: "{}" });

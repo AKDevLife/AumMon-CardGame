@@ -9,8 +9,6 @@ import { OnlinePage } from "../features/online/OnlinePage.tsx";
 import { SoloSetupPage } from "../features/solo/SoloSetupPage.tsx";
 import { GamePage } from "../features/game/GamePage.tsx";
 import { TutorialPage } from "../features/tutorial/TutorialPage.tsx";
-import { DummyPage } from "../games/dummy/DummyPage.tsx";
-import { PokerPage } from "../games/poker/PokerPage.tsx";
 import { AppLayout } from "./AppLayout.tsx";
 import { HomePage } from "./HomePage.tsx";
 import { NotFoundPage } from "./NotFoundPage.tsx";
@@ -32,8 +30,6 @@ export const routes: RouteObject[] = [
       { path: "game/:matchId", element: <GamePage /> },
       { path: "games/:gameId/solo", element: <SoloSetupPage /> },
       { path: "games/:gameId/online", element: <OnlinePage /> },
-      { path: "games/dummy/match/:matchId", element: <DummyPage /> },
-      { path: "games/poker/match/:matchId", element: <PokerPage /> },
       { path: "admin", element: <AdminPage /> },
       { path: "admin/:section", element: <AdminPage /> },
       { path: "*", element: <NotFoundPage /> },

@@ -544,8 +544,6 @@ export function AdminPage() {
                 className="am-sticker bg-am-card px-2 py-1"
               >
                 <option value="edo_battle">EDO Battle</option>
-                <option value="dummy">ดัมมี่</option>
-                <option value="poker">โป๊กเกอร์</option>
               </select>
             </label>
             {sim !== null && (

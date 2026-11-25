@@ -18,8 +18,6 @@ describe("app routes", () => {
     expect(screen.getByRole("heading", { level: 1, name: "AumMon" })).toBeInTheDocument();
     expect(screen.getByText("Game Center")).toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 2, name: /EDO Battle/ })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { level: 3, name: /ดัมมี่/ })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { level: 3, name: /โป๊กเกอร์/ })).toBeInTheDocument();
     for (const name of ["Solo vs Bot", "Online"]) {
       expect(screen.getByRole("button", { name })).toBeDisabled();
     }
@@ -34,18 +32,6 @@ describe("app routes", () => {
   it("home offers the rules button", () => {
     renderAt("/");
     expect(screen.getByRole("button", { name: /วิธีเล่น & กติกา/ })).toBeEnabled();
-  });
-
-  it("home offers Dummy and Poker rules", async () => {
-    renderAt("/");
-    for (const [name, text] of [
-      ["ดัมมี่", /ทิ้งโง่/],
-      ["โป๊กเกอร์", /ไม่ใช่เงินจริง/],
-    ] as const) {
-      fireEvent.click(screen.getByRole("button", { name: new RegExp(`กติกา\\s*${name}`) }));
-      const dialog = await screen.findByRole("dialog", { name: `กติกา${name}` });
-      expect(within(dialog).getByText(text)).toBeInTheDocument();
-    }
   });
 
   it("back button shows on inner pages, not on home", () => {

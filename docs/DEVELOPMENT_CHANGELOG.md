@@ -2,6 +2,12 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-25 — 15.2 Product v2 docs + Dummy / Poker retired (owner)
+
+- Spec v15 (`aummon_game_spec.md`) = v2 product; new `docs/v2/` Vision, Strategy, Requirements (R1–R8 with AC), Game Module Compatibility; handoff + roadmap Phase 15.
+- Dummy and Poker removed from engine, UI, tests, registry and smoke check; rules archived to `docs/archive/games/`. Migration `20261125000000` disables both games and ends open rooms / matches — rows kept as history. Admin can switch retired games off but never on; history filters still accept them.
+- EDO Battle unchanged and playable (deferred, Q1).
+
 ## 2026-11-25 — Product Direction v2 audit (owner)
 
 - Owner changed direction to a guest-first, text-driven party platform (flagship BLUFF) and asked to remove Dummy / Poker. Phase 1 audit: `docs/v2/AumMon_Product_Direction_Audit.md` (reuse, changes, compatibility, MVP, roadmap, open questions Q1–Q8). No code, data or migration changed; waiting for owner approval.

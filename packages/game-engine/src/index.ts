@@ -16,5 +16,3 @@ export * as discard from "./discard/index.ts";
 export * as sdk from "./sdk/index.ts";
 export { edoBattle, parseEdoCommand, type EdoCommand } from "./edo-battle/module.ts";
 export { GAME_MODULES, getGameModule, isGameId } from "./registry.ts";
-export * as pokerGame from "./poker/index.ts";
-export * as dummyGame from "./dummy/index.ts";

@@ -1,27 +1,28 @@
 # AumMon — Master Project Handoff
 
-> Entry point for a new session. Updated: 2026-11-22. Numbers: `pnpm progress`.
+> Entry point for a new session. Updated: 2026-11-25. Numbers: `pnpm progress`.
 
 ## Product
 
-Casual Discard Edition — 2–8 player shed-your-hand card game with 16 Everyday Objects (`aummon_game_spec.md`, rules in `docs/discard/`). Modes: Solo vs bots, Online. Ruleset `13` (7 / 5 cards, 60 s turns, card changes DC14–DC15), engine `7.0.0`.
+**v2 (owner 2026-11-25):** guest-first, text-driven social party gaming platform for 2–8 players; flagship game **BLUFF**; Casual now, Ranked later (`aummon_game_spec.md`, `docs/v2/`). Dummy and Poker retired; EDO Battle (ruleset `13`) deferred but playable on Dev.
 
 ## Status
 
-| Area                               | State                                                                          | Details                                                |
-| ---------------------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------ |
-| Game (engine, backend, UI)         | Live on Dev, awaiting owner playtest (12.8)                                    | `docs/DEVELOPMENT_PROGRESS.md`                         |
-| Quick Match (5–10 min, 20 s turns) | **live on Dev — ruleset "8"** (12.12); playtest next                           | `docs/discard/AumMon_Quick_Match_Rules.md`             |
-| Quality 9–10 upgrade               | audit + proposals done (12.13); **owner decisions Q1–Q4**; no human scores yet | `docs/discard/AumMon_Game_Design_Upgrade.md`           |
-| VIP / gacha                        | design later (12.7), no payments                                               | spec §1                                                |
-| Art production                     | pipeline ready, waiting for Art Direction choice (13.2); no images yet         | `docs/art-production/AumMon_Art_Production_Handoff.md` |
-| Production deploy                  | blocked on owner (6.8, 7.3, 7.8)                                               | progress file                                          |
+| Area                         | State                                                                    | Details                                       |
+| ---------------------------- | ------------------------------------------------------------------------ | --------------------------------------------- |
+| v2 Phase 1 audit             | approved (Q1–Q8 defaults)                                                | `docs/v2/AumMon_Product_Direction_Audit.md`   |
+| v2 Phase 2 docs + retirement | done (this handoff); Dummy / Poker code removed, rows kept as history    | `docs/v2/AumMon_Game_Module_Compatibility.md` |
+| Next                         | Phase 3 BLUFF design (+ 5 UI prototype, 6 guest architecture, 9 content) | `docs/DEVELOPMENT_ROADMAP.md` Phase 15        |
+| EDO Battle                   | live on Dev, deferred                                                    | `docs/discard/`                               |
+| Art production               | paused (Q8)                                                              | `docs/art-production/`                        |
+| Production deploy            | blocked on owner (6.8, 7.3, 7.8)                                         | progress file                                 |
 
 ## Key documents
 
 | Topic                                 | File                                  |
 | ------------------------------------- | ------------------------------------- |
-| Rules / cards                         | `docs/discard/`                       |
+| Product v2                            | `docs/v2/`                            |
+| EDO rules / cards                     | `docs/discard/`                       |
 | Architecture, DB, security, test plan | `aummon_project_blueprint.md`         |
 | Roadmap / progress / changelog        | `docs/DEVELOPMENT_*.md`               |
 | Colors / UI tokens                    | `docs/color_design_system.md`         |

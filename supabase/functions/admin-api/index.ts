@@ -59,8 +59,11 @@ const limit = (body: Body, max = 100) => {
 };
 
 /** Optional game filter for listings (null = all games). */
-const gameFilter = (body: Body): string | null =>
-  isGameId(body["gameId"]) ? body["gameId"] : null;
+const gameFilter = (body: Body): string | null => {
+  const v = body["gameId"];
+  // Retired games (Dummy, Poker) stay filterable in history.
+  return typeof v === "string" && /^[a-z_]{2,32}$/.test(v) ? v : null;
+};
 
 const actions: Record<string, Action> = {
   /** Game Center registry with live counts per game (GC7.1). */
@@ -77,8 +80,14 @@ const actions: Record<string, Action> = {
   /** Turn a game on/off for players (running matches finish normally; new ones are refused). */
   "game.set_enabled": async (admin, body) => {
     const gameId = body["gameId"];
-    if (!isGameId(gameId)) throw new HttpError(400, "invalid_input", "gameId invalid");
     const enabled = body["enabled"] === true;
+    // Any registered row may be turned off; only games with a module may be turned on (retired ones stay off).
+    if (
+      typeof gameId !== "string" ||
+      !/^[a-z_]{2,32}$/.test(gameId) ||
+      (enabled && !isGameId(gameId))
+    )
+      throw new HttpError(400, "invalid_input", "gameId invalid");
     return db().begin(async (tx) => {
       const rows = await tx`update public.games set is_enabled = ${enabled}, updated_at = now()
         where id = ${gameId} returning id`;

@@ -2,13 +2,13 @@
 
 ## Authoritative documents
 
-- `aummon_game_spec.md` — product/platform decisions + index; rules and cards live in `docs/discard/` (Casual Discard Edition, 2–8 players).
+- `aummon_game_spec.md` — product/platform decisions + index (v2: guest-first party platform, flagship BLUFF; product docs in `docs/v2/`). EDO Battle rules live in `docs/discard/`.
 - `aummon_project_blueprint.md` — architecture, database, security, stack and test plan; roadmap in `docs/DEVELOPMENT_ROADMAP.md`.
 - `docs/discard/AumMon_Rule_Clarification.md` — owner decisions and open questions.
 
 ## Rules
 
-- Platform decisions (spec §1), Core Rules and the Card Library change only with owner approval; result-affecting changes require a new `ruleset_version` (current: `"13"`; older versions are retired — history in the changelog).
+- Platform decisions (spec §1) and each game's rules change only with owner approval; result-affecting changes require a new `ruleset_version` per game (EDO Battle: `"13"`; history in the changelog).
 - Never invent missing mechanics. Never silently resolve conflicting requirements; record them in `docs/discard/AumMon_Rule_Clarification.md`, mark affected tasks blocked, and continue with unblocked work.
 - Approved architecture: React + Vite + TS strict, Tailwind, Supabase (Auth, PostgreSQL, Edge Functions, Realtime), Vercel.
 - `packages/game-engine` stays pure TypeScript: no React, UI, Supabase, Node/Deno/browser APIs, I/O, `Math.random` or wall-clock time (enforced by ESLint, tsconfig and architecture test — never relax these).

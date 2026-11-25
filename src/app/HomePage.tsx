@@ -5,9 +5,6 @@ import { useAuth } from "../features/auth/auth-context.ts";
 import { CardGallery } from "../features/game/CardGallery.tsx";
 import { Popup } from "../features/game/Popup.tsx";
 import { RulesText } from "../features/game/RulesText.tsx";
-import { GameRulesButton } from "../games/GameRules.tsx";
-import { GAMES } from "../platform/games.ts";
-import { useEnabledGames } from "../platform/useEnabledGames.ts";
 
 const MODES = [
   { id: "solo", label: "Solo vs Bot" },
@@ -28,7 +25,6 @@ export function HomePage() {
   const signedIn = auth.mode === "live" && auth.session !== null;
   const [rules, setRules] = useState(false);
   const [cards, setCards] = useState(false);
-  const enabled = useEnabledGames();
   return (
     <div className="flex flex-1 flex-col justify-center gap-8">
       <section className="am-sticker relative overflow-hidden bg-am-brand px-6 py-6 text-center text-am-inverse">
@@ -106,48 +102,6 @@ export function HomePage() {
             <span aria-hidden="true">🗂️</span> การ์ดทั้งหมด
           </button>
         </div>
-      </section>
-
-      <section aria-labelledby="more-games" className="flex flex-col gap-3">
-        <h2 id="more-games" className="text-center font-display text-2xl font-bold">
-          เกมอื่นใน AumMon
-        </h2>
-        <ul className="grid gap-3 sm:grid-cols-2">
-          {GAMES.filter((g) => g.id !== "edo_battle").map((g) => {
-            const open = signedIn && enabled.has(g.id);
-            return (
-              <li key={g.id} className="am-sticker flex flex-col gap-2 bg-am-card p-4">
-                <h3 className="font-display text-xl font-bold">
-                  <span aria-hidden="true">{g.icon}</span> {g.name}
-                </h3>
-                <p className="text-sm text-am-muted">{g.tagline}</p>
-                {open ? (
-                  <div className="flex gap-2">
-                    <Link
-                      to={g.soloPath}
-                      aria-label={`เล่น${g.name}กับ Bot`}
-                      className="am-pressable flex min-h-11 flex-1 items-center justify-center rounded-full border-[3px] border-am-ink bg-am-title px-3 font-display font-semibold"
-                    >
-                      Solo
-                    </Link>
-                    <Link
-                      to={g.onlinePath}
-                      aria-label={`เล่น${g.name}กับเพื่อน`}
-                      className="am-pressable flex min-h-11 flex-1 items-center justify-center rounded-full border-[3px] border-am-ink bg-am-title px-3 font-display font-semibold"
-                    >
-                      Online
-                    </Link>
-                  </div>
-                ) : (
-                  <p className="text-sm font-semibold">
-                    {enabled.has(g.id) ? "ต้องเข้าสู่ระบบก่อนเล่น" : "เร็ว ๆ นี้"}
-                  </p>
-                )}
-                <GameRulesButton gameId={g.id} gameName={g.name} />
-              </li>
-            );
-          })}
-        </ul>
       </section>
 
       <Popup
