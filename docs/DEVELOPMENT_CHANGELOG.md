@@ -2,6 +2,11 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-25 — 15.9 Content management design + BLUFF draft pack
+
+- `docs/v2/AumMon_Content_Management.md`: `private.content_items` schema (versioned, history, per-round `content_id` + version), selection rules, draft → in_review → approved → retired flow, roles, player reports, writing guide.
+- `docs/v2/content/bluff_th_v1_draft.json`: 150 Thai items (10 categories × 15, humor 1–2, 3 `group`), all `draft` → owner review C1–C4.
+
 ## 2026-11-25 — 15.4 BLUFF player-count balance approved (owner)
 
 - `docs/v2/AumMon_Player_Count_Design.md` + `scripts/bluff-sim.mjs` (variants × listener trust, 2p head-to-head, tie-break applied).
