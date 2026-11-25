@@ -45,8 +45,18 @@ export interface GameModule<S, C, V, E extends { readonly type: string }> {
   readonly afkTimeouts: number;
 
   start(playerIds: readonly string[], rng: RandomSource): { state: S; events: E[] };
-  /** Seat that must act now; null = finished. */
+  /** Seat that must act now; null = finished or a simultaneous phase (see pendingSeats). */
   actingSeat(state: S): Seat | null;
+  /**
+   * Simultaneous decisions: seats that may still act in the current phase (any order).
+   * Defining it switches the flow to the multi-seat path: one deadline per phase (timerKey),
+   * per-seat timeout defaults, `tick` for phases nobody acts in. Absent = single acting seat.
+   */
+  pendingSeats?(state: S): Seat[];
+  /** Simultaneous modules: advances a phase without pending seats once its deadline passed. */
+  tick?(state: S, rng: RandomSource): Transition<S, E>;
+  /** Number of seats (defaults to handCounts(state).length). */
+  seatCount?(state: S): number;
   /** Changes whenever a fresh decision timer must start (new turn / new decision). */
   timerKey(state: S): string;
   /** Time the acting seat gets for its current decision. */
@@ -63,8 +73,8 @@ export interface GameModule<S, C, V, E extends { readonly type: string }> {
   timeoutCommands(state: S, seat: Seat): C[];
   /** Follow-up after a timed-out command while the same seat still decides (or null). */
   afterTimeout?(state: S, seat: Seat): C | null;
-  /** Bot decision for `seat`. */
-  bot(state: S, seat: Seat, rng: RandomSource): C;
+  /** Bot decision for `seat` (absent = the game has no bots; bot seats are not allowed). */
+  bot?(state: S, seat: Seat, rng: RandomSource): C;
   /** What `seat` may see (null = spectator). The only source of client game data. */
   view(state: S, seat: Seat | null): V;
   /** Redacted copy of `event` safe for every match member, or null to keep it private. */

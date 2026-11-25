@@ -227,8 +227,16 @@ Plan, dependencies and MVP scope: `docs/v2/AumMon_Product_Direction_Audit.md` §
 - [x] **15.7** Casual & Ranked architecture; SDK simultaneous-decision design — deps: 15.6 — PR #124 (2026-11-25)
 - [x] **15.8** XP, rank, economy, monetization + cost model (design only) — deps: 15.7 — PR #125 (2026-11-25)
 - [x] **15.9** Content management design (schema, review flow, first ~150 items drafted) — deps: 15.3 — PR #122 (2026-11-25)
-- [~] **15.10** Technical migration plan + test strategy → owner approval — deps: 15.4–15.9 — awaiting owner T1–T2 (`docs/v2/AumMon_Technical_Migration_Plan.md`)
-- [ ] **15.11** MVP implementation (guest, Casual rooms, BLUFF, content, share) — deps: 15.10
+- [x] **15.10** Technical migration plan + test strategy → owner approval — deps: 15.4–15.9 — PR #127 (2026-11-25)
+- [~] **15.11** MVP implementation (guest, Casual rooms, BLUFF, content, share) — deps: 15.10 — slices S1–S8 (`docs/v2/AumMon_Technical_Migration_Plan.md` §3)
+  - [x] S1 SDK simultaneous decisions + contract tests; flaky EDO solo backend test fixed — PR #128 (2026-11-25)
+  - [ ] S2 `bluff` engine module
+  - [ ] S3 guest identity (M1, M4) + Home nickname + `requireAccount()`
+  - [ ] S4 Casual rooms 2–8 + settings (M2, M3, M7); BLUFF playable server-side
+  - [ ] S5 content tables + seed + selection + admin review (M5, M6)
+  - [ ] S6 BLUFF UI live + Results + share
+  - [ ] S7 account linking UI
+  - [ ] S8 v2 Home, EDO hidden, prototype removed, docs
 - [ ] **15.12** Closed playtest on real phones (2 / 4 / 8 players) — deps: 15.11
 - [ ] **15.13** Balance & UX iteration — deps: 15.12
 - [ ] **15.14** Launch preparation (production project, legal, payments decision) — deps: 15.13, 6.8, 7.8
