@@ -104,6 +104,17 @@
 }
 
 @theme inline {
+  --color-party-bg: var(--party-bg);
+  --color-party-surface: var(--party-surface);
+  --color-party-surface-raised: var(--party-surface-raised);
+  --color-party-border: var(--party-border);
+  --color-party-text: var(--party-text);
+  --color-party-muted: var(--party-muted);
+  --color-party-accent: var(--party-accent);
+  --color-party-pink: var(--party-pink);
+  --color-party-blue: var(--party-blue);
+  --color-party-green: var(--party-green);
+  --color-party-red: var(--party-red);
   --color-am-bg: var(--am-bg);
   --color-am-deco-purple: var(--am-deco-purple);
   --color-am-deco-green: var(--am-deco-green);
@@ -332,4 +343,22 @@
       animation: none;
     }
   }
+}
+
+/* v2 dark party theme (docs/v2/AumMon_UI_UX_Guidelines.md §2) */
+.theme-party {
+  --party-bg: #140b26;
+  --party-surface: #22143f;
+  --party-surface-raised: #2e1c55;
+  --party-border: #4a3480;
+  --party-text: #f6f0ff;
+  --party-muted: #b9a9dd;
+  --party-accent: #ffc83d;
+  --party-pink: #ff4f9a;
+  --party-blue: #55c9f4;
+  --party-green: #65d69a;
+  --party-red: #ff6b85;
+  background: var(--party-bg);
+  color: var(--party-text);
+  min-height: 100dvh;
 }

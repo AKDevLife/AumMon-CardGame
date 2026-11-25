@@ -2,7 +2,12 @@
 
 Newest first. Significant changes only.
 
-## 2026-11-25 — 15.8 XP, rank, economy, monetization (draft, design only)
+## 2026-11-25 — 15.5 UI/UX guidelines + BLUFF prototype (owner review)
+
+- `docs/v2/AumMon_UI_UX_Guidelines.md`: dark party theme tokens (`.theme-party`, `party-*` Tailwind colours), screen list, copy tone; owner review U1–U3.
+- Clickable mock prototype `src/features/prototype/BluffPrototype.tsx` at `/prototype/bluff` (Home → Lobby → Read → Claim → Lock → Reveal → Score → Results); unit test + Playwright phone-viewport test.
+
+## 2026-11-25 — 15.8 XP, rank, economy, monetization (approved E1–E4; funny rank names หน้าใส → ราชันย์ตบตา)
 
 - New `docs/v2/`: `AumMon_Level_XP_Design.md` (XP sources, anti-farm, level curve, missions), `AumMon_Rank_System.md` (OpenSkill, tiers, 8-week seasons, integrity), `AumMon_Game_Economy.md` (coins + gems, cosmetics only, gacha off until legal check), `AumMon_Monetization_Strategy.md` (cost model, break-even ≈ 1,000 MAU at 2 %). Prices are assumptions to re-check. Awaiting owner E1–E4.
 
