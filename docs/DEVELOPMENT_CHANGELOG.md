@@ -2,7 +2,11 @@
 
 Newest first. Significant changes only.
 
-## 2026-11-25 — 15.6 Guest-first architecture + account linking (draft)
+## 2026-11-25 — 15.7 Game modes + SDK simultaneous decisions (draft)
+
+- `docs/v2/AumMon_Game_Modes.md`: Casual (MVP) vs Ranked (post-MVP) rules; additive SDK `pendingSeats` / `tick` / `seatCount` / optional `bot`, one deadline per phase, per-seat timeout defaults, stale-version locks; BLUFF module sketch; tests. Awaiting owner M1–M3.
+
+## 2026-11-25 — 15.6 Guest-first architecture + account linking (approved G1–G3, L1–L2)
 
 - `docs/v2/AumMon_Guest_First_Architecture.md`: Supabase anonymous sign-in, `private.is_guest()` + restrictive account-only policies, `requireAccount()`, nickname snapshot, abuse limits, 30-day guest cleanup, tests.
 - `docs/v2/AumMon_Account_Linking.md`: same-id conversion (`updateUser` e-mail → password), `email_exists` = sign in without merge (Q4). Awaiting owner G1–G3, L1–L2.
