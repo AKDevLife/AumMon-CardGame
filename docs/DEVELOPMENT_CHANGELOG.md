@@ -2,6 +2,10 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-25 — Product Direction v2 audit (owner)
+
+- Owner changed direction to a guest-first, text-driven party platform (flagship BLUFF) and asked to remove Dummy / Poker. Phase 1 audit: `docs/v2/AumMon_Product_Direction_Audit.md` (reuse, changes, compatibility, MVP, roadmap, open questions Q1–Q8). No code, data or migration changed; waiting for owner approval.
+
 ## 2026-11-23 — 14.13 Dummy ruleset "5" (owner)
 
 - Runs: ace only high (Q-K-A); A-2-3 is no longer a run (melds and ทิ้งเต็ม). Engine 11.0.0; migration `20261123000500`.
