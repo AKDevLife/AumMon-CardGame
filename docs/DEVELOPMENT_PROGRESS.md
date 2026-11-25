@@ -6,7 +6,7 @@
 
 - **Status:** 🎉 Product Direction v2 (owner 2026-11-25): guest-first social party platform, flagship BLUFF. Phase 15.1–15.2 done; Dummy / Poker retired; EDO Battle deferred. Plan: `docs/v2/AumMon_Product_Direction_Audit.md`.
 - **Phase:** 12 — engine, backend, UI, cleanup and VIP/gacha design (12.7) done.
-- **Current task:** 15.7 approved (M1–M3). 15.8 XP / rank / economy / cost model draft → **owner E1–E4** (`docs/v2/AumMon_Monetization_Strategy.md` §5). Next: 15.5 UI, then 15.10.
+- **Current task:** 15.8 approved (E1–E4; rank tiers renamed หน้าใส → ราชันย์ตบตา). 15.5 UI/UX guidelines + clickable prototype `/prototype/bluff` → **owner review U1–U3**. Then 15.10.
 - **Next:** 15.3 design → owner approval; art production paused (Q8).
 - **Playtest URL (latest `main`):** https://aum-mon-card-game-git-playtest-aum-mon.vercel.app
 - **Dev backend:** Supabase `AumMon-Dev` (ref `yaxtzdhryctfjaspxvix`, ap-northeast-1), email confirmation OFF for playtesting.
@@ -26,8 +26,8 @@
 | 12 Discard Edition      |      20 |      21 |     95% |
 | 13 AI Art Production    |       1 |       9 |     11% |
 | 14 Game Center          |      13 |      14 |     93% |
-| 15 Product v2           |       7 |      14 |     50% |
-| **Overall**             | **127** | **147** | **86%** |
+| 15 Product v2           |       8 |      14 |     57% |
+| **Overall**             | **128** | **147** | **87%** |
 
 ## Completed (summary)
 

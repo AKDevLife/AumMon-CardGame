@@ -9,11 +9,13 @@ import { OnlinePage } from "../features/online/OnlinePage.tsx";
 import { SoloSetupPage } from "../features/solo/SoloSetupPage.tsx";
 import { GamePage } from "../features/game/GamePage.tsx";
 import { TutorialPage } from "../features/tutorial/TutorialPage.tsx";
+import { BluffPrototype } from "../features/prototype/BluffPrototype.tsx";
 import { AppLayout } from "./AppLayout.tsx";
 import { HomePage } from "./HomePage.tsx";
 import { NotFoundPage } from "./NotFoundPage.tsx";
 
 export const routes: RouteObject[] = [
+  { path: "prototype/bluff", element: <BluffPrototype /> },
   {
     element: <AppLayout />,
     children: [

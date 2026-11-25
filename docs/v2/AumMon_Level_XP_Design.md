@@ -1,6 +1,6 @@
 # AumMon — Level & XP Design (15.8)
 
-> Status: **design only — built post-MVP** (15.8, audit P4). Server-authoritative; nothing affects game results (no pay-to-win).
+> Status: **APPROVED by owner 2026-11-25 (E1–E4), design only — built post-MVP** (15.8, audit P4). Server-authoritative; nothing affects game results (no pay-to-win).
 
 ## 1. XP per match (server computes from the match result)
 

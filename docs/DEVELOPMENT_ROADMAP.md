@@ -222,10 +222,10 @@ Plan, dependencies and MVP scope: `docs/v2/AumMon_Product_Direction_Audit.md` §
 - [x] **15.2** Product docs (vision, strategy, requirements, compatibility, handoff), spec v15; Dummy / Poker retired (code removed, rows kept) — deps: 15.1 — PR #119 (2026-11-25)
 - [x] **15.3** BLUFF game design + scoring model + simulation → owner approval — deps: 15.2 — PR #120 (2026-11-25)
 - [x] **15.4** 2–8 player balance design (2 / 3–4 / 5–8 variants) — deps: 15.3 — PR #121 (2026-11-25)
-- [ ] **15.5** UI/UX guidelines (dark theme) + clickable prototype → owner review — deps: 15.3
+- [~] **15.5** UI/UX guidelines (dark theme) + clickable prototype → owner review — deps: 15.3 — prototype `/prototype/bluff`; awaiting owner review U1–U3
 - [x] **15.6** Guest-first architecture + account linking design (anonymous auth, RLS) → owner approval — deps: 15.2 — PR #123 (2026-11-25)
 - [x] **15.7** Casual & Ranked architecture; SDK simultaneous-decision design — deps: 15.6 — PR #124 (2026-11-25)
-- [~] **15.8** XP, rank, economy, monetization + cost model (design only) — deps: 15.7 — awaiting owner E1–E4
+- [x] **15.8** XP, rank, economy, monetization + cost model (design only) — deps: 15.7 — PR #125 (2026-11-25)
 - [x] **15.9** Content management design (schema, review flow, first ~150 items drafted) — deps: 15.3 — PR #122 (2026-11-25)
 - [ ] **15.10** Technical migration plan + test strategy → owner approval — deps: 15.4–15.9
 - [ ] **15.11** MVP implementation (guest, Casual rooms, BLUFF, content, share) — deps: 15.10

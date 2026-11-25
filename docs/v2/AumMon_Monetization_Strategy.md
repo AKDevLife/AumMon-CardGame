@@ -1,6 +1,6 @@
 # AumMon — Monetization Strategy & Cost Model (15.8)
 
-> Status: **design only — built post-MVP** (15.8, audit P4). Server-authoritative; nothing affects game results (no pay-to-win). Prices below are **assumptions from audit §8** and must be re-checked on the providers' pricing pages before any paid plan is enabled (owner approval required — CLAUDE.md).
+> Status: **APPROVED by owner 2026-11-25 (E1–E4), design only — built post-MVP** (15.8, audit P4). Server-authoritative; nothing affects game results (no pay-to-win). Prices below are **assumptions from audit §8** and must be re-checked on the providers' pricing pages before any paid plan is enabled (owner approval required — CLAUDE.md).
 
 ## 1. Costs
 
@@ -31,9 +31,9 @@
 
 ## 5. Open questions (owner, for all four 15.8 docs)
 
-| ID  | Question                                                                                  | Proposed default       |
-| --- | ----------------------------------------------------------------------------------------- | ---------------------- |
-| E1  | XP / levels / missions as in `AumMon_Level_XP_Design.md`; guests earn XP?                 | yes                    |
-| E2  | Ranked: OpenSkill rating, 8-week seasons, tiers Bronze → Master, solo queue first?        | yes                    |
-| E3  | Economy: coins (earned) + gems (paid), cosmetics only, gacha still off until legal check? | yes                    |
-| E4  | Revenue order: cosmetic shop → VIP host pass; ads only later and only on results screen?  | yes; ads decided later |
+| ID    | Question                                                                                                | Proposed default       |
+| ----- | ------------------------------------------------------------------------------------------------------- | ---------------------- |
+| E1 ✅ | XP / levels / missions as in `AumMon_Level_XP_Design.md`; guests earn XP?                               | yes                    |
+| E2 ✅ | Ranked: OpenSkill rating, 8-week seasons, tiers หน้าใส → ราชันย์ตบตา (renamed by owner), solo queue first? | yes                    |
+| E3 ✅ | Economy: coins (earned) + gems (paid), cosmetics only, gacha still off until legal check?               | yes                    |
+| E4 ✅ | Revenue order: cosmetic shop → VIP host pass; ads only later and only on results screen?                | yes; ads decided later |

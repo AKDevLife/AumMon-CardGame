@@ -1,6 +1,6 @@
 # AumMon — Game Economy (15.8)
 
-> Status: **design only — built post-MVP** (15.8, audit P4). Server-authoritative; nothing affects game results (no pay-to-win). Updates `docs/discard/AumMon_VIP_Cosmetics_Design.md` (12.7) for v2; its principles, legal checklist (§6) and owner questions (Q1–Q5) still apply.
+> Status: **APPROVED by owner 2026-11-25 (E1–E4), design only — built post-MVP** (15.8, audit P4). Server-authoritative; nothing affects game results (no pay-to-win). Updates `docs/discard/AumMon_VIP_Cosmetics_Design.md` (12.7) for v2; its principles, legal checklist (§6) and owner questions (Q1–Q5) still apply.
 
 ## 1. Items (cosmetic only)
 
