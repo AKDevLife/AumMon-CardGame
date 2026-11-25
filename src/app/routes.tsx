@@ -9,17 +9,32 @@ import { OnlinePage } from "../features/online/OnlinePage.tsx";
 import { SoloSetupPage } from "../features/solo/SoloSetupPage.tsx";
 import { GamePage } from "../features/game/GamePage.tsx";
 import { TutorialPage } from "../features/tutorial/TutorialPage.tsx";
-import { BluffPrototype } from "../features/prototype/BluffPrototype.tsx";
+import { BluffGame } from "../features/party/BluffGame.tsx";
+import { MePage } from "../features/party/MePage.tsx";
+import { PartyHome } from "../features/party/PartyHome.tsx";
+import { PartyJoin } from "../features/party/PartyJoin.tsx";
+import { PartyLobby } from "../features/party/PartyLobby.tsx";
+import { PartyShell } from "../features/party/PartyShell.tsx";
 import { AppLayout } from "./AppLayout.tsx";
 import { HomePage } from "./HomePage.tsx";
 import { NotFoundPage } from "./NotFoundPage.tsx";
 
 export const routes: RouteObject[] = [
-  { path: "prototype/bluff", element: <BluffPrototype /> },
+  {
+    element: <PartyShell />,
+    children: [
+      { index: true, element: <PartyHome /> },
+      { path: "join/:code", element: <PartyJoin /> },
+      { path: "party/lobby/:roomId", element: <PartyLobby /> },
+      { path: "party/game/:matchId", element: <BluffGame /> },
+      { path: "me", element: <MePage /> },
+    ],
+  },
   {
     element: <AppLayout />,
     children: [
-      { index: true, element: <HomePage /> },
+      // EDO Battle is hidden in v2 (Q1: deferred, kept): reachable only by URL.
+      { path: "edo", element: <HomePage /> },
       { path: "login", element: <LoginPage /> },
       { path: "register", element: <RegisterPage /> },
       { path: "profile", element: <ProfilePage /> },

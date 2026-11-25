@@ -14,7 +14,7 @@ describe("app routes", () => {
   });
 
   it("home shows title, ruleset and disabled modes", () => {
-    renderAt("/");
+    renderAt("/edo");
     expect(screen.getByRole("heading", { level: 1, name: "AumMon" })).toBeInTheDocument();
     expect(screen.getByText("Game Center")).toBeInTheDocument();
     expect(screen.getByRole("heading", { level: 2, name: /EDO Battle/ })).toBeInTheDocument();
@@ -24,13 +24,13 @@ describe("app routes", () => {
   });
 
   it("home header holds the settings button next to the account links", () => {
-    renderAt("/");
+    renderAt("/edo");
     const nav = screen.getByRole("navigation", { name: "Account" });
     expect(within(nav).getByRole("button", { name: /ตั้งค่า/ })).toBeEnabled();
   });
 
   it("home offers the rules button", () => {
-    renderAt("/");
+    renderAt("/edo");
     expect(screen.getByRole("button", { name: /วิธีเล่น & กติกา/ })).toBeEnabled();
   });
 

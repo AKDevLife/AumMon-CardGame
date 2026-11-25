@@ -126,7 +126,7 @@ describe("auth (live mode)", () => {
 
   it("shows the signed-in user and logs out", async () => {
     const { client, auth } = mockClient({ session: { user: { email: "a@test.local" } } });
-    renderAt("/", client);
+    renderAt("/edo", client);
     fireEvent.click(await screen.findByRole("button", { name: "ตั้งค่า" }));
     expect(await screen.findByRole("link", { name: "โปรไฟล์" })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "ออกจากระบบ" }));
