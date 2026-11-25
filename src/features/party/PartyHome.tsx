@@ -13,6 +13,7 @@ export function PartyHome() {
   const navigate = useNavigate();
   const [nick, setNick] = useState(savedNickname);
   const [code, setCode] = useState("");
+  const [players, setPlayers] = useState(4);
   const [slow, setSlow] = useState(false);
   const [humor, setHumor] = useState<1 | 2>(2);
   const [group, setGroup] = useState(false);
@@ -34,7 +35,12 @@ export function PartyHome() {
         const room = await callFunction<{ roomId: string; joinCode: string }>(
           auth.client,
           "rooms-create",
-          { mode: "online", gameId: "bluff", maxPlayers: 8, settings: { slow, humor, group } },
+          {
+            mode: "online",
+            gameId: "bluff",
+            maxPlayers: players,
+            settings: { slow, humor, group },
+          },
         );
         rememberJoinCode(room.roomId, room.joinCode);
         void navigate(`/party/lobby/${room.roomId}`);
@@ -71,7 +77,23 @@ export function PartyHome() {
       </label>
 
       <section className={`${panel} flex flex-col gap-3`} aria-label="สร้างห้อง">
-        <h2 className="text-lg font-bold">สร้างห้อง BLUFF (2–8 คน)</h2>
+        <h2 className="text-lg font-bold">สร้างห้อง BLUFF</h2>
+        <label className="flex items-center justify-between gap-2">
+          <span>จำนวนผู้เล่น (ที่ว่างจะเป็น Bot)</span>
+          <select
+            value={players}
+            onChange={(e) => {
+              setPlayers(Number(e.target.value));
+            }}
+            className="min-h-12 rounded-xl border border-party-border bg-party-surface px-3 text-party-text"
+          >
+            {[2, 3, 4, 5, 6, 7, 8].map((n) => (
+              <option key={n} value={n}>
+                {n} คน
+              </option>
+            ))}
+          </select>
+        </label>
         <label className="flex items-center justify-between gap-2">
           <span>เวลาช้า ×1.5</span>
           <input

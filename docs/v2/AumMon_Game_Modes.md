@@ -4,15 +4,15 @@
 
 ## 1. Modes
 
-| Item          | Casual (MVP)                                                               | Ranked (post-MVP)                                                   |
-| ------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| Who           | guests + accounts                                                          | accounts only (`requireAccount()`, Q3)                              |
-| Entry         | private room: create → code / link → join → ready → host starts            | queue (reuses `matchmaking.ts`), per game + size bucket             |
-| Players       | game min–max (BLUFF 2–8); no bots (Q7)                                     | fixed sizes (BLUFF 4 or 6) so ratings compare                       |
-| Settings      | host: timer speed normal / slow ×1.5, humor 1–2, `group` prompts on / off  | fixed: normal timers, humor 1, no `group`, items with `ranked` mode |
-| Result effect | Casual stats only, never rating                                            | rating change (15.8); dodge / AFK penalties                         |
-| After match   | rematch in the same room (existing)                                        | back to queue                                                       |
-| Leave / AFK   | seat kept for the reconnect window, then timeout defaults; match continues | same + counted as AFK for penalties                                 |
+| Item          | Casual (MVP)                                                                                                     | Ranked (post-MVP)                                                   |
+| ------------- | ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| Who           | guests + accounts                                                                                                | accounts only (`requireAccount()`, Q3)                              |
+| Entry         | private room: create → code / link → join → ready → host starts                                                  | queue (reuses `matchmaking.ts`), per game + size bucket             |
+| Players       | host picks 2–8 seats; empty seats become medium bots at start (owner 2026-11-25, replaces Q7); 1 human may start | fixed sizes (BLUFF 4 or 6) so ratings compare                       |
+| Settings      | host: timer speed normal / slow ×1.5, humor 1–2, `group` prompts on / off                                        | fixed: normal timers, humor 1, no `group`, items with `ranked` mode |
+| Result effect | Casual stats only, never rating                                                                                  | rating change (15.8); dodge / AFK penalties                         |
+| After match   | rematch in the same room (existing)                                                                              | back to queue                                                       |
+| Leave / AFK   | seat kept for the reconnect window, then timeout defaults; match continues                                       | same + counted as AFK for penalties                                 |
 
 - Room settings are stored on the room, shown to everyone in the lobby before start (R2), copied into the match at start (immutable during the match).
 - `match.mode` gets `casual` / `ranked` (existing `solo` / `online` / `quick_match` stay for EDO). Exact columns → 15.10.
@@ -38,7 +38,7 @@ Orchestrator rules (`flow.ts` + `_shared/game.ts`):
    - no pending seats → `tick`.
 5. Timers are lazy as today: applied on the next `game-view` / command after the deadline (+ `GRACE_MS`); clients poll / receive Realtime and call `game-view` at the deadline, so no server cron is needed.
 6. Hidden choices: the module stores answers / predictions / wagers in state; `view(state, seat)` shows a seat only its own choice and, for others, only `locked: true` until Reveal. `publicEvent` for `lock` carries the seat only; claims are public text. Broadcasts never include hidden fields (existing rule).
-7. AFK: a seat with ≥ `afkTimeouts` consecutive missed phases is shown "AFK" and keeps receiving timeout defaults (no bot takeover in Casual — there are no BLUFF bots); acting again resets the counter.
+7. AFK: a seat with ≥ `afkTimeouts` consecutive missed phases is shown "AFK" and keeps receiving timeout defaults (no bot takeover, M2); acting again resets the counter. Only real bot seats (filled seats, players who left) are played by the server; bots use public data only (`bluffBot`).
 
 ## 3. BLUFF module sketch (`packages/game-engine/src/bluff/`)
 

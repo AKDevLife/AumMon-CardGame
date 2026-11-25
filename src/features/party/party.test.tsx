@@ -59,6 +59,17 @@ describe("party home", () => {
     expect(screen.getByLabelText("ชื่อเล่น")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "สร้างห้อง" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "เข้าห้องด้วยโค้ด" })).toBeDisabled();
+    const size = screen.getByLabelText(/จำนวนผู้เล่น/);
+    expect(Array.from((size as HTMLSelectElement).options).map((o) => o.value)).toEqual([
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+    ]);
+    expect(screen.getByRole("button", { name: /ตั้งค่า/ })).toBeInTheDocument();
   });
 
   it("normalizes join codes", () => {

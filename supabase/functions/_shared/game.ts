@@ -230,6 +230,9 @@ async function saveGame(tx: Tx, locked: Locked, rt: Runtime, events: GameEvent[]
         where id = ${locked.roomId}`;
       await tx`update public.room_players set status = case when user_id = ${locked.ownerId} then 'ready' else 'waiting' end
         where room_id = ${locked.roomId} and status <> 'left'`;
+      // Filled bot seats free up again so friends can join the next round.
+      await tx`update public.room_players set status = 'left'
+        where room_id = ${locked.roomId} and player_type = 'bot'`;
     } else await tx`update public.game_rooms set status = 'closed' where id = ${locked.roomId}`;
   }
   return version;
@@ -563,10 +566,26 @@ export async function startOnlineGame(userId: string, roomId: string): Promise<s
       throw new HttpError(404, "not_found", "Room not found");
     if (room.status !== "lobby")
       throw new HttpError(409, "room_not_in_lobby", "Room already started");
-    const lobby = await tx<{ status: string }[]>`
-      select status from public.room_players where room_id = ${roomId} and status <> 'left'`;
+    const lobby = await tx<{ status: string; seat: number }[]>`
+      select status, seat from public.room_players
+      where room_id = ${roomId} and status <> 'left' and player_type = 'human'`;
     if (lobby.some((p) => p.status !== "ready"))
       throw new HttpError(409, "not_ready", "All players must be ready");
+    // Empty seats become server bots (owner 2026-11-25): one human may start a full room.
+    const [cfg] = await tx<{ game_id: string; max_players: number }[]>`
+      select game_id, max_players from public.game_rooms where id = ${roomId}`;
+    const game = await enabledGame(tx, cfg?.game_id ?? "");
+    if (game.bot && cfg) {
+      await tx`update public.room_players set status = 'left'
+        where room_id = ${roomId} and player_type = 'bot'`;
+      const used = new Set(lobby.map((p) => p.seat));
+      const free = Array.from({ length: cfg.max_players }, (_, i) => i + 1).filter(
+        (n) => !used.has(n),
+      );
+      for (const [i, seat] of free.entries())
+        await tx`insert into public.room_players (room_id, seat, player_type, display_name_snapshot, status)
+          values (${roomId}, ${seat}, 'bot', ${`Bot ${String(i + 1)}`}, 'ready')`;
+    }
     return startMatch(tx, roomId);
   });
 }

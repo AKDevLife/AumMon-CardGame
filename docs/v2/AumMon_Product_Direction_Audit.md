@@ -148,16 +148,16 @@ Phases 3, 5, 6 and 9 can run in parallel after Phase 2.
 
 ## 9. Open questions (owner)
 
-| #   | Question                                                                                        | Default if not answered          |
-| --- | ----------------------------------------------------------------------------------------------- | -------------------------------- |
-| Q1  | EDO Battle: defer (hidden, kept) or retire too?                                                 | defer (P2)                       |
-| Q2  | Guests via Supabase Anonymous Sign-ins (P1)?                                                    | yes                              |
-| Q3  | Ranked account-only (P3)?                                                                       | yes                              |
-| Q4  | Email already has an account when a guest links: keep guest data separate (MVP) or merge later? | separate, sign in to the account |
-| Q5  | Content language at launch: Thai only?                                                          | Thai only                        |
-| Q6  | Who writes the first ~150 BLUFF scenarios: Claude drafts, owner reviews?                        | yes                              |
-| Q7  | Bots in BLUFF (to fill 2-player or small rooms)?                                                | no bots in MVP Casual rooms      |
-| Q8  | Art pipeline (Phase 13 of the old roadmap) paused since v2 is text-driven?                      | pause                            |
+| #   | Question                                                                                        | Default if not answered                                      |
+| --- | ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| Q1  | EDO Battle: defer (hidden, kept) or retire too?                                                 | defer (P2)                                                   |
+| Q2  | Guests via Supabase Anonymous Sign-ins (P1)?                                                    | yes                                                          |
+| Q3  | Ranked account-only (P3)?                                                                       | yes                                                          |
+| Q4  | Email already has an account when a guest links: keep guest data separate (MVP) or merge later? | separate, sign in to the account                             |
+| Q5  | Content language at launch: Thai only?                                                          | Thai only                                                    |
+| Q6  | Who writes the first ~150 BLUFF scenarios: Claude drafts, owner reviews?                        | yes                                                          |
+| Q7  | Bots in BLUFF (to fill 2-player or small rooms)?                                                | ~~no bots~~ → owner 2026-11-25: medium bots fill empty seats |
+| Q8  | Art pipeline (Phase 13 of the old roadmap) paused since v2 is text-driven?                      | pause                                                        |
 
 ## 10. Assumptions
 

@@ -102,7 +102,8 @@ export function PartyLobby() {
   const isHost = room.owner_id === userId;
   const mine = seats.find((s) => s.user_id === userId);
   const notReady = seats.filter((s) => s.status !== "ready").length;
-  const canStart = isHost && seats.length >= 2 && notReady === 0;
+  const canStart = isHost && notReady === 0;
+  const bots = Math.max(0, room.max_players - seats.length);
   const link = code ? joinLink(code) : null;
 
   const act = async (fn: string, body: Record<string, unknown>, after?: () => void) => {
@@ -174,12 +175,17 @@ export function PartyLobby() {
             </span>
           </li>
         ))}
+        {Array.from({ length: bots }, (_, i) => (
+          <li key={`bot-${String(i)}`} className={`${panel} py-2 text-party-muted`}>
+            ว่าง · 🤖 Bot เล่นแทน
+          </li>
+        ))}
       </ul>
       <p role="status" className="text-center">
-        {seats.length < 2
-          ? "รอเพื่อนอย่างน้อยอีก 1 คน"
-          : notReady > 0
-            ? `รออีก ${String(notReady)} คนกดพร้อม`
+        {notReady > 0
+          ? `รออีก ${String(notReady)} คนกดพร้อม`
+          : bots > 0
+            ? `พร้อมแล้ว! เริ่มได้เลย ที่ว่าง ${String(bots)} ที่จะเป็น Bot`
             : "พร้อมครบแล้ว!"}
       </p>
       {mine && !isHost && (
