@@ -6,7 +6,7 @@
 
 - **Status:** 🎉 Product Direction v2 (owner 2026-11-25): guest-first social party platform, flagship BLUFF. Phase 15.1–15.2 done; Dummy / Poker retired; EDO Battle deferred. Plan: `docs/v2/AumMon_Product_Direction_Audit.md`.
 - **Phase:** 12 — engine, backend, UI, cleanup and VIP/gacha design (12.7) done.
-- **Current task:** 15.4 approved (BLUFF ruleset "2"); 15.9 content design + 150 draft items done → owner review C1–C4 (`docs/v2/AumMon_Content_Management.md`). Next: 15.5 UI / 15.6 guest architecture (parallel).
+- **Current task:** 15.9 approved (C1–C4). 15.6 guest-first + account linking draft → **owner approval G1–G3, L1–L2** (`docs/v2/AumMon_Guest_First_Architecture.md`, `AumMon_Account_Linking.md`). Parallel: 15.5 UI.
 - **Next:** 15.3 design → owner approval; art production paused (Q8).
 - **Playtest URL (latest `main`):** https://aum-mon-card-game-git-playtest-aum-mon.vercel.app
 - **Dev backend:** Supabase `AumMon-Dev` (ref `yaxtzdhryctfjaspxvix`, ap-northeast-1), email confirmation OFF for playtesting.
