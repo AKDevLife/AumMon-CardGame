@@ -8,7 +8,8 @@ returns boolean
 language sql
 stable
 set search_path = ''
-as $$ select coalesce((auth.jwt() ->> 'is_anonymous')::boolean, false) $$;
+-- Reads the claims PostgREST sets (same source as auth.jwt(), which older images lack).
+as $$ select coalesce((nullif(current_setting('request.jwt.claims', true), '')::jsonb ->> 'is_anonymous')::boolean, false) $$;
 revoke all on function public.is_guest() from public;
 grant execute on function public.is_guest() to authenticated, service_role;
 
