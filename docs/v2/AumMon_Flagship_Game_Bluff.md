@@ -42,7 +42,7 @@ Skill = reading friends + bluffing them. No right/wrong answers, so content is c
 - **Timeout default:** no answer (not counted in votes, no Crowd), no prediction (0), wager 0, no claim. A disconnected seat gets the same default after the reconnect window (R3).
 - **Final tie-break:** most correct predictions → most Bluff + Honest points → shared place (both shown as winners).
 
-## 5. Variants (tuned in 15.4)
+## 5. Variants (tuned in 15.4 — see `AumMon_Player_Count_Design.md`; ruleset "2" proposed)
 
 | Players | Differences                                                                                 |
 | ------- | ------------------------------------------------------------------------------------------- |
@@ -50,7 +50,7 @@ Skill = reading friends + bluffing them. No right/wrong answers, so content is c
 | 3–4     | Rules as §4                                                                                 |
 | 5–8     | Bluff cap 2; content may use group prompts ("ใครในห้องนี้…" excluded from MVP unless reviewed) |
 
-## 6. Simulation (Monte Carlo, `scripts/bluff-sim.mjs`, 20,000 matches per size, seeded)
+## 6. Simulation (Monte Carlo, 20,000 matches per size, seeded; original script in PR #120, superseded by the 15.4 `scripts/bluff-sim.mjs`)
 
 Strategies: R random · S reads the crowd · B = S + always bluffs · W = S + always wager 2 · H = S + honest claim. Simulated listeners trust claims a little (naive), which favours bluffers — real players will adapt.
 

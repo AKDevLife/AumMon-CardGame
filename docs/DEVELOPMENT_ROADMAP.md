@@ -221,7 +221,7 @@ Plan, dependencies and MVP scope: `docs/v2/AumMon_Product_Direction_Audit.md` §
 - [x] **15.1** Repository audit + owner approval (Q1–Q8 defaults) — deps: — — PR #118 (2026-11-25)
 - [x] **15.2** Product docs (vision, strategy, requirements, compatibility, handoff), spec v15; Dummy / Poker retired (code removed, rows kept) — deps: 15.1 — PR #119 (2026-11-25)
 - [x] **15.3** BLUFF game design + scoring model + simulation → owner approval — deps: 15.2 — PR #120 (2026-11-25)
-- [ ] **15.4** 2–8 player balance design (2 / 3–4 / 5–8 variants) — deps: 15.3
+- [~] **15.4** 2–8 player balance design (2 / 3–4 / 5–8 variants) — deps: 15.3 — awaiting owner approval (P1–P2, `docs/v2/AumMon_Player_Count_Design.md`)
 - [ ] **15.5** UI/UX guidelines (dark theme) + clickable prototype → owner review — deps: 15.3
 - [ ] **15.6** Guest-first architecture + account linking design (anonymous auth, RLS) → owner approval — deps: 15.2
 - [ ] **15.7** Casual & Ranked architecture; SDK simultaneous-decision design — deps: 15.6
