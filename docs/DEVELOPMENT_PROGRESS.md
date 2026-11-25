@@ -46,12 +46,13 @@ None
 
 ## Waiting for the owner
 
-| Task  | Needs                                                                    |
-| ----- | ------------------------------------------------------------------------ |
-| GC7.3 | Decide whether to add scoped admin roles (who gets them)                 |
-| 12.8  | Playtest Quick Match on Dev (best-of-3: no — owner 2026-11-23)           |
-| 12.7  | VIP/gacha Q1–Q5 + legal check (`AumMon_VIP_Cosmetics_Design.md` §8)      |
-| 13.2  | Choose the Art Direction (`docs/art-production/AumMon_Art_Direction.md`) |
+| Task  | Needs                                                                                              |
+| ----- | -------------------------------------------------------------------------------------------------- |
+| v2    | Approve Product Direction v2 audit + answer Q1–Q8 (`docs/v2/AumMon_Product_Direction_Audit.md` §9) |
+| GC7.3 | Decide whether to add scoped admin roles (who gets them)                                           |
+| 12.8  | Playtest Quick Match on Dev (best-of-3: no — owner 2026-11-23)                                     |
+| 12.7  | VIP/gacha Q1–Q5 + legal check (`AumMon_VIP_Cosmetics_Design.md` §8)                                |
+| 13.2  | Choose the Art Direction (`docs/art-production/AumMon_Art_Direction.md`)                           |
 
 ## Deferred (production — owner decision)
 
