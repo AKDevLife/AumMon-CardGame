@@ -1,6 +1,6 @@
-# AumMon — Flagship Game: BLUFF (draft v0.1)
+# AumMon — Flagship Game: BLUFF (v1 — approved)
 
-> Status: **DRAFT — awaiting owner approval** (task 15.3). Nothing here is locked until approved; then `ruleset_version` for BLUFF starts at `"1"`. Player-count tuning is task 15.4; content schema is 15.9.
+> Status: **APPROVED by owner 2026-11-25** (B1–B5 = proposed defaults); BLUFF `ruleset_version` `"1"`. Player-count tuning is task 15.4; content schema is 15.9.
 
 ## 1. Concept
 
@@ -77,10 +77,10 @@ Findings:
 
 ## 8. Open questions (owner)
 
-| ID  | Question                                                           | Proposed default               |
-| --- | ------------------------------------------------------------------ | ------------------------------ |
-| B1  | Approve the core loop (answer + crowd prediction + wager + claim)? | yes                            |
-| B2  | Wager 0–2 per round, or a match budget of chips?                   | 0–2 per round (simpler)        |
-| B3  | Final round ×2?                                                    | yes                            |
-| B4  | 2-player fix: remove Bluff points or keep and re-tune in 15.4?     | re-tune in 15.4                |
-| B5  | Phase timers 6 / 15 / 20 / 8 / 5 s OK?                             | yes; host may pick "slow" ×1.5 |
+| ID    | Question                                                           | Proposed default               |
+| ----- | ------------------------------------------------------------------ | ------------------------------ |
+| B1 ✅ | Approve the core loop (answer + crowd prediction + wager + claim)? | yes                            |
+| B2 ✅ | Wager 0–2 per round, or a match budget of chips?                   | 0–2 per round (simpler)        |
+| B3 ✅ | Final round ×2?                                                    | yes                            |
+| B4 ✅ | 2-player fix: remove Bluff points or keep and re-tune in 15.4?     | re-tune in 15.4                |
+| B5 ✅ | Phase timers 6 / 15 / 20 / 8 / 5 s OK?                             | yes; host may pick "slow" ×1.5 |
