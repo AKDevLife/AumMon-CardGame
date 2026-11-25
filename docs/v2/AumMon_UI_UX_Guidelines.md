@@ -1,6 +1,6 @@
-# AumMon — UI/UX Guidelines v2 (15.5 — draft, owner review)
+# AumMon — UI/UX Guidelines v2 (15.5 — approved)
 
-> Extends `docs/color_design_system.md` (Theme A, light, EDO) with a **dark party theme** for v2 / BLUFF. Clickable prototype: `/prototype/bluff` on the Vercel preview (mock data, no backend).
+> **APPROVED by owner 2026-11-25** (U1–U3 after prototype review; claim buttons show option text). Extends `docs/color_design_system.md` (Theme A, light, EDO) with a **dark party theme** for v2 / BLUFF. Clickable prototype: `/prototype/bluff` on the Vercel preview (mock data, no backend).
 
 ## 1. Principles
 
@@ -48,8 +48,8 @@
 
 ## 5. Owner review (prototype)
 
-| ID  | Question                                                                      |
-| --- | ----------------------------------------------------------------------------- |
-| U1  | Dark party theme colours and feel OK?                                         |
-| U2  | Screen flow Home → Lobby → Read → Claim → Lock → Reveal → Score → Results OK? |
-| U3  | Lock screen (answer + prediction + wager on one screen) easy enough on phone? |
+| ID    | Question                                                                      |
+| ----- | ----------------------------------------------------------------------------- |
+| U1 ✅ | Dark party theme colours and feel OK?                                         |
+| U2 ✅ | Screen flow Home → Lobby → Read → Claim → Lock → Reveal → Score → Results OK? |
+| U3 ✅ | Lock screen (answer + prediction + wager on one screen) easy enough on phone? |

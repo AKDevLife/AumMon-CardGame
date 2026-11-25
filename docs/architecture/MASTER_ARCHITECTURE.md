@@ -214,3 +214,7 @@ Rationale for keeping `packages/game-engine` as the EDO package: renaming touche
 - Batch seat updates in `saveGame` (one statement) before adding games.
 - Partition/prune `match_events` and `function_metrics` by time when volume grows.
 - Poker hands are short; store per-hand history in compact rows, not one ever-growing JSON.
+
+## 13. v2 (Product Direction 2026-11-25)
+
+Guest-first party platform with flagship BLUFF. Changes to this architecture are planned in `docs/v2/AumMon_Technical_Migration_Plan.md` (migrations M1–M8, build slices S1–S8) and tested per `docs/v2/AumMon_Test_Strategy.md`.
