@@ -1,7 +1,7 @@
 -- v2 (15.11 S3–S5): content is server-only, BLUFF registered, guest helper, room settings.
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(11);
+select plan(12);
 
 select has_table('private', 'content_items', 'content_items exists');
 select ok(not has_table_privilege('authenticated', 'private.content_items', 'select'),
@@ -17,7 +17,8 @@ select is((select current_ruleset from public.games where id = 'bluff'), '2', 'B
 select throws_ok($$insert into private.content_items (id, game_id, category, humor, body)
   values ('bad-one', 'bluff', 'food', 1, '{"prompt":"ทดสอบคำถาม","options":["a","a","b","c"]}')$$,
   '23514', null, 'BLUFF options must be 4 distinct');
-select col_default_is('public', 'game_rooms', 'settings', '''{}''::jsonb', 'room settings default {}');
+select is((select settings from public.game_rooms limit 0), null, 'settings column exists');
+select is((select column_default from information_schema.columns where table_schema = 'public' and table_name = 'game_rooms' and column_name = 'settings'), '''{}''::jsonb', 'room settings default {}');
 
 set local role authenticated;
 set local request.jwt.claims = '{"sub":"00000000-0000-0000-0000-000000000001","is_anonymous":true}';
