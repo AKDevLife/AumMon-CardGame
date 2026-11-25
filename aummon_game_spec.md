@@ -21,7 +21,7 @@
 | MVP requirements (acceptance criteria) | [`docs/v2/AumMon_Product_Requirements.md`](./docs/v2/AumMon_Product_Requirements.md) |
 | Game modules (retired / deferred / new) | [`docs/v2/AumMon_Game_Module_Compatibility.md`](./docs/v2/AumMon_Game_Module_Compatibility.md) |
 | Audit, open questions, roadmap | [`docs/v2/AumMon_Product_Direction_Audit.md`](./docs/v2/AumMon_Product_Direction_Audit.md) |
-| Flagship BLUFF rules | Phase 3 (`docs/v2/AumMon_Flagship_Game_Bluff.md`, not yet written) |
+| Flagship BLUFF rules | Phase 3 (`docs/v2/AumMon_Flagship_Game_Bluff.md`, approved, ruleset "1") |
 
 ## 3. Games
 
