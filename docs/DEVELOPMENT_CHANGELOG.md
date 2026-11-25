@@ -2,6 +2,10 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-25 — 15.11 S2 BLUFF engine module
+
+- `packages/game-engine/src/bluff/` (`scoring.ts`, `module.ts`): ruleset "2", phases read → claim → lock → reveal → score × 5, final ×2, timeouts, tie-break, hidden view; content + slow timers via new `start(…, setup)`; registry `bluff`; engine 11.1.0. AFK seats without bots keep timeout defaults (flow). Tests `packages/game-engine/tests/bluff.test.ts`.
+
 ## 2026-11-25 — 15.11 S1 SDK simultaneous decisions
 
 - `packages/game-engine/src/sdk`: optional `pendingSeats` / `tick` / `seatCount`, `bot` optional; `flow.advance` multi-seat path (one deadline per phase, bots at once, per-seat timeout defaults in seat order, tick phases); `pendingSeatsOf` / `seatCountOf` helpers. EDO single-seat path unchanged (golden replay green).

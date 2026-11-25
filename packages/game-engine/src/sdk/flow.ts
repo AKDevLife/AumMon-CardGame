@@ -161,7 +161,9 @@ function advanceSimultaneous<S, C, V, E extends { readonly type: string }>(
   const timeouts = Array.from({ length: seats }, (_, i) => input.timeouts[i] ?? 0);
   const events: E[] = [];
   const key = (s: S) => `${String(game.isFinished(s))}:${game.timerKey(s)}`;
-  const kindAt = (seat: Seat) => effectiveKinds(kinds, timeouts, mode, game.afkTimeouts)[seat];
+  // Without bots an AFK seat keeps getting timeout defaults instead of a bot takeover (M2).
+  const kindAt = (seat: Seat) =>
+    (game.bot ? effectiveKinds(kinds, timeouts, mode, game.afkTimeouts) : kinds)[seat];
   const run = (seat: Seat, command: C) => {
     const t = game.apply(state, seat, command, rng);
     state = t.state;

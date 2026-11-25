@@ -15,4 +15,14 @@ export {
 export * as discard from "./discard/index.ts";
 export * as sdk from "./sdk/index.ts";
 export { edoBattle, parseEdoCommand, type EdoCommand } from "./edo-battle/module.ts";
+export {
+  bluff,
+  BLUFF_RULESET_VERSION,
+  BLUFF_TAUNTS,
+  parseBluffSetup,
+  type BluffCommand,
+  type BluffItem,
+  type BluffSetup,
+  type BluffView,
+} from "./bluff/module.ts";
 export { GAME_MODULES, getGameModule, isGameId } from "./registry.ts";

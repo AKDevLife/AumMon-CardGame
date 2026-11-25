@@ -5,7 +5,7 @@ import type { RandomSource } from "../rng/seeded-random.ts";
  * Each game owns its rules and authoritative state; the platform only orchestrates
  * (seats, timers, bots, persistence). Implementations must stay pure and deterministic.
  */
-export type GameId = "edo_battle";
+export type GameId = "edo_battle" | "bluff";
 export type Seat = number;
 
 export interface Transition<S, E> {
@@ -44,7 +44,12 @@ export interface GameModule<S, C, V, E extends { readonly type: string }> {
   /** Consecutive timeouts after which an online human seat is played by the server. */
   readonly afkTimeouts: number;
 
-  start(playerIds: readonly string[], rng: RandomSource): { state: S; events: E[] };
+  /** `setup` = server-chosen match data (e.g. BLUFF content items + room settings); validated by the module. */
+  start(
+    playerIds: readonly string[],
+    rng: RandomSource,
+    setup?: unknown,
+  ): { state: S; events: E[] };
   /** Seat that must act now; null = finished or a simultaneous phase (see pendingSeats). */
   actingSeat(state: S): Seat | null;
   /**

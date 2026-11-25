@@ -1,3 +1,4 @@
+import { bluff } from "./bluff/module.ts";
 import { edoBattle } from "./edo-battle/module.ts";
 import type { AnyGameModule, GameId } from "./sdk/module.ts";
 
@@ -7,9 +8,10 @@ import type { AnyGameModule, GameId } from "./sdk/module.ts";
  */
 export const GAME_MODULES: Partial<Record<GameId, AnyGameModule>> = {
   edo_battle: edoBattle,
+  bluff,
 };
 
-export const isGameId = (v: unknown): v is GameId => v === "edo_battle";
+export const isGameId = (v: unknown): v is GameId => v === "edo_battle" || v === "bluff";
 
 export function getGameModule(id: string): AnyGameModule {
   const m = isGameId(id) ? GAME_MODULES[id] : undefined;
