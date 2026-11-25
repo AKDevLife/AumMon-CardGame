@@ -1,30 +1,34 @@
-# AumMon — Game Spec (Casual Discard Edition)
+# AumMon — Product Spec (v2: Guest-First Social Party Gaming)
 
-> Version 14.0 · `ruleset_version = "13"` (Quick Match, 7 / 5 cards, 60 s turns, card changes DC14–DC15, 2026-11-22) · approved by owner 2026-11-22 (DC1–DC7). Replaces the retired 1v1 TCG (rulesets 1–6).
-> Architecture, database and security: `aummon_project_blueprint.md`.
+> Version 15.0 · approved by the owner 2026-11-25 (Product Direction v2, decisions V1–V10, Q1–Q8 defaults). Replaces the "Casual Discard Edition" spec v14 as the product definition.
+> Architecture, database and security: `aummon_project_blueprint.md` (v2 impact: `docs/v2/AumMon_Product_Direction_Audit.md` §3).
 
 ## 1. Platform decisions (LOCKED)
 
-- Web game (mobile first), Thai UI, theme "Everyday Objects".
-- Modes (Pass & Play removed by the owner 2026-11-22, DC8): **Solo** vs 1–7 server bots · **Online** rooms (2–8 seats; a leaving player is replaced by a bot).
-- Server-authoritative; clients send intent only. Hands and peeks are private to their seat.
-- Accounts, profiles, admin, sound and music settings are shared platform features.
-- VIP and cosmetic gacha: designed later; nothing paid is built before a legal check and owner approval (DC7).
+- **AumMon** — Text-Driven Social Party Gaming Platform. Tagline: _Say Less. Bluff More. Troll Your Friends._
+- Web, mobile first, Thai first. 2–8 players per room; each game declares its own min / max.
+- **Guest-first:** play without sign-up (Supabase anonymous session); optional account keeps the same user id.
+- **Modes:** Casual (private rooms, custom rules, no rating) · Ranked (standard rules, matchmaking, seasons; account only — post-MVP).
+- Server-authoritative; clients send intent only; hidden choices stay server-side until reveal.
+- Free-to-play; cosmetics / convenience only; no pay-to-win, no real-money wagering. Nothing paid before a legal check and owner approval.
 
-## 2. Rules (LOCKED)
+## 2. Product documents
 
-| Topic | Authoritative document |
+| Topic | Document |
 | --- | --- |
-| Core rules (turns, pile, reset, reactions, winning) | [`docs/discard/AumMon_Core_Rules.md`](./docs/discard/AumMon_Core_Rules.md) |
-| 16 cards × 4 copies = 64 | [`docs/discard/AumMon_Card_Library.md`](./docs/discard/AumMon_Card_Library.md) |
-| Owner decisions DC1–DC7, open questions | [`docs/discard/AumMon_Rule_Clarification.md`](./docs/discard/AumMon_Rule_Clarification.md) |
-| Quick Match (ruleset "8", approved) | [`docs/discard/AumMon_Quick_Match_Proposal.md`](./docs/discard/AumMon_Quick_Match_Proposal.md) |
-| Quality upgrade 9–10 (audit, proposals, playtest protocol) | [`docs/discard/AumMon_Game_Design_Upgrade.md`](./docs/discard/AumMon_Game_Design_Upgrade.md) |
-| Simulation and balance | [`docs/discard/AumMon_Card_Balance.md`](./docs/discard/AumMon_Card_Balance.md) |
+| Vision | [`docs/v2/AumMon_Product_Vision.md`](./docs/v2/AumMon_Product_Vision.md) |
+| Strategy | [`docs/v2/AumMon_Product_Strategy.md`](./docs/v2/AumMon_Product_Strategy.md) |
+| MVP requirements (acceptance criteria) | [`docs/v2/AumMon_Product_Requirements.md`](./docs/v2/AumMon_Product_Requirements.md) |
+| Game modules (retired / deferred / new) | [`docs/v2/AumMon_Game_Module_Compatibility.md`](./docs/v2/AumMon_Game_Module_Compatibility.md) |
+| Audit, open questions, roadmap | [`docs/v2/AumMon_Product_Direction_Audit.md`](./docs/v2/AumMon_Product_Direction_Audit.md) |
+| Flagship BLUFF rules | Phase 3 (`docs/v2/AumMon_Flagship_Game_Bluff.md`, not yet written) |
 
-Card data in code: `packages/game-engine/src/discard/cards.ts` (must match the Card Library).
-Any change that affects game results needs owner approval and a new `ruleset_version`.
+## 3. Games
 
-## 3. Art
+| Game | Status | Rules |
+| --- | --- | --- |
+| BLUFF | flagship, in design (Phase 3) | — |
+| EDO Battle | deferred, playable on Dev (ruleset `"13"`) | [`docs/discard/`](./docs/discard/) (locked) |
+| Dummy, Poker | retired 2026-11-25 | [`docs/archive/games/`](./docs/archive/games/) |
 
-Visual direction, style, characters and the AI art pipeline: [`docs/art-production/`](./docs/art-production/) (owner approves direction, Style Bible and each character).
+Any change that affects a game's results needs owner approval and a new `ruleset_version`.

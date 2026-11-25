@@ -213,3 +213,24 @@ Multi-game platform: EDO Battle (= Discard Edition) + Dummy + Texas Hold'em (pla
 - [!] **14.9** GC9 Production readiness — owner-gated (6.8, 7.3, 7.8, legal check for play-money poker)
 
 **Acceptance:** EDO Battle unchanged (golden replay + existing suites) · each game isolated with its own rules/bots · solo, private room and quick match per game · server-authoritative hidden information · central admin for all games
+
+## Phase 15 — Product Direction v2: guest-first party platform (owner 2026-11-25)
+
+Plan, dependencies and MVP scope: `docs/v2/AumMon_Product_Direction_Audit.md` §6–§7. Phases 3, 5, 6 and 9 of the audit (15.3, 15.5, 15.6, 15.9) may run in parallel after 15.2.
+
+- [x] **15.1** Repository audit + owner approval (Q1–Q8 defaults) — deps: — — PR #118 (2026-11-25)
+- [x] **15.2** Product docs (vision, strategy, requirements, compatibility, handoff), spec v15; Dummy / Poker retired (code removed, rows kept) — deps: 15.1 — PR #119 (2026-11-25)
+- [ ] **15.3** BLUFF game design + scoring model + simulation → owner approval — deps: 15.2
+- [ ] **15.4** 2–8 player balance design (2 / 3–4 / 5–8 variants) — deps: 15.3
+- [ ] **15.5** UI/UX guidelines (dark theme) + clickable prototype → owner review — deps: 15.3
+- [ ] **15.6** Guest-first architecture + account linking design (anonymous auth, RLS) → owner approval — deps: 15.2
+- [ ] **15.7** Casual & Ranked architecture; SDK simultaneous-decision design — deps: 15.6
+- [ ] **15.8** XP, rank, economy, monetization + cost model (design only) — deps: 15.7
+- [ ] **15.9** Content management design (schema, review flow, first ~150 items drafted) — deps: 15.3
+- [ ] **15.10** Technical migration plan + test strategy → owner approval — deps: 15.4–15.9
+- [ ] **15.11** MVP implementation (guest, Casual rooms, BLUFF, content, share) — deps: 15.10
+- [ ] **15.12** Closed playtest on real phones (2 / 4 / 8 players) — deps: 15.11
+- [ ] **15.13** Balance & UX iteration — deps: 15.12
+- [ ] **15.14** Launch preparation (production project, legal, payments decision) — deps: 15.13, 6.8, 7.8
+
+**Acceptance:** MVP requirements R1–R8 met (`docs/v2/AumMon_Product_Requirements.md`) · BLUFF tested at 2, 3–4 and 5–8 players · no client-decided result · guests play without sign-up · CI green.
