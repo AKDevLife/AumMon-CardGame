@@ -226,7 +226,7 @@ Plan, dependencies and MVP scope: `docs/v2/AumMon_Product_Direction_Audit.md` §
 - [ ] **15.6** Guest-first architecture + account linking design (anonymous auth, RLS) → owner approval — deps: 15.2
 - [ ] **15.7** Casual & Ranked architecture; SDK simultaneous-decision design — deps: 15.6
 - [ ] **15.8** XP, rank, economy, monetization + cost model (design only) — deps: 15.7
-- [ ] **15.9** Content management design (schema, review flow, first ~150 items drafted) — deps: 15.3
+- [x] **15.9** Content management design (schema, review flow, first ~150 items drafted) — deps: 15.3 — PR #122 (2026-11-25)
 - [ ] **15.10** Technical migration plan + test strategy → owner approval — deps: 15.4–15.9
 - [ ] **15.11** MVP implementation (guest, Casual rooms, BLUFF, content, share) — deps: 15.10
 - [ ] **15.12** Closed playtest on real phones (2 / 4 / 8 players) — deps: 15.11
