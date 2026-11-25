@@ -228,7 +228,7 @@ Plan, dependencies and MVP scope: `docs/v2/AumMon_Product_Direction_Audit.md` §
 - [x] **15.8** XP, rank, economy, monetization + cost model (design only) — deps: 15.7 — PR #125 (2026-11-25)
 - [x] **15.9** Content management design (schema, review flow, first ~150 items drafted) — deps: 15.3 — PR #122 (2026-11-25)
 - [x] **15.10** Technical migration plan + test strategy → owner approval — deps: 15.4–15.9 — PR #127 (2026-11-25)
-- [~] **15.11** MVP implementation (guest, Casual rooms, BLUFF, content, share) — deps: 15.10 — slices S1–S8 (`docs/v2/AumMon_Technical_Migration_Plan.md` §3)
+- [x] **15.11** MVP implementation (guest, Casual rooms, BLUFF, content, share) — deps: 15.10 — slices S1–S8, PRs #128–#131 (2026-11-25)
   - [x] S1 SDK simultaneous decisions + contract tests; flaky EDO solo backend test fixed — PR #128 (2026-11-25)
   - [x] S2 `bluff` engine module (ruleset "2", scoring per variant, tie-break, hidden view) — PR #129 (2026-11-25)
   - [x] S3 guest identity (M1, M4) + Home nickname + `requireAccount()` — PR #130 (2026-11-25)
