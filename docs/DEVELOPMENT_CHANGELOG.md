@@ -2,7 +2,11 @@
 
 Newest first. Significant changes only.
 
-## 2026-11-25 — 15.5 UI/UX guidelines + BLUFF prototype (owner review)
+## 2026-11-25 — 15.10 Technical migration plan + test strategy (draft)
+
+- `docs/v2/AumMon_Technical_Migration_Plan.md`: architecture impact, migrations M1–M8 (guest, seats 2–8, room settings, guest cleanup, content + seed, BLUFF registry, account-only guard), build slices S1–S8, risks. `docs/v2/AumMon_Test_Strategy.md`; MASTER_ARCHITECTURE §13. Awaiting owner T1–T2.
+
+## 2026-11-25 — 15.5 UI/UX guidelines + BLUFF prototype (approved U1–U3)
 
 - `docs/v2/AumMon_UI_UX_Guidelines.md`: dark party theme tokens (`.theme-party`, `party-*` Tailwind colours), screen list, copy tone; owner review U1–U3.
 - Clickable mock prototype `src/features/prototype/BluffPrototype.tsx` at `/prototype/bluff` (Home → Lobby → Read → Claim → Lock → Reveal → Score → Results); unit test + Playwright phone-viewport test.
