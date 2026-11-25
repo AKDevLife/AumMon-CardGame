@@ -1,6 +1,6 @@
-# AumMon — Guest-First Architecture (15.6 — draft, awaiting owner approval)
+# AumMon — Guest-First Architecture (15.6 — approved)
 
-> Covers R1 (guest session) and the guest side of R2–R4. Account linking: `AumMon_Account_Linking.md`. Decisions P1 / Q2 (Supabase Anonymous Sign-ins), Q3 (Ranked account-only), Q7 (no bots in Casual rooms). Built in Phase 11; migrations listed in 15.10.
+> **APPROVED by owner 2026-11-25** (G1–G3 / L1–L2 = proposed defaults). Covers R1 (guest session) and the guest side of R2–R4. Account linking: `AumMon_Account_Linking.md`. Decisions P1 / Q2 (Supabase Anonymous Sign-ins), Q3 (Ranked account-only), Q7 (no bots in Casual rooms). Built in Phase 11; migrations listed in 15.10.
 
 ## 1. Identity model
 
@@ -66,8 +66,8 @@
 
 ## 9. Open questions (owner)
 
-| ID  | Question                                                                          | Proposed default |
-| --- | --------------------------------------------------------------------------------- | ---------------- |
-| G1  | CAPTCHA (Turnstile, free) only before public launch, not for the closed playtest? | yes              |
-| G2  | Guest expiry 30 days of inactivity (R1), finished match rows kept with nickname?  | yes              |
-| G3  | Guest room-create limit 10 / hour?                                                | yes              |
+| ID    | Question                                                                          | Proposed default |
+| ----- | --------------------------------------------------------------------------------- | ---------------- |
+| G1 ✅ | CAPTCHA (Turnstile, free) only before public launch, not for the closed playtest? | yes              |
+| G2 ✅ | Guest expiry 30 days of inactivity (R1), finished match rows kept with nickname?  | yes              |
+| G3 ✅ | Guest room-create limit 10 / hour?                                                | yes              |

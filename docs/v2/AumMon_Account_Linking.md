@@ -1,6 +1,6 @@
-# AumMon — Account Linking (15.6 — draft, awaiting owner approval)
+# AumMon — Account Linking (15.6 — approved)
 
-> Covers R6 and Q4. A guest becomes an account **without changing its user id**, so profile, stats and history stay.
+> **APPROVED by owner 2026-11-25** (G1–G3 / L1–L2 = proposed defaults). Covers R6 and Q4. A guest becomes an account **without changing its user id**, so profile, stats and history stay.
 
 ## 1. Flow (Supabase "convert anonymous user")
 
@@ -44,7 +44,7 @@
 
 ## 6. Open questions (owner)
 
-| ID  | Question                                | Proposed default |
-| --- | --------------------------------------- | ---------------- |
-| L1  | Social login (Google / LINE) post-MVP?  | yes, post-MVP    |
-| L2  | Linking blocked during an active match? | yes              |
+| ID    | Question                                | Proposed default |
+| ----- | --------------------------------------- | ---------------- |
+| L1 ✅ | Social login (Google / LINE) post-MVP?  | yes, post-MVP    |
+| L2 ✅ | Linking blocked during an active match? | yes              |
