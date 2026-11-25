@@ -11,6 +11,7 @@ import {
   sdk,
   type RngState,
 } from "@aummon/game-engine";
+import { parseSettings, pickBluffItems } from "./content.ts";
 import { db } from "./db.ts";
 import { edoHooks } from "./games/edo-battle.ts";
 import { HttpError } from "./http.ts";
@@ -252,6 +253,8 @@ export interface GameResponse {
   /** Caller's seat; null = spectator / not seated. */
   seat: number | null;
   acting: number | null;
+  /** Seats that may still act in this phase (simultaneous games; single-seat games: [acting]). */
+  pending: number[];
   botActing: boolean;
   names: string[];
   view: unknown;
@@ -304,6 +307,7 @@ async function respondGame(
     deadline: rt.deadline === null ? null : new Date(rt.deadline).toISOString(),
     seat,
     acting,
+    pending: sdk.pendingSeatsOf(game, state),
     botActing: acting !== null && kinds[acting] === "bot",
     names: [...locked.seats].sort((a, b) => a.seat - b.seat).map((s) => s.display_name),
     view: game.view(state, seat),
@@ -474,8 +478,8 @@ export async function leaveGame(userId: string, matchId: string): Promise<{ ok: 
 
 /** Builds the game state for a room and stores it (room → playing). */
 export async function startMatch(tx: Tx, roomId: string): Promise<string> {
-  const [room] = await tx<{ mode: Mode; game_id: string }[]>`
-    select mode, game_id from public.game_rooms where id = ${roomId}`;
+  const [room] = await tx<{ mode: Mode; game_id: string; settings: unknown }[]>`
+    select mode, game_id, settings from public.game_rooms where id = ${roomId}`;
   if (!room) throw new HttpError(404, "not_found", "Room not found");
   const game = await enabledGame(tx, room.game_id);
   const seats = await tx<{ id: string; seat: number; player_type: Kind; user_id: string | null }[]>`
@@ -489,7 +493,13 @@ export async function startMatch(tx: Tx, roomId: string): Promise<string> {
     );
   const playerIds = seats.map(() => crypto.randomUUID());
   const rng = createSeededRandom(cryptoSeed());
-  const { state, events } = game.start(playerIds, rng);
+  // Server-chosen match data (BLUFF: approved content + host settings); other games need none.
+  let setup: unknown;
+  if (game.id === "bluff") {
+    const settings = parseSettings(room.settings);
+    setup = { items: await pickBluffItems(tx, seats.length, settings), slow: settings.slow };
+  }
+  const { state, events } = game.start(playerIds, rng, setup);
   const [match] = await tx<{ id: string }[]>`
     insert into public.matches (room_id, game_id, status, phase, engine_version, ruleset_version, started_at)
     values (${roomId}, ${game.id}, 'active', ${game.phase(state)}, ${ENGINE_VERSION}, ${game.rulesetVersion}, now()) returning id`;
@@ -527,6 +537,7 @@ export async function createGame(
   await rateLimit(userId, "room.create", 20, 60);
   return db().begin(async (tx) => {
     const game = await enabledGame(tx, gameId);
+    if (!game.bot) throw new HttpError(400, "no_bots", "This game is played with friends only");
     const size = bots + 1;
     if (size < game.minPlayers || size > game.maxPlayers)
       throw new HttpError(400, "invalid_input", "bots out of range");

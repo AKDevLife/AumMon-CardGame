@@ -176,7 +176,10 @@ function advanceSimultaneous<S, C, V, E extends { readonly type: string }>(
     const bots = pending.filter((seat) => kindAt(seat) === "bot");
     const due = deadline !== null && now >= deadline;
     if (bots.length > 0) {
-      for (const seat of bots) run(seat, botCommand(game, state, seat, rng));
+      // Games without bots: a seat the server plays (player left) takes its timeout defaults at once.
+      for (const seat of bots)
+        if (game.bot) run(seat, botCommand(game, state, seat, rng));
+        else for (const command of game.timeoutCommands(state, seat)) run(seat, command);
     } else if (pending.length > 0 && due) {
       for (const seat of pending) {
         events.push(game.timeoutEvent(seat));

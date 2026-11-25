@@ -1,8 +1,26 @@
 import { createClient } from "npm:@supabase/supabase-js@2";
 import { HttpError } from "./http.ts";
 
-/** Verifies the caller's JWT with Supabase Auth and returns the user id. */
+export interface Caller {
+  id: string;
+  /** Supabase anonymous user (guest, docs/v2/AumMon_Guest_First_Architecture.md). */
+  isGuest: boolean;
+}
+
+/** Verifies the caller's JWT with Supabase Auth and returns the user id (guests included). */
 export async function requireUser(request: Request): Promise<string> {
+  return (await requireCaller(request)).id;
+}
+
+/** Account-only endpoints (Ranked, purchases, …): guests get 403 account_required. */
+export async function requireAccount(request: Request): Promise<string> {
+  const caller = await requireCaller(request);
+  if (caller.isGuest) throw new HttpError(403, "account_required", "Create an account first");
+  return caller.id;
+}
+
+/** Verifies the JWT with Supabase Auth (never trusts request bodies for identity). */
+export async function requireCaller(request: Request): Promise<Caller> {
   const header = request.headers.get("authorization") ?? "";
   const token = header.startsWith("Bearer ") ? header.slice(7) : "";
   if (!token) throw new HttpError(401, "unauthenticated", "Missing bearer token");
@@ -12,5 +30,5 @@ export async function requireUser(request: Request): Promise<string> {
   const client = createClient(url, anon, { auth: { persistSession: false } });
   const { data, error } = await client.auth.getUser(token);
   if (error) throw new HttpError(401, "unauthenticated", "Invalid or expired session");
-  return data.user.id;
+  return { id: data.user.id, isGuest: data.user.is_anonymous === true };
 }

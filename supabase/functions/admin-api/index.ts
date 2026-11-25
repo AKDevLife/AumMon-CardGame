@@ -382,6 +382,72 @@ const actions: Record<string, Action> = {
     db: (await db()`select version() as version, now() as now`)[0],
   }),
 
+  /** Content review (docs/v2/AumMon_Content_Management.md §3). Owner = reviewer in MVP. */
+  content: async (_a, body) => {
+    const status = typeof body["status"] === "string" ? body["status"] : null;
+    const category = typeof body["category"] === "string" ? body["category"] : null;
+    const items = await db()`
+      select c.id, c.game_id, c.category, c.humor, c.min_players, c.max_players, c.tags, c.status,
+             c.version, c.body, c.review_note, c.updated_at,
+             (select count(*)::int from private.content_reports r where r.content_id = c.id) as reports
+      from private.content_items c
+      where (${status}::text is null or c.status = ${status})
+        and (${category}::text is null or c.category = ${category})
+      order by c.category, c.id limit 500`;
+    const counts = await db()`
+      select status, count(*)::int as n from private.content_items group by status`;
+    return { items, counts };
+  },
+
+  contentReview: async (admin, body) => {
+    const decision = body["decision"];
+    const ids = Array.isArray(body["ids"]) ? body["ids"] : [body["id"]];
+    if (decision !== "approve" && decision !== "reject" && decision !== "retire")
+      throw new HttpError(400, "invalid_input", "decision approve | reject | retire");
+    if (ids.length === 0 || ids.length > 200 || !ids.every((x) => typeof x === "string"))
+      throw new HttpError(400, "invalid_input", "ids: 1–200 content ids");
+    const note = typeof body["note"] === "string" ? body["note"].slice(0, 300) : null;
+    const next = decision === "approve" ? "approved" : decision === "retire" ? "retired" : "draft";
+    return db().begin(async (tx) => {
+      const rows = await tx<{ id: string }[]>`
+        update private.content_items set status = ${next}, review_note = ${note},
+          reviewed_by = ${admin.userId}, reviewed_at = now(), updated_at = now()
+        where id = any(${ids}) returning id`;
+      await audit(tx, admin, `content.${decision}`, "content", null, {
+        ids: rows.map((r) => r.id),
+      });
+      return { updated: rows.length, status: next };
+    });
+  },
+
+  contentEdit: async (admin, body) => {
+    const id = typeof body["id"] === "string" ? body["id"] : "";
+    const prompt = typeof body["prompt"] === "string" ? body["prompt"].trim() : "";
+    const options = Array.isArray(body["options"]) ? body["options"] : [];
+    if (
+      prompt.length < 5 ||
+      prompt.length > 120 ||
+      options.length !== 4 ||
+      !options.every((o) => typeof o === "string" && o.trim().length > 0 && o.length <= 40) ||
+      new Set(options).size !== 4
+    )
+      throw new HttpError(400, "invalid_input", "prompt 5–120 chars, 4 distinct options ≤ 40");
+    return db().begin(async (tx) => {
+      const [old] = await tx<{ version: number; body: unknown; status: string }[]>`
+        select version, body, status from private.content_items where id = ${id} for update`;
+      if (!old) throw new HttpError(404, "not_found", "Content not found");
+      await tx`insert into private.content_item_history (content_id, version, body, status, changed_by)
+        values (${id}, ${old.version}, ${tx.json(old.body as never)}, ${old.status}, ${admin.userId})`;
+      // An edit always goes back to review (an approved text never changes silently).
+      const [row] = await tx`
+        update private.content_items set body = ${tx.json({ prompt, options })},
+          version = version + 1, status = 'in_review', updated_at = now()
+        where id = ${id} returning id, version, status`;
+      await audit(tx, admin, "content.edit", "content", id, { version: old.version + 1 });
+      return row;
+    });
+  },
+
   settings: () =>
     Promise.resolve({
       env: appEnv(),

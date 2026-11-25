@@ -156,6 +156,15 @@ describe("SDK simultaneous decisions", () => {
     expect(pendingSeatsOf(toy, rt.state)).toEqual([1]);
   });
 
+  it("without bots, a server-played seat (player left) takes timeout defaults at once", () => {
+    const noBots: typeof toy = Object.fromEntries(
+      Object.entries(toy).filter(([k]) => k !== "bot"),
+    ) as unknown as typeof toy;
+    const rt = advance(noBots, fresh(), ["bot", "human", "human"], T0, "online");
+    expect(rt.state.picks).toEqual([1, null, null]);
+    expect(pendingSeatsOf(noBots, rt.state)).toEqual([1, 2]);
+  });
+
   it("plays a whole match on timeouts alone", () => {
     let rt = advance(toy, fresh(), humans, T0, "online");
     let now = T0;

@@ -42,7 +42,7 @@ draft ──submit──▶ in_review ──approve──▶ approved ──reti
 ```
 
 - Roles: `content_editor` writes / submits; `content_reviewer` (owner for MVP) approves, rejects with a note, retires. Admin role from Phase 9 can do both; a reviewer may not approve their own edit once there are 2+ reviewers.
-- Editing an `approved` item creates a new version in `in_review`; the old approved version keeps serving until the new one is approved.
+- Editing an item creates a new version in `in_review` (history keeps the old text); it stops serving until re-approved (MVP simplification).
 - Player report button (post-reveal, "เนื้อหาไม่เหมาะสม"): 3 reports from different players auto-moves an item to `in_review`.
 - All actions are server commands (Edge Function) with role checks and an audit row; no direct table access from clients.
 

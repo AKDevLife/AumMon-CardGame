@@ -6,7 +6,7 @@
 
 | Area      | Change                                                                                            | Design doc                      |
 | --------- | ------------------------------------------------------------------------------------------------- | ------------------------------- |
-| Auth      | anonymous sign-ins on; `private.is_guest()`; `requireAccount()`; guest cleanup job                | Guest_First_Architecture        |
+| Auth      | anonymous sign-ins on; `public.is_guest()`; `requireAccount()`; guest cleanup job                 | Guest_First_Architecture        |
 | Engine    | SDK `pendingSeats` / `tick` / `seatCount` / optional `bot`; new pure module `bluff` (ruleset "2") | Game_Modes, Flagship_Game_Bluff |
 | Server    | orchestrator multi-seat path; `allowsStaleVersion` locks; room settings; content selection        | Game_Modes, Content_Management  |
 | Data      | 2–8 seats; `casual` mode; room settings; content tables; seat nickname snapshot on matches        | §2                              |
@@ -19,14 +19,14 @@
 
 | #   | Migration                     | Content                                                                                                                                                               |
 | --- | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| M1  | `v2_guest_identity`           | `private.is_guest()`; `profile-update` support (nickname rules); config `enable_anonymous_sign_ins = true` (local + Dev dashboard)                                    |
+| M1  | `v2_guest_identity`           | `public.is_guest()`; `profile-update` support (nickname rules); config `enable_anonymous_sign_ins = true` (local + Dev dashboard)                                     |
 | M2  | `v2_seats_2_to_8`             | widen checks: `game_rooms.max_players` 2–8, `match_players.seat` / `room_players.seat` 1–8 (and any private runtime seat checks); `mode` adds `casual`                |
 | M3  | `v2_room_settings`            | `game_rooms.settings jsonb` (timer speed, humor, group) with check; copied to `matches.settings` at start                                                             |
 | M4  | `v2_guest_cleanup`            | `match_players.user_id` / `room_players.user_id` → `on delete set null` + `display_name_snapshot` on `match_players`; `private.cleanup_guests()`; pg_cron daily job   |
 | M5  | `v2_content`                  | `private.content_items`, `private.content_item_history`, `private.content_reports`; checks (§2 Content Management); `content_editor` / `content_reviewer` admin roles |
 | M6  | `v2_content_seed_bluff_th_v1` | 150 items from `docs/v2/content/bluff_th_v1_draft.json` as `draft` (owner approves in admin, C1)                                                                      |
 | M7  | `v2_bluff_registry`           | `public.games` row `bluff` (min 2, max 8, ruleset "2", enabled on Dev); per-round `content_id` + `content_version` on match rounds                                    |
-| M8  | `v2_account_only_guard`       | restrictive `not private.is_guest()` policy helper ready for future account-only tables (none yet in MVP) + pgTAP proving it                                          |
+| M8  | `v2_account_only_guard`       | restrictive `not public.is_guest()` policy helper ready for future account-only tables (none yet in MVP) + pgTAP proving it                                           |
 
 - Every change to an existing table is additive or widens a check; no data is deleted. EDO rows stay valid (seats 1–4 ⊂ 1–8).
 - Dev reset is allowed (pre-production); production does not exist yet.

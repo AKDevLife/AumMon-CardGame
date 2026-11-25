@@ -1,4 +1,5 @@
 /** Online lobby (blueprint §6.3): join codes are random, stored only as SHA-256, expire, and are rate-limited. */
+import { parseSettings } from "./content.ts";
 import { db } from "./db.ts";
 import { enabledGame } from "./game.ts";
 import { HttpError } from "./http.ts";
@@ -25,7 +26,13 @@ async function displayName(tx: Tx, userId: string) {
 }
 
 /** Private online room (join code) for any enabled game, within the game's seat limits. */
-export async function createOnlineRoom(userId: string, maxPlayers?: number, gameId = "edo_battle") {
+export async function createOnlineRoom(
+  userId: string,
+  maxPlayers?: number,
+  gameId = "edo_battle",
+  rawSettings?: unknown,
+) {
+  const settings = parseSettings(rawSettings);
   await rateLimit(userId, "room.create", 10, 60); // outside the transaction (own connection)
   return db().begin(async (tx) => {
     const game = await enabledGame(tx, gameId);
@@ -34,8 +41,8 @@ export async function createOnlineRoom(userId: string, maxPlayers?: number, game
       throw new HttpError(400, "invalid_input", "maxPlayers out of range for this game");
     const code = newCode();
     const [room] = await tx<{ id: string }[]>`
-      insert into public.game_rooms (owner_id, game_id, join_code_hash, mode, status, max_players, ruleset_version, expires_at)
-      values (${userId}, ${game.id}, ${await hashRequest(code)}, 'online', 'lobby', ${size}, ${game.rulesetVersion}, now() + ${`${LOBBY_TTL_MINUTES} minutes`}::interval)
+      insert into public.game_rooms (owner_id, game_id, join_code_hash, mode, status, max_players, ruleset_version, expires_at, settings)
+      values (${userId}, ${game.id}, ${await hashRequest(code)}, 'online', 'lobby', ${size}, ${game.rulesetVersion}, now() + ${`${LOBBY_TTL_MINUTES} minutes`}::interval, ${tx.json(settings as never)})
       returning id`;
     if (!room) throw new Error("room insert failed");
     await tx`

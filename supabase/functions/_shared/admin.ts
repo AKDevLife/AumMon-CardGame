@@ -43,6 +43,9 @@ export async function requireAdmin(request: Request, allowAal1 = false): Promise
   // getUser validates the token with Auth (signature, expiry, revoked sessions).
   const { data, error } = await client.auth.getUser(token);
   if (error) throw new HttpError(401, "unauthenticated", "Invalid or expired session");
+  // Guests can never be admins (defence in depth; roles are granted to accounts only).
+  if (data.user.is_anonymous === true)
+    throw new HttpError(403, "account_required", "Account required");
   const [row] = await db()<{ role: "super_admin" }[]>`
     select role from private.admin_roles where user_id = ${data.user.id}`;
   if (!row) throw new HttpError(403, "forbidden", "Admin access required");
