@@ -1,6 +1,6 @@
 # AumMon — Game Modes & SDK Simultaneous Decisions (15.7)
 
-> Casual = MVP (R2, R3). Ranked = post-MVP, architecture only here; rating / tiers / seasons are 15.8. Guest rules: `AumMon_Guest_First_Architecture.md`.
+> **APPROVED by owner 2026-11-25** (M1–M3 = proposed defaults). Casual = MVP (R2, R3). Ranked = post-MVP, architecture only here; rating / tiers / seasons are 15.8. Guest rules: `AumMon_Guest_First_Architecture.md`.
 
 ## 1. Modes
 
@@ -55,8 +55,8 @@ Orchestrator rules (`flow.ts` + `_shared/game.ts`):
 
 ## 5. Open questions (owner)
 
-| ID  | Question                                                                                | Proposed default                        |
-| --- | --------------------------------------------------------------------------------------- | --------------------------------------- |
-| M1  | Casual host settings = timer speed, humor 1–2, `group` on / off (nothing else for MVP)? | yes                                     |
-| M2  | AFK in Casual: keep the seat with timeout defaults, never kick?                         | yes                                     |
-| M3  | Ranked later with fixed BLUFF sizes 4 and 6?                                            | yes (decide in 15.8 with rating design) |
+| ID    | Question                                                                                | Proposed default                        |
+| ----- | --------------------------------------------------------------------------------------- | --------------------------------------- |
+| M1 ✅ | Casual host settings = timer speed, humor 1–2, `group` on / off (nothing else for MVP)? | yes                                     |
+| M2 ✅ | AFK in Casual: keep the seat with timeout defaults, never kick?                         | yes                                     |
+| M3 ✅ | Ranked later with fixed BLUFF sizes 4 and 6?                                            | yes (decide in 15.8 with rating design) |
