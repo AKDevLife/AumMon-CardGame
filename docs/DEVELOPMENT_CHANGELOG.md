@@ -2,6 +2,11 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-25 — 15.12 playtest prepared
+
+- Owner approved all 150 BLUFF items (applied on Dev, audited). Dev smoke: 3 guests start a match, read → claim advances on the server timer.
+- `docs/v2/AumMon_Playtest_Plan.md`: sessions 2 / 4 / 8 players, what to report, what telemetry is read afterwards.
+
 ## 2026-11-25 — 15.11 S3–S8 MVP build (guests, BLUFF rooms, content, party UI)
 
 - Backend (PR #130): anonymous sign-ins; `public.is_guest()` (public: RLS runs as `authenticated`); `requireCaller` / `requireAccount`; admin rejects guests; guest room limit 10/h. Migrations `20261126000000` (room `settings`, private content tables + history + reports, BLUFF registry, guest cleanup + pg_cron) and `20261126000100` (150 items as draft). BLUFF start picks 5 approved items (players / humor / group); responses include `pending`; no BLUFF bots; a left seat takes timeout defaults; `content-report`; admin `content` / `contentReview` (bulk) / `contentEdit`. Casual rooms reuse mode `online` (no new mode value).

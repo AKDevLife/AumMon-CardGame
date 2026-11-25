@@ -237,7 +237,7 @@ Plan, dependencies and MVP scope: `docs/v2/AumMon_Product_Direction_Audit.md` §
   - [x] S6 BLUFF UI live + Results + share — PR #131 (2026-11-25)
   - [x] S7 account linking UI — PR #131 (2026-11-25)
   - [x] S8 v2 Home, EDO hidden (`/edo`), prototype removed, docs — PR #131 (2026-11-25)
-- [ ] **15.12** Closed playtest on real phones (2 / 4 / 8 players) — deps: 15.11
+- [~] **15.12** Closed playtest on real phones (2 / 4 / 8 players) — deps: 15.11 — plan `docs/v2/AumMon_Playtest_Plan.md`; waiting for the owner session
 - [ ] **15.13** Balance & UX iteration — deps: 15.12
 - [ ] **15.14** Launch preparation (production project, legal, payments decision) — deps: 15.13, 6.8, 7.8
 
