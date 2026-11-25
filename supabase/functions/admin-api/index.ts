@@ -309,6 +309,8 @@ const actions: Record<string, Action> = {
       throw new HttpError(403, "dev_only", "Development tools are disabled here");
     const gameId = isGameId(body["gameId"]) ? body["gameId"] : "edo_battle";
     const game = getGameModule(gameId);
+    const bot = game.bot?.bind(game);
+    if (bot === undefined) throw new HttpError(400, "no_bots", "This game has no bots");
     const games = Math.min(Math.max(Number(body["games"] ?? 10) || 10, 1), 50);
     const players = Math.min(
       Math.max(Number(body["players"] ?? 4) || 4, game.minPlayers),
@@ -330,7 +332,7 @@ const actions: Record<string, Action> = {
       );
       for (let n = 0; n < 20_000 && !game.isFinished(s); n++) {
         const seat = game.actingSeat(s) ?? 0;
-        s = game.apply(s, seat, game.bot(s, seat, rng), rng).state;
+        s = game.apply(s, seat, bot(s, seat, rng), rng).state;
       }
       rounds += game.round(s);
       for (const w of game.result(s)?.winners ?? []) wins[w] = (wins[w] ?? 0) + 1;

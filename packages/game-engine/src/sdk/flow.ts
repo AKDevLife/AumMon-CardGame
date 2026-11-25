@@ -1,4 +1,5 @@
 import { createSeededRandom, type RngState } from "../rng/seeded-random.ts";
+import type { RandomSource } from "../rng/seeded-random.ts";
 import type { GameModule, Seat } from "./module.ts";
 
 /**
@@ -35,6 +36,36 @@ export function effectiveKinds(
   );
 }
 
+type AnyModule<S, C, V, E extends { readonly type: string }> = GameModule<S, C, V, E>;
+
+/** Seats that may act now: `pendingSeats` for simultaneous modules, else the acting seat. */
+export function pendingSeatsOf<S, C, V, E extends { readonly type: string }>(
+  game: AnyModule<S, C, V, E>,
+  state: S,
+): Seat[] {
+  if (game.isFinished(state)) return [];
+  if (game.pendingSeats) return game.pendingSeats(state);
+  const seat = game.actingSeat(state);
+  return seat === null ? [] : [seat];
+}
+
+export function seatCountOf<S, C, V, E extends { readonly type: string }>(
+  game: AnyModule<S, C, V, E>,
+  state: S,
+): number {
+  return game.seatCount ? game.seatCount(state) : game.handCounts(state).length;
+}
+
+function botCommand<S, C, V, E extends { readonly type: string }>(
+  game: AnyModule<S, C, V, E>,
+  state: S,
+  seat: Seat,
+  rng: RandomSource,
+): C {
+  if (!game.bot) throw new Error(`${game.id} has no bots`);
+  return game.bot(state, seat, rng);
+}
+
 /** Keep the timer only while the same seat is still on the same decision. */
 export function deadlineAfterAct<S, C, V, E extends { readonly type: string }>(
   game: GameModule<S, C, V, E>,
@@ -42,9 +73,10 @@ export function deadlineAfterAct<S, C, V, E extends { readonly type: string }>(
   after: S,
   deadline: number | null,
 ): number | null {
+  // Simultaneous phases keep one deadline for the whole phase, however many seats acted.
   const same =
     !game.isFinished(after) &&
-    game.actingSeat(after) === game.actingSeat(before) &&
+    (game.pendingSeats !== undefined || game.actingSeat(after) === game.actingSeat(before)) &&
     game.timerKey(after) === game.timerKey(before);
   return same ? deadline : null;
 }
@@ -57,9 +89,10 @@ export function advance<S, C, V, E extends { readonly type: string }>(
   now: number,
   mode: Mode = "solo",
 ): Runtime<S> & { events: E[] } {
+  if (game.pendingSeats) return advanceSimultaneous(game, input, kinds, now, mode);
   const rng = createSeededRandom(input.rng);
   let { state, deadline } = input;
-  const seats = game.handCounts(state).length;
+  const seats = seatCountOf(game, state);
   const timeouts = Array.from({ length: seats }, (_, i) => input.timeouts[i] ?? 0);
   const events: E[] = [];
   const key = (s: S) => `${String(game.isFinished(s))}:${game.timerKey(s)}`;
@@ -73,7 +106,7 @@ export function advance<S, C, V, E extends { readonly type: string }>(
     let timedOut = false;
     if (kindAt(seat) === "bot") {
       if (deadline !== null && now < deadline) break;
-      commands = [game.bot(state, seat, rng)];
+      commands = [botCommand(game, state, seat, rng)];
     } else if (deadline !== null && now >= deadline) {
       commands = game.timeoutCommands(state, seat);
       timedOut = true;
@@ -107,5 +140,54 @@ export function advance<S, C, V, E extends { readonly type: string }>(
   const floor = game.minDecision?.(state) ?? null;
   if (floor && deadline !== null && kindAt(floor.seat) === "human")
     deadline = Math.max(deadline, now + floor.ms);
+  return { state, rng: rng.getState(), deadline, timeouts, events };
+}
+
+/**
+ * Multi-seat path: every pending seat decides in the same phase under one deadline.
+ * Bots act at once; at the deadline each pending human gets its timeout defaults (seat order);
+ * a phase without pending seats moves on through `tick` when its deadline passes.
+ */
+function advanceSimultaneous<S, C, V, E extends { readonly type: string }>(
+  game: GameModule<S, C, V, E>,
+  input: Runtime<S>,
+  kinds: readonly Kind[],
+  now: number,
+  mode: Mode,
+): Runtime<S> & { events: E[] } {
+  const rng = createSeededRandom(input.rng);
+  let { state, deadline } = input;
+  const seats = seatCountOf(game, state);
+  const timeouts = Array.from({ length: seats }, (_, i) => input.timeouts[i] ?? 0);
+  const events: E[] = [];
+  const key = (s: S) => `${String(game.isFinished(s))}:${game.timerKey(s)}`;
+  const kindAt = (seat: Seat) => effectiveKinds(kinds, timeouts, mode, game.afkTimeouts)[seat];
+  const run = (seat: Seat, command: C) => {
+    const t = game.apply(state, seat, command, rng);
+    state = t.state;
+    events.push(...t.events);
+  };
+
+  for (let guard = 0; guard < 300 && !game.isFinished(state); guard++) {
+    const before = key(state);
+    const pending = pendingSeatsOf(game, state);
+    const bots = pending.filter((seat) => kindAt(seat) === "bot");
+    const due = deadline !== null && now >= deadline;
+    if (bots.length > 0) {
+      for (const seat of bots) run(seat, botCommand(game, state, seat, rng));
+    } else if (pending.length > 0 && due) {
+      for (const seat of pending) {
+        events.push(game.timeoutEvent(seat));
+        timeouts[seat] = (timeouts[seat] ?? 0) + 1;
+        for (const command of game.timeoutCommands(state, seat)) run(seat, command);
+      }
+    } else if (pending.length === 0 && due && game.tick) {
+      const t = game.tick(state, rng);
+      state = t.state;
+      events.push(...t.events);
+    } else break;
+    if (key(state) !== before) deadline = null;
+  }
+  if (deadline === null && !game.isFinished(state)) deadline = now + game.timeoutMs(state);
   return { state, rng: rng.getState(), deadline, timeouts, events };
 }

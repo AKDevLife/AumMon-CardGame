@@ -1,6 +1,6 @@
-# AumMon — Technical Migration Plan v2 (15.10 — draft, awaiting owner approval)
+# AumMon — Technical Migration Plan v2 (15.10 — approved)
 
-> Turns the approved designs (15.3–15.9) into an ordered build plan for 15.11. Append-only migrations, Dev project only (`AumMon-Dev`); no production work (15.14). Test plan: `AumMon_Test_Strategy.md`.
+> **APPROVED by owner 2026-11-25** (T1–T2). Turns the approved designs (15.3–15.9) into an ordered build plan for 15.11. Append-only migrations, Dev project only (`AumMon-Dev`); no production work (15.14). Test plan: `AumMon_Test_Strategy.md`.
 
 ## 1. Architecture impact (summary; detail in each design doc)
 
@@ -55,7 +55,7 @@
 
 ## 5. Owner approval
 
-| ID  | Question                                         | Proposed default |
-| --- | ------------------------------------------------ | ---------------- |
-| T1  | Approve migrations M1–M8 and slices S1–S8 order? | yes              |
-| T2  | Remove the `/prototype/bluff` route in S8?       | yes              |
+| ID    | Question                                         | Proposed default |
+| ----- | ------------------------------------------------ | ---------------- |
+| T1 ✅ | Approve migrations M1–M8 and slices S1–S8 order? | yes              |
+| T2 ✅ | Remove the `/prototype/bluff` route in S8?       | yes              |

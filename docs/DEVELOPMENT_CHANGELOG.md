@@ -2,7 +2,13 @@
 
 Newest first. Significant changes only.
 
-## 2026-11-25 — 15.10 Technical migration plan + test strategy (draft)
+## 2026-11-25 — 15.11 S1 SDK simultaneous decisions
+
+- `packages/game-engine/src/sdk`: optional `pendingSeats` / `tick` / `seatCount`, `bot` optional; `flow.advance` multi-seat path (one deadline per phase, bots at once, per-seat timeout defaults in seat order, tick phases); `pendingSeatsOf` / `seatCountOf` helpers. EDO single-seat path unchanged (golden replay green).
+- Contract tests `packages/game-engine/tests/sdk-simultaneous.test.ts` (toy module). Admin bot simulation rejects games without bots.
+- Fixed the known flaky `tests/backend/game.test.ts` solo check (a bot moving first can make seat 0 draw before the first view).
+
+## 2026-11-25 — 15.10 Technical migration plan + test strategy (approved T1–T2)
 
 - `docs/v2/AumMon_Technical_Migration_Plan.md`: architecture impact, migrations M1–M8 (guest, seats 2–8, room settings, guest cleanup, content + seed, BLUFF registry, account-only guard), build slices S1–S8, risks. `docs/v2/AumMon_Test_Strategy.md`; MASTER_ARCHITECTURE §13. Awaiting owner T1–T2.
 
