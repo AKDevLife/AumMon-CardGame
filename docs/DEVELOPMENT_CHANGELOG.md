@@ -2,6 +2,11 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-25 — 15.3 BLUFF design draft
+
+- `docs/v2/AumMon_Flagship_Game_Bluff.md`: round loop (claim → answer + crowd prediction + wager → reveal), scoring, timeouts, tie-break, 2 / 3–4 / 5–8 variants, open questions B1–B5.
+- Monte Carlo `scripts/bluff-sim.mjs`: skill beats random at 3+ players; 2-player bluff too strong → tune in 15.4. Awaiting owner approval.
+
 ## 2026-11-25 — 15.2 Product v2 docs + Dummy / Poker retired (owner)
 
 - Spec v15 (`aummon_game_spec.md`) = v2 product; new `docs/v2/` Vision, Strategy, Requirements (R1–R8 with AC), Game Module Compatibility; handoff + roadmap Phase 15.
