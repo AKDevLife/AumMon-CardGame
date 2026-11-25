@@ -1,6 +1,6 @@
 # AumMon — Content Management (15.9)
 
-> Status: design for MVP (R5). First BLUFF pack drafted by Claude for owner review (Q6): `docs/v2/content/bluff_th_v1_draft.json` (150 items, all `draft`). Built in Phase 11 (migration + admin UI); this task is design + draft only.
+> Status: **APPROVED by owner 2026-11-25** (C1–C4 = proposed defaults). Design for MVP (R5). First BLUFF pack drafted by Claude for owner review (Q6): `docs/v2/content/bluff_th_v1_draft.json` (150 items, all `draft`). Built in Phase 11 (migration + admin UI); this task is design + draft only.
 
 ## 1. Goals
 
@@ -59,9 +59,9 @@ draft ──submit──▶ in_review ──approve──▶ approved ──reti
 
 ## 6. Open questions (owner)
 
-| ID  | Question                                                                     | Proposed default                |
-| --- | ---------------------------------------------------------------------------- | ------------------------------- |
-| C1  | Review the 150 draft items (approve / edit / drop) before the playtest (Q6)? | yes — owner reviews in admin UI |
-| C2  | Humor levels 1–2 only for MVP; room default = 2?                             | yes                             |
-| C3  | `group` prompts off by default, host can enable?                             | yes                             |
-| C4  | Auto-hide an item after 3 player reports?                                    | yes (moves to `in_review`)      |
+| ID    | Question                                                                     | Proposed default                |
+| ----- | ---------------------------------------------------------------------------- | ------------------------------- |
+| C1 ✅ | Review the 150 draft items (approve / edit / drop) before the playtest (Q6)? | yes — owner reviews in admin UI |
+| C2 ✅ | Humor levels 1–2 only for MVP; room default = 2?                             | yes                             |
+| C3 ✅ | `group` prompts off by default, host can enable?                             | yes                             |
+| C4 ✅ | Auto-hide an item after 3 player reports?                                    | yes (moves to `in_review`)      |

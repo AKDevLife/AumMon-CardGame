@@ -2,7 +2,12 @@
 
 Newest first. Significant changes only.
 
-## 2026-11-25 — 15.9 Content management design + BLUFF draft pack
+## 2026-11-25 — 15.6 Guest-first architecture + account linking (draft)
+
+- `docs/v2/AumMon_Guest_First_Architecture.md`: Supabase anonymous sign-in, `private.is_guest()` + restrictive account-only policies, `requireAccount()`, nickname snapshot, abuse limits, 30-day guest cleanup, tests.
+- `docs/v2/AumMon_Account_Linking.md`: same-id conversion (`updateUser` e-mail → password), `email_exists` = sign in without merge (Q4). Awaiting owner G1–G3, L1–L2.
+
+## 2026-11-25 — 15.9 Content management design + BLUFF draft pack (approved C1–C4)
 
 - `docs/v2/AumMon_Content_Management.md`: `private.content_items` schema (versioned, history, per-round `content_id` + version), selection rules, draft → in_review → approved → retired flow, roles, player reports, writing guide.
 - `docs/v2/content/bluff_th_v1_draft.json`: 150 Thai items (10 categories × 15, humor 1–2, 3 `group`), all `draft` → owner review C1–C4.

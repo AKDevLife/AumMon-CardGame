@@ -223,7 +223,7 @@ Plan, dependencies and MVP scope: `docs/v2/AumMon_Product_Direction_Audit.md` §
 - [x] **15.3** BLUFF game design + scoring model + simulation → owner approval — deps: 15.2 — PR #120 (2026-11-25)
 - [x] **15.4** 2–8 player balance design (2 / 3–4 / 5–8 variants) — deps: 15.3 — PR #121 (2026-11-25)
 - [ ] **15.5** UI/UX guidelines (dark theme) + clickable prototype → owner review — deps: 15.3
-- [ ] **15.6** Guest-first architecture + account linking design (anonymous auth, RLS) → owner approval — deps: 15.2
+- [~] **15.6** Guest-first architecture + account linking design (anonymous auth, RLS) → owner approval — deps: 15.2 — awaiting owner approval (G1–G3, L1–L2)
 - [ ] **15.7** Casual & Ranked architecture; SDK simultaneous-decision design — deps: 15.6
 - [ ] **15.8** XP, rank, economy, monetization + cost model (design only) — deps: 15.7
 - [x] **15.9** Content management design (schema, review flow, first ~150 items drafted) — deps: 15.3 — PR #122 (2026-11-25)
