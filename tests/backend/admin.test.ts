@@ -216,6 +216,7 @@ describe.runIf(run)("admin RBAC via Edge Functions", () => {
     // Game Center: admin lists all games and turns one off; players then cannot start it.
     const games = await admin.call({ action: "games" });
     expect((games.body as unknown as { id: string }[]).map((g) => g.id)).toEqual([
+      "bluff",
       "edo_battle",
       "dummy",
       "poker",

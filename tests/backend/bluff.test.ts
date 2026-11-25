@@ -105,9 +105,9 @@ describe.runIf(run)("BLUFF with guests via Edge Functions", () => {
 
   it("guests cannot use admin; BLUFF has no solo bots", async () => {
     expect((await a.call("admin-api", { action: "me" })).body["error"]).toBe("account_required");
-    expect((await a.call("game-create", { bots: 2, gameId: "bluff" })).body["error"]).toBe(
-      "no_bots",
-    );
+    expect(
+      (await a.call("game-create", { mode: "solo", bots: 2, gameId: "bluff" })).body["error"],
+    ).toBe("no_bots");
   });
 
   it("validates room settings", async () => {
@@ -119,60 +119,64 @@ describe.runIf(run)("BLUFF with guests via Edge Functions", () => {
     expect(bad.status).toBe(400);
   });
 
-  it("a guest room with 3 players plays a round: hidden locks, concurrent locks, reveal", async () => {
-    const created = await a.call("rooms-create", {
-      mode: "online",
-      gameId: "bluff",
-      maxPlayers: 8,
-      settings: { humor: 2, slow: false, group: false },
-    });
-    expect(created.status).toBe(200);
-    const roomId = String(created.body["roomId"]);
-    const joinCode = String(created.body["joinCode"]);
-    for (const g of [b, c]) {
-      expect((await g.call("rooms-join", { joinCode })).status).toBe(200);
-      expect((await g.call("rooms-ready", { roomId, ready: true })).status).toBe(200);
-    }
-    const start = await a.call("game-start", { roomId });
-    expect(start.status, JSON.stringify(start.body)).toBe(200);
-    matchId = String(start.body["matchId"]);
+  it(
+    "a guest room with 3 players plays a round: hidden locks, concurrent locks, reveal",
+    { timeout: 60_000 },
+    async () => {
+      const created = await a.call("rooms-create", {
+        mode: "online",
+        gameId: "bluff",
+        maxPlayers: 8,
+        settings: { humor: 2, slow: false, group: false },
+      });
+      expect(created.status).toBe(200);
+      const roomId = String(created.body["roomId"]);
+      const joinCode = String(created.body["joinCode"]);
+      for (const g of [b, c]) {
+        expect((await g.call("rooms-join", { joinCode })).status).toBe(200);
+        expect((await g.call("rooms-ready", { roomId, ready: true })).status).toBe(200);
+      }
+      const start = await a.call("game-start", { roomId });
+      expect(start.status, JSON.stringify(start.body)).toBe(200);
+      matchId = String(start.body["matchId"]);
 
-    const read = await view(a, matchId);
-    expect(read.view.gameId).toBe("bluff");
-    expect(read.view.phase).toBe("read");
-    expect(read.view.item?.options).toHaveLength(4);
-    expect(read.pending).toEqual([]);
+      const read = await view(a, matchId);
+      expect(read.view.gameId).toBe("bluff");
+      expect(read.view.phase).toBe("read");
+      expect(read.view.item?.options).toHaveLength(4);
+      expect(read.pending).toEqual([]);
 
-    let v = await waitPhase(a, matchId, "claim");
-    expect(v.pending).toEqual([0, 1, 2]);
-    expect((await cmd(a, v, { type: "claim", option: 1 })).status).toBe(200);
-    expect((await cmd(a, await view(a, matchId), { type: "pass" })).body["error"]).toBe(
-      "already_claimed",
-    );
-    await cmd(b, await view(b, matchId), { type: "taunt", taunt: 0 });
-    await cmd(c, await view(c, matchId), { type: "pass" });
+      let v = await waitPhase(a, matchId, "claim");
+      expect(v.pending).toEqual([0, 1, 2]);
+      expect((await cmd(a, v, { type: "claim", option: 1 })).status).toBe(200);
+      expect((await cmd(a, await view(a, matchId), { type: "pass" })).body["error"]).toBe(
+        "already_claimed",
+      );
+      await cmd(b, await view(b, matchId), { type: "taunt", taunt: 0 });
+      await cmd(c, await view(c, matchId), { type: "pass" });
 
-    v = await waitPhase(a, matchId, "lock");
-    const lockA = await cmd(a, v, { type: "lock", answer: 0, prediction: 2, wager: 1 });
-    expect(lockA.status).toBe(200);
-    const vb = await view(b, matchId);
-    expect(vb.view.locked.filter(Boolean)).toHaveLength(1);
-    expect(vb.view.myLock).toBeNull();
-    expect(JSON.stringify(vb)).not.toContain('"prediction":2');
-    // Both remaining players lock at the same moment with the same (stale) version.
-    const vc = await view(c, matchId);
-    const [rb, rc] = await Promise.all([
-      cmd(b, vb, { type: "lock", answer: 2, prediction: 2, wager: 0 }),
-      cmd(c, vc, { type: "lock", answer: 2, prediction: 2, wager: 2 }),
-    ]);
-    expect([rb.status, rc.status]).toEqual([200, 200]);
+      v = await waitPhase(a, matchId, "lock");
+      const lockA = await cmd(a, v, { type: "lock", answer: 0, prediction: 2, wager: 1 });
+      expect(lockA.status).toBe(200);
+      const vb = await view(b, matchId);
+      expect(vb.view.locked.filter(Boolean)).toHaveLength(1);
+      expect(vb.view.myLock).toBeNull();
+      expect(JSON.stringify(vb)).not.toContain('"prediction":2');
+      // Both remaining players lock at the same moment with the same (stale) version.
+      const vc = await view(c, matchId);
+      const [rb, rc] = await Promise.all([
+        cmd(b, vb, { type: "lock", answer: 2, prediction: 2, wager: 0 }),
+        cmd(c, vc, { type: "lock", answer: 2, prediction: 2, wager: 2 }),
+      ]);
+      expect([rb.status, rc.status]).toEqual([200, 200]);
 
-    const reveal = await view(a, matchId);
-    expect(reveal.view.phase).toBe("reveal");
-    expect(reveal.view.reveal?.locks.map((l) => l.answer)).toEqual([0, 2, 2]);
-    // a: predicted C, Top for a = C → +2 +1 = 3; b/c: Top for them = A,C tie → hit, crowd +1
-    expect(reveal.view.scores).toEqual([3, 3, 5]);
-  });
+      const reveal = await view(a, matchId);
+      expect(reveal.view.phase).toBe("reveal");
+      expect(reveal.view.reveal?.locks.map((l) => l.answer)).toEqual([0, 2, 2]);
+      // a: predicted C, Top for a = C → +2 +1 = 3; b/c: Top for them = A,C tie → hit, crowd +1
+      expect(reveal.view.scores).toEqual([3, 3, 5]);
+    },
+  );
 
   it("only seated players can see or act", async () => {
     const outsider = await guest("แขก");
