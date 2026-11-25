@@ -21,8 +21,8 @@
 
 ## 3. Authorization
 
-- SQL helper `private.is_guest()` = `coalesce((auth.jwt() ->> 'is_anonymous')::boolean, false)` (stable, `security definer` not needed).
-- **Account-only** tables (future Ranked ratings, purchases, inventory, leaderboard entries) add a **restrictive** policy `using (not private.is_guest())` on top of the owner policy, so a missing check fails closed.
+- SQL helper `public.is_guest()` = `coalesce((auth.jwt() ->> 'is_anonymous')::boolean, false)` (stable; in `public` because RLS policies run as `authenticated`, which has no usage on `private`; it reads only the caller's own claim).
+- **Account-only** tables (future Ranked ratings, purchases, inventory, leaderboard entries) add a **restrictive** policy `using (not public.is_guest())` on top of the owner policy, so a missing check fails closed.
 - Edge Functions: `requireUser()` returns `{ id, isGuest }` (from the verified JWT via `auth.getUser`, never from the request body). New `requireAccount()` rejects guests with `403 account_required` — used by Ranked, purchases and admin.
 - Admin already needs an admin role + MFA `aal2`; guests can hold neither. `requireAdmin()` also rejects `isGuest` explicitly (defence in depth).
 - Realtime room / match channels: authorized by seat membership (unchanged), so guests and accounts are treated the same.

@@ -216,6 +216,7 @@ describe.runIf(run)("admin RBAC via Edge Functions", () => {
     // Game Center: admin lists all games and turns one off; players then cannot start it.
     const games = await admin.call({ action: "games" });
     expect((games.body as unknown as { id: string }[]).map((g) => g.id)).toEqual([
+      "bluff",
       "edo_battle",
       "dummy",
       "poker",
@@ -228,7 +229,10 @@ describe.runIf(run)("admin RBAC via Edge Functions", () => {
       (await admin.call({ action: "game.set_enabled", gameId: "poker", enabled: false })).status,
     ).toBe(200);
     const listed = await player.client.from("games").select("id");
-    expect((listed.data ?? []).map((g: { id: string }) => g.id)).toEqual(["edo_battle"]);
+    expect((listed.data ?? []).map((g: { id: string }) => g.id).sort()).toEqual([
+      "bluff",
+      "edo_battle",
+    ]);
     expect(
       (await admin.call({ action: "game.set_enabled", gameId: "poker", enabled: true })).status,
     ).toBe(400);

@@ -40,7 +40,7 @@ describe("game module isolation", () => {
 });
 
 describe("Edge Functions authenticate callers", () => {
-  // verify_jwt = false in supabase/config.toml: every handler must call requireUser / requireAdmin.
+  // verify_jwt = false in supabase/config.toml: every handler must authenticate (auth.ts / admin.ts).
   const PUBLIC = new Set(["engine-health"]);
   const fnRoot = join(root, "supabase/functions");
   const fns = readdirSync(fnRoot).filter(
@@ -48,6 +48,6 @@ describe("Edge Functions authenticate callers", () => {
   );
   it.each(fns)("%s checks the caller", (name) => {
     const code = readFileSync(join(fnRoot, name, "index.ts"), "utf8");
-    expect(/requireUser\(|requireAdmin\(/.test(code)).toBe(true);
+    expect(/requireUser\(|requireCaller\(|requireAccount\(|requireAdmin\(/.test(code)).toBe(true);
   });
 });
