@@ -35,8 +35,10 @@ test("signed-in screens (setup, lobby, match, profile) have no WCAG 2.1 AA viola
   await page.getByLabel("อีเมล").fill(`a11y${Date.now()}@test.local`);
   await page.getByLabel("รหัสผ่าน").fill("secret123");
   await page.getByRole("button", { name: "สร้างบัญชี" }).click();
+  await expect(page.getByLabel("ชื่อเล่น")).toBeVisible(); // v2 party home
+  await page.goto("/edo"); // EDO Battle is hidden in v2 but kept (Q1)
   await expect(page.getByRole("link", { name: "Solo vs Bot" })).toBeVisible();
-  for (const path of ["/profile", "/play/pass", "/play/online"]) {
+  for (const path of ["/", "/me", "/profile", "/play/pass", "/play/online"]) {
     await page.goto(path);
     await page.waitForLoadState("networkidle");
     await scan(path);

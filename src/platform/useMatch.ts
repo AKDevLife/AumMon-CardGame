@@ -13,6 +13,8 @@ export interface MatchResponse<V> {
   deadline: string | null;
   seat: number | null;
   acting: number | null;
+  /** Seats that may still act (simultaneous games such as BLUFF). */
+  pending?: number[];
   botActing: boolean;
   names: string[];
   view: V;

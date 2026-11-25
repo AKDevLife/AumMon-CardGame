@@ -2,7 +2,7 @@
  * Client game registry (Game Center). Availability comes from public.games (is_enabled, RLS);
  * this list only holds presentation and routes. Internal ids match supabase public.games.id.
  */
-export type GameId = "edo_battle";
+export type GameId = "edo_battle" | "bluff";
 
 export interface ClientGame {
   readonly id: GameId;
@@ -30,6 +30,18 @@ export const GAMES: readonly ClientGame[] = [
     soloPath: "/play/solo",
     onlinePath: "/play/online",
     matchPath: (id) => `/game/${id}`,
+  },
+  {
+    id: "bluff",
+    name: "BLUFF",
+    tagline: "เกมทายใจ ตบตาเพื่อน 2–8 คน",
+    icon: "🎭",
+    minPlayers: 2,
+    maxPlayers: 8,
+    // BLUFF has no bots (Q7): "solo" leads to the party home.
+    soloPath: "/",
+    onlinePath: "/",
+    matchPath: (id) => `/party/game/${id}`,
   },
 ];
 

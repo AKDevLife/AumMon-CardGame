@@ -4,6 +4,7 @@ import { StickerButton } from "../../components/StickerButton.tsx";
 import { ApiError, callFunction } from "../../lib/api.ts";
 import { useAuth } from "../auth/auth-context.ts";
 import { ago, dateTime, eventText, label, seats, shortId } from "./format.ts";
+import { AdminContent } from "./AdminContent.tsx";
 import { gateFromError, gateFromMe, SECTIONS, type AdminGate, type SectionId } from "./guard.ts";
 import { MfaPanel } from "./MfaPanel.tsx";
 import { SoundSettings } from "./SoundSettings.tsx";
@@ -94,6 +95,7 @@ const Section = ({
 const ACTION: Record<SectionId, string> = {
   overview: "overview",
   games: "games",
+  content: "content",
   players: "players",
   cards: "cards",
   rooms: "rooms",
@@ -563,6 +565,8 @@ export function AdminPage() {
           </>
         );
       }
+      case "content":
+        return <AdminContent data={data} api={api} onChanged={load} />;
       case "sounds":
         return (
           <SoundSettings

@@ -24,5 +24,7 @@ export {
   type BluffItem,
   type BluffSetup,
   type BluffView,
+  type RoundRecord as BluffRoundRecord,
 } from "./bluff/module.ts";
+export type { SeatScore as BluffSeatScore } from "./bluff/scoring.ts";
 export { GAME_MODULES, getGameModule, isGameId } from "./registry.ts";

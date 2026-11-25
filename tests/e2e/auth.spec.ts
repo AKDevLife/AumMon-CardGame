@@ -14,6 +14,7 @@ test("sign up → profile → logout → login", async ({ page }) => {
   await expect(page).toHaveURL("/");
   await expect(page.getByRole("status")).toHaveCount(0); // no preview banner
 
+  await page.goto("/edo");
   await page.getByRole("button", { name: "ตั้งค่า" }).click();
   await page.getByRole("link", { name: "โปรไฟล์" }).click();
   const name = page.getByLabel("ชื่อที่แสดง");
@@ -25,7 +26,7 @@ test("sign up → profile → logout → login", async ({ page }) => {
   await expect(page.getByLabel("ชื่อที่แสดง")).toHaveValue("Renamed");
 
   await page.getByRole("button", { name: "ย้อนกลับ" }).click();
-  await expect(page).toHaveURL("/");
+  await expect(page).toHaveURL("/edo");
   await page.getByRole("button", { name: "ตั้งค่า" }).click();
   await page.getByRole("button", { name: "ออกจากระบบ" }).click();
   await expect(
@@ -40,5 +41,7 @@ test("sign up → profile → logout → login", async ({ page }) => {
 
   await page.getByLabel("รหัสผ่าน").fill("secret123");
   await page.getByRole("button", { name: "เข้าสู่ระบบ" }).click();
+  await expect(page.getByLabel("ชื่อเล่น")).toBeVisible(); // v2 party home
+  await page.goto("/edo"); // EDO Battle is hidden in v2 but kept (Q1)
   await expect(page.getByRole("link", { name: "Solo vs Bot" })).toBeVisible();
 });
