@@ -2,7 +2,11 @@
 
 Newest first. Significant changes only.
 
-## 2026-11-25 — 15.7 Game modes + SDK simultaneous decisions (draft)
+## 2026-11-25 — 15.8 XP, rank, economy, monetization (draft, design only)
+
+- New `docs/v2/`: `AumMon_Level_XP_Design.md` (XP sources, anti-farm, level curve, missions), `AumMon_Rank_System.md` (OpenSkill, tiers, 8-week seasons, integrity), `AumMon_Game_Economy.md` (coins + gems, cosmetics only, gacha off until legal check), `AumMon_Monetization_Strategy.md` (cost model, break-even ≈ 1,000 MAU at 2 %). Prices are assumptions to re-check. Awaiting owner E1–E4.
+
+## 2026-11-25 — 15.7 Game modes + SDK simultaneous decisions (approved M1–M3)
 
 - `docs/v2/AumMon_Game_Modes.md`: Casual (MVP) vs Ranked (post-MVP) rules; additive SDK `pendingSeats` / `tick` / `seatCount` / optional `bot`, one deadline per phase, per-seat timeout defaults, stale-version locks; BLUFF module sketch; tests. Awaiting owner M1–M3.
 
