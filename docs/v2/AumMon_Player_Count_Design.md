@@ -1,6 +1,6 @@
-# AumMon — BLUFF Player Count Balance (15.4 — draft, awaiting owner approval)
+# AumMon — BLUFF Player Count Balance (15.4 — approved)
 
-> Status: **DRAFT** — proposes BLUFF `ruleset_version` `"2"` (2-player scoring change only). Base rules: `AumMon_Flagship_Game_Bluff.md` (ruleset "1").
+> Status: **APPROVED by owner 2026-11-25** (P1–P2 = proposed defaults) — BLUFF `ruleset_version` `"2"` (2-player scoring change only). Base rules: `AumMon_Flagship_Game_Bluff.md` (ruleset "1").
 > Simulation: `node scripts/bluff-sim.mjs` (all variants × listener trust; ~30 s) and `--h2h` (2-player head-to-head). Seeded, 20,000 matches per cell.
 
 ## 1. Method
@@ -53,7 +53,7 @@ Mixed tables 3–8 are unchanged (see script output): R 2–21 %, B 19–41 %, H
 
 ## 5. Open questions (owner)
 
-| ID  | Question                                                                  | Proposed default |
-| --- | ------------------------------------------------------------------------- | ---------------- |
-| P1  | Approve ruleset "2": 2-player no Bluff / Honest points?                   | yes              |
-| P2  | Keep 3–8 unchanged (no silent bonus; show correct-read count on results)? | yes              |
+| ID    | Question                                                                  | Proposed default |
+| ----- | ------------------------------------------------------------------------- | ---------------- |
+| P1 ✅ | Approve ruleset "2": 2-player no Bluff / Honest points?                   | yes              |
+| P2 ✅ | Keep 3–8 unchanged (no silent bonus; show correct-read count on results)? | yes              |

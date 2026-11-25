@@ -1,6 +1,6 @@
 # AumMon — Flagship Game: BLUFF (v1 — approved)
 
-> Status: **APPROVED by owner 2026-11-25** (B1–B5 = proposed defaults); BLUFF `ruleset_version` `"1"`. Player-count tuning is task 15.4; content schema is 15.9.
+> Status: **APPROVED by owner 2026-11-25** (B1–B5 = proposed defaults); BLUFF `ruleset_version` `"1"`; **ruleset `"2"` approved 2026-11-25 (15.4)**: 2-player no Bluff / Honest points. Player-count tuning is task 15.4; content schema is 15.9.
 
 ## 1. Concept
 
@@ -31,12 +31,12 @@ Skill = reading friends + bluffing them. No right/wrong answers, so content is c
 
 "Top" = the option(s) with the most answers **among the other players** (ties: every tied option counts). In the 2-player variant Top = the opponent's answer.
 
-| Rule       | Points                                                                                                           |
-| ---------- | ---------------------------------------------------------------------------------------------------------------- |
-| Prediction | Prediction ∈ Top → **+2 + wager**; otherwise **− wager**                                                         |
-| Crowd (3+) | Your answer is (one of) the most-picked overall → **+1**                                                         |
-| Bluff      | Claim ≠ your answer: **+1 per opponent** who predicted your claimed option and was wrong; cap 1 (2–4p), 2 (5–8p) |
-| Honest     | Claim = your answer and at least one opponent predicted it → **+1**                                              |
+| Rule        | Points                                                                                                                       |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Prediction  | Prediction ∈ Top → **+2 + wager**; otherwise **− wager**                                                                     |
+| Crowd (3+)  | Your answer is (one of) the most-picked overall → **+1**                                                                     |
+| Bluff       | Claim ≠ your answer: **+1 per opponent** who predicted your claimed option and was wrong; cap 1 (3–4p), 2 (5–8p); none in 2p |
+| Honest (3+) | Claim = your answer and at least one opponent predicted it → **+1**                                                          |
 
 - Wager > 0 pays only when the guess hit rate is above 50 % (EV = 2p + w(2p − 1)), so wagering is a confidence call, not a free bonus.
 - **Timeout default:** no answer (not counted in votes, no Crowd), no prediction (0), wager 0, no claim. A disconnected seat gets the same default after the reconnect window (R3).
@@ -44,11 +44,11 @@ Skill = reading friends + bluffing them. No right/wrong answers, so content is c
 
 ## 5. Variants (tuned in 15.4 — see `AumMon_Player_Count_Design.md`; ruleset "2" proposed)
 
-| Players | Differences                                                                                 |
-| ------- | ------------------------------------------------------------------------------------------- |
-| 2       | Prediction = guess the opponent's answer; no Crowd; Bluff cap 1                             |
-| 3–4     | Rules as §4                                                                                 |
-| 5–8     | Bluff cap 2; content may use group prompts ("ใครในห้องนี้…" excluded from MVP unless reviewed) |
+| Players | Differences                                                                                    |
+| ------- | ---------------------------------------------------------------------------------------------- |
+| 2       | Prediction = guess the opponent's answer; no Crowd; **no Bluff / Honest points** (ruleset "2") |
+| 3–4     | Rules as §4                                                                                    |
+| 5–8     | Bluff cap 2; content may use group prompts ("ใครในห้องนี้…" excluded from MVP unless reviewed)    |
 
 ## 6. Simulation (Monte Carlo, 20,000 matches per size, seeded; original script in PR #120, superseded by the 15.4 `scripts/bluff-sim.mjs`)
 
