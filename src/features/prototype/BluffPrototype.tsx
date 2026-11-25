@@ -28,7 +28,13 @@ const panel = "rounded-2xl border border-party-border bg-party-surface p-4";
 const primary =
   "w-full min-h-12 rounded-2xl bg-party-accent px-4 py-3 text-lg font-bold text-party-bg disabled:opacity-40";
 
-function Choice(props: { label: string; selected: boolean; onClick: () => void; tone: string }) {
+function Choice(props: {
+  label: string;
+  sub?: string | undefined;
+  selected: boolean;
+  onClick: () => void;
+  tone: string;
+}) {
   return (
     <button
       type="button"
@@ -39,6 +45,9 @@ function Choice(props: { label: string; selected: boolean; onClick: () => void; 
       }`}
     >
       {props.label}
+      {props.sub !== undefined && (
+        <span className="block text-sm font-normal text-party-muted">{props.sub}</span>
+      )}
     </button>
   );
 }
@@ -178,6 +187,7 @@ export function BluffPrototype() {
               <Choice
                 key={l}
                 label={`ฉันเลือก ${l}`}
+                sub={ITEM.options[k]}
                 selected={claim === k}
                 tone="border-party-pink"
                 onClick={() => {
@@ -189,7 +199,7 @@ export function BluffPrototype() {
           <ul className={`${panel} text-sm`} aria-label="คำประกาศ">
             {BOTS.filter((b) => b.claim !== null).map((b) => (
               <li key={b.name}>
-                {b.name}: ฉันเลือก {LETTERS[b.claim]}
+                {b.name}: ฉันเลือก {LETTERS[b.claim]} ({ITEM.options[b.claim]})
               </li>
             ))}
           </ul>

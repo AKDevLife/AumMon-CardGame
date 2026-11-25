@@ -5,6 +5,12 @@ import { BluffPrototype } from "./BluffPrototype.tsx";
 const click = (name: string | RegExp) => fireEvent.click(screen.getByRole("button", { name }));
 
 describe("BLUFF prototype", () => {
+  it("claim buttons show each option text so players do not forget it", () => {
+    render(<BluffPrototype />);
+    for (const name of ["สร้างห้อง", "เริ่มเกม", "ต่อไป"]) click(name);
+    expect(screen.getByRole("button", { name: /ฉันเลือก D/ })).toHaveTextContent("ไม่กิน นอนเลย");
+  });
+
   it("walks Home → Lobby → round → results", () => {
     render(<BluffPrototype />);
     fireEvent.change(screen.getByLabelText("ชื่อเล่น"), { target: { value: "ออม" } });
@@ -12,7 +18,7 @@ describe("BLUFF prototype", () => {
     expect(screen.getByText("K7QX")).toBeInTheDocument();
     click("เริ่มเกม");
     click("ต่อไป");
-    click("ฉันเลือก C");
+    click(/ฉันเลือก C/);
     click("ประกาศแล้ว ต่อไป");
     const lock = screen.getByRole("button", { name: "ล็อก" });
     expect(lock).toBeDisabled();
