@@ -229,7 +229,10 @@ describe.runIf(run)("admin RBAC via Edge Functions", () => {
       (await admin.call({ action: "game.set_enabled", gameId: "poker", enabled: false })).status,
     ).toBe(200);
     const listed = await player.client.from("games").select("id");
-    expect((listed.data ?? []).map((g: { id: string }) => g.id)).toEqual(["edo_battle"]);
+    expect((listed.data ?? []).map((g: { id: string }) => g.id).sort()).toEqual([
+      "bluff",
+      "edo_battle",
+    ]);
     expect(
       (await admin.call({ action: "game.set_enabled", gameId: "poker", enabled: true })).status,
     ).toBe(400);
