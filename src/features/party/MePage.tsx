@@ -53,7 +53,7 @@ export function MePage() {
     return (
       <p className="text-center">
         ยังไม่ได้เข้าเล่น —{" "}
-        <Link to="/" className="text-party-accent underline">
+        <Link to="/bluff" className="text-party-accent underline">
           ตั้งชื่อเล่นที่หน้าแรก
         </Link>
       </p>

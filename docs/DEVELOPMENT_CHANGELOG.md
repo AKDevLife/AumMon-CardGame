@@ -2,6 +2,10 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-27 — Platform hub at `/` (owner)
+
+- `/` = AumMon game hub: AumMon BLUFF (`/bluff`) and AumMon Object Battle Card (`/edo`, EDO Battle un-hidden, BR1 display name). BLUFF "home" links now go to `/bluff`. Tests updated.
+
 ## 2026-11-27 — BR1–BR2 approved (owner)
 
 - BR2: header and share texts say "AumMon BLUFF". BR1: "AumMon Object Battle Card" = EDO Battle's public name when it returns (internal id `edo_battle` unchanged).

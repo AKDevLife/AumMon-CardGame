@@ -59,7 +59,7 @@ describe("profile page", () => {
     renderProfile(client);
     expect(await screen.findByDisplayValue("Aum")).toBeInTheDocument();
     expect(from).toHaveBeenCalledWith("profiles");
-    expect(await screen.findByText(/EDO Battle: เล่น 3 · ชนะ 1/)).toBeInTheDocument();
+    expect(await screen.findByText(/AumMon Object Battle Card: เล่น 3 · ชนะ 1/)).toBeInTheDocument();
   });
 
   it("updates display_name only, scoped to own id", async () => {

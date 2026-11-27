@@ -41,7 +41,7 @@ test("sign up → profile → logout → login", async ({ page }) => {
 
   await page.getByLabel("รหัสผ่าน").fill("secret123");
   await page.getByRole("button", { name: "เข้าสู่ระบบ" }).click();
-  await expect(page.getByLabel("ชื่อเล่น")).toBeVisible(); // v2 party home
+  await expect(page.getByRole("navigation", { name: "AumMon Games" })).toBeVisible(); // platform hub
   await page.goto("/edo"); // EDO Battle is hidden in v2 but kept (Q1)
   await expect(page.getByRole("link", { name: "Solo vs Bot" })).toBeVisible();
 });

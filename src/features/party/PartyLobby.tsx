@@ -214,7 +214,7 @@ export function PartyLobby() {
         disabled={busy}
         onClick={() =>
           void act("rooms-leave", { roomId }, () => {
-            void navigate("/");
+            void navigate("/bluff");
           })
         }
       >

@@ -10,7 +10,7 @@ async function player(browser: Browser, name: string): Promise<Page> {
   await page.getByLabel("อีเมล").fill(`${name.toLowerCase()}${Date.now()}@test.local`);
   await page.getByLabel("รหัสผ่าน").fill("secret123");
   await page.getByRole("button", { name: "สร้างบัญชี" }).click();
-  await expect(page.getByLabel("ชื่อเล่น")).toBeVisible();
+  await expect(page.getByRole("navigation", { name: "AumMon Games" })).toBeVisible();
   await page.goto("/edo");
   await page.getByRole("link", { name: "Online" }).click();
   return page;
