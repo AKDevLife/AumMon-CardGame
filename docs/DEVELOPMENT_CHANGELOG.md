@@ -2,6 +2,10 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-27 — Master brand architecture recorded (owner)
+
+- `docs/v2/AumMon_Brand_Architecture.md` (v1.0 draft): AumMon = master brand + multi-game party platform; games AumMon BLUFF, AumMon Object Battle Card; IP actions for the owner; open BR1–BR2. Linked from the spec index.
+
 ## 2026-11-25 — 15.12 playtest prepared
 
 - Owner approved all 150 BLUFF items (applied on Dev, audited). Dev smoke: 3 guests start a match, read → claim advances on the server timer.
