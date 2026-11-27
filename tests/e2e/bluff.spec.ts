@@ -12,7 +12,7 @@ async function phone(browser: Browser): Promise<Page> {
 test("two guests: create → join by link → claim → lock → reveal", async ({ browser }) => {
   test.setTimeout(120_000);
   const a = await phone(browser);
-  await a.goto("/");
+  await a.goto("/bluff");
   await a.getByLabel("ชื่อเล่น").fill("ออม");
   await a.getByRole("button", { name: "สร้างห้อง" }).click();
   await expect(a).toHaveURL(/\/party\/lobby\//);

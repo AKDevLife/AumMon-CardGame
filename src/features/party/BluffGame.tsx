@@ -427,7 +427,7 @@ export function BluffGame() {
         <Link to={`/party/lobby/${data.roomId}`} className={secondary}>
           กลับห้อง (เล่นอีกรอบ)
         </Link>
-        <Link to="/" className={secondary}>
+        <Link to="/bluff" className={secondary}>
           หน้าหลัก
         </Link>
       </section>
@@ -449,7 +449,7 @@ export function BluffGame() {
           <button
             type="button"
             className={secondary}
-            onClick={() => void m.leave().then(() => navigate("/"))}
+            onClick={() => void m.leave().then(() => navigate("/bluff"))}
           >
             ยืนยันออกจากเกม
           </button>

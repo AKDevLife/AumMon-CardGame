@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { createMemoryRouter, RouterProvider } from "react-router";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { routes } from "../../app/routes.tsx";
@@ -53,9 +53,25 @@ const base = (view: Record<string, unknown>, extra: Partial<MatchResponse<unknow
 const renderAt = (path: string) =>
   render(<RouterProvider router={createMemoryRouter(routes, { initialEntries: [path] })} />);
 
+describe("platform hub", () => {
+  it("/ lets the player pick an AumMon game", () => {
+    renderAt("/");
+    const nav = screen.getByRole("navigation", { name: "AumMon Games" });
+    expect(within(nav).getByRole("link", { name: /AumMon BLUFF/ })).toHaveAttribute(
+      "href",
+      "/bluff",
+    );
+    expect(within(nav).getByRole("link", { name: /AumMon Object Battle Card/ })).toHaveAttribute(
+      "href",
+      "/edo",
+    );
+    expect(nav).toBeInTheDocument();
+  });
+});
+
 describe("party home", () => {
   it("asks for a nickname and offers create / join (disabled in preview)", () => {
-    renderAt("/");
+    renderAt("/bluff");
     expect(screen.getByLabelText("ชื่อเล่น")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "สร้างห้อง" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "เข้าห้องด้วยโค้ด" })).toBeDisabled();

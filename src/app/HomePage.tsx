@@ -45,7 +45,7 @@ export function HomePage() {
       <section aria-labelledby="edo-title" className="flex flex-col gap-4">
         <div className="text-center">
           <h2 id="edo-title" className="font-display text-3xl font-bold">
-            🧸 EDO Battle
+            🧸 AumMon Object Battle Card
           </h2>
           <p className="text-sm text-am-muted">เกมไพ่ทิ้งให้หมดมือ 2–8 คน · สิ่งของรอบตัวมีชีวิต</p>
         </div>

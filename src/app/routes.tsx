@@ -9,6 +9,7 @@ import { OnlinePage } from "../features/online/OnlinePage.tsx";
 import { SoloSetupPage } from "../features/solo/SoloSetupPage.tsx";
 import { GamePage } from "../features/game/GamePage.tsx";
 import { TutorialPage } from "../features/tutorial/TutorialPage.tsx";
+import { GameHub } from "../features/party/GameHub.tsx";
 import { BluffGame } from "../features/party/BluffGame.tsx";
 import { MePage } from "../features/party/MePage.tsx";
 import { PartyHome } from "../features/party/PartyHome.tsx";
@@ -23,7 +24,8 @@ export const routes: RouteObject[] = [
   {
     element: <PartyShell />,
     children: [
-      { index: true, element: <PartyHome /> },
+      { index: true, element: <GameHub /> },
+      { path: "bluff", element: <PartyHome /> },
       { path: "join/:code", element: <PartyJoin /> },
       { path: "party/lobby/:roomId", element: <PartyLobby /> },
       { path: "party/game/:matchId", element: <BluffGame /> },
@@ -33,7 +35,7 @@ export const routes: RouteObject[] = [
   {
     element: <AppLayout />,
     children: [
-      // EDO Battle is hidden in v2 (Q1: deferred, kept): reachable only by URL.
+      // AumMon Object Battle Card (EDO Battle, BR1) home; listed on the platform hub.
       { path: "edo", element: <HomePage /> },
       { path: "login", element: <LoginPage /> },
       { path: "register", element: <RegisterPage /> },

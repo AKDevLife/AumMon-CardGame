@@ -22,7 +22,7 @@ export interface ClientGame {
 export const GAMES: readonly ClientGame[] = [
   {
     id: "edo_battle",
-    name: "EDO Battle",
+    name: "AumMon Object Battle Card",
     tagline: "เกมไพ่ทิ้งให้หมดมือ 2–8 คน · สิ่งของรอบตัวมีชีวิต",
     icon: "🧸",
     minPlayers: 2,
@@ -39,8 +39,8 @@ export const GAMES: readonly ClientGame[] = [
     minPlayers: 2,
     maxPlayers: 8,
     // BLUFF has no bots (Q7): "solo" leads to the party home.
-    soloPath: "/",
-    onlinePath: "/",
+    soloPath: "/bluff",
+    onlinePath: "/bluff",
     matchPath: (id) => `/party/game/${id}`,
   },
 ];
