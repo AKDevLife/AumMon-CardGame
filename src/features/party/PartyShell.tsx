@@ -21,7 +21,7 @@ export function PartyShell() {
       )}
       <header className="mx-auto flex w-full max-w-md items-center justify-between px-4 py-4">
         <Link to="/" className="text-2xl font-bold text-party-accent">
-          BLUFF
+          AumMon <span className="text-party-text">BLUFF</span>
         </Link>
         {/* Settings top right as before (owner 2026-11-25): tap sound, music, home, profile, sign out. */}
         <div className="text-am-text">

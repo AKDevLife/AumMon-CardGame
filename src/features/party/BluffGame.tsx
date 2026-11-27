@@ -126,11 +126,11 @@ export function BluffGame() {
       (i) =>
         `${String(v.placements?.[i] ?? "")}. ${names[i] ?? ""} ${String(v.scores[i] ?? 0)} แต้ม`,
     );
-    const text = `BLUFF 🎭\n${lines.join("\n")}\nSay Less. Bluff More.`;
+    const text = `AumMon BLUFF 🎭\n${lines.join("\n")}\nSay Less. Bluff More.`;
     const url = window.location.origin;
     try {
       if (typeof navigator.share === "function")
-        await navigator.share({ title: "BLUFF", text, url });
+        await navigator.share({ title: "AumMon BLUFF", text, url });
       else {
         await navigator.clipboard.writeText(`${text}\n${url}`);
         setShared(true);
