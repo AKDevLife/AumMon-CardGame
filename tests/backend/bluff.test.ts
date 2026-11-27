@@ -106,9 +106,9 @@ describe.runIf(run)("BLUFF with guests via Edge Functions", () => {
 
   it("guests cannot use admin; BLUFF solo with bots starts", async () => {
     expect((await a.call("admin-api", { action: "me" })).body["error"]).toBe("account_required");
-    expect(
-      (await a.call("game-create", { mode: "solo", bots: 2, gameId: "bluff" })).body["error"],
-    ).toBe("no_bots");
+    const solo = await a.call("game-create", { mode: "solo", bots: 2, gameId: "bluff" });
+    expect(solo.status, JSON.stringify(solo.body)).toBe(200);
+    await a.call("game-leave", { matchId: solo.body["matchId"] });
   });
 
   it("validates room settings", async () => {
@@ -127,7 +127,7 @@ describe.runIf(run)("BLUFF with guests via Edge Functions", () => {
       const created = await a.call("rooms-create", {
         mode: "online",
         gameId: "bluff",
-        maxPlayers: 8,
+        maxPlayers: 3,
         settings: { humor: 2, slow: false, group: false },
       });
       expect(created.status).toBe(200);
