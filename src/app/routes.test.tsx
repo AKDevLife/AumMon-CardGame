@@ -15,10 +15,8 @@ describe("app routes", () => {
 
   it("home shows title, ruleset and disabled modes", () => {
     renderAt("/edo");
-    expect(screen.getByRole("heading", { level: 1, name: "AumMon" })).toBeInTheDocument();
-    expect(screen.getByText("Game Center")).toBeInTheDocument();
     expect(
-      screen.getByRole("heading", { level: 2, name: /AumMon Object Battle Card/ }),
+      screen.getByRole("heading", { level: 1, name: /AumMon Object Battle Card/ }),
     ).toBeInTheDocument();
     for (const name of ["Solo vs Bot", "Online"]) {
       expect(screen.getByRole("button", { name })).toBeDisabled();

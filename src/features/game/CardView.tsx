@@ -72,7 +72,7 @@ export function CardView({
       disabled={!onSelect}
       aria-pressed={onSelect ? selected : undefined}
       onClick={onSelect}
-      className={`am-sticker relative flex shrink-0 flex-col overflow-hidden !rounded-2xl bg-am-card text-left text-am-text transition-[transform,filter,opacity] duration-150 ease-out disabled:cursor-default ${s.box} ${ring} ${dimmed ? "opacity-70 saturate-50" : ""} ${className}`}
+      className={`am-sticker relative flex shrink-0 flex-col overflow-hidden !rounded-2xl bg-am-cardface text-left text-am-cardink transition-[transform,filter,opacity] duration-150 ease-out disabled:cursor-default ${s.box} ${ring} ${dimmed ? "opacity-70 saturate-50" : ""} ${className}`}
     >
       <span
         className={`relative grid place-items-center bg-am-deco-purple ${small ? "h-[52%]" : size === "lg" ? "h-28 [@media(max-height:700px)]:h-20" : "h-[36%]"}`}
