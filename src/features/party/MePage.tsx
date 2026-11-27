@@ -6,7 +6,7 @@ import { alertBox, field, panel, primary, secondary } from "./ui.ts";
 
 /**
  * Profile (R6): nickname; guests can save the account with e-mail + password and keep the same
- * user id (docs/v2/AumMon_Account_Linking.md). Linking is blocked during an active match (L2).
+ * user id (docs/platform/PLATFORM_SPEC.md). Linking is blocked during an active match (L2).
  */
 export function MePage() {
   const auth = useAuth();

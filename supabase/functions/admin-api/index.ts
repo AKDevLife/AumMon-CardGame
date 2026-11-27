@@ -382,7 +382,7 @@ const actions: Record<string, Action> = {
     db: (await db()`select version() as version, now() as now`)[0],
   }),
 
-  /** Content review (docs/v2/AumMon_Content_Management.md §3). Owner = reviewer in MVP. */
+  /** Content review (docs/games/bluff/SPEC.md §3). Owner = reviewer in MVP. */
   content: async (_a, body) => {
     const status = typeof body["status"] === "string" ? body["status"] : null;
     const category = typeof body["category"] === "string" ? body["category"] : null;

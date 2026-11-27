@@ -1,5 +1,5 @@
 /**
- * Game content (docs/v2/AumMon_Content_Management.md): only `approved` items reach matches;
+ * Game content (docs/games/bluff/SPEC.md): only `approved` items reach matches;
  * the server picks them (the engine never reads the database) and clients never browse the pool.
  */
 import { HttpError } from "./http.ts";

@@ -1,5 +1,5 @@
 /**
- * Platform match orchestrator (Game Center, docs/architecture/MASTER_ARCHITECTURE.md §5–6):
+ * Platform match orchestrator (Game Center, docs/platform/PLATFORM_SPEC.md §5–6):
  * create/start, lock → advance (bots, timers) → command → advance → save, and per-seat views.
  * The game module is always chosen from matches.game_id (never from client input).
  * Clients send intent only; hidden information stays in private.match_runtime.

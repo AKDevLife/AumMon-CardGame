@@ -1,4 +1,4 @@
-/** Shared class names of the v2 dark party theme (docs/v2/AumMon_UI_UX_Guidelines.md §2). */
+/** Shared class names of the v2 dark party theme (docs/platform/PLATFORM_SPEC.md §2). */
 export const panel = "rounded-2xl border border-party-border bg-party-surface p-4";
 export const primary =
   "flex min-h-12 w-full items-center justify-center rounded-2xl bg-party-accent px-4 py-3 text-lg font-bold text-party-bg disabled:opacity-40";

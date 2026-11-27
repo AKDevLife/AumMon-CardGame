@@ -6,7 +6,7 @@ import { CardView } from "../game/CardView.tsx";
 import { playSound } from "../game/sound.ts";
 
 /**
- * Interactive tutorial (docs/discard/AumMon_Tutorial_Design.md): 7 scripted situations run on the
+ * Interactive tutorial (docs/games/object-battle/SPEC.md): 7 scripted situations run on the
  * real engine locally (nothing is sent to the server, nothing is saved).
  */
 type State = discard.GameState;

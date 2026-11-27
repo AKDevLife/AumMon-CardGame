@@ -1,6 +1,6 @@
 /**
  * v2 BLUFF + guests: real Edge Functions + local Supabase (skipped without a local stack).
- * docs/v2/AumMon_Test_Strategy.md — guest → room → join by code → round with concurrent locks.
+ * docs/platform/PLATFORM_SPEC.md — guest → room → join by code → round with concurrent locks.
  */
 import { createClient } from "@supabase/supabase-js";
 import { randomUUID } from "node:crypto";

@@ -1,5 +1,5 @@
 /**
- * Game Center isolation (docs/architecture/MASTER_ARCHITECTURE.md §2–3):
+ * Game Center isolation (docs/platform/PLATFORM_SPEC.md §2–3):
  * each game folder in packages/game-engine/src imports only itself, the shared sdk / rng / version,
  * and (EDO Battle adapter only) its rules engine `discard`. No game imports another game.
  */

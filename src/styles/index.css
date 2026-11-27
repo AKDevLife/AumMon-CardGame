@@ -2,7 +2,7 @@
 
 /*
  * AumMon Color Design System — Theme A "Playful Cartoon / Candy Fantasy", Balanced.
- * Single source of truth: docs/color_design_system.md. Components use only these tokens
+ * Single source of truth for colours (one dark AumMon theme, docs/platform/PLATFORM_SPEC.md §10). Components use only these tokens
  * (Tailwind classes `bg-am-*`, `text-am-*`, `border-am-*`). Change colors here only.
  */
 :root {
@@ -211,7 +211,7 @@
   }
 }
 
-/* Gameplay (docs/color_design_system.md §4–§5). Short, transform/opacity-only animations. */
+/* Gameplay (docs/platform/PLATFORM_SPEC.md §10). Short, transform/opacity-only animations. */
 :root {
   --am-card-w: 6.75rem;
   --am-card-h: 9.25rem;
@@ -356,7 +356,7 @@
   }
 }
 
-/* v2 dark party theme (docs/v2/AumMon_UI_UX_Guidelines.md §2) */
+/* v2 dark party theme (docs/platform/PLATFORM_SPEC.md §10) */
 :root {
   --party-bg: #140b26;
   --party-surface: #22143f;

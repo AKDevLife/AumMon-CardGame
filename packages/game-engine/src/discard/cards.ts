@@ -1,5 +1,5 @@
 /**
- * Casual Discard Edition — card data (docs/discard/AumMon_Card_Library.md).
+ * Casual Discard Edition — card data (docs/games/object-battle/SPEC.md).
  * Data-driven: the engine resolves abilities by `ability` id, so new cards reuse effects.
  */
 export type AbilityId =

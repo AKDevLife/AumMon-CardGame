@@ -1,18 +1,17 @@
 # AumMon
 
-เกมไพ่ทิ้งให้หมดมือ 2–8 คน ธีมสิ่งของในชีวิตประจำวัน (Casual Discard Edition) — Solo vs Bot และ Online
-Server-authoritative · `ruleset_version = "13"` (Quick Match) · engine 7.0.0
+AumMon Party Game Platform — เกม AumMon BLUFF (ปาร์ตี้ทายใจ 2–8 คน) และ AumMon Object Battle Card (เกมไพ่ 2–8 คน)
+Server-authoritative · guest-first · ธีมเดียวทั้งเว็บ
 
 ## เอกสารหลัก
 
-| เอกสาร                                                             | ขอบเขต                                                                 |
-| ------------------------------------------------------------------ | ---------------------------------------------------------------------- |
-| [`aummon_game_spec.md`](./aummon_game_spec.md)                     | ภาพรวมผลิตภัณฑ์ + ดัชนีกติกา                                                 |
-| [`docs/discard/`](./docs/discard/)                                 | กติกา (Core Rules), การ์ด (Card Library), Balance, Rule Clarification    |
-| [`aummon_project_blueprint.md`](./aummon_project_blueprint.md)     | Architecture, Database, Security, Stack                                |
-| [`docs/art-production/`](./docs/art-production/)                   | AI Art Production Pipeline (style, characters, prompts, asset tracker) |
-| [`docs/AumMon_Master_Handoff.md`](./docs/AumMon_Master_Handoff.md) | สถานะรวมของโปรเจกต์                                                     |
-| [`docs/DEVELOPMENT_ROADMAP.md`](./docs/DEVELOPMENT_ROADMAP.md)     | Roadmap และสถานะงาน                                                    |
+| ขอบเขต                    | Spec                                                                     | Roadmap                                                                        |
+| ------------------------- | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------ |
+| Platform (ฟังก์ชันกลาง)      | [`docs/platform/PLATFORM_SPEC.md`](./docs/platform/PLATFORM_SPEC.md)     | [`docs/platform/ROADMAP.md`](./docs/platform/ROADMAP.md)                       |
+| AumMon BLUFF              | [`docs/games/bluff/SPEC.md`](./docs/games/bluff/SPEC.md)                 | [`docs/games/bluff/ROADMAP.md`](./docs/games/bluff/ROADMAP.md)                 |
+| AumMon Object Battle Card | [`docs/games/object-battle/SPEC.md`](./docs/games/object-battle/SPEC.md) | [`docs/games/object-battle/ROADMAP.md`](./docs/games/object-battle/ROADMAP.md) |
+
+สถานะรวม: [`docs/DEVELOPMENT_PROGRESS.md`](./docs/DEVELOPMENT_PROGRESS.md) · ประวัติ: [`docs/DEVELOPMENT_CHANGELOG.md`](./docs/DEVELOPMENT_CHANGELOG.md)
 
 ## Tech stack
 
@@ -66,7 +65,7 @@ Supabase local (ต้องมี Docker): `pnpm exec supabase start`
 
 ## Roadmap
 
-ดู `docs/DEVELOPMENT_ROADMAP.md` (Phase 12 = Casual Discard Edition)
+ดูตารางเอกสารหลักด้านบน (`pnpm progress` = % รวมทุก roadmap)
 
 ## Supabase Dev project (`AumMon-Dev`)
 

@@ -2,7 +2,7 @@ import type { ButtonHTMLAttributes, MouseEvent } from "react";
 import { Spinner } from "./Spinner.tsx";
 import { useClickBusy } from "./useClickBusy.ts";
 
-/** Button roles from docs/color_design_system.md §Buttons. `default` = neutral surface. */
+/** Button roles from docs/platform/PLATFORM_SPEC.md §Buttons. `default` = neutral surface. */
 type Variant = "default" | "primary" | "secondary" | "confirm" | "info" | "danger";
 
 const VARIANT_CLASSES: Record<Variant, string> = {
