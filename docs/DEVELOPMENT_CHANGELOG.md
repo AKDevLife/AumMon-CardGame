@@ -2,6 +2,13 @@
 
 Newest first. Significant changes only. About 15 entries; older ones are in git history (token-efficiency.md).
 
+## 2026-11-27 — 15.13 BLUFF UX iteration (part 1, no human data)
+
+- Result screen: equal scores show the tie-break (`หลอก+จริงใจ` points + note); engine view adds public `reads` (no rule / ruleset change). UI tolerates the old view until `game-view` is redeployed.
+- `useMatch`: one failed poll (e.g. the 504 seen in the 8-player run) no longer flashes an error; shown after 2 in a row. Test `src/platform/useMatch.test.ts`.
+- `scripts/bluff-playtest-report.sql`: per player count (claim / lie / AFK / hit %, points by source) + per item vote spread verdict.
+- Remaining: balance, timers and item rewrites wait for human ratings; 2-player prediction hit 48 % to re-check.
+
 ## 2026-11-27 — 15.12 automated playtest / 15.13 blocked
 
 - Playwright bots (360×740) played full matches on the playtest URL: 2 p (2.4 min), 4 p (3.5 min), 8 p slow ×1.5 + group (5.0 min). No page errors, no horizontal overflow, tab close/rejoin and AFK rounds recover.

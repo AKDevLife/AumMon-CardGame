@@ -246,6 +246,8 @@ Each session = one full match (5 rounds, ~7–10 min) + one rematch ("กลั�
 
 ### 4. What Claude reads afterwards (Dev data, no personal data)
 
+Query: `scripts/bluff-playtest-report.sql` (per player count + per item vote spread; items need ≥ 10 votes before a rewrite).
+
 - Per match: players, rounds finished, timeouts per phase (AFK), claim usage %, lock time vs deadline.
 - Per item: vote spread (dominant option > 60 % or a 0 % option → rewrite), reports.
 - Win rate of players who never claimed (balance check from 15.4).

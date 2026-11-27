@@ -397,6 +397,11 @@ export function BluffGame() {
     const order = v.players
       .map((_, i) => i)
       .sort((a, b) => (v.placements?.[a] ?? 9) - (v.placements?.[b] ?? 9));
+    // Equal scores: show the tie-break (SPEC §1 final tie-break) so a lower place is explained.
+    const tiedScore = (i: number) => v.scores.some((s, j) => j !== i && s === v.scores[i]);
+    const anyTie = v.players.some((_, i) => tiedScore(i));
+    // `reads` is absent until the game-view function is redeployed with the new engine view.
+    const reads: readonly (number | undefined)[] = (v as { reads?: readonly number[] }).reads ?? [];
     body = (
       <section className="flex flex-col gap-3">
         <h1 className="text-center text-2xl font-bold">ผลการแข่งขัน</h1>
@@ -414,13 +419,21 @@ export function BluffGame() {
                         ? "🥉"
                         : `${String(place)}.`}{" "}
                   {names[i]}{" "}
-                  <span className="text-sm text-party-muted">อ่านใจถูก {v.hits[i]} ครั้ง</span>
+                  <span className="text-sm text-party-muted">
+                    อ่านใจถูก {v.hits[i]} ครั้ง
+                    {tiedScore(i) && ` · หลอก+จริงใจ ${String(reads[i] ?? 0)}`}
+                  </span>
                 </span>
                 <b className="tabular-nums text-party-accent">{v.scores[i]}</b>
               </li>
             );
           })}
         </ol>
+        {anyTie && (
+          <p className="text-center text-xs text-party-muted">
+            คะแนนเท่ากัน: ตัดสินด้วยจำนวนครั้งที่อ่านใจถูก แล้วคะแนนหลอก+จริงใจ
+          </p>
+        )}
         <button type="button" className={primary} onClick={() => void shareResult()}>
           {shared ? "คัดลอกผลแล้ว ✓" : "แชร์ผล"}
         </button>

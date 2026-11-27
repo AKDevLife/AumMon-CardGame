@@ -101,6 +101,8 @@ export interface BluffView {
   readonly myLock: Lock | null;
   readonly scores: readonly number[];
   readonly hits: readonly number[];
+  /** Bluff + Honest points per seat (public: every round's points are revealed); final tie-break. */
+  readonly reads: readonly number[];
   /** Last scored round, shown from Reveal on (answers, predictions, wagers, points). */
   readonly reveal: RoundRecord | null;
   readonly placements: readonly number[] | null;
@@ -340,6 +342,7 @@ export const bluff: GameModule<BluffState, BluffCommand, BluffView, BluffEvent> 
       myLock: own,
       scores: s.scores,
       hits: s.hits,
+      reads: s.reads,
       reveal: showReveal ? (s.history[s.history.length - 1] ?? null) : null,
       placements: s.phase === "finished" ? placements(s.scores, s.hits, s.reads) : null,
     };

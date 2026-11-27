@@ -6,7 +6,7 @@
 
 - **Platform:** AumMon party game platform, one dark theme + shell (16.1); docs merged (16.2).
 - **Games:** AumMon BLUFF (flagship, ruleset "2", bots fill seats) · AumMon Object Battle Card (`edo_battle`, ruleset "13").
-- **Current task:** BLUFF 15.12 closed playtest — automated 2 / 4 / 8 bot run passed (no errors, no overflow, reconnect + AFK OK); 15.13 blocked until human ratings + more match data.
+- **Current task:** BLUFF 15.12 closed playtest — automated 2 / 4 / 8 bot run passed (no errors, no overflow, reconnect + AFK OK); 15.13 in progress: UX fixes done without human data; balance waits for human ratings + more match data.
 - **Playtest URL (`main`):** https://aum-mon-card-game-git-playtest-aum-mon.vercel.app
 - **Dev backend:** Supabase `AumMon-Dev` (ref `yaxtzdhryctfjaspxvix`). `AumMon-Production` exists but is untouched (owner approval required).
 

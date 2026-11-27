@@ -26,6 +26,8 @@ export interface MatchResponse<V> {
 }
 
 const POLL_MS = 2000;
+/** Consecutive failed polls before the error is shown (one 504 / blip is retried silently). */
+export const POLL_ERRORS_SHOWN_AFTER = 2;
 
 /**
  * Platform match hook for Game Center games: polls game-view (which also advances bots and
@@ -41,6 +43,7 @@ export function useMatch<V>(matchId: string) {
   const [offset, setOffset] = useState(0);
   const [now, setNow] = useState(() => Date.now());
   const idem = useRef<{ key: string; body: string } | null>(null);
+  const failedPolls = useRef(0);
 
   const refresh = useCallback(async () => {
     if (!client) return;
@@ -49,8 +52,11 @@ export function useMatch<V>(matchId: string) {
       setOffset(next.serverNow - Date.now());
       setData(next);
       setError(null);
+      failedPolls.current = 0;
     } catch (e) {
-      setError(e instanceof ApiError ? e.message : "โหลดเกมไม่สำเร็จ");
+      failedPolls.current += 1;
+      if (failedPolls.current >= POLL_ERRORS_SHOWN_AFTER)
+        setError(e instanceof ApiError ? e.message : "โหลดเกมไม่สำเร็จ");
     }
   }, [client, matchId]);
 
