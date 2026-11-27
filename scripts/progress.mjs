@@ -1,27 +1,32 @@
 #!/usr/bin/env node
 /**
- * Computes roadmap progress from docs/DEVELOPMENT_ROADMAP.md checkboxes.
+ * Roadmap progress from checkboxes in the platform + per-game roadmaps.
  * Counts top-level tasks only (`- [ ] **P.N** ...`); indented subtasks are ignored.
  * Usage: pnpm progress
  */
 import { readFileSync } from "node:fs";
 
-const text = readFileSync("docs/DEVELOPMENT_ROADMAP.md", "utf8");
+const FILES = [
+  ["Platform", "docs/platform/ROADMAP.md"],
+  ["BLUFF", "docs/games/bluff/ROADMAP.md"],
+  ["Object Battle", "docs/games/object-battle/ROADMAP.md"],
+];
 const phases = [];
-let current;
-
-for (const line of text.split("\n")) {
-  const heading = /^## (Phase \d+)\b(.*)$/.exec(line);
-  if (heading) {
-    current = { name: heading[1], title: heading[2].replace(/^\s*[—-]\s*/, ""), tasks: [] };
-    phases.push(current);
-    continue;
-  }
-  const task = /^- \[( |x|~|!)\] \*\*(\d+\.\d+)\*\*\s*(.*)$/.exec(line);
-  if (task && current) {
-    const rest = task[3];
-    const status = { x: "done", "!": "blocked", "~": "in-progress" }[task[1]] ?? "todo";
-    current.tasks.push({ id: task[2], title: rest.split(" — ")[0], status });
+for (const [label, file] of FILES) {
+  let current;
+  for (const line of readFileSync(file, "utf8").split("\n")) {
+    const heading = /^## (Phase \d+)\b(.*)$/.exec(line);
+    if (heading) {
+      const title = heading[2].replace(/^\s*[—-]\s*/, "");
+      current = { name: `${label} · ${heading[1]}`, title, tasks: [] };
+      phases.push(current);
+      continue;
+    }
+    const task = /^- \[( |x|~|!)\] \*\*(\d+\.\d+)\*\*\s*(.*)$/.exec(line);
+    if (task && current) {
+      const status = { x: "done", "!": "blocked", "~": "in-progress" }[task[1]] ?? "todo";
+      current.tasks.push({ id: task[2], title: task[3].split(" — ")[0], status });
+    }
   }
 }
 

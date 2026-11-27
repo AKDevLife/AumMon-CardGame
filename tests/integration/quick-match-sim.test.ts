@@ -1,7 +1,7 @@
 /**
  * Quick Match simulation on the real engine (ruleset "8": 5 / 4 cards, Draw Then Play, Alarm
  * next-only). The task 12.11 comparison with ruleset 7 (configs A–E, X1–X3) was run on the
- * ruleset 7 engine at commit 07ebd61 — see docs/discard/AumMon_Game_Simulation_Report.md.
+ * ruleset 7 engine at commit 07ebd61 — see docs/games/object-battle/SPEC.md.
  * Harness-only variants (for tuning): starting hand size, Draw Then Play off (drawn card kept),
  * timers. Human time is a MODEL (`lognormal` medians per profile), not measured play.
  *

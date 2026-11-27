@@ -1,6 +1,6 @@
 # @aummon/game-engine
 
-Pure TypeScript engine for AumMon Casual Discard Edition (`ruleset_version = "7"`, `aummon_game_spec.md`).
+Pure TypeScript engine for AumMon Casual Discard Edition (`ruleset_version = "7"`, `docs/platform/PLATFORM_SPEC.md`).
 
 ## Isolation rules (enforced)
 

@@ -1,7 +1,7 @@
 import type { RandomSource } from "../rng/seeded-random.ts";
 
 /**
- * Game Module Interface (docs/architecture/MASTER_ARCHITECTURE.md §4).
+ * Game Module Interface (docs/platform/PLATFORM_SPEC.md §4).
  * Each game owns its rules and authoritative state; the platform only orchestrates
  * (seats, timers, bots, persistence). Implementations must stay pure and deterministic.
  */

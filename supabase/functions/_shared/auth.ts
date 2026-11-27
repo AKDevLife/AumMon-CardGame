@@ -3,7 +3,7 @@ import { HttpError } from "./http.ts";
 
 export interface Caller {
   id: string;
-  /** Supabase anonymous user (guest, docs/v2/AumMon_Guest_First_Architecture.md). */
+  /** Supabase anonymous user (guest, docs/platform/PLATFORM_SPEC.md). */
   isGuest: boolean;
 }
 

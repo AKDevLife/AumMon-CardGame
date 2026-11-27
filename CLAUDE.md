@@ -21,7 +21,7 @@ Detailed rules live in `.claude/rules/` (auto-loaded). Each rule is stated once,
 
 **Approval required:**
 
-- Changing locked game rules in `aummon_game_spec.md` (see aummon-domain.md)
+- Changing locked game rules in `docs/games/<game>/SPEC.md` or platform decisions in `docs/platform/PLATFORM_SPEC.md` (see aummon-domain.md)
 - Changing the approved core architecture or technology stack
 - Deleting important historical data or backups
 - Destructive database operations

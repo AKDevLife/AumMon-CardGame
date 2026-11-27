@@ -2,7 +2,7 @@ import type { RandomSource } from "../rng/seeded-random.ts";
 import { DISCARD_CARDS, DISCARD_RULES, getDiscardCard, type AbilityId } from "./cards.ts";
 
 /**
- * Casual Discard Edition engine (docs/discard/AumMon_Core_Rules.md). Pure and deterministic:
+ * Casual Discard Edition engine (docs/games/object-battle/SPEC.md). Pure and deterministic:
  * every command returns a new state + events; randomness comes from the injected RandomSource.
  */
 export type Seat = number;

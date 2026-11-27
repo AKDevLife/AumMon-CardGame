@@ -1,6 +1,6 @@
 /**
- * BLUFF round scoring, ruleset "2" (docs/v2/AumMon_Flagship_Game_Bluff.md §4 +
- * docs/v2/AumMon_Player_Count_Design.md §3). Pure; null = no answer / prediction (timeout).
+ * BLUFF round scoring, ruleset "2" (docs/games/bluff/SPEC.md §4 +
+ * docs/games/bluff/SPEC.md §3). Pure; null = no answer / prediction (timeout).
  */
 export type Option = 0 | 1 | 2 | 3;
 export const OPTIONS: readonly Option[] = [0, 1, 2, 3];

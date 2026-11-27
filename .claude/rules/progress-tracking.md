@@ -2,7 +2,7 @@
 
 Files (keep them matching the real repository state):
 
-- `docs/DEVELOPMENT_ROADMAP.md` — Phases 1–7, tasks with IDs, dependencies, acceptance criteria.
+- Roadmaps (tasks with IDs, dependencies, acceptance criteria): `docs/platform/ROADMAP.md` (shared website / functions), `docs/games/bluff/ROADMAP.md`, `docs/games/object-battle/ROADMAP.md`. A task lives in exactly one roadmap.
 - `docs/DEVELOPMENT_PROGRESS.md` — current phase/task, percentages, task status, latest verification.
 - `docs/DEVELOPMENT_CHANGELOG.md` — newest first: date, task, key files, tests, decisions, remaining issues.
 

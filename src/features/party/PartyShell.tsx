@@ -6,7 +6,7 @@ import { SettingsButton } from "../auth/AccountNav.tsx";
 import { installMusic } from "../game/music.ts";
 import { installAudioUnlock, installTapSounds } from "../game/sound.ts";
 
-/** v2 party frame: dark theme, BLUFF header, profile link (docs/v2/AumMon_UI_UX_Guidelines.md). */
+/** v2 party frame: dark theme, BLUFF header, profile link (docs/platform/PLATFORM_SPEC.md). */
 export function PartyShell() {
   const auth = useAuth();
   useEffect(() => installAudioUnlock(), []);

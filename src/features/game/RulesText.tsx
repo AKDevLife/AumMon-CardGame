@@ -1,4 +1,4 @@
-/** Rules in plain Thai (docs/discard/AumMon_Core_Rules.md). */
+/** Rules in plain Thai (docs/games/object-battle/SPEC.md). */
 export function RulesText() {
   return (
     <div className="flex flex-col gap-2 text-sm">
