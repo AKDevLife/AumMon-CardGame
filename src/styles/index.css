@@ -2,13 +2,13 @@
 
 /*
  * AumMon Color Design System — Theme A "Playful Cartoon / Candy Fantasy", Balanced.
- * Single source of truth: docs/color_design_system.md. Components use only these tokens
+ * Single source of truth for colours (one dark AumMon theme, docs/platform/PLATFORM_SPEC.md §10). Components use only these tokens
  * (Tailwind classes `bg-am-*`, `text-am-*`, `border-am-*`). Change colors here only.
  */
 :root {
   /* Palette (approved HEX) */
-  --color-brand-primary: #30205b;
-  --color-brand-deep: #24143f;
+  --color-brand-primary: #2e1c55;
+  --color-brand-deep: #140b26;
   --color-brand-accent: #ffc83d;
   --color-purple: #8064c8;
   --color-pink: #ff4f9a;
@@ -16,39 +16,46 @@
   --color-green: #65d69a;
   --color-orange: #ff914d;
   --color-red: #ed4966;
-  --color-soft-purple: #e9dfff;
-  --color-lavender: #d8c6fa;
-  --color-cream: #fffbeb;
+  --color-soft-purple: #22143f;
+  --color-lavender: #2e1c55;
+  --color-cream: #22143f;
 
   /* Background & surfaces */
-  --color-bg-main: #f6f0ff;
+  --color-bg-main: #140b26;
   --color-bg-secondary: var(--color-soft-purple);
   --color-bg-soft: var(--color-lavender);
   --color-surface: var(--color-cream);
 
   /* Text */
-  --color-text-primary: #30205b;
-  --color-text-secondary: #75658f;
-  --color-text-muted: #8b809a;
+  --color-text-primary: #f6f0ff;
+  --color-text-secondary: #b9a9dd;
+  --color-text-muted: #9a8cc0;
   --color-text-inverse: #fffbeb;
-  --color-text-accent: #5b2fb8;
-  --color-text-danger: #b9284a;
-  --color-text-success: #164e35;
-  --color-text-info: #173c55;
+  --color-text-accent: #ffc83d;
+  --color-text-danger: #ff6b85;
+  --color-text-success: #65d69a;
+  --color-text-info: #55c9f4;
 
   /* Battlefield */
   --color-battlefield-bg: var(--color-soft-purple);
-  --color-player-area: #ddf5ff;
-  --color-opponent-area: #ffe0ef;
+  --color-player-area: #1b2a4d;
+  --color-opponent-area: #3a1838;
   --color-slot: var(--color-bg-main);
   --color-slot-empty: var(--color-soft-purple);
   --color-selection: var(--color-brand-accent);
   --color-target-valid: var(--color-green);
   --color-target-invalid: var(--color-red);
-  --color-exhausted: #75658f;
+  --color-exhausted: #6d6290;
+
+  /* Card faces stay light on the dark theme (owner 2026-11-27) */
+  --color-card-face: #fffbeb;
+  --color-card-ink: #30205b;
+  --color-card-ink-muted: #5e4e7a;
+  /* Text on bright fills (yellow / green / blue / pink buttons) */
+  --color-on-bright: #140b26;
 
   /* Card frame */
-  --color-card-title-bg: var(--color-soft-purple);
+  --color-card-title-bg: #e9dfff;
   --color-card-stat-bg: #fff0c2;
   --color-atk: var(--color-orange);
   --color-hp: var(--color-pink);
@@ -69,16 +76,16 @@
   --color-draw: var(--color-purple);
 
   /* Feedback */
-  --color-heal-soft: #ddf8e9;
-  --color-error-bg: #ffe0ef;
+  --color-heal-soft: #15382a;
+  --color-error-bg: #3a1630;
 
   /* Interaction */
   --color-hover: #ffe36e;
-  --color-disabled: #ddd6e8;
+  --color-disabled: #3a3150;
   --color-focus: var(--color-text-accent);
 
   /* Identity (unchanged): border + sticker shadow */
-  --border-color: #2a1650;
+  --border-color: #4a3480;
   --border-width: 3px;
   --sticker-shadow: 0 5px 0 var(--border-color);
   --pressed-shadow: 0 2px 0 var(--border-color);
@@ -116,6 +123,10 @@
   --color-party-green: var(--party-green);
   --color-party-red: var(--party-red);
   --color-am-bg: var(--am-bg);
+  --color-am-cardface: var(--color-card-face);
+  --color-am-cardink: var(--color-card-ink);
+  --color-am-cardmuted: var(--color-card-ink-muted);
+  --color-am-onbright: var(--color-on-bright);
   --color-am-deco-purple: var(--am-deco-purple);
   --color-am-deco-green: var(--am-deco-green);
   --color-am-deco-yellow: var(--am-deco-yellow);
@@ -200,7 +211,7 @@
   }
 }
 
-/* Gameplay (docs/color_design_system.md §4–§5). Short, transform/opacity-only animations. */
+/* Gameplay (docs/platform/PLATFORM_SPEC.md §10). Short, transform/opacity-only animations. */
 :root {
   --am-card-w: 6.75rem;
   --am-card-h: 9.25rem;
@@ -345,8 +356,8 @@
   }
 }
 
-/* v2 dark party theme (docs/v2/AumMon_UI_UX_Guidelines.md §2) */
-.theme-party {
+/* v2 dark party theme (docs/platform/PLATFORM_SPEC.md §10) */
+:root {
   --party-bg: #140b26;
   --party-surface: #22143f;
   --party-surface-raised: #2e1c55;
@@ -358,7 +369,42 @@
   --party-blue: #55c9f4;
   --party-green: #65d69a;
   --party-red: #ff6b85;
-  background: var(--party-bg);
-  color: var(--party-text);
-  min-height: 100dvh;
+}
+
+/* Unified dark theme (owner 2026-11-27): bright fills always get dark text; card faces stay light. */
+.bg-am-title,
+.bg-am-green,
+.bg-am-blue,
+.bg-am-hover,
+.bg-am-pink,
+.bg-am-round,
+.bg-am-orange,
+.bg-am-deco-yellow,
+.bg-am-cardface {
+  color: var(--color-on-bright);
+}
+.bg-am-cardface {
+  color: var(--color-card-ink);
+}
+.bg-am-cardface .text-am-muted,
+.bg-am-cardface .text-am-faint {
+  color: var(--color-card-ink-muted);
+}
+.bg-am-cardface .text-am-text {
+  color: var(--color-card-ink);
+}
+.bg-am-cardface .text-am-accent {
+  color: #5b2fb8;
+}
+.bg-am-cardface .text-am-danger-text {
+  color: #b9284a;
+}
+.bg-am-cardface .text-am-success-text {
+  color: #164e35;
+}
+.bg-am-cardface .text-am-info-text {
+  color: #173c55;
+}
+.bg-am-cardface .bg-am-deco-purple {
+  background-color: #e9dfff;
 }

@@ -42,7 +42,7 @@ function AccountActions({ onDone, profilePath }: { onDone: () => void; profilePa
 }
 
 /** Header settings (every page except running EDO tables, which have their own): sound, home, profile, sign out. */
-export function SettingsButton({ profilePath = "/profile" }: { profilePath?: string }) {
+export function SettingsButton({ profilePath = "/me" }: { profilePath?: string }) {
   const { pathname } = useLocation();
   const [open, setOpen] = useState(false);
   if (isTablePath(pathname)) return null;

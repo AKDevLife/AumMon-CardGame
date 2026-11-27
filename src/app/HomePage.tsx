@@ -27,26 +27,11 @@ export function HomePage() {
   const [cards, setCards] = useState(false);
   return (
     <div className="flex flex-1 flex-col justify-center gap-8">
-      <section className="am-sticker relative overflow-hidden bg-am-brand px-6 py-6 text-center text-am-inverse">
-        <span
-          aria-hidden="true"
-          className="absolute -left-6 -top-6 h-14 w-14 rounded-full bg-am-pink/50"
-        />
-        <span
-          aria-hidden="true"
-          className="absolute -bottom-8 -right-6 h-14 w-14 rounded-full bg-am-blue/40"
-        />
-        <h1 className="relative font-display text-5xl font-bold tracking-wide text-am-title">
-          AumMon
-        </h1>
-        <p className="relative mt-2">Game Center · หลายเกม บัญชีเดียว</p>
-      </section>
-
       <section aria-labelledby="edo-title" className="flex flex-col gap-4">
         <div className="text-center">
-          <h2 id="edo-title" className="font-display text-3xl font-bold">
+          <h1 id="edo-title" className="font-display text-3xl font-bold">
             🧸 AumMon Object Battle Card
-          </h2>
+          </h1>
           <p className="text-sm text-am-muted">เกมไพ่ทิ้งให้หมดมือ 2–8 คน · สิ่งของรอบตัวมีชีวิต</p>
         </div>
         <nav aria-label="Game modes" className="flex flex-col gap-4">

@@ -17,13 +17,14 @@ test("sign up → profile → logout → login", async ({ page }) => {
   await page.goto("/edo");
   await page.getByRole("button", { name: "ตั้งค่า" }).click();
   await page.getByRole("link", { name: "โปรไฟล์" }).click();
-  const name = page.getByLabel("ชื่อที่แสดง");
+  await expect(page).toHaveURL("/me");
+  const name = page.getByLabel("ชื่อเล่น");
   await expect(name).toHaveValue("E2E Player");
   await name.fill("Renamed");
-  await page.getByRole("button", { name: "บันทึก" }).click();
-  await expect(page.getByText("บันทึกแล้ว")).toBeVisible();
+  await page.getByRole("button", { name: "บันทึกชื่อเล่น" }).click();
+  await expect(page.getByText("บันทึกชื่อเล่นแล้ว")).toBeVisible();
   await page.reload();
-  await expect(page.getByLabel("ชื่อที่แสดง")).toHaveValue("Renamed");
+  await expect(page.getByLabel("ชื่อเล่น")).toHaveValue("Renamed");
 
   await page.getByRole("button", { name: "ย้อนกลับ" }).click();
   await expect(page).toHaveURL("/edo");

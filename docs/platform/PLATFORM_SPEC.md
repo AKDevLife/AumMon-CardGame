@@ -514,6 +514,8 @@ Orchestrator rules (`flow.ts` + `_shared/game.ts`):
 
 ## 10. UI / UX + theme
 
+> **Owner 2026-11-27:** one dark theme (this palette) for the whole site and both games; card faces stay light; one shell (`src/app/AppLayout.tsx`): AumMon + game name, back / settings / login top right. Tokens: `src/styles/index.css`.
+
 > **APPROVED by owner 2026-11-25** (U1–U3 after prototype review; claim buttons show option text). Extends `docs/platform/PLATFORM_SPEC.md` (Theme A, light, EDO) with a **dark party theme** for v2 / BLUFF. Clickable prototype: `/prototype/bluff` on the Vercel preview (mock data, no backend).
 
 ### 1. Principles
