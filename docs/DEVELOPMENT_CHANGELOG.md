@@ -2,6 +2,12 @@
 
 Newest first. Significant changes only. About 15 entries; older ones are in git history (token-efficiency.md).
 
+## 2026-11-27 — 15.12 automated playtest / 15.13 blocked
+
+- Playwright bots (360×740) played full matches on the playtest URL: 2 p (2.4 min), 4 p (3.5 min), 8 p slow ×1.5 + group (5.0 min). No page errors, no horizontal overflow, tab close/rejoin and AFK rounds recover.
+- 1 of 2,747 `game-view` calls returned 504 during the 8-player run (shown as CORS in the browser); client recovered. Watch.
+- Human Dev data: 4 × 2 p, 1 × 4 p; 2 p claim 23 % / lie 3 %, prediction hit 48 %. 23 items played, ≤ 7 votes each: too few for vote-spread rewrites. 15.13 blocked until human ratings + more matches. No rule or timer change.
+
 ## 2026-11-27 — 16.2 Docs merged (owner)
 
 - One platform spec + roadmap (`docs/platform/`), one spec + roadmap per game (`docs/games/bluff/`, `docs/games/object-battle/`); progress + changelog stay project-wide. `pnpm progress` reads all roadmaps.
