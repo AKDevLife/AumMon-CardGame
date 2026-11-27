@@ -9,4 +9,4 @@ Format: `- [ ] **P.N** task — deps: … — PR #n (date)` · `[ ]` not started
 - [x] **15.4** 2–8 player balance design (2 / 3–4 / 5–8 variants) — deps: 15.3 — PR #121 (2026-11-25)
 - [x] **15.9** Content management design (schema, review flow, first ~150 items drafted) — deps: 15.3 — PR #122 (2026-11-25)
 - [~] **15.12** Closed playtest on real phones (2 / 4 / 8 players) — deps: 15.11 — plan `docs/games/bluff/SPEC.md` §4; automated 2 / 4 / 8 bot run passed (2026-11-27), waiting for human ratings
-- [!] **15.13** Balance & UX iteration — deps: 15.12 — blocked: Dev data too small (6 human matches, 23 items, ≤ 7 votes/item; no 5–8 human match); needs human playtest ratings + more matches
+- [~] **15.13** Balance & UX iteration — deps: 15.12 — done without human data: tie-break shown on the result screen, single failed poll retried silently, playtest report query; balance / timer / item changes wait for human ratings + ≥ 10 votes per item

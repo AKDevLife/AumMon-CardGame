@@ -44,6 +44,7 @@ const base = (view: Record<string, unknown>, extra: Partial<MatchResponse<unknow
     myLock: null,
     scores: [0, 0, 0],
     hits: [0, 0, 0],
+    reads: [0, 0, 0],
     reveal: null,
     placements: null,
     ...view,
@@ -167,5 +168,21 @@ describe("BLUFF game screen", () => {
     expect(ranking.firstElementChild).toHaveTextContent("ฟ้า");
     expect(ranking).toHaveTextContent("อ่านใจถูก 4 ครั้ง");
     expect(screen.getByRole("link", { name: /กลับห้อง/ })).toHaveAttribute("href", "/party/lobby/r1");
+    expect(screen.queryByText(/คะแนนเท่ากัน/)).toBeNull();
+  });
+
+  it("explains a tie-break on equal scores", () => {
+    current = base({
+      phase: "finished",
+      scores: [11, 11, 4],
+      hits: [1, 1, 0],
+      reads: [3, 1, 0],
+      placements: [1, 2, 3],
+    });
+    renderAt("/party/game/m1");
+    const ranking = screen.getByRole("list", { name: "อันดับ" });
+    expect(ranking).toHaveTextContent("หลอก+จริงใจ 3");
+    expect(ranking).toHaveTextContent("หลอก+จริงใจ 1");
+    expect(screen.getByText(/คะแนนเท่ากัน/)).toBeVisible();
   });
 });
