@@ -122,10 +122,10 @@ export function PartyLobby() {
 
   const share = async () => {
     if (!link) return;
-    const text = `มาเล่น BLUFF กัน! โค้ด ${code ?? ""}`;
+    const text = `มาเล่น AumMon BLUFF กัน! โค้ด ${code ?? ""}`;
     try {
       if (typeof navigator.share === "function")
-        await navigator.share({ title: "BLUFF", text, url: link });
+        await navigator.share({ title: "AumMon BLUFF", text, url: link });
       else {
         await navigator.clipboard.writeText(`${text} ${link}`);
         setCopied(true);

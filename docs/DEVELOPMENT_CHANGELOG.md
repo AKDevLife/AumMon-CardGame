@@ -2,6 +2,10 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-27 — BR1–BR2 approved (owner)
+
+- BR2: header and share texts say "AumMon BLUFF". BR1: "AumMon Object Battle Card" = EDO Battle's public name when it returns (internal id `edo_battle` unchanged).
+
 ## 2026-11-27 — Master brand architecture recorded (owner)
 
 - `docs/v2/AumMon_Brand_Architecture.md` (v1.0 draft): AumMon = master brand + multi-game party platform; games AumMon BLUFF, AumMon Object Battle Card; IP actions for the owner; open BR1–BR2. Linked from the spec index.

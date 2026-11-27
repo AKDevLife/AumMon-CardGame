@@ -1,4 +1,4 @@
-# AumMon — Master Brand Architecture (v1.0 draft, owner 2026-11-27)
+# AumMon — Master Brand Architecture (v1.0, owner 2026-11-27; BR1–BR2 approved)
 
 > Source: owner message 2026-11-27. AumMon is the master brand and multi-game party platform, not a single game.
 
@@ -25,7 +25,7 @@
 
 ## 4. Open questions (owner)
 
-| ID  | Question                                                                             | Proposed default                                                               |
-| --- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ |
-| BR1 | Is "AumMon Object Battle Card" the new public name of EDO Battle (deferred, hidden)? | yes — rename display text only when it returns; internal id `edo_battle` stays |
-| BR2 | Show "AumMon BLUFF" (not just "BLUFF") in the app header and share text?             | yes                                                                            |
+| ID     | Question                                                                             | Proposed default                                                               |
+| ------ | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ |
+| BR1 ✅ | Is "AumMon Object Battle Card" the new public name of EDO Battle (deferred, hidden)? | yes — rename display text only when it returns; internal id `edo_battle` stays |
+| BR2 ✅ | Show "AumMon BLUFF" (not just "BLUFF") in the app header and share text?             | yes                                                                            |
