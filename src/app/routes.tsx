@@ -15,14 +15,13 @@ import { MePage } from "../features/party/MePage.tsx";
 import { PartyHome } from "../features/party/PartyHome.tsx";
 import { PartyJoin } from "../features/party/PartyJoin.tsx";
 import { PartyLobby } from "../features/party/PartyLobby.tsx";
-import { PartyShell } from "../features/party/PartyShell.tsx";
 import { AppLayout } from "./AppLayout.tsx";
 import { HomePage } from "./HomePage.tsx";
 import { NotFoundPage } from "./NotFoundPage.tsx";
 
 export const routes: RouteObject[] = [
   {
-    element: <PartyShell />,
+    element: <AppLayout />,
     children: [
       { index: true, element: <GameHub /> },
       { path: "bluff", element: <PartyHome /> },
@@ -30,11 +29,7 @@ export const routes: RouteObject[] = [
       { path: "party/lobby/:roomId", element: <PartyLobby /> },
       { path: "party/game/:matchId", element: <BluffGame /> },
       { path: "me", element: <MePage /> },
-    ],
-  },
-  {
-    element: <AppLayout />,
-    children: [
+
       // AumMon Object Battle Card (EDO Battle, BR1) home; listed on the platform hub.
       { path: "edo", element: <HomePage /> },
       { path: "login", element: <LoginPage /> },
