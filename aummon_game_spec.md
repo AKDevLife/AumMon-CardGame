@@ -16,6 +16,7 @@
 
 | Topic | Document |
 | --- | --- |
+| Brand architecture | [`docs/v2/AumMon_Brand_Architecture.md`](./docs/v2/AumMon_Brand_Architecture.md) |
 | Vision | [`docs/v2/AumMon_Product_Vision.md`](./docs/v2/AumMon_Product_Vision.md) |
 | Strategy | [`docs/v2/AumMon_Product_Strategy.md`](./docs/v2/AumMon_Product_Strategy.md) |
 | MVP requirements (acceptance criteria) | [`docs/v2/AumMon_Product_Requirements.md`](./docs/v2/AumMon_Product_Requirements.md) |

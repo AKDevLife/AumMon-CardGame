@@ -2,6 +2,10 @@
 
 Newest first. Significant changes only.
 
+## 2026-11-27 — Master brand architecture recorded (owner)
+
+- `docs/v2/AumMon_Brand_Architecture.md` (v1.0 draft): AumMon = master brand + multi-game party platform; games AumMon BLUFF, AumMon Object Battle Card; IP actions for the owner; open BR1–BR2. Linked from the spec index.
+
 ## 2026-11-25 — Owner feedback: settings menu, room size, bots (BLUFF)
 
 - Party header gets the settings menu top right again (tap sounds, music, home, profile, sign out); music + tap sounds on party pages.
