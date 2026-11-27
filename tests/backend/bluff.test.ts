@@ -104,7 +104,7 @@ describe.runIf(run)("BLUFF with guests via Edge Functions", () => {
     expect(error).not.toBeNull();
   });
 
-  it("guests cannot use admin; BLUFF has no solo bots", async () => {
+  it("guests cannot use admin; BLUFF solo with bots starts", async () => {
     expect((await a.call("admin-api", { action: "me" })).body["error"]).toBe("account_required");
     expect(
       (await a.call("game-create", { mode: "solo", bots: 2, gameId: "bluff" })).body["error"],
