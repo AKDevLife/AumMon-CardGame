@@ -23,6 +23,7 @@ interface View {
   deadline: string | null;
   view: {
     gameId: string;
+    players: string[];
     phase: string;
     round: number;
     item: { prompt: string; options: string[] } | null;
@@ -103,11 +104,11 @@ describe.runIf(run)("BLUFF with guests via Edge Functions", () => {
     expect(error).not.toBeNull();
   });
 
-  it("guests cannot use admin; BLUFF has no solo bots", async () => {
+  it("guests cannot use admin; BLUFF solo with bots starts", async () => {
     expect((await a.call("admin-api", { action: "me" })).body["error"]).toBe("account_required");
-    expect(
-      (await a.call("game-create", { mode: "solo", bots: 2, gameId: "bluff" })).body["error"],
-    ).toBe("no_bots");
+    const solo = await a.call("game-create", { mode: "solo", bots: 2, gameId: "bluff" });
+    expect(solo.status, JSON.stringify(solo.body)).toBe(200);
+    await a.call("game-leave", { matchId: solo.body["matchId"] });
   });
 
   it("validates room settings", async () => {
@@ -126,7 +127,7 @@ describe.runIf(run)("BLUFF with guests via Edge Functions", () => {
       const created = await a.call("rooms-create", {
         mode: "online",
         gameId: "bluff",
-        maxPlayers: 8,
+        maxPlayers: 3,
         settings: { humor: 2, slow: false, group: false },
       });
       expect(created.status).toBe(200);
@@ -175,6 +176,39 @@ describe.runIf(run)("BLUFF with guests via Edge Functions", () => {
       expect(reveal.view.reveal?.locks.map((l) => l.answer)).toEqual([0, 2, 2]);
       // a: predicted C, Top for a = C → +2 +1 = 3; b/c: Top for them = A,C tie → hit, crowd +1
       expect(reveal.view.scores).toEqual([3, 3, 5]);
+    },
+  );
+
+  it(
+    "one guest can start a 4-seat room: empty seats become bots that decide at once",
+    { timeout: 60_000 },
+    async () => {
+      const solo = await guest("เดี่ยว");
+      const created = await solo.call("rooms-create", {
+        mode: "online",
+        gameId: "bluff",
+        maxPlayers: 4,
+      });
+      const roomId = String(created.body["roomId"]);
+      const start = await solo.call("game-start", { roomId });
+      expect(start.status, JSON.stringify(start.body)).toBe(200);
+      const id = String(start.body["matchId"]);
+      const v = await waitPhase(solo, id, "claim");
+      expect(v.view.players).toHaveLength(4);
+      expect(v.pending).toEqual([0]); // bots already claimed / passed
+      expect((v as unknown as { names: string[] }).names.slice(1)).toEqual([
+        "Bot 1",
+        "Bot 2",
+        "Bot 3",
+      ]);
+      await cmd(solo, v, { type: "pass" });
+      const lock = await waitPhase(solo, id, "lock");
+      expect(lock.pending).toEqual([0]);
+      await cmd(solo, lock, { type: "lock", answer: 1, prediction: 1, wager: 0 });
+      const reveal = await view(solo, id);
+      expect(reveal.view.phase).toBe("reveal");
+      expect(reveal.view.reveal?.locks.every((l) => l.answer !== null)).toBe(true);
+      await solo.call("game-leave", { matchId: id });
     },
   );
 

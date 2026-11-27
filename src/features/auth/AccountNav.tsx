@@ -13,7 +13,7 @@ const menuItem =
   "am-sticker am-pressable flex min-h-11 items-center justify-center gap-2 bg-am-card px-4 py-2 font-display font-semibold";
 
 /** Account actions inside the settings popup (signed-in only). */
-function AccountActions({ onDone }: { onDone: () => void }) {
+function AccountActions({ onDone, profilePath }: { onDone: () => void; profilePath: string }) {
   const auth = useAuth();
   const [error, setError] = useState(false);
   if (auth.mode !== "live" || !auth.session) return null;
@@ -26,7 +26,7 @@ function AccountActions({ onDone }: { onDone: () => void }) {
   return (
     <div className="mt-4 flex flex-col gap-2 border-t-2 border-am-ink/20 pt-4">
       <h3 className="font-display font-bold">บัญชี</h3>
-      <Link to="/profile" onClick={onDone} className={menuItem}>
+      <Link to={profilePath} onClick={onDone} className={menuItem}>
         <span aria-hidden="true">👤</span> โปรไฟล์
       </Link>
       <button type="button" onClick={() => void signOut()} className={menuItem}>
@@ -41,8 +41,8 @@ function AccountActions({ onDone }: { onDone: () => void }) {
   );
 }
 
-/** Header settings (every page except running tables, which have their own): sound, home, profile, sign out. */
-function SettingsButton() {
+/** Header settings (every page except running EDO tables, which have their own): sound, home, profile, sign out. */
+export function SettingsButton({ profilePath = "/profile" }: { profilePath?: string }) {
   const { pathname } = useLocation();
   const [open, setOpen] = useState(false);
   if (isTablePath(pathname)) return null;
@@ -65,7 +65,7 @@ function SettingsButton() {
         <Link to="/" onClick={close} className={`${menuItem} mt-2`}>
           <span aria-hidden="true">🏠</span> หน้าหลัก
         </Link>
-        <AccountActions onDone={close} />
+        <AccountActions onDone={close} profilePath={profilePath} />
       </Popup>
     </>
   );

@@ -212,6 +212,32 @@ function pending(s: BluffState): Seat[] {
   return open === null ? [] : open.flatMap((x, i) => (x === null ? [i] : []));
 }
 
+/**
+ * Medium bot (owner 2026-11-25): uses only public data (claims) — never other seats' locks.
+ * Claim phase: 50 % claims (60 % of those truthful to the answer it will give), 20 % taunt, 30 % pass.
+ * Lock: keeps its claim when it was truthful; predicts the most-claimed option among others
+ * (random if nobody claimed) and wagers 1 only when two or more others agree, else 0.
+ */
+export function bluffBot(s: BluffState, seat: Seat, rng: RandomSource): BluffCommand {
+  const pick = (): Option => rng.nextInt(4) as Option;
+  if (s.phase === "claim") {
+    const r = rng.nextInt(10);
+    if (r < 5) return { type: "claim", option: pick() };
+    if (r < 7) return { type: "taunt", taunt: rng.nextInt(BLUFF_TAUNTS.length) };
+    return { type: "pass" };
+  }
+  const own = s.acts[seat];
+  const answer: Option = own?.kind === "claim" && rng.nextInt(10) < 6 ? own.option : pick();
+  const counts = [0, 0, 0, 0];
+  s.acts.forEach((a, i) => {
+    if (i !== seat && a?.kind === "claim") counts[a.option] = (counts[a.option] ?? 0) + 1;
+  });
+  const max = Math.max(...counts);
+  const best = ([0, 1, 2, 3] as const).filter((k) => counts[k] === max);
+  const prediction: Option = max === 0 ? pick() : (best[rng.nextInt(best.length)] ?? 0);
+  return { type: "lock", answer, prediction, wager: max >= 2 ? 1 : 0 };
+}
+
 export const bluff: GameModule<BluffState, BluffCommand, BluffView, BluffEvent> = {
   id: "bluff",
   rulesetVersion: BLUFF_RULESET_VERSION,
@@ -294,6 +320,7 @@ export const bluff: GameModule<BluffState, BluffCommand, BluffView, BluffEvent> 
     }
   },
   // Timeout = no claim / no answer (not counted, no Crowd), no prediction, wager 0 (Bluff §4).
+  bot: bluffBot,
   timeoutCommands: (s) => (s.phase === "claim" ? [{ type: "pass" }] : [{ type: "lock_default" }]),
   view(s, seat) {
     const own = seat === null ? null : (s.locks[seat] ?? null);

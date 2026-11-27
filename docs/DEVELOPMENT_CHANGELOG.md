@@ -6,6 +6,12 @@ Newest first. Significant changes only.
 
 - `docs/v2/AumMon_Brand_Architecture.md` (v1.0 draft): AumMon = master brand + multi-game party platform; games AumMon BLUFF, AumMon Object Battle Card; IP actions for the owner; open BR1–BR2. Linked from the spec index.
 
+## 2026-11-25 — Owner feedback: settings menu, room size, bots (BLUFF)
+
+- Party header gets the settings menu top right again (tap sounds, music, home, profile, sign out); music + tap sounds on party pages.
+- Create room: host picks 2–8 seats. Host can start with any number of ready humans (even alone); empty seats become **medium bots** (owner decision, replaces Q7 "no bots"): claim 50 % / taunt 20 % / pass 30 %, predict the most-claimed option, wager 1 only on agreement — public data only. Bots score and rank like players; no stats for bots. Bot rows are freed when the room returns to the lobby. AFK humans still get timeout defaults (M2), never a bot takeover.
+- Tests: engine bot tests, backend "one guest + 3 bots" round, web unit for the size picker.
+
 ## 2026-11-25 — 15.12 playtest prepared
 
 - Owner approved all 150 BLUFF items (applied on Dev, audited). Dev smoke: 3 guests start a match, read → claim advances on the server timer.

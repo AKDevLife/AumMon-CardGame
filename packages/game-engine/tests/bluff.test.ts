@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { createSeededRandom } from "../src/rng/seeded-random.ts";
-import { bluff, parseBluffCommand, type BluffSetup } from "../src/bluff/module.ts";
+import { bluff, bluffBot, parseBluffCommand, type BluffSetup } from "../src/bluff/module.ts";
 import { placements, scoreRound, type SeatInput } from "../src/bluff/scoring.ts";
 import { advance, GameRuleError, InvalidCommandError, type Kind } from "../src/sdk/index.ts";
 
@@ -132,5 +132,39 @@ describe("BLUFF module", () => {
     expect(s.scores).toEqual([24, 18, 0]); // seat2: −1 wager +1 crowd per round
     expect(bluff.result(s)?.winners).toEqual([0]);
     expect(bluff.view(s, null).placements).toEqual([1, 2, 3]);
+  });
+
+  it("bots fill seats: they claim, lock legal commands and finish a match with one human", () => {
+    const kinds: Kind[] = ["human", "bot", "bot", "bot"];
+    let rt = {
+      state: bluff.start(["h", "b1", "b2", "b3"], rng(), setup()).state,
+      rng: rng().getState(),
+      deadline: null as number | null,
+      timeouts: [0, 0, 0, 0],
+    };
+    let now = 0;
+    for (let i = 0; i < 60 && !bluff.isFinished(rt.state); i++) {
+      rt = advance(bluff, rt, kinds, now, "online");
+      expect(rt.state.acts.slice(1).every((a) => rt.state.phase !== "claim" || a !== null)).toBe(
+        true,
+      );
+      now = rt.deadline ?? now;
+    }
+    expect(bluff.isFinished(rt.state)).toBe(true);
+    expect(rt.state.history.every((h) => h.locks.slice(1).every((l) => l.answer !== null))).toBe(
+      true,
+    );
+  });
+
+  it("the bot reads only public claims (its command ignores other seats' locks)", () => {
+    let s = bluff.start(["a", "b", "c"], rng(), setup()).state;
+    s = bluff.tick?.(s, rng()).state ?? s;
+    s = bluff.apply(s, 0, { type: "claim", option: 2 }, rng()).state;
+    s = bluff.apply(s, 1, { type: "claim", option: 2 }, rng()).state;
+    s = bluff.apply(s, 2, { type: "pass" }, rng()).state;
+    const a = bluff.apply(s, 0, { type: "lock", answer: 0, prediction: 0, wager: 0 }, rng()).state;
+    const b = bluff.apply(s, 0, { type: "lock", answer: 3, prediction: 1, wager: 2 }, rng()).state;
+    expect(bluffBot(a, 2, rng())).toEqual(bluffBot(b, 2, rng()));
+    expect(bluffBot(a, 2, rng())).toMatchObject({ type: "lock", prediction: 2, wager: 1 });
   });
 });

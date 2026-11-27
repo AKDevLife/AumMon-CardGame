@@ -89,7 +89,7 @@ export function advance<S, C, V, E extends { readonly type: string }>(
   now: number,
   mode: Mode = "solo",
 ): Runtime<S> & { events: E[] } {
-  if (game.pendingSeats) return advanceSimultaneous(game, input, kinds, now, mode);
+  if (game.pendingSeats) return advanceSimultaneous(game, input, kinds, now);
   const rng = createSeededRandom(input.rng);
   let { state, deadline } = input;
   const seats = seatCountOf(game, state);
@@ -153,7 +153,6 @@ function advanceSimultaneous<S, C, V, E extends { readonly type: string }>(
   input: Runtime<S>,
   kinds: readonly Kind[],
   now: number,
-  mode: Mode,
 ): Runtime<S> & { events: E[] } {
   const rng = createSeededRandom(input.rng);
   let { state, deadline } = input;
@@ -161,9 +160,9 @@ function advanceSimultaneous<S, C, V, E extends { readonly type: string }>(
   const timeouts = Array.from({ length: seats }, (_, i) => input.timeouts[i] ?? 0);
   const events: E[] = [];
   const key = (s: S) => `${String(game.isFinished(s))}:${game.timerKey(s)}`;
-  // Without bots an AFK seat keeps getting timeout defaults instead of a bot takeover (M2).
-  const kindAt = (seat: Seat) =>
-    (game.bot ? effectiveKinds(kinds, timeouts, mode, game.afkTimeouts) : kinds)[seat];
+  // Simultaneous games: an AFK human keeps getting timeout defaults, never a bot takeover (M2);
+  // only real bot seats (filled seats, players who left) are played by the server.
+  const kindAt = (seat: Seat) => kinds[seat];
   const run = (seat: Seat, command: C) => {
     const t = game.apply(state, seat, command, rng);
     state = t.state;
